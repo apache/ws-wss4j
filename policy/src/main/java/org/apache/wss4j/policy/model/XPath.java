@@ -64,7 +64,7 @@ public class XPath {
     public Map<String, String> getPrefixNamespaceMap() {
         return prefixNamespaceMap;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -73,7 +73,7 @@ public class XPath {
         if (!(object instanceof XPath)) {
             return false;
         }
-        
+
         XPath that = (XPath)object;
         if (xPath != null && !xPath.equals(that.xPath)
             || xPath == null && that.xPath != null) {
@@ -86,10 +86,10 @@ public class XPath {
             || filter == null && that.filter != null) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -102,7 +102,7 @@ public class XPath {
         if (filter != null) {
             result = 31 * result + filter.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 }

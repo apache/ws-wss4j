@@ -79,7 +79,7 @@ public final class OpenSAMLUtil {
             ConfigurationService.setConfiguration(configuration);
 
             XMLObjectProviderRegistry providerRegistry = new XMLObjectProviderRegistry();
-            configuration.register(XMLObjectProviderRegistry.class, providerRegistry, 
+            configuration.register(XMLObjectProviderRegistry.class, providerRegistry,
                                    ConfigurationService.DEFAULT_PARTITION_NAME);
 
             try {
@@ -87,7 +87,7 @@ public final class OpenSAMLUtil {
 
                 SAMLConfiguration samlConfiguration = new SAMLConfiguration();
 
-                configuration.register(SAMLConfiguration.class, samlConfiguration, 
+                configuration.register(SAMLConfiguration.class, samlConfiguration,
                                        ConfigurationService.DEFAULT_PARTITION_NAME);
 
                 builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();

@@ -70,7 +70,7 @@ import org.w3c.dom.NodeList;
  * A class to encrypt references.
  */
 public class Encryptor {
-    
+
     private Document doc;
     private WSSecHeader securityHeader;
     private WsuIdAllocator idAllocator;
@@ -132,7 +132,7 @@ public class Encryptor {
             if (expandXopInclude) {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     Element encrElement = elementToEncrypt;
-                    
+
                     // Look for xop:Include Nodes
                     List<Element> includeElements =
                         XMLUtils.findElements(elementToEncrypt.getFirstChild(), "Include", WSConstants.XOP_NS);
@@ -154,10 +154,10 @@ public class Encryptor {
                                 String xopURI = includeElement.getAttributeNS(null, "href");
                                 if (xopURI != null) {
                                     // Delete the attachment
-                                    
+
                                     AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
                                     attachmentRequestCallback.setAttachmentId(WSSecurityUtil.getAttachmentId(xopURI));
-                                    
+
                                     try {
                                         attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
                                     } catch (UnsupportedCallbackException | IOException e) {
@@ -167,7 +167,7 @@ public class Encryptor {
                             }
                         }
                     }
-                    
+
                     if (storeBytesInAttachment) {
                         try {
                             String id =
@@ -214,26 +214,26 @@ public class Encryptor {
 
         return encDataRef;
     }
-    
+
     private Element findMatchingExpandedElement(Element element) {
         Element matchingElement = null;
-        
+
         if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
             String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
             matchingElement = wsDocInfo.getTokenElement(id);
         }
-        
+
         if (matchingElement == null && element.hasAttributeNS(null, "Id")) {
             String id = element.getAttributeNS(null, "Id");
             matchingElement = wsDocInfo.getTokenElement(id);
         }
-        
+
         // Check the Elements are the same
         if (matchingElement != null && matchingElement.getNamespaceURI().equals(element.getNamespaceURI())
             && matchingElement.getLocalName().equals(element.getLocalName())) {
             return matchingElement;
         }
-        
+
         return null;
     }
 
@@ -290,7 +290,7 @@ public class Encryptor {
             if (null != children) {
                 serializedOctets = serializer.serializeToByteArray(children);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION,
                                               "Element has no content.");
             }
         } else {
@@ -427,10 +427,10 @@ public class Encryptor {
         String jceAlgorithm = JCEMapper.translateURItoJCEID(encryptionAlgorithm);
         try {
             Cipher cipher = Cipher.getInstance(jceAlgorithm);
-            
+
             int ivLen = JCEMapper.getIVLengthFromURI(encryptionAlgorithm) / 8;
             byte[] iv = XMLSecurityConstants.generateBytes(ivLen);
-            AlgorithmParameterSpec paramSpec = 
+            AlgorithmParameterSpec paramSpec =
                 XMLCipherUtil.constructBlockCipherParameters(encryptionAlgorithm, iv, Encryptor.class);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
 

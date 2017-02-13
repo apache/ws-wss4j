@@ -177,7 +177,7 @@ public class UsernameTokenValidator implements Validator {
         if (usernameToken.isHashed()) {
             String passDigest;
             if (passwordsAreEncoded) {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, 
+                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime,
                                                             Base64.getMimeDecoder().decode(origPassword));
             } else {
                 passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);

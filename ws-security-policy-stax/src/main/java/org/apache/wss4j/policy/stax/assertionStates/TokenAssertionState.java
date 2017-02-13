@@ -129,13 +129,13 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
             } else if (WSSecurityTokenConstants.TokenUsage_Encryption.equals(tokenUsage)) {
                 throw new WSSPolicyException("Illegal token usage!");
-            } else if (WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
+            } else if (WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage)
+                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage)
                 || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage)
             ) {
 

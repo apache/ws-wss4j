@@ -72,7 +72,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     public boolean equal(PolicyComponent policyComponent) {
         return policyComponent == this;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -81,7 +81,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         if (!(object instanceof AbstractSecurityAssertion)) {
             return false;
         }
-        
+
         AbstractSecurityAssertion that = (AbstractSecurityAssertion)object;
         if (isOptional != that.isOptional) {
             return false;
@@ -89,15 +89,15 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         if (isIgnorable != that.isIgnorable) {
             return false;
         }
-        
+
         if (version != null && !version.equals(that.version)
             || version == null && that.version != null) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -106,10 +106,10 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         }
         result = 31 * result + Boolean.hashCode(isOptional);
         result = 31 * result + Boolean.hashCode(isIgnorable);
-        
+
         return result;
     }
-    
+
     @Override
     public PolicyComponent normalize() {
         if (normalized == null) {
@@ -185,13 +185,13 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_IGNORABLE, "true");
         }
         nestedPolicy.serialize(writer);

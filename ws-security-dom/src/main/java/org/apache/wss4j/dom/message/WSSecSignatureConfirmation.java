@@ -38,7 +38,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     public WSSecSignatureConfirmation(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecSignatureConfirmation(Document doc) {
         super(doc);
     }

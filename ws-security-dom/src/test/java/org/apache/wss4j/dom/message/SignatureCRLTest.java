@@ -92,7 +92,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -126,7 +126,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -164,7 +164,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);

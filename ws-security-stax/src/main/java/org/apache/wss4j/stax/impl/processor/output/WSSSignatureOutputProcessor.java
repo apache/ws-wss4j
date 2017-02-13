@@ -73,7 +73,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
         throws XMLStreamException, XMLSecurityException {
         if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
             XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
@@ -289,7 +289,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
 
-        InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) 
+        InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement)
             throws XMLSecurityException {
             super(signaturePartDef, xmlSecStartElement);
             this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());

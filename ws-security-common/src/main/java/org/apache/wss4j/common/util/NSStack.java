@@ -87,7 +87,7 @@ public class NSStack {
             // Reset the currentDefaultNS to ignore the frame just removed.
             currentDefaultNS = top;
             while (currentDefaultNS > 0) {
-                if (stack[currentDefaultNS] != null 
+                if (stack[currentDefaultNS] != null
                     && stack[currentDefaultNS].getPrefix().length() == 0) {
                     break;
                 }
@@ -205,7 +205,7 @@ public class NSStack {
 
         // If defaults are OK, and the given NS is the current default,
         // return "" as the prefix to favor defaults where possible.
-        if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null 
+        if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null
             && namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI())) {
             return "";
         }

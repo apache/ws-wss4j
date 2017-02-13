@@ -171,7 +171,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
                     signatureType.getKeyInfo(), WSSecurityTokenConstants.KeyUsage_Signature_Verification,
                     securityProperties, inboundSecurityContext);
 
-            SignatureTokenValidator signatureTokenValidator = 
+            SignatureTokenValidator signatureTokenValidator =
                 ((WSSSecurityProperties) securityProperties).getValidator(WSSConstants.TAG_dsig_Signature);
             if (signatureTokenValidator == null) {
                 signatureTokenValidator = new SignatureTokenValidatorImpl();

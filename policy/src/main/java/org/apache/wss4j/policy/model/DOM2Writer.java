@@ -38,7 +38,7 @@ final class DOM2Writer {
     public static final char NL = '\n';
     public static final String LS = System.getProperty("line.separator",
             Character.valueOf(NL).toString());
-    
+
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
 
@@ -241,7 +241,7 @@ final class DOM2Writer {
                                            PrintWriter out) {
         String namespaceURI = node.getNamespaceURI();
         String prefix = node.getPrefix();
-        if (!(namespaceURI.equals(XMLNS_NS) && prefix.equals("xmlns")) 
+        if (!(namespaceURI.equals(XMLNS_NS) && prefix.equals("xmlns"))
             && !(namespaceURI.equals(XML_NS) && prefix.equals("xml"))) {
             if (getNamespace(prefix, owner) == null) {
                 out.print(" xmlns:" + prefix + "=\"" + namespaceURI + '\"');
@@ -280,7 +280,7 @@ final class DOM2Writer {
             }
         }
     }
-    
+
     private static String getNamespace(String prefix, Node e) {
         while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
             Attr attr = null;

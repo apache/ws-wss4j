@@ -35,7 +35,7 @@ public class WSSecurityException extends XMLSecurityException {
      * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
      */
 
-    public static final String NS_WSSE10 = 
+    public static final String NS_WSSE10 =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
     /**

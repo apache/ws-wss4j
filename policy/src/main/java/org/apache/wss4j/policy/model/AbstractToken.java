@@ -79,7 +79,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -88,7 +88,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         if (!(object instanceof AbstractToken)) {
             return false;
         }
-        
+
         AbstractToken that = (AbstractToken)object;
         if (includeTokenType != that.includeTokenType
             || derivedKeys != that.derivedKeys) {
@@ -98,30 +98,30 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
             || issuerName == null && that.issuerName != null) {
             return false;
         }
-        
+
         if (issuer == null && that.issuer != null
             || issuer != null && issuer == null) {
             return false;
         }
-        
-        if (issuer != null 
+
+        if (issuer != null
             && !DOM2Writer.nodeToString(issuer).equals(DOM2Writer.nodeToString(that.issuer))) {
             return false;
         }
-        
+
         if (claims == null && that.claims != null
             || claims != null && claims == null) {
             return false;
         }
-        
-        if (claims != null 
+
+        if (claims != null
             && !DOM2Writer.nodeToString(claims).equals(DOM2Writer.nodeToString(that.claims))) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -134,14 +134,14 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         if (issuerName != null) {
             result = 31 * result + issuerName.hashCode();
         }
-        
+
         if (issuer != null) {
             result = 31 * result + DOM2Writer.nodeToString(issuer).hashCode();
         }
         if (claims != null) {
             result = 31 * result + DOM2Writer.nodeToString(claims).hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 

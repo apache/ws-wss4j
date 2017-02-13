@@ -62,12 +62,12 @@ public class DsaKeyValueSecurityTokenImpl
     public Subject getSubject() throws WSSecurityException {
         return null;
     }
-    
+
     @Override
     public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                       String correlationID) throws XMLSecurityException {
         PublicKey publicKey = getPublicKey();
-        
+
         try {
             return crypto.getPrivateKey(publicKey, callbackHandler);
         } catch (WSSecurityException ex) {

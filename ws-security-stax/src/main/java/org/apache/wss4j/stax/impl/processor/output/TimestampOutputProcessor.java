@@ -66,7 +66,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
             final QName headerElementName = WSSConstants.TAG_WSU_TIMESTAMP;
             OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-            XMLGregorianCalendar created = 
+            XMLGregorianCalendar created =
                 WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
             GregorianCalendar expiresCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));

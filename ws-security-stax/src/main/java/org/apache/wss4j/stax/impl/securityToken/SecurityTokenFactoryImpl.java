@@ -92,32 +92,32 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
             if (securityTokenReferenceType != null) {
-                return getSecurityToken(securityTokenReferenceType, crypto, 
+                return getSecurityToken(securityTokenReferenceType, crypto,
                                         ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext,
                                         ((WSSSecurityProperties)securityProperties));
             }
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
             if (keyValueType != null) {
-                return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), 
+                return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
                                         inboundSecurityContext,
                                         ((WSSSecurityProperties)securityProperties));
             }
 
         } else if (crypto != null && crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityTokenImpl(
-                    (WSInboundSecurityContext) inboundSecurityContext, crypto, 
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto,
                     ((WSSSecurityProperties)securityProperties).getCallbackHandler(), crypto.getDefaultX509Identifier(),
-                    crypto.getDefaultX509Identifier(), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, 
+                    crypto.getDefaultX509Identifier(), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo,
                     ((WSSSecurityProperties)securityProperties)
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
     }
 
-    public static InboundSecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType, 
+    public static InboundSecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType,
                                                         Crypto crypto,
-                                                        final CallbackHandler callbackHandler, 
+                                                        final CallbackHandler callbackHandler,
                                                         InboundSecurityContext inboundSecurityContext,
                                                         WSSSecurityProperties securityProperties)
             throws XMLSecurityException {
@@ -143,7 +143,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
             if (x509DataType != null) {
-                InboundSecurityToken securityToken = 
+                InboundSecurityToken securityToken =
                     getSecurityToken(x509DataType, securityTokenReferenceType.getId(), crypto, callbackHandler,
                                      inboundSecurityContext, securityProperties);
                 if (securityToken != null) {
@@ -158,8 +158,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final KeyIdentifierType keyIdentifierType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
             if (keyIdentifierType != null) {
-                InboundSecurityToken securityToken = 
-                    getSecurityToken(keyIdentifierType, securityTokenReferenceType.getId(), tokenType, crypto, 
+                InboundSecurityToken securityToken =
+                    getSecurityToken(keyIdentifierType, securityTokenReferenceType.getId(), tokenType, crypto,
                                      callbackHandler, inboundSecurityContext, securityProperties);
                 if (securityToken != null) {
                     return securityToken;
@@ -181,9 +181,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     private static InboundSecurityToken getSecurityToken(X509DataType x509DataType,
                                                          String securityTokenReferenceId,
                                                          Crypto crypto,
-                                                         final CallbackHandler callbackHandler, 
+                                                         final CallbackHandler callbackHandler,
                                                          InboundSecurityContext inboundSecurityContext,
-                                                         WSSSecurityProperties securityProperties) 
+                                                         WSSSecurityProperties securityProperties)
                                                              throws XMLSecurityException {
         //Issuer Serial
         X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
@@ -200,7 +200,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
                     final X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
                     Principal principal = new X500Principal(x509IssuerSerialType.getX509IssuerName());
-                    if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0 
+                    if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0
                         && x509Certificate.getIssuerX500Principal().equals(principal)) {
                         return createSecurityTokenProxy(inboundSecurityToken,
                                 WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
@@ -233,17 +233,17 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
                     x509CertificateBytes, securityTokenReferenceId, securityProperties);
         }
-        
+
         return null;
     }
-    
+
     private static InboundSecurityToken getSecurityToken(KeyIdentifierType keyIdentifierType,
                                                          String securityTokenReferenceId,
                                                          String tokenType,
                                                          Crypto crypto,
-                                                         final CallbackHandler callbackHandler, 
+                                                         final CallbackHandler callbackHandler,
                                                          InboundSecurityContext inboundSecurityContext,
-                                                         WSSSecurityProperties securityProperties) 
+                                                         WSSSecurityProperties securityProperties)
                                                              throws XMLSecurityException {
         String valueType = keyIdentifierType.getValueType();
         if (valueType == null) {
@@ -309,7 +309,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
             if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
-            } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) 
+            } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType)
                 && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
             }
@@ -342,7 +342,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
                     InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
                     if (inboundSecurityToken instanceof KerberosServiceSecurityToken) {
-                        KerberosServiceSecurityToken kerberosSecurityToken = 
+                        KerberosServiceSecurityToken kerberosSecurityToken =
                             (KerberosServiceSecurityToken)inboundSecurityToken;
                         byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
                         if (Arrays.equals(tokenDigest, binaryContent)) {
@@ -363,14 +363,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
             ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3063);
         }
-        
+
         return null;
     }
-    
+
     private static InboundSecurityToken getSecurityToken(org.apache.wss4j.binding.wss10.ReferenceType referenceType,
                                                          String tokenType,
                                                          InboundSecurityContext inboundSecurityContext,
-                                                         WSSSecurityProperties securityProperties) 
+                                                         WSSSecurityProperties securityProperties)
                                                              throws XMLSecurityException {
         String uri = referenceType.getURI();
         if (uri == null) {
@@ -447,17 +447,17 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
                 }
-            } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(samlTokenType) 
+            } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(samlTokenType)
                 && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
             }
         }
-        
+
 
         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                 WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
     }
-    
+
     public static InboundSecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext,
                                                  WSSSecurityProperties securityProperties)

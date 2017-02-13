@@ -71,7 +71,7 @@ public class X509Token extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getX509Token();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -80,7 +80,7 @@ public class X509Token extends AbstractToken {
         if (!(object instanceof X509Token)) {
             return false;
         }
-        
+
         X509Token that = (X509Token)object;
         if (tokenType != that.tokenType) {
             return false;
@@ -91,10 +91,10 @@ public class X509Token extends AbstractToken {
             || requireThumbprintReference != that.requireThumbprintReference) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -105,7 +105,7 @@ public class X509Token extends AbstractToken {
         result = 31 * result + Boolean.hashCode(requireIssuerSerialReference);
         result = 31 * result + Boolean.hashCode(requireEmbeddedTokenReference);
         result = 31 * result + Boolean.hashCode(requireThumbprintReference);
-        
+
         return 31 * result + super.hashCode();
     }
 

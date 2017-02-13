@@ -62,7 +62,7 @@ public class SamlToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getSamlToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -71,7 +71,7 @@ public class SamlToken extends AbstractToken {
         if (!(object instanceof SamlToken)) {
             return false;
         }
-        
+
         SamlToken that = (SamlToken)object;
         if (requireKeyIdentifierReference != that.requireKeyIdentifierReference) {
             return false;
@@ -79,10 +79,10 @@ public class SamlToken extends AbstractToken {
         if (samlTokenType != that.samlTokenType) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -90,13 +90,13 @@ public class SamlToken extends AbstractToken {
             result = 31 * result + samlTokenType.hashCode();
         }
         result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
-        
+
         return 31 * result + super.hashCode();
     }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SamlToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), 
+        return new SamlToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(),
                              getClaims(), nestedPolicy);
     }
 
@@ -119,8 +119,8 @@ public class SamlToken extends AbstractToken {
                     samlToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                
-                QName requireKeyIdentifierRef = 
+
+                QName requireKeyIdentifierRef =
                     getVersion().getSPConstants().getRequireKeyIdentifierReference();
                 if (requireKeyIdentifierRef.getLocalPart().equals(assertionName)
                     && requireKeyIdentifierRef.getNamespaceURI().equals(assertionNamespace)) {

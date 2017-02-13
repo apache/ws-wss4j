@@ -68,7 +68,7 @@ public class STRSignatureTest extends org.junit.Assert {
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
 
@@ -116,7 +116,7 @@ public class STRSignatureTest extends org.junit.Assert {
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
 
@@ -173,7 +173,7 @@ public class STRSignatureTest extends org.junit.Assert {
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
 
@@ -225,7 +225,7 @@ public class STRSignatureTest extends org.junit.Assert {
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
 

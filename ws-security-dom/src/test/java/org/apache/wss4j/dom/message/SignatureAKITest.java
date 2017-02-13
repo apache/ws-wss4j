@@ -62,7 +62,7 @@ public class SignatureAKITest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -89,7 +89,7 @@ public class SignatureAKITest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);

@@ -75,13 +75,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private boolean embedEncryptedKey;
 
     private List<Element> attachmentEncryptedDataElements;
-    
+
     private Serializer encryptionSerializer;
-    
+
     public WSSecEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecEncrypt(Document doc) {
         super(doc);
     }
@@ -157,7 +157,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *
      * This is a convenience method and for backward compatibility. The method
      * calls the single function methods in order to perform a <i>one shot
-     * encryption</i>. 
+     * encryption</i>.
      *
      * @param crypto an instance of the Crypto API to handle keystore and Certificates
      * @return the SOAP envelope with encrypted Body as <code>Document</code>
@@ -197,7 +197,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         return encryptForRef(null, getParts());
     }
-    
+
     /**
      * Encrypt one or more parts or elements of the message.
      *
@@ -228,7 +228,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider
         //so create a new secretKeySpec to make everybody happy.
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
-        
+
         Encryptor encryptor = new Encryptor();
         encryptor.setDoc(getDocument());
         encryptor.setSecurityHeader(getSecurityHeader());

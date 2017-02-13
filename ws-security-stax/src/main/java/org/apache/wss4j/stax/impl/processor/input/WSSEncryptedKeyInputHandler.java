@@ -44,8 +44,8 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         org.slf4j.LoggerFactory.getLogger(WSSEncryptedKeyInputHandler.class);
 
     @Override
-    public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, 
-                       XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) 
+    public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType,
+                       XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties)
         throws XMLSecurityException {
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
 

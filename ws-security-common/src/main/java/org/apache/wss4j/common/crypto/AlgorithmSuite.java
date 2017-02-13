@@ -29,22 +29,22 @@ import java.util.Set;
  * match the appropriate algorithm stored in this class.
  */
 public class AlgorithmSuite {
-    
+
     private Set<String> signatureMethods = Collections.emptySet();
     private Set<String> c14nAlgorithms = Collections.emptySet();
     private Set<String> digestAlgorithms = Collections.emptySet();
     private Set<String> transformAlgorithms = Collections.emptySet();
-    
+
     private Set<String> encryptionMethods = Collections.emptySet();
     private Set<String> keyWrapAlgorithms = Collections.emptySet();
-    
+
     private Set<String> derivedKeyAlgorithms = Collections.emptySet();
-    
+
     private int maximumSymmetricKeyLength = 256;
     private int minimumSymmetricKeyLength = 128;
     private int maximumAsymmetricKeyLength = 4096;
     private int minimumAsymmetricKeyLength = 1024;
-    
+
     private int signatureDerivedKeyLength;
     private int encryptionDerivedKeyLength;
 
@@ -54,73 +54,73 @@ public class AlgorithmSuite {
         }
         signatureMethods.add(signatureMethod);
     }
-    
+
     public Set<String> getSignatureMethods() {
         return signatureMethods;
     }
-    
+
     public void addC14nAlgorithm(String c14nAlgorithm) {
         if (c14nAlgorithms.isEmpty()) {
             c14nAlgorithms = new HashSet<>();
         }
         c14nAlgorithms.add(c14nAlgorithm);
     }
-    
+
     public Set<String> getC14nAlgorithms() {
         return c14nAlgorithms;
     }
-    
+
     public void addDigestAlgorithm(String digestAlgorithm) {
         if (digestAlgorithms.isEmpty()) {
             digestAlgorithms = new HashSet<>();
         }
         digestAlgorithms.add(digestAlgorithm);
     }
-    
+
     public Set<String> getDigestAlgorithms() {
         return digestAlgorithms;
     }
-    
+
     public void addTransformAlgorithm(String transformAlgorithm) {
         if (transformAlgorithms.isEmpty()) {
             transformAlgorithms = new HashSet<>();
         }
         transformAlgorithms.add(transformAlgorithm);
     }
-    
+
     public Set<String> getTransformAlgorithms() {
         return transformAlgorithms;
     }
-    
+
     public void addEncryptionMethod(String encryptionMethod) {
         if (encryptionMethods.isEmpty()) {
             encryptionMethods = new HashSet<>();
         }
         encryptionMethods.add(encryptionMethod);
     }
-    
+
     public Set<String> getEncryptionMethods() {
         return encryptionMethods;
     }
-    
+
     public void addKeyWrapAlgorithm(String keyWrapAlgorithm) {
         if (keyWrapAlgorithms.isEmpty()) {
             keyWrapAlgorithms = new HashSet<>();
         }
         keyWrapAlgorithms.add(keyWrapAlgorithm);
     }
-    
+
     public Set<String> getKeyWrapAlgorithms() {
         return keyWrapAlgorithms;
     }
-    
+
     public void addDerivedKeyAlgorithm(String derivedKeyAlgorithm) {
         if (derivedKeyAlgorithms.isEmpty()) {
             derivedKeyAlgorithms = new HashSet<>();
         }
         derivedKeyAlgorithms.add(derivedKeyAlgorithm);
     }
-    
+
     public Set<String> getDerivedKeyAlgorithms() {
         return derivedKeyAlgorithms;
     }

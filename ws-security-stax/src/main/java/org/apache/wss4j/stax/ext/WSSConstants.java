@@ -99,9 +99,9 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_WSU_CREATED = new QName(NS_WSU10, "Created", PREFIX_WSU);
     public static final QName TAG_WSU_EXPIRES = new QName(NS_WSU10, "Expires", PREFIX_WSU);
 
-    public static final String NS10_SOAPMESSAGE_SECURITY = 
+    public static final String NS10_SOAPMESSAGE_SECURITY =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String NS11_SOAPMESSAGE_SECURITY = 
+    public static final String NS11_SOAPMESSAGE_SECURITY =
         "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
 
     public static final String NS_X509TOKEN_PROFILE =
@@ -123,7 +123,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_WSSE11_SALT = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
     public static final QName TAG_WSSE11_ITERATION = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
 
-    public static final String NS_USERNAMETOKEN_PROFILE11 = 
+    public static final String NS_USERNAMETOKEN_PROFILE11 =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE11 + "#PasswordDigest";
     public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE11 + "#PasswordText";

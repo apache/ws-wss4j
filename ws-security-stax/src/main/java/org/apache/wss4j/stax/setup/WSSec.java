@@ -168,7 +168,7 @@ public class WSSec {
      * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
-    public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) 
+    public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties)
         throws WSSConfigurationException {
         if (securityProperties.getActions() == null || securityProperties.getActions().isEmpty()) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
@@ -245,7 +245,7 @@ public class WSSec {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
                 checkDefaultSecureParts(true, securityProperties);
-            } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action) 
+            } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)
                 && securityProperties.getSamlCallbackHandler() == null) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSAMLCallbackHandler");
             } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
@@ -280,7 +280,7 @@ public class WSSec {
         }
         return new WSSSecurityProperties(securityProperties);
     }
-    
+
     private static void checkOutboundSignatureProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
             if (securityProperties.getSignatureKeyStore() == null
@@ -309,7 +309,7 @@ public class WSSec {
         }
         checkDefaultSecureParts(true, securityProperties);
     }
-    
+
     private static void checkOutboundSignatureDerivedProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getCallbackHandler() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -349,7 +349,7 @@ public class WSSec {
         }
         checkDefaultSecureParts(true, securityProperties);
     }
-    
+
     private static void checkOutboundEncryptionProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getEncryptionUseThisCertificate() == null
             && securityProperties.getEncryptionKeyStore() == null
@@ -379,8 +379,8 @@ public class WSSec {
         }
         checkDefaultSecureParts(false, securityProperties);
     }
-    
-    private static void checkOutboundEncryptionDerivedProperties(WSSSecurityProperties securityProperties) 
+
+    private static void checkOutboundEncryptionDerivedProperties(WSSSecurityProperties securityProperties)
         throws WSSConfigurationException {
         if (securityProperties.getCallbackHandler() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -451,7 +451,7 @@ public class WSSec {
      * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
-    public static WSSSecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(WSSSecurityProperties securityProperties) 
+    public static WSSSecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(WSSSecurityProperties securityProperties)
         throws WSSConfigurationException {
         return new WSSSecurityProperties(securityProperties);
     }
@@ -496,15 +496,15 @@ public class WSSec {
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema-11.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig11-schema.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd", 
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd",
                                                                               WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd", 
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd",
                                                                               WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd", 
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd",
                                                                               WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-200502.xsd", 
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-200502.xsd",
                                                                               WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-1.3.xsd", 
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-1.3.xsd",
                                                                               WSSec.class)),
                 }
         );

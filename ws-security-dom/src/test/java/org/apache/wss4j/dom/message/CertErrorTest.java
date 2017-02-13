@@ -51,7 +51,7 @@ public class CertErrorTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("bob", "security");
         try {
@@ -71,7 +71,7 @@ public class CertErrorTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("alice");
         try {

@@ -155,7 +155,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches, includeSTR);
 
-                final SAMLSecurityTokenProvider securityTokenProvider = 
+                final SAMLSecurityTokenProvider securityTokenProvider =
                     new SAMLSecurityTokenProvider(samlKeyInfo, samlCallback, tokenId, ref,
                                                   finalSAMLTokenOutputProcessor);
 
@@ -226,7 +226,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
         outputProcessorChain.processEvent(xmlSecEvent);
     }
-    
+
     private GenericOutboundSecurityToken getSecurityToken(SAMLCallback samlCallback,
                                               OutputProcessorChain outputProcessorChain) throws WSSecurityException {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -271,17 +271,17 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
         };
 
-        outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, 
+        outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId,
                                                                                 securityTokenProvider);
-        outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+        outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
                                                       binarySecurityTokenId);
 
         return bstSecurityToken;
     }
-    
-    private SAMLKeyInfo getSamlKeyInfo(SAMLCallback samlCallback) 
+
+    private SAMLKeyInfo getSamlKeyInfo(SAMLCallback samlCallback)
         throws WSSConfigurationException, WSSecurityException {
-        
+
         final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo();
 
         SubjectBean subjectBean = samlCallback.getSubject();
@@ -317,10 +317,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             }
         }
-        
+
         return samlKeyInfo;
     }
-    
+
     private static class SAMLSecurityTokenProvider
         implements SecurityTokenProvider<OutboundSecurityToken> {
 
@@ -330,7 +330,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private String tokenId;
         private Element ref;
         private FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
-        
+
         SAMLSecurityTokenProvider(SAMLKeyInfo samlKeyInfo, SAMLCallback samlCallback, String tokenId,
                                          Element ref, FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor) {
             this.samlKeyInfo = samlKeyInfo;
@@ -339,14 +339,14 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             this.ref = ref;
             this.finalSAMLTokenOutputProcessor = finalSAMLTokenOutputProcessor;
         }
-    
+
         @Override
         public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
-    
+
             if (this.samlSecurityToken != null) {
                 return this.samlSecurityToken;
             }
-    
+
             WSSecurityTokenConstants.TokenType tokenType;
             if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_10) {
                 tokenType = WSSecurityTokenConstants.SAML_10_TOKEN;
@@ -361,10 +361,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 this.samlSecurityToken = new GenericOutboundSecurityToken(
                         tokenId, tokenType) {
-    
+
                     @Override
                     public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-    
+
                         Key key;
                         try {
                             key = super.getSecretKey(algorithmURI);
@@ -387,7 +387,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             this.samlSecurityToken.setCustomTokenReference(ref);
             return this.samlSecurityToken;
         }
-    
+
         @Override
         public String getId() {
             return tokenId;
@@ -459,8 +459,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         private boolean includeBST() {
-            if (senderVouches 
-                && getSecurityProperties().getSignatureKeyIdentifier() 
+            if (senderVouches
+                && getSecurityProperties().getSignatureKeyIdentifier()
                     == WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
                 && securityToken != null
                 && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action)

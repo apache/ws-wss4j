@@ -92,7 +92,7 @@ public class EncryptedKeyProcessor implements Processor {
         String id = elem.getAttributeNS(null, "Id");
         if (!"".equals(id)) {
              WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
-             if (result != null 
+             if (result != null
                  && WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
              ) {
                  return Collections.singletonList(result);
@@ -161,12 +161,12 @@ public class EncryptedKeyProcessor implements Processor {
                     } catch (NoSuchProviderException ex) {
                         signatureFactory = XMLSignatureFactory.getInstance("DOM");
                     }
-                    
-                    publicKey = X509Util.parseKeyValue((Element)keyInfoChildElement.getParentNode(), 
+
+                    publicKey = X509Util.parseKeyValue((Element)keyInfoChildElement.getParentNode(),
                                                        signatureFactory);
                 }
             }
-            
+
             if (publicKey == null && (certs == null || certs.length < 1 || certs[0] == null)) {
                 throw new WSSecurityException(
                                           WSSecurityException.ErrorCode.FAILURE,
@@ -242,7 +242,7 @@ public class EncryptedKeyProcessor implements Processor {
         data.getWsDocInfo().addTokenElement(elem);
         return Collections.singletonList(result);
     }
-    
+
     private PrivateKey getPrivateKey(
         RequestData data, X509Certificate[] certs, PublicKey publicKey
     ) throws WSSecurityException {
@@ -460,7 +460,7 @@ public class EncryptedKeyProcessor implements Processor {
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
                     byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
                     if (token == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData",
                                                       new Object[] {"0"});
                     }
                     try (InputStream in = new ByteArrayInputStream(token)) {
@@ -479,7 +479,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         return null;
     }
-    
+
     private Element getFirstElement(Element element) {
         for (Node currentChild = element.getFirstChild();
              currentChild != null;

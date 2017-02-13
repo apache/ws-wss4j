@@ -40,12 +40,12 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
     public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverSameDocument(uri);
     }
-    
+
     @Override
     public boolean matches(XMLSecStartElement xmlSecStartElement) {
         return matches(xmlSecStartElement, XMLSecurityConstants.ATT_NULL_Id);
     }
-    
+
     public boolean matches(XMLSecStartElement xmlSecStartElement, QName idAttributeNS) {
         Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
@@ -63,5 +63,5 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
         }
         return super.matches(xmlSecStartElement, idAttributeNS);
     }
-    
+
 }

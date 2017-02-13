@@ -188,7 +188,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                     //the body element has documentLevel 2 but we have to use 3 because
                     //the body element itself is never encrypted but child elements are. So we
                     //test for the body child element.
-                    
+
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent
                             = new EncryptedPartSecurityEvent(null, false, null);
                     encryptedPartSecurityEvent.setElementPath(elementPath);
@@ -246,7 +246,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     protected void init(InputProcessorChain inputProcessorChain) {
         if (!this.initDone) {
             this.initDone = true;
-            this.transportSecurityActive = 
+            this.transportSecurityActive =
                 Boolean.TRUE.equals(inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE));
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());

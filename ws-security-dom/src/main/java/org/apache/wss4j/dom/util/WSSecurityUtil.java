@@ -99,7 +99,7 @@ public final class WSSecurityUtil {
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
      */
-    public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12) 
+    public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12)
         throws WSSecurityException {
 
         String actorLocal = WSConstants.ATTR_ACTOR;
@@ -525,15 +525,15 @@ public final class WSSecurityUtil {
             );
         }
     }
-    
-    public static void inlineAttachments(List<Element> includeElements, 
+
+    public static void inlineAttachments(List<Element> includeElements,
                                          CallbackHandler attachmentCallbackHandler,
                                          boolean removeAttachments) throws WSSecurityException {
         for (Element includeElement : includeElements) {
             String xopURI = includeElement.getAttributeNS(null, "href");
             if (xopURI != null) {
                 // Retrieve the attachment bytes
-                byte[] attachmentBytes = 
+                byte[] attachmentBytes =
                     WSSecurityUtil.getBytesFromAttachment(xopURI, attachmentCallbackHandler, removeAttachments);
                 String encodedBytes = Base64.getMimeEncoder().encodeToString(attachmentBytes);
 
@@ -588,7 +588,7 @@ public final class WSSecurityUtil {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
-    
+
     public static String getAttachmentId(String xopUri) throws WSSecurityException {
         try {
             return URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
@@ -628,6 +628,6 @@ public final class WSSecurityUtil {
         }
 
     }
-    
-    
+
+
 }

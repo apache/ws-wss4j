@@ -179,7 +179,7 @@ public interface Crypto {
     PrivateKey getPrivateKey(
         X509Certificate certificate, CallbackHandler callbackHandler
     ) throws WSSecurityException;
-    
+
     /**
      * Gets the private key corresponding to the given PublicKey.
      *

@@ -55,17 +55,17 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     public QName getName() {
         return supportingTokenType;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof SupportingTokens)) {
             return false;
         }
-        
+
         SupportingTokens that = (SupportingTokens)object;
         if (supportingTokenType != null && !supportingTokenType.equals(that.supportingTokenType)
             || supportingTokenType == null && that.supportingTokenType != null) {
@@ -94,10 +94,10 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
         if (!tokens.equals(that.tokens)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -120,7 +120,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
             result = 31 * result + encryptedElements.hashCode();
         }
         result = 31 * result + tokens.hashCode();
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -161,7 +161,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     abstractToken.setParentAssertion(supportingTokens);
                     continue;
                 }
-                
+
                 QName algSuite = getVersion().getSPConstants().getAlgorithmSuite();
                 if (algSuite.getLocalPart().equals(assertionName)
                     && algSuite.getNamespaceURI().equals(assertionNamespace)) {
@@ -171,7 +171,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     supportingTokens.setAlgorithmSuite((AlgorithmSuite) assertion);
                     continue;
                 }
-                
+
                 QName signedParts = getVersion().getSPConstants().getSignedParts();
                 if (signedParts.getLocalPart().equals(assertionName)
                     && signedParts.getNamespaceURI().equals(assertionNamespace)) {
@@ -181,7 +181,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     supportingTokens.setSignedParts((SignedParts) assertion);
                     continue;
                 }
-                
+
                 QName signedElements = getVersion().getSPConstants().getSignedElements();
                 if (signedElements.getLocalPart().equals(assertionName)
                     && signedElements.getNamespaceURI().equals(assertionNamespace)) {
@@ -191,7 +191,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     supportingTokens.setSignedElements((SignedElements) assertion);
                     continue;
                 }
-                
+
                 QName encryptedParts = getVersion().getSPConstants().getEncryptedParts();
                 if (encryptedParts.getLocalPart().equals(assertionName)
                     && encryptedParts.getNamespaceURI().equals(assertionNamespace)) {
@@ -201,7 +201,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     supportingTokens.setEncryptedParts((EncryptedParts) assertion);
                     continue;
                 }
-                
+
                 QName encryptedElements = getVersion().getSPConstants().getEncryptedElements();
                 if (encryptedElements.getLocalPart().equals(assertionName)
                     && encryptedElements.getNamespaceURI().equals(assertionNamespace)) {

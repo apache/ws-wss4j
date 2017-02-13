@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.apache.wss4j.common.util.AttachmentUtils;
 
 public class AttachmentTest {
-    
+
     @Test
     public void testMatch() {
         Assert.assertTrue("text/xml".matches("(?i)(text/xml).*"));

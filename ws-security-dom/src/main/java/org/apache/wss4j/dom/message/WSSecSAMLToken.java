@@ -42,7 +42,7 @@ public class WSSecSAMLToken extends WSSecBase {
     public WSSecSAMLToken(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecSAMLToken(Document doc) {
         super(doc);
     }

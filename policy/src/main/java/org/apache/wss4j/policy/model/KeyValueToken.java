@@ -30,7 +30,7 @@ public class KeyValueToken extends AbstractToken {
 
     private boolean rsaKeyValue;
 
-    public KeyValueToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType, 
+    public KeyValueToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
                          Policy nestedPolicy) {
         super(version, includeTokenType, null, null, null, nestedPolicy);
         setIncludeTokenType(includeTokenType);
@@ -42,7 +42,7 @@ public class KeyValueToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getKeyValueToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -51,20 +51,20 @@ public class KeyValueToken extends AbstractToken {
         if (!(object instanceof KeyValueToken)) {
             return false;
         }
-        
+
         KeyValueToken that = (KeyValueToken)object;
         if (rsaKeyValue != that.rsaKeyValue) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + Boolean.hashCode(rsaKeyValue);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -84,7 +84,7 @@ public class KeyValueToken extends AbstractToken {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName rsaKeyValue = getVersion().getSPConstants().getRsaKeyValue();
                 if (rsaKeyValue.getLocalPart().equals(assertionName)
                     && rsaKeyValue.getNamespaceURI().equals(assertionNamespace)) {

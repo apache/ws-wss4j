@@ -129,7 +129,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
@@ -180,10 +180,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("wernerd", 
+        builder.setUserInfo("wernerd",
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8))));
         LOG.info("Before adding UsernameToken PW Digest....");
         Document signedDoc = builder.build();
@@ -212,7 +212,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("badusername", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
@@ -244,7 +244,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Digest....");
@@ -275,7 +275,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         Document signedDoc = builder.build();
@@ -430,7 +430,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
@@ -466,7 +466,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         byte[] password = "verySecret".getBytes();
@@ -494,7 +494,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecre");
@@ -576,7 +576,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(null);
         builder.setUserInfo("nopassuser", null);
@@ -604,7 +604,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("emptyuser", "");
@@ -645,7 +645,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType("RandomType");
         builder.setUserInfo("wernerd", "verySecret");
@@ -677,7 +677,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType("RandomType");
         builder.setUserInfo("wernerd", "verySecret");
@@ -714,7 +714,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
@@ -758,7 +758,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
@@ -799,7 +799,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
@@ -909,7 +909,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
@@ -953,7 +953,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
@@ -997,7 +997,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
@@ -1041,7 +1041,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
@@ -1116,7 +1116,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
 

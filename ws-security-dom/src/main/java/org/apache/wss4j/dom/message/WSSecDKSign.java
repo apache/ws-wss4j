@@ -80,7 +80,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         super(securityHeader);
         init();
     }
-    
+
     public WSSecDKSign(Document doc) {
         super(doc);
         init();

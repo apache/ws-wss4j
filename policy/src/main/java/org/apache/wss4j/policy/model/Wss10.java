@@ -54,7 +54,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
     public QName getName() {
         return getVersion().getSPConstants().getWss10();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -63,7 +63,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
         if (!(object instanceof Wss10)) {
             return false;
         }
-        
+
         Wss10 that = (Wss10)object;
         if (mustSupportRefKeyIdentifier != that.mustSupportRefKeyIdentifier
             || mustSupportRefIssuerSerial != that.mustSupportRefIssuerSerial
@@ -71,10 +71,10 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
             || mustSupportRefEmbeddedToken != that.mustSupportRefEmbeddedToken) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -82,7 +82,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
         result = 31 * result + Boolean.hashCode(mustSupportRefIssuerSerial);
         result = 31 * result + Boolean.hashCode(mustSupportRefExternalURI);
         result = 31 * result + Boolean.hashCode(mustSupportRefEmbeddedToken);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -112,7 +112,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName mustSupportRefKeyIdentifier = getVersion().getSPConstants().getMustSupportRefKeyIdentifier();
                 if (mustSupportRefKeyIdentifier.getLocalPart().equals(assertionName)
                     && mustSupportRefKeyIdentifier.getNamespaceURI().equals(assertionNamespace)) {
@@ -122,7 +122,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
                     wss10.setMustSupportRefKeyIdentifier(true);
                     continue;
                 }
-                
+
                 QName mustSupportRefIssuerSerial = getVersion().getSPConstants().getMustSupportRefIssuerSerial();
                 if (mustSupportRefIssuerSerial.getLocalPart().equals(assertionName)
                     && mustSupportRefIssuerSerial.getNamespaceURI().equals(assertionNamespace)) {
@@ -132,7 +132,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
                     wss10.setMustSupportRefIssuerSerial(true);
                     continue;
                 }
-                
+
                 QName mustSupportRefExternal = getVersion().getSPConstants().getMustSupportRefExternalUri();
                 if (mustSupportRefExternal.getLocalPart().equals(assertionName)
                     && mustSupportRefExternal.getNamespaceURI().equals(assertionNamespace)) {
@@ -142,7 +142,7 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
                     wss10.setMustSupportRefExternalURI(true);
                     continue;
                 }
-                
+
                 QName mustSupportRefEmbedded = getVersion().getSPConstants().getMustSupportRefEmbeddedToken();
                 if (mustSupportRefEmbedded.getLocalPart().equals(assertionName)
                     && mustSupportRefEmbedded.getNamespaceURI().equals(assertionNamespace)) {

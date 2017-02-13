@@ -33,7 +33,7 @@ public class SignatureToken extends AbstractTokenWrapper {
     public QName getName() {
         return getVersion().getSPConstants().getSignatureToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -42,14 +42,14 @@ public class SignatureToken extends AbstractTokenWrapper {
         if (!(object instanceof SignatureToken)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
-        
+
         return 31 * result + super.hashCode();
     }
 

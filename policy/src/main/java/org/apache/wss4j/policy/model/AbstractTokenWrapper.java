@@ -46,7 +46,7 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
     public Policy getPolicy() {
         return nestedPolicy;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -55,23 +55,23 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
         if (!(object instanceof AbstractTokenWrapper)) {
             return false;
         }
-        
+
         AbstractTokenWrapper that = (AbstractTokenWrapper)object;
         if (token != null && !token.equals(that.token)
             || token == null && that.token != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         if (token != null) {
             result = 31 * result + token.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 

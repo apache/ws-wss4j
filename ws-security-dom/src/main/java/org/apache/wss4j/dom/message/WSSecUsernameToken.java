@@ -56,7 +56,7 @@ public class WSSecUsernameToken extends WSSecBase {
     public WSSecUsernameToken(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecUsernameToken(Document doc) {
         super(doc);
     }

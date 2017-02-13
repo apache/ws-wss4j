@@ -34,7 +34,7 @@ public class ContentEncryptedElements extends EncryptedElements {
     public QName getName() {
         return getVersion().getSPConstants().getContentEncryptedElements();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -43,14 +43,14 @@ public class ContentEncryptedElements extends EncryptedElements {
         if (!(object instanceof ContentEncryptedElements)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
-        
+
         return 31 * result + super.hashCode();
     }
 

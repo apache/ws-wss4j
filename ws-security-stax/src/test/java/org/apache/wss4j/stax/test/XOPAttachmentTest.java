@@ -115,7 +115,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
     private List<Attachment> createEncryptedBodyInAttachment(Document doc) throws Exception {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("receiver", "default");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);

@@ -61,7 +61,7 @@ public class RelToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getRelToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -70,7 +70,7 @@ public class RelToken extends AbstractToken {
         if (!(object instanceof RelToken)) {
             return false;
         }
-        
+
         RelToken that = (RelToken)object;
         if (requireKeyIdentifierReference != that.requireKeyIdentifierReference) {
             return false;
@@ -78,10 +78,10 @@ public class RelToken extends AbstractToken {
         if (relTokenType != that.relTokenType) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -89,7 +89,7 @@ public class RelToken extends AbstractToken {
             result = 31 * result + relTokenType.hashCode();
         }
         result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
-        
+
         return 31 * result + super.hashCode();
     }
 

@@ -42,12 +42,12 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
      * Construct a SubjectPublicKeyInfo for the given public key.
      *
      * @param key the public key.
-     * @throws WSSecurityException if the public key encoding format is 
+     * @throws WSSecurityException if the public key encoding format is
      *                             not X.509 or the encoding is null.
      */
     public X509SubjectPublicKeyInfo(PublicKey key) throws WSSecurityException {
         super(key.getEncoded());
-        if (!("X.509".equalsIgnoreCase(key.getFormat()) 
+        if (!("X.509".equalsIgnoreCase(key.getFormat())
                 || "X509".equalsIgnoreCase(key.getFormat()))) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,

@@ -33,7 +33,7 @@ public class InitiatorSignatureToken extends AbstractTokenWrapper {
     public QName getName() {
         return getVersion().getSPConstants().getInitiatorSignatureToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -42,14 +42,14 @@ public class InitiatorSignatureToken extends AbstractTokenWrapper {
         if (!(object instanceof InitiatorSignatureToken)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
-        
+
         return 31 * result + super.hashCode();
     }
 

@@ -134,7 +134,7 @@ public class CertificateStore extends CryptoBase {
     ) throws WSSecurityException {
         return null;
     }
-    
+
     /**
      * Gets the private key corresponding to the identifier. Not supported.
      *

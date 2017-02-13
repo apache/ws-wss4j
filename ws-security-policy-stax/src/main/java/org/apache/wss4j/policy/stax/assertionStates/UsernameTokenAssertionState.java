@@ -87,7 +87,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
         if (usernameToken.getPasswordType() != null) {
             switch (usernameToken.getPasswordType()) {
                 case NoPassword:
-                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() 
+                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType()
                         != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
                         setErrorMessage("UsernameToken contains a password but the policy prohibits it");
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.NO_PASSWORD),
@@ -97,7 +97,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
                     getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.NO_PASSWORD));
                     break;
                 case HashPassword:
-                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() 
+                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType()
                         != WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
                         setErrorMessage("UsernameToken does not contain a hashed password");
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.HASH_PASSWORD),
@@ -119,7 +119,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             return false;
         }
         if (usernameToken.isCreated()) {
-            if (usernameSecurityToken.getCreatedTime() == null 
+            if (usernameSecurityToken.getCreatedTime() == null
                 || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT) {
                 setErrorMessage("UsernameToken does not contain a created timestamp or password is not plain text");
                 getPolicyAsserter().unassertPolicy(SP13Constants.CREATED, getErrorMessage());
@@ -130,7 +130,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
         }
 
         if (usernameToken.isNonce()) {
-            if (usernameSecurityToken.getNonce() == null 
+            if (usernameSecurityToken.getNonce() == null
                 || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT) {
                 setErrorMessage("UsernameToken does not contain a nonce or password is not plain text");
                 getPolicyAsserter().unassertPolicy(SP13Constants.NONCE, getErrorMessage());

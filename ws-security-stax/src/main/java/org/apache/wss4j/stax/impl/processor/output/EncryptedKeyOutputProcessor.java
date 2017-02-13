@@ -66,7 +66,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
         throws XMLStreamException, XMLSecurityException {
         try {
 
@@ -106,7 +106,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             boolean sharedToken = encTokenId.equals(sigTokenId);
 
-            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = 
+            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor =
                 new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
@@ -119,7 +119,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT) 
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
                         finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
@@ -152,7 +152,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY) 
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
                     }
@@ -221,7 +221,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         "failedCredentialLoad"
                     );
                 }
-                
+
                 final String encryptionKeyTransportAlgorithm = getSecurityProperties().getEncryptionKeyTransportAlgorithm();
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
@@ -234,12 +234,12 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                 final String encryptionKeyTransportMGFAlgorithm = getSecurityProperties().getEncryptionKeyTransportMGFAlgorithm();
 
-                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) 
+                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
                     || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
                     byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
                     if (oaepParams != null) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams, 
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams,
                                                            false, null);
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(oaepParams));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
@@ -249,7 +249,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (encryptionKeyTransportDigestAlgorithm != null) {
                         attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportDigestAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, 
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod,
                                                            true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
                     }
@@ -257,7 +257,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (encryptionKeyTransportMGFAlgorithm != null) {
                         attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportMGFAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF, 
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF,
                                                            true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF);
                     }
@@ -280,11 +280,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     Cipher cipher = Cipher.getInstance(jceid);
 
                     AlgorithmParameterSpec algorithmParameterSpec = null;
-                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) 
+                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
                         || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
                         String jceDigestAlgorithm = "SHA-1";
-                        String encryptionKeyTransportDigestAlgorithm = 
+                        String encryptionKeyTransportDigestAlgorithm =
                             getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
                         if (encryptionKeyTransportDigestAlgorithm != null) {
                             jceDigestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportDigestAlgorithm);
@@ -330,7 +330,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
 
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, 
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain,
                                                      new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
@@ -361,14 +361,14 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
                 return;
             }
-            
+
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             if ((x509Certificates == null || x509Certificates.length == 0)
                 && securityToken.getKeyWrappingToken().getPublicKey() != null) {
-                WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, 
+                WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain,
                                                       securityToken.getKeyWrappingToken().getPublicKey());
                 return;
-            } 
+            }
 
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));

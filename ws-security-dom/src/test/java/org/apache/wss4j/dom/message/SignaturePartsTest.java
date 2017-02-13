@@ -102,7 +102,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -159,7 +159,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -196,7 +196,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -233,7 +233,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -289,7 +289,7 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -351,7 +351,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -379,7 +379,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -407,7 +407,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -477,7 +477,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -527,7 +527,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);

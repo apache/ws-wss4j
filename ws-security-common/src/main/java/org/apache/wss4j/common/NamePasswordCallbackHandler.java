@@ -63,7 +63,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                 pwCallback.setPassword(password.toCharArray());
             } else if (!invokePasswordCallback(callback)) {
                 LOG.error("Unsupported callback type " + callbacks[i].getClass().getName());
-                throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type " 
+                throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type "
                     + callbacks[i].getClass().getName());
             }
         }

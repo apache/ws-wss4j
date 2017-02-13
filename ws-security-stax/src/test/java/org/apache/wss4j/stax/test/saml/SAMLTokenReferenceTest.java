@@ -803,7 +803,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
             samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
-            
+
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();

@@ -93,7 +93,7 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
                 } else {
                     //an element must be encrypted but isn't
                     setAsserted(false);
-                    setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) 
+                    setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath())
                         + " must be encrypted");
                     policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;

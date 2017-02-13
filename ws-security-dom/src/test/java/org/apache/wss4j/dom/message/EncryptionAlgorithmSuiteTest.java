@@ -69,7 +69,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -102,7 +102,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     public void testEncryptionKeyTransportRSA15() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -139,7 +139,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     public void testEncryptionKeyTransportRSA15NoAlgorithmSuite() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -186,7 +186,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -221,7 +221,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
         byte[] keyData = key.getEncoded();
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();

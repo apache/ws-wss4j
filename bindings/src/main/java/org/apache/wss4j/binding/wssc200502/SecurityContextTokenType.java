@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
 /**
  *
  * 		Actual content model is non-deterministic, hence wildcard. The following shows intended content model:
- * 		
+ *
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="http://java.sun.com/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" minOccurs="1" ref="wsc:Identifier"/&gt;
  * </pre>

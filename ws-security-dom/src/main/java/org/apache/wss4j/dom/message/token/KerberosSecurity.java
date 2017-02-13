@@ -118,7 +118,7 @@ public class KerberosSecurity extends BinarySecurity {
     public void retrieveServiceTicket(
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        KerberosContextAndServiceNameCallback contextAndServiceNameCallback = 
+        KerberosContextAndServiceNameCallback contextAndServiceNameCallback =
             new KerberosContextAndServiceNameCallback();
         try {
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
@@ -128,12 +128,12 @@ public class KerberosSecurity extends BinarySecurity {
 
         String jaasLoginModuleName = contextAndServiceNameCallback.getContextName();
         if (jaasLoginModuleName == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "kerberosCallbackContextNameNotSupplied");
         }
         String serviceName = contextAndServiceNameCallback.getServiceName();
         if (serviceName == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "kerberosCallbackServiceNameNotSupplied");
         }
 
@@ -324,17 +324,17 @@ public class KerberosSecurity extends BinarySecurity {
         if (!(object instanceof KerberosSecurity)) {
             return false;
         }
-        
+
         KerberosSecurity that = (KerberosSecurity)object;
         if (secretKey != null && !secretKey.equals(that.secretKey)) {
             return false;
         } else if (secretKey == null && that.secretKey != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int hashCode = 17;

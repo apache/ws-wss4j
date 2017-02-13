@@ -182,7 +182,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
     public Principal getPrincipal() throws WSSecurityException {
         return principal;
     }
-    
+
     /**
      * Get the KerberosTokenDecoder instance used to extract a session key from the received Kerberos
      * token.

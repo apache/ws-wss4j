@@ -56,7 +56,7 @@ public abstract class AbstractDerivedAction {
         }
         Node firstChild = secHeader.getFirstChild();
         while (firstChild != null) {
-            if (firstChild instanceof Element 
+            if (firstChild instanceof Element
                 && namespace.equals(((Element)firstChild).getNamespaceURI())
                 && localName.equals(((Element)firstChild).getLocalName())
                 && firstChild.getNextSibling() != null) {

@@ -75,7 +75,7 @@ public class Timestamp {
          ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()) {
                 Element currentChildElement = (Element) currentChild;
-                if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) 
+                if (WSConstants.CREATED_LN.equals(currentChild.getLocalName())
                     && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
                         String valueType = currentChildElement.getAttributeNS(null, "ValueType");
@@ -88,7 +88,7 @@ public class Timestamp {
                         // Test for multiple Created elements
                         bspEnforcer.handleBSPRule(BSPRule.R3203);
                     }
-                } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) 
+                } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName())
                     && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
                         // Created must appear before Expires

@@ -1336,7 +1336,7 @@ public abstract class WSHandler {
             );
         reqData.setExpandXopIncludeForSignature(expandXOP);
     }
-    
+
     private Collection<Pattern> getCertConstraints(String certConstraints) throws WSSecurityException {
         String[] certConstraintsList = certConstraints.split(",");
         if (certConstraintsList != null && certConstraintsList.length > 0) {
@@ -1350,7 +1350,7 @@ public abstract class WSHandler {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
             }
-            
+
             return certConstraintsCollection;
         }
         return Collections.emptyList();

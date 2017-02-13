@@ -50,7 +50,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 public class ReplayTest extends AbstractTestBase {
-    
+
     private ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         byte[] nonceValue;
@@ -115,7 +115,7 @@ public class ReplayTest extends AbstractTestBase {
                 Assert.assertEquals("The message has expired", e.getCause().getMessage());
             }
         }
-        
+
         replayCache.close();
     }
 
@@ -169,7 +169,7 @@ public class ReplayTest extends AbstractTestBase {
                 Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
-        
+
         replayCache.close();
     }
 
@@ -237,7 +237,7 @@ public class ReplayTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.assertNotNull(document);
         }
-        
+
         replayCache.close();
     }
 
@@ -308,7 +308,7 @@ public class ReplayTest extends AbstractTestBase {
                 Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
-        
+
         replayCache.close();
     }
 

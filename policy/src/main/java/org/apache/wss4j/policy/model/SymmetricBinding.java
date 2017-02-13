@@ -42,17 +42,17 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
     public QName getName() {
         return getVersion().getSPConstants().getSymmetricBinding();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof SymmetricBinding)) {
             return false;
         }
-        
+
         SymmetricBinding that = (SymmetricBinding)object;
         if (encryptionToken != null && !encryptionToken.equals(that.encryptionToken)
             || encryptionToken == null && that.encryptionToken != null) {
@@ -66,10 +66,10 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
             || protectionToken == null && that.protectionToken != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -82,7 +82,7 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
         if (protectionToken != null) {
             result = 31 * result + protectionToken.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -102,29 +102,29 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName encryptionToken = getVersion().getSPConstants().getEncryptionToken();
                 if (encryptionToken.getLocalPart().equals(assertionName)
                     && encryptionToken.getNamespaceURI().equals(assertionNamespace)) {
-                    if (symmetricBinding.getEncryptionToken() != null 
+                    if (symmetricBinding.getEncryptionToken() != null
                         || symmetricBinding.getProtectionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     symmetricBinding.setEncryptionToken((EncryptionToken) assertion);
                     continue;
                 }
-                
+
                 QName signatureToken = getVersion().getSPConstants().getSignatureToken();
                 if (signatureToken.getLocalPart().equals(assertionName)
                     && signatureToken.getNamespaceURI().equals(assertionNamespace)) {
-                    if (symmetricBinding.getSignatureToken() != null 
+                    if (symmetricBinding.getSignatureToken() != null
                         || symmetricBinding.getProtectionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     symmetricBinding.setSignatureToken((SignatureToken) assertion);
                     continue;
                 }
-                
+
                 QName protectionToken = getVersion().getSPConstants().getProtectionToken();
                 if (protectionToken.getLocalPart().equals(assertionName)
                     && protectionToken.getNamespaceURI().equals(assertionNamespace)) {

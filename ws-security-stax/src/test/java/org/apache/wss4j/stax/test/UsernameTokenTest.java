@@ -281,7 +281,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
-        
+
         replayCache.close();
     }
 
@@ -836,7 +836,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
-    
+
     private ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         byte[] nonceValue;

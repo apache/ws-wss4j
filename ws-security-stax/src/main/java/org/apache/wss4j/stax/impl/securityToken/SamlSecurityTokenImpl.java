@@ -79,7 +79,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
             } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
-            
+
             secret = pwcb.getKey();
             key = pwcb.getKeyObject();
             if (this.key instanceof PrivateKey) {
@@ -135,7 +135,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     }
 
     @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) 
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID)
         throws XMLSecurityException {
         Key key = null;
         if (this.key != null) {
@@ -157,7 +157,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     }
 
     @Override
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) 
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID)
         throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getPublicKey(algorithmURI, algorithmUsage, correlationID);

@@ -57,7 +57,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
         throws XMLStreamException, XMLSecurityException {
         try {
 
@@ -65,7 +65,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = 
+            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider =
                 outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
@@ -95,7 +95,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             }
 
-            String defaultLabel = 
+            String defaultLabel =
                 WSSConstants.WS_SEC_CONV_DEFAULT_LABEL + WSSConstants.WS_SEC_CONV_DEFAULT_LABEL;
             byte[] label = defaultLabel.getBytes(StandardCharsets.UTF_8);
 
@@ -111,7 +111,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             byte[] secret;
             if (WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN.equals(wrappingSecurityToken.getTokenType())) {
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
-                WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), 
+                WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(),
                                              passwordCallback, wsuIdDKT);
                 if (passwordCallback.getKey() == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey",
@@ -170,7 +170,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor =
-                    new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length, 
+                    new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length,
                                                             new String(Base64.encodeBase64(nonce)),
                                                             ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace(),
                                                             wrappingSecurityToken.getSha1Identifier());

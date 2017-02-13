@@ -80,7 +80,7 @@ public class PrincipalTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         Document signedDoc = builder.build();
@@ -113,7 +113,7 @@ public class PrincipalTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         Document signedDoc = builder.build();
@@ -145,7 +145,7 @@ public class PrincipalTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -192,7 +192,7 @@ public class PrincipalTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document unsignedDoc = wsSign.build(samlAssertion);
@@ -236,7 +236,7 @@ public class PrincipalTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document unsignedDoc = wsSign.build(samlAssertion);

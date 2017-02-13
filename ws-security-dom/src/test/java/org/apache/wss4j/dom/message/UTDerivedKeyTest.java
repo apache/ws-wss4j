@@ -190,7 +190,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", 
+        builder.setUserInfo("bob",
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(false, null, 1000);
         builder.prepare();
@@ -392,7 +392,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", 
+        builder.setUserInfo("bob",
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(true, null, 1000);
         builder.prepare();

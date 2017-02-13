@@ -71,7 +71,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
-                    String base64SigValue = 
+                    String base64SigValue =
                         new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue());
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE, base64SigValue));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);

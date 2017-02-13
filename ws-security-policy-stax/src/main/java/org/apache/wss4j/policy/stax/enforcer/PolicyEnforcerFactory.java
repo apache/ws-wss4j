@@ -163,7 +163,7 @@ public class PolicyEnforcerFactory {
         return newInstance(wsdlUrl, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, 
+    public static PolicyEnforcerFactory newInstance(URL wsdlUrl,
                                                     List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
@@ -176,7 +176,7 @@ public class PolicyEnforcerFactory {
         return newInstance(document, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(Document document, 
+    public static PolicyEnforcerFactory newInstance(Document document,
                                                     List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
@@ -264,7 +264,7 @@ public class PolicyEnforcerFactory {
         return operationPolicyList;
     }
 
-    private Policy getPolicy(Service service, Port port, Binding binding, 
+    private Policy getPolicy(Service service, Port port, Binding binding,
                              BindingOperation bindingOperation, Operation operation) throws WSSPolicyException {
         List<Policy> policies = new ArrayList<>();
 
@@ -364,12 +364,12 @@ public class PolicyEnforcerFactory {
         for (int i = 0; i < extensibilityElements.size(); i++) {
             ExtensibilityElement extensibilityElement = extensibilityElements.get(i);
             if (extensibilityElement instanceof UnknownExtensibilityElement) {
-                UnknownExtensibilityElement unknownExtensibilityElement = 
+                UnknownExtensibilityElement unknownExtensibilityElement =
                     (UnknownExtensibilityElement) extensibilityElement;
                 if (unknownExtensibilityElement.getElementType().getLocalPart().equals("PolicyReference")) {
                     String uri = unknownExtensibilityElement.getElement().getAttributeNS(null, "URI").substring(1);
-                    NodeList policyNodeList = 
-                        unknownExtensibilityElement.getElement().getOwnerDocument().getElementsByTagNameNS("*", 
+                    NodeList policyNodeList =
+                        unknownExtensibilityElement.getElement().getOwnerDocument().getElementsByTagNameNS("*",
                                                                                                            "Policy");
 
                     boolean found = false;
@@ -428,7 +428,7 @@ public class PolicyEnforcerFactory {
      * creates a new PolicyEnforcer instance
      * @param soapAction The requested soapAction of the actual request
      * @param initiator Boolean flag to tell the engine if it is running in client or server mode
-     * @param roleOrActor The actor or role of the security processing. Must be set to the same value 
+     * @param roleOrActor The actor or role of the security processing. Must be set to the same value
      * as WSSSecurityProperties#setActor()
      * @param attachmentCount The number of Attachments received in the message
      * @return the newly created PolicyEnforcer instance

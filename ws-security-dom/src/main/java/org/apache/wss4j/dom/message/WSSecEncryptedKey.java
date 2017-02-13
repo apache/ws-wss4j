@@ -128,7 +128,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     private BinarySecurity bstToken;
 
     private X509Certificate useThisCert;
-    
+
     private PublicKey useThisPublicKey;
 
     /**
@@ -148,7 +148,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     public WSSecEncryptedKey(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecEncryptedKey(Document doc) {
         super(doc);
     }
@@ -233,15 +233,15 @@ public class WSSecEncryptedKey extends WSSecBase {
                     }
                     remoteCert = certs[0];
                 }
-                
+
                 prepareInternal(symmetricKey, remoteCert, crypto);
             }
         } else {
             prepareInternal(symmetricKey);
         }
     }
-    
-    private void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted) 
+
+    private void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
         throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
@@ -457,7 +457,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             xencCipherValue.appendChild(keyText);
         }
     }
-    
+
     protected void prepareInternal(
         SecretKey secretKey,
         PublicKey remoteKey,
@@ -483,7 +483,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else {
             SecurityTokenReference secToken = null;
-            
+
             switch (keyIdentifierType) {
             case WSConstants.CUSTOM_SYMM_SIGNING :
                 secToken = new SecurityTokenReference(getDocument());
@@ -543,7 +543,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     } catch (NoSuchProviderException ex) {
                         signatureFactory = XMLSignatureFactory.getInstance("DOM");
                     }
-                    
+
                     KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
                     KeyValue keyValue = keyInfoFactory.newKeyValue(remoteKey);
                     String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
@@ -551,7 +551,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                         keyInfoFactory.newKeyInfo(
                             java.util.Collections.singletonList(keyValue), keyInfoUri
                         );
-                    
+
                     keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
                 } catch (java.security.KeyException | MarshalException ex) {
                     LOG.error("", ex);
@@ -560,7 +560,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     );
                 }
             }
-            
+
             if (secToken != null) {
                 Element keyInfoElement =
                     getDocument().createElementNS(
@@ -804,11 +804,11 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
-    
+
     public X509Certificate getUseThisCert() {
         return useThisCert;
     }
-    
+
     /**
      * Set the PublicKey to use for encryption.
      * @param key the PublicKey instance to use for encryption
@@ -816,7 +816,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisPublicKey(PublicKey key) {
         useThisPublicKey = key;
     }
-    
+
     public PublicKey getUseThisPublicKey() {
         return useThisPublicKey;
     }

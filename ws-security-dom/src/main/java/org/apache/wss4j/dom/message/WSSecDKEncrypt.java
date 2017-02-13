@@ -48,13 +48,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     private int derivedKeyLength = -1;
 
     private List<Element> attachmentEncryptedDataElements;
-    
+
     private Serializer encryptionSerializer;
-    
+
     public WSSecDKEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecDKEncrypt(Document doc) {
         super(doc);
     }
@@ -103,7 +103,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         return encryptForExternalRef(null, getParts());
     }
-    
+
     /**
      * Encrypt one or more parts or elements of the message (external).
      *
@@ -143,7 +143,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         encryptor.setWsDocInfo(getWsDocInfo());
         List<String> encDataRefs =
             encryptor.doEncryption(keyInfo, key, symEncAlgo, references, attachmentEncryptedDataElements);
-        
+
         if (dataRef == null) {
             dataRef =
                 getDocument().createElementNS(

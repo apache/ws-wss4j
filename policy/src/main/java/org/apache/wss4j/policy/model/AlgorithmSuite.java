@@ -219,11 +219,11 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private String ns;
         private String encryptionDigest;
 
-        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, 
-                                  String asymmetricKeyWrap, String encryptionKeyDerivation, 
+        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap,
+                                  String asymmetricKeyWrap, String encryptionKeyDerivation,
                                   String signatureKeyDerivation, int encryptionDerivedKeyLength,
                                   int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
-                                  int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, 
+                                  int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength,
                                   int maximumAsymmetricKeyLength) {
             this.name = name;
             this.digest = digest;
@@ -256,17 +256,17 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumAsymmetricKeyLength = algorithmSuiteType.maximumAsymmetricKeyLength;
             this.mgfAlgo = algorithmSuiteType.mgfAlgo;
         }
-        
+
         @Override
         public boolean equals(Object object) {
             if (object == this) {
                 return true;
             }
-            
+
             if (!(object instanceof AlgorithmSuiteType)) {
                 return false;
             }
-            
+
             AlgorithmSuiteType that = (AlgorithmSuiteType)object;
             if (name != null && !name.equals(that.name)
                 || name == null && that.name != null) {
@@ -308,7 +308,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 || encryptionDigest == null && that.encryptionDigest != null) {
                 return false;
             }
-            
+
             if (encryptionDerivedKeyLength != that.encryptionDerivedKeyLength
                 || signatureDerivedKeyLength != that.signatureDerivedKeyLength
                 || minimumSymmetricKeyLength != that.minimumSymmetricKeyLength
@@ -317,10 +317,10 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 || maximumAsymmetricKeyLength != that.maximumAsymmetricKeyLength) {
                 return false;
             }
-            
+
             return true;
         }
-        
+
         @Override
         public int hashCode() {
             int result = 17;
@@ -345,14 +345,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             if (signatureKeyDerivation != null) {
                 result = 31 * result + signatureKeyDerivation.hashCode();
             }
-            
+
             result = 31 * result + Integer.hashCode(encryptionDerivedKeyLength);
             result = 31 * result + Integer.hashCode(signatureDerivedKeyLength);
             result = 31 * result + Integer.hashCode(minimumSymmetricKeyLength);
             result = 31 * result + Integer.hashCode(maximumSymmetricKeyLength);
             result = 31 * result + Integer.hashCode(minimumAsymmetricKeyLength);
             result = 31 * result + Integer.hashCode(maximumAsymmetricKeyLength);
-            
+
             if (mgfAlgo != null) {
                 result = 31 * result + mgfAlgo.hashCode();
             }
@@ -362,7 +362,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             if (encryptionDigest != null) {
                 result = 31 * result + encryptionDigest.hashCode();
             }
-            
+
             return 31 * result + super.hashCode();
         }
 
@@ -433,11 +433,11 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         public String getMGFAlgo() {
             return mgfAlgo;
         }
-        
+
         public void setEncryptionDigest(String encryptionDigest) {
             this.encryptionDigest = encryptionDigest;
         }
-        
+
         public String getEncryptionDigest() {
             return encryptionDigest;
         }
@@ -582,23 +582,23 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     public QName getName() {
         return getVersion().getSPConstants().getAlgorithmSuite();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof AlgorithmSuite)) {
             return false;
         }
-        
+
         AlgorithmSuite that = (AlgorithmSuite)object;
         if (c14n != that.c14n || soapNormType != that.soapNormType || strType != that.strType
             || xPathType != that.xPathType) {
             return false;
         }
-        
+
         if (algorithmSuiteType != null && !algorithmSuiteType.equals(that.algorithmSuiteType)
             || algorithmSuiteType == null && that.algorithmSuiteType != null) {
             return false;
@@ -615,10 +615,10 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             || computedKey == null && that.computedKey != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -646,7 +646,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         if (computedKey != null) {
             result = 31 * result + computedKey.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 

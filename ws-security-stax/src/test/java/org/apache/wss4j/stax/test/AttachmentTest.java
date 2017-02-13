@@ -479,7 +479,7 @@ public class AttachmentTest extends AbstractTestBase {
         Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
-    
+
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
 
@@ -513,7 +513,7 @@ public class AttachmentTest extends AbstractTestBase {
             xmlStreamWriter.close();
 
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-            
+
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
             Assert.assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
@@ -636,7 +636,7 @@ public class AttachmentTest extends AbstractTestBase {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("receiver", "default");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -1322,5 +1322,5 @@ public class AttachmentTest extends AbstractTestBase {
             }
         }
     }
-    
+
 }

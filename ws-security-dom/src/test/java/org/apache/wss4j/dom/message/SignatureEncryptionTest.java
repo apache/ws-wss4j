@@ -103,7 +103,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
@@ -145,7 +145,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
@@ -231,7 +231,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
@@ -255,7 +255,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
@@ -294,7 +294,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("wss40");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -456,13 +456,13 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, reqData);
     }
-    
+
     @Test
     public void testSigningEncryptionSOAP12Fault() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
@@ -471,7 +471,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         sign.build(crypto);
         Document encryptedSignedDoc = encrypt.build(crypto);
-        
+
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }

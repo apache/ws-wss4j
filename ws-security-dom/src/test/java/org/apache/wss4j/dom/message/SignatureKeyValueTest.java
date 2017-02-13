@@ -66,7 +66,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
@@ -109,7 +109,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss86", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
@@ -145,7 +145,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);

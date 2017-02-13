@@ -45,7 +45,7 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        
+
         Policy nestedPolicy = null;
         if (nestedPolicyElement == null) {
             if (spVersion != SPConstants.SPVersion.SP11) {
@@ -55,7 +55,7 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         } else {
             nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        
+
         SpnegoContextToken spnegoContextToken = new SpnegoContextToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),

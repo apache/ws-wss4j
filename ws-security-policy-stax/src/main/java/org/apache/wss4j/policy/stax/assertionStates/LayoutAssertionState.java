@@ -65,17 +65,17 @@ public class LayoutAssertionState extends AssertionState implements Assertable {
                 //todo?
                 break;
             case LaxTsFirst:
-                if (occuredEvents.isEmpty() 
+                if (occuredEvents.isEmpty()
                     && !WSSecurityEventConstants.TIMESTAMP.equals(securityEvent.getSecurityEventType())) {
                     setAsserted(false);
-                    setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " 
+                    setErrorMessage("Policy enforces " + layout.getLayoutType() + " but "
                         + securityEvent.getSecurityEventType() + " occured first");
                 }
                 break;
             case LaxTsLast:
                 if (occuredEvents.contains(WSSecurityEventConstants.TIMESTAMP)) {
                     setAsserted(false);
-                    setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " 
+                    setErrorMessage("Policy enforces " + layout.getLayoutType() + " but "
                         + securityEvent.getSecurityEventType() + " occured last");
                 }
                 break;

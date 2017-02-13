@@ -73,7 +73,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -117,7 +117,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp builder = new WSSecTimestamp(secHeader);
         builder.setTimeToLive(-1);
 
@@ -143,7 +143,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.addCreated();
         builder.addNonce();
@@ -171,7 +171,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.addCreated();
         builder.addNonce();

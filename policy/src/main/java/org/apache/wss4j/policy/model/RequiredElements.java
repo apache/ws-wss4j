@@ -46,30 +46,30 @@ public class RequiredElements extends AbstractSecurityAssertion {
     public QName getName() {
         return getVersion().getSPConstants().getRequiredElements();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof RequiredElements)) {
             return false;
         }
-        
+
         RequiredElements that = (RequiredElements)object;
         if (xPathVersion != null && !xPathVersion.equals(that.xPathVersion)
             || xPathVersion == null && that.xPathVersion != null) {
             return false;
         }
-        
+
         if (!xPaths.equals(that.xPaths)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -77,7 +77,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
             result = 31 * result + xPathVersion.hashCode();
         }
         result = 31 * result + xPaths.hashCode();
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -91,16 +91,16 @@ public class RequiredElements extends AbstractSecurityAssertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_OPTIONAL, "true");
         }
         if (getXPathVersion() != null) {
             writer.writeAttribute(SPConstants.XPATH_VERSION, getXPathVersion());
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_IGNORABLE, "true");
         }
         for (int i = 0; i < xPaths.size(); i++) {
@@ -120,7 +120,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
                         getVersion().getSPConstants().getXPath2Expression().getNamespaceURI());
                 writer.writeAttribute(SPConstants.FILTER, xPath.getFilter());
             }
-            Iterator<Map.Entry<String, String>> namespaceIterator = 
+            Iterator<Map.Entry<String, String>> namespaceIterator =
                 xPath.getPrefixNamespaceMap().entrySet().iterator();
             while (namespaceIterator.hasNext()) {
                 Map.Entry<String, String> namespaceEntry = namespaceIterator.next();

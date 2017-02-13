@@ -66,14 +66,14 @@ public final class SignatureUtils {
             WSSecurityException.ErrorCode.FAILED_CHECK, "elementNotSigned",
             new Object[] {elem});
     }
-    
+
     /**
      * Get the List of inclusive prefixes from the DOM Element argument
      */
     public static List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
         List<String> result = new ArrayList<>();
         Node parent = target;
-        while (parent.getParentNode() != null 
+        while (parent.getParentNode() != null
             && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
             NamedNodeMap attributes = parent.getAttributes();

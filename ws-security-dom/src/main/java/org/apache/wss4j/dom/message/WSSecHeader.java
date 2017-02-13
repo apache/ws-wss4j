@@ -101,7 +101,7 @@ public class WSSecHeader {
     public Element getSecurityHeaderElement() {
         return securityHeader;
     }
-    
+
     public void setSecurityHeaderElement(Element securityHeaderElement) {
         this.securityHeader = securityHeaderElement;
     }

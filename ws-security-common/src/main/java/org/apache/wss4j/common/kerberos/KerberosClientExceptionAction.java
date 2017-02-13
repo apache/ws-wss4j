@@ -115,11 +115,11 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
 
         try {
             @SuppressWarnings("rawtypes")
-            Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS 
+            Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS
                 : SUN_JGSS_INQUIRE_TYPE_CLASS);
 
             @SuppressWarnings("rawtypes")
-            Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS 
+            Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS
                 : SUN_JGSS_EXT_GSSCTX_CLASS);
 
             @SuppressWarnings("unchecked")

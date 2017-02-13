@@ -79,7 +79,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -111,7 +111,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
@@ -149,7 +149,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -183,7 +183,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
@@ -217,7 +217,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
@@ -252,7 +252,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);

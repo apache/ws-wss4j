@@ -60,13 +60,13 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
                 elementName);
 
-        final WSInboundSecurityContext wsInboundSecurityContext = 
+        final WSInboundSecurityContext wsInboundSecurityContext =
             (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
         final List<QName> elementPath = getElementPath(eventQueue);
 
-        final TokenContext tokenContext = 
+        final TokenContext tokenContext =
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         SecurityContextTokenValidator securityContextTokenValidator = wssSecurityProperties.getValidator(elementName);

@@ -113,7 +113,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -184,7 +184,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -247,7 +247,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -309,7 +309,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -374,7 +374,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -435,7 +435,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -496,7 +496,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -562,7 +562,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -637,7 +637,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");

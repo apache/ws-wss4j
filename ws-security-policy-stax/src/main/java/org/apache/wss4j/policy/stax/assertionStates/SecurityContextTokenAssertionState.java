@@ -73,9 +73,9 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
         SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = (SecurityContextTokenSecurityEvent) tokenSecurityEvent;
         SecurityContextToken securityContextToken = (SecurityContextToken) abstractToken;
 
-        if (securityContextToken.getIssuerName() != null 
+        if (securityContextToken.getIssuerName() != null
             && !securityContextToken.getIssuerName().equals(securityContextTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + securityContextToken.getIssuerName() 
+            setErrorMessage("IssuerName in Policy (" + securityContextToken.getIssuerName()
                 + ") didn't match with the one in the SecurityContextToken (" + securityContextTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;

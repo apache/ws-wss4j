@@ -218,7 +218,7 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
                 setErrorMessage("STR transformation algorithm " + algorithmURI  + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.XPATH.equals(keyUsage) && algorithmSuite.getXPathType() != null 
+        } else if (WSSConstants.XPATH.equals(keyUsage) && algorithmSuite.getXPathType() != null
             && !algorithmSuite.getXPathType().getValue().equals(algorithmURI)) {
             setAsserted(false);
             setErrorMessage("XPATH algorithm " + algorithmURI + " does not meet policy");

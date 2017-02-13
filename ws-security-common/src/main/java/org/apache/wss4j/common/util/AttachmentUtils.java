@@ -490,8 +490,8 @@ public final class AttachmentUtils {
                 while (read != ivLen) {
                     read += super.in.read(ivBytes, read, ivLen - read);
                 }
-                
-                AlgorithmParameterSpec paramSpec = 
+
+                AlgorithmParameterSpec paramSpec =
                     XMLCipherUtil.constructBlockCipherParameters(encAlgo, ivBytes, AttachmentUtils.class);
 
                 try {
@@ -571,10 +571,10 @@ public final class AttachmentUtils {
                     //the encryption. If a header listed in the profile is present it MUST be included in
                     //the encryption. If a header is not listed in this profile, then it MUST NOT be
                     //included in the encryption.
-                    if (AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION.equals(key) 
-                        || AttachmentUtils.MIME_HEADER_CONTENT_DISPOSITION.equals(key) 
-                        || AttachmentUtils.MIME_HEADER_CONTENT_ID.equals(key) 
-                        || AttachmentUtils.MIME_HEADER_CONTENT_LOCATION.equals(key) 
+                    if (AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION.equals(key)
+                        || AttachmentUtils.MIME_HEADER_CONTENT_DISPOSITION.equals(key)
+                        || AttachmentUtils.MIME_HEADER_CONTENT_ID.equals(key)
+                        || AttachmentUtils.MIME_HEADER_CONTENT_LOCATION.equals(key)
                         || AttachmentUtils.MIME_HEADER_CONTENT_TYPE.equals(key)) {
                         iterator.remove();
                         outputStreamWriter.write(key);

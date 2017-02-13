@@ -34,24 +34,24 @@ public class EncryptedParts extends AbstractSecuredParts {
     public QName getName() {
         return getVersion().getSPConstants().getEncryptedParts();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof EncryptedParts)) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
-        
+
         return 31 * result + super.hashCode();
     }
 

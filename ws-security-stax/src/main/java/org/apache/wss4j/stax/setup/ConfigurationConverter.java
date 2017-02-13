@@ -605,7 +605,7 @@ public final class ConfigurationConverter {
             properties.setDerivedKeyKeyIdentifier(convertedDerivedKeyIdentifier);
         }
     }
-    
+
     private static Collection<Pattern> getCertConstraints(String certConstraints) {
         String[] certConstraintsList = certConstraints.split(",");
         if (certConstraintsList != null && certConstraintsList.length > 0) {
@@ -618,12 +618,12 @@ public final class ConfigurationConverter {
                     LOG.error(ex.getMessage(), ex);
                 }
             }
-            
+
             return certConstraintsCollection;
         }
         return Collections.emptyList();
     }
-    
+
     private static void configureParts(Object secureParts, WSSSecurityProperties properties,
                                        String digestAlgo, boolean required, boolean signature) {
         if (secureParts != null) {

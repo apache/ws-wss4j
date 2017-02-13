@@ -80,7 +80,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         super(securityHeader);
         doDebug = LOG.isDebugEnabled();
     }
-    
+
     public WSSecSignatureSAML(Document doc) {
         super(doc);
         doDebug = LOG.isDebugEnabled();
@@ -378,7 +378,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         getWsDocInfo().addTokenElement(samlToken, false);
     }
-    
+
     private void configureKeyInfo(
         SecurityTokenReference secRef, X509Certificate cert,
         Crypto crypto, SamlAssertionWrapper samlAssertion

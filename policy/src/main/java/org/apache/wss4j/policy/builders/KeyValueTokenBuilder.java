@@ -46,7 +46,7 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
         }
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        
+
         Policy nestedPolicy = null;
         if (nestedPolicyElement == null) {
             if (spVersion != SPConstants.SPVersion.SP11) {

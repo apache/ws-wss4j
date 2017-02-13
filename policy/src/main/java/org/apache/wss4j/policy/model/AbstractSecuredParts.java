@@ -43,7 +43,7 @@ public abstract class AbstractSecuredParts extends RequiredParts {
     public QName getName() {
         return getVersion().getSPConstants().getSignedParts();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -52,19 +52,19 @@ public abstract class AbstractSecuredParts extends RequiredParts {
         if (!(object instanceof AbstractSecuredParts)) {
             return false;
         }
-        
+
         AbstractSecuredParts that = (AbstractSecuredParts)object;
         if (body != that.body) {
             return false;
         }
-        if (attachments != null && !attachments.equals(that.attachments) 
+        if (attachments != null && !attachments.equals(that.attachments)
             || attachments == null && that.attachments != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -72,7 +72,7 @@ public abstract class AbstractSecuredParts extends RequiredParts {
             result = 31 * result + attachments.hashCode();
         }
         result = 31 * result + Boolean.hashCode(body);
-        
+
         return 31 * result + super.hashCode();
     }
 

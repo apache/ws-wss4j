@@ -42,33 +42,33 @@ public class TransportBinding extends AbstractBinding {
     public QName getName() {
         return getVersion().getSPConstants().getTransportBinding();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof TransportBinding)) {
             return false;
         }
-        
+
         TransportBinding that = (TransportBinding)object;
         if (transportToken != null && !transportToken.equals(that.transportToken)
             || transportToken == null && that.transportToken != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         if (transportToken != null) {
             result = 31 * result + transportToken.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -88,7 +88,7 @@ public class TransportBinding extends AbstractBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName transportToken = getVersion().getSPConstants().getTransportToken();
                 if (transportToken.getLocalPart().equals(assertionName)
                     && transportToken.getNamespaceURI().equals(assertionNamespace)) {

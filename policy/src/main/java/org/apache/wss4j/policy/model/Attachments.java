@@ -31,7 +31,7 @@ public class Attachments extends AbstractSecurityAssertion {
     private boolean contentSignatureTransform;
     private boolean attachmentCompleteSignatureTransform;
 
-    public Attachments(SPConstants.SPVersion version, boolean contentSignatureTransform, 
+    public Attachments(SPConstants.SPVersion version, boolean contentSignatureTransform,
                        boolean attachmentCompleteSignatureTransform) {
         super(version);
 
@@ -43,17 +43,17 @@ public class Attachments extends AbstractSecurityAssertion {
     public QName getName() {
         return getVersion().getSPConstants().getAttachments();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof Attachments)) {
             return false;
         }
-        
+
         Attachments that = (Attachments)object;
         if (contentSignatureTransform != that.contentSignatureTransform) {
             return false;
@@ -61,16 +61,16 @@ public class Attachments extends AbstractSecurityAssertion {
         if (attachmentCompleteSignatureTransform != that.attachmentCompleteSignatureTransform) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + Boolean.hashCode(contentSignatureTransform);
         result = 31 * result + Boolean.hashCode(attachmentCompleteSignatureTransform);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -84,13 +84,13 @@ public class Attachments extends AbstractSecurityAssertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_IGNORABLE, "true");
         }
         if (isContentSignatureTransform()) {

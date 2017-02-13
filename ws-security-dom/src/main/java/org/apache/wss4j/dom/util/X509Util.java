@@ -116,7 +116,7 @@ public final class X509Util {
         }
         return decryptedData;
     }
-    
+
     public static PublicKey parseKeyValue(Element keyInfoElement,
                                           XMLSignatureFactory signatureFactory) throws WSSecurityException {
         KeyValue keyValue = null;

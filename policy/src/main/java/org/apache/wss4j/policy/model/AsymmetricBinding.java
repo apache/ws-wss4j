@@ -45,17 +45,17 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
     public QName getName() {
         return getVersion().getSPConstants().getAsymmetricBinding();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof AsymmetricBinding)) {
             return false;
         }
-        
+
         AsymmetricBinding that = (AsymmetricBinding)object;
         if (initiatorToken != null && !initiatorToken.equals(that.initiatorToken)
             || initiatorToken == null && that.initiatorToken != null) {
@@ -69,7 +69,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
             || initiatorEncryptionToken == null && that.initiatorEncryptionToken != null) {
             return false;
         }
-        
+
         if (recipientToken != null && !recipientToken.equals(that.recipientToken)
             || recipientToken == null && that.recipientToken != null) {
             return false;
@@ -82,10 +82,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
             || recipientEncryptionToken == null && that.recipientEncryptionToken != null) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -98,7 +98,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
         if (initiatorEncryptionToken != null) {
             result = 31 * result + initiatorEncryptionToken.hashCode();
         }
-        
+
         if (recipientToken != null) {
             result = 31 * result + recipientToken.hashCode();
         }
@@ -108,7 +108,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
         if (recipientEncryptionToken != null) {
             result = 31 * result + recipientEncryptionToken.hashCode();
         }
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -128,7 +128,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName initiatorToken = getVersion().getSPConstants().getInitiatorToken();
                 if (initiatorToken.getLocalPart().equals(assertionName)
                     && initiatorToken.getNamespaceURI().equals(assertionNamespace)) {
@@ -142,7 +142,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                
+
                 QName initiatorSigToken = getVersion().getSPConstants().getInitiatorSignatureToken();
                 if (initiatorSigToken.getLocalPart().equals(assertionName)
                     && initiatorSigToken.getNamespaceURI().equals(assertionNamespace)) {
@@ -155,7 +155,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                
+
                 QName initiatorEncToken = getVersion().getSPConstants().getInitiatorEncryptionToken();
                 if (initiatorEncToken.getLocalPart().equals(assertionName)
                     && initiatorEncToken.getNamespaceURI().equals(assertionNamespace)) {
@@ -168,7 +168,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorEncryptionToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                
+
                 QName recipientToken = getVersion().getSPConstants().getRecipientToken();
                 if (recipientToken.getLocalPart().equals(assertionName)
                     && recipientToken.getNamespaceURI().equals(assertionNamespace)) {
@@ -182,7 +182,7 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     recipientToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                
+
                 QName recipientSigToken = getVersion().getSPConstants().getRecipientSignatureToken();
                 if (recipientSigToken.getLocalPart().equals(assertionName)
                     && recipientSigToken.getNamespaceURI().equals(assertionNamespace)) {
@@ -195,8 +195,8 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     recipientSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                
-                QName recipientEncToken = getVersion().getSPConstants().getRecipientEncryptionToken(); 
+
+                QName recipientEncToken = getVersion().getSPConstants().getRecipientEncryptionToken();
                 if (recipientEncToken.getLocalPart().equals(assertionName)
                     && recipientEncToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getRecipientToken() != null

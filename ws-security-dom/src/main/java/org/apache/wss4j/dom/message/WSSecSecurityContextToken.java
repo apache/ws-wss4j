@@ -70,7 +70,7 @@ public class WSSecSecurityContextToken {
         }
         wssConfig = config;
     }
-    
+
     public WSSecSecurityContextToken(Document doc, WSSConfig config) {
         this.securityHeader = null;
         this.doc = doc;

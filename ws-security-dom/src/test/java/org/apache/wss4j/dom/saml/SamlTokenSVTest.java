@@ -88,7 +88,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -148,7 +148,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -208,7 +208,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -268,7 +268,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -330,7 +330,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 

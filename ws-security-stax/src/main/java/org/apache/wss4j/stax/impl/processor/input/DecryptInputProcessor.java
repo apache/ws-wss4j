@@ -179,8 +179,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                                          Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
 
         String typeStr = encryptedDataType.getType();
-        if (typeStr != null 
-            && (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) 
+        if (typeStr != null
+            && (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr)
                 || WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
 
             CipherReferenceType cipherReferenceType = encryptedDataType.getCipherData().getCipherReference();
@@ -237,7 +237,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     protected void handleSecurityToken(InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext,
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
         inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
-        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = 
+        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent =
             WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
         inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }

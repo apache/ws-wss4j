@@ -157,7 +157,7 @@ public class OutboundWSSec {
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamWriter processOutMessage(
-            XMLStreamWriter xmlStreamWriter, String encoding, OutboundSecurityContext outbounSecurityContext) 
+            XMLStreamWriter xmlStreamWriter, String encoding, OutboundSecurityContext outbounSecurityContext)
                 throws WSSecurityException {
         return processOutMessage((Object) xmlStreamWriter, encoding, outbounSecurityContext);
     }
@@ -174,9 +174,9 @@ public class OutboundWSSec {
         try {
             final SecurityHeaderOutputProcessor securityHeaderOutputProcessor = new SecurityHeaderOutputProcessor();
             initializeOutputProcessor(outputProcessorChain, securityHeaderOutputProcessor, null);
-            
+
             ConfiguredAction configuredAction = configureActions(outputProcessorChain);
-            
+
             // Set up appropriate keys
             if (configuredAction.signatureAction) {
                 setupSignatureKey(outputProcessorChain, securityProperties, configuredAction.signedSAML);
@@ -523,7 +523,7 @@ public class OutboundWSSec {
         }
         return null;
     }
-    
+
     private PublicKey getReqSigPublicKey(SecurityContext securityContext) throws XMLSecurityException {
         List<SecurityEvent> securityEventList = securityContext.getAsList(SecurityEvent.class);
         if (securityEventList != null) {
@@ -564,10 +564,10 @@ public class OutboundWSSec {
                 break;
             }
     }
-    
+
     private ConfiguredAction configureActions(OutputProcessorChainImpl outputProcessorChain) throws XMLSecurityException {
         ConfiguredAction configuredAction = new ConfiguredAction();
-        
+
         //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
         //todo they use the same signature parts
 
@@ -645,7 +645,7 @@ public class OutboundWSSec {
                     }
                     configuredAction.encryptionAction = true;
                     configuredAction.derivedEncryption = true;
-                } else if (securityProperties.getDerivedKeyTokenReference() 
+                } else if (securityProperties.getDerivedKeyTokenReference()
                     == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
                     final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
                             new SecurityContextTokenOutputProcessor();
@@ -673,7 +673,7 @@ public class OutboundWSSec {
                     encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
 
-                } else if (securityProperties.getDerivedKeyTokenReference() 
+                } else if (securityProperties.getDerivedKeyTokenReference()
                     == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
                     final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
                             new SecurityContextTokenOutputProcessor();
@@ -735,10 +735,10 @@ public class OutboundWSSec {
                 initializeOutputProcessor(outputProcessorChain, unknownTokenOutputProcessor, action);
             }
         }
-        
+
         return configuredAction;
     }
-    
+
     private static class ConfiguredAction {
         boolean signatureAction = false;
         boolean encryptionAction = false;

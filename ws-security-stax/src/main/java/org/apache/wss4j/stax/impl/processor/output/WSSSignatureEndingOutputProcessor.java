@@ -116,7 +116,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 || WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER.equals(keyIdentifier)
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
-            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier) 
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier)
                 && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_X509_PKIPATH_V1));
             }
@@ -195,7 +195,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     }
 
     @Override
-    protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) 
+    protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef)
         throws XMLStreamException, XMLSecurityException {
         String[] transforms = signaturePartDef.getTransforms();
         if (transforms != null && transforms.length > 0) {
@@ -206,11 +206,11 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[0]));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
                 if (transforms.length >= 2) {
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS, 
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS,
                                                        false, null);
                     attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[1]));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, 
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod,
                                                        false, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
@@ -228,9 +228,9 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transform)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform)) {
                         attributes = new ArrayList<>(1);
-                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, 
+                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList,
                                                        signaturePartDef.getInclusiveNamespacesPrefixes()));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, 
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces,
                                                            true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                     }

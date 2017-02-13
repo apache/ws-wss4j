@@ -891,7 +891,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             Document doc = SOAPUtil.toSOAPPart(sourceDocument);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            
+
             WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
             wsSign.prepare(samlAssertion);

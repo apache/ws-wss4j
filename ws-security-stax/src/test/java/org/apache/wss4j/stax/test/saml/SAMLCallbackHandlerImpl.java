@@ -89,7 +89,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
                 InputStream input = this.getClass().getClassLoader().getResourceAsStream("saml/issuer.jks");
                 keyStore.load(input, "default".toCharArray());
                 input.close();
-                
+
                 Merlin crypto = new Merlin();
                 crypto.setKeyStore(keyStore);
                 samlCallback.setIssuerCrypto(crypto);

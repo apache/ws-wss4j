@@ -151,7 +151,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      *
      * The value under this tag is of type STRParser.REFERENCE_TYPE.
      */
-    public static final String TAG_X509_REFERENCE_TYPE  = "x509-reference-type";
+    public static final String TAG_X509_REFERENCE_TYPE = "x509-reference-type";
 
     /**
      * Tag denoting the encrypted key bytes

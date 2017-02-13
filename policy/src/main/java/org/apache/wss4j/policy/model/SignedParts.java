@@ -39,7 +39,7 @@ public class SignedParts extends AbstractSecuredParts {
     public QName getName() {
         return getVersion().getSPConstants().getSignedParts();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -48,20 +48,20 @@ public class SignedParts extends AbstractSecuredParts {
         if (!(object instanceof SignedParts)) {
             return false;
         }
-        
+
         SignedParts that = (SignedParts)object;
         if (signAllHeaders != that.signAllHeaders) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + Boolean.hashCode(signAllHeaders);
-        
+
         return 31 * result + super.hashCode();
     }
 

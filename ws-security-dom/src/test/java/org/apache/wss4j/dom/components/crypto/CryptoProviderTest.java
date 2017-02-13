@@ -83,7 +83,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -107,7 +107,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -135,7 +135,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -198,7 +198,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            
+
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
             Document encryptedDoc = encrypt.build(crypto);
@@ -254,7 +254,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            
+
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
             Document encryptedDoc = encrypt.build(crypto);

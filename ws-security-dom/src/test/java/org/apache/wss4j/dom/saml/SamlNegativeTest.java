@@ -119,7 +119,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
@@ -173,7 +173,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document signedDoc = wsSign.build(samlAssertion);
@@ -225,7 +225,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document signedDoc = wsSign.build(samlAssertion);
@@ -357,7 +357,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");

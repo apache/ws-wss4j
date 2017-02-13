@@ -78,7 +78,7 @@ public class UsernameToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getUsernameToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -87,7 +87,7 @@ public class UsernameToken extends AbstractToken {
         if (!(object instanceof UsernameToken)) {
             return false;
         }
-        
+
         UsernameToken that = (UsernameToken)object;
         if (passwordType != that.passwordType || usernameTokenType != that.usernameTokenType) {
             return false;
@@ -95,10 +95,10 @@ public class UsernameToken extends AbstractToken {
         if (created != that.created || nonce != that.nonce) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -110,7 +110,7 @@ public class UsernameToken extends AbstractToken {
         }
         result = 31 * result + Boolean.hashCode(created);
         result = 31 * result + Boolean.hashCode(nonce);
-        
+
         return 31 * result + super.hashCode();
     }
 

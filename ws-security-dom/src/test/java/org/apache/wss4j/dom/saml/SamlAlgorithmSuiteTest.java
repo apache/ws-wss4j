@@ -79,7 +79,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
         Document signedDoc = wsSign.build(samlAssertion);
 
@@ -122,7 +122,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document signedDoc = wsSign.build(samlAssertion);
@@ -166,7 +166,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         Document signedDoc = wsSign.build(samlAssertion);

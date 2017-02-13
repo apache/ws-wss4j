@@ -47,7 +47,7 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             Throwable cause = e.getCause();
 
             // Allow a WSSPolicyException
-            if (returnSecurityError || initiator 
+            if (returnSecurityError || initiator
                 || cause != null && cause.getCause() instanceof WSSPolicyException) {
                 throw e;
             }

@@ -38,7 +38,7 @@ public class IssuedToken extends AbstractToken {
     private boolean requireInternalReference;
 
     public IssuedToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
-                       Element issuer, String issuerName, Element requestSecurityTokenTemplate, Element claims, 
+                       Element issuer, String issuerName, Element requestSecurityTokenTemplate, Element claims,
                        Policy nestedPolicy) {
         super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
         setRequestSecurityTokenTemplate(requestSecurityTokenTemplate);
@@ -50,7 +50,7 @@ public class IssuedToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getIssuedToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -59,27 +59,27 @@ public class IssuedToken extends AbstractToken {
         if (!(object instanceof IssuedToken)) {
             return false;
         }
-        
+
         IssuedToken that = (IssuedToken)object;
         if (requireExternalReference != that.requireExternalReference
             || requireInternalReference != that.requireInternalReference) {
             return false;
         }
-        
+
         if (requestSecurityTokenTemplate == null && that.requestSecurityTokenTemplate != null
             || requestSecurityTokenTemplate != null && requestSecurityTokenTemplate == null) {
             return false;
         }
-        
-        if (requestSecurityTokenTemplate != null 
+
+        if (requestSecurityTokenTemplate != null
             && !DOM2Writer.nodeToString(requestSecurityTokenTemplate).equals(
                 DOM2Writer.nodeToString(that.requestSecurityTokenTemplate))) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -88,7 +88,7 @@ public class IssuedToken extends AbstractToken {
         }
         result = 31 * result + Boolean.hashCode(requireExternalReference);
         result = 31 * result + Boolean.hashCode(requireInternalReference);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -105,13 +105,13 @@ public class IssuedToken extends AbstractToken {
             );
         }
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, 
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_IGNORABLE, "true");
         }
         if (getIssuer() != null) {
@@ -159,7 +159,7 @@ public class IssuedToken extends AbstractToken {
                     issuedToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                
+
                 QName requireExternalRef = getVersion().getSPConstants().getRequireExternalReference();
                 if (requireExternalRef.getLocalPart().equals(assertionName)
                     && requireExternalRef.getNamespaceURI().equals(assertionNamespace)) {
@@ -169,7 +169,7 @@ public class IssuedToken extends AbstractToken {
                     issuedToken.setRequireExternalReference(true);
                     continue;
                 }
-                
+
                 QName requireInternalRef = getVersion().getSPConstants().getRequireInternalReference();
                 if (requireInternalRef.getLocalPart().equals(assertionName)
                     && requireInternalRef.getNamespaceURI().equals(assertionNamespace)) {

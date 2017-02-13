@@ -52,7 +52,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
-        final WSInboundSecurityContext wssecurityContextInbound = 
+        final WSInboundSecurityContext wssecurityContextInbound =
             (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
 
         //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
@@ -157,7 +157,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (createdCalendar.getSecond() > 59) {
                 securityContext.handleBSPRule(BSPRule.R3213);
             }
-            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), 
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(),
                                                                   WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3225);
@@ -183,7 +183,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (expiresCalendar.getSecond() > 59) {
                 securityContext.handleBSPRule(BSPRule.R3215);
             }
-            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), 
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(),
                                                                   WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3226);

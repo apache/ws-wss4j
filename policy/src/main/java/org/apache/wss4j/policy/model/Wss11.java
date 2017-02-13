@@ -42,7 +42,7 @@ public class Wss11 extends Wss10 {
     public QName getName() {
         return getVersion().getSPConstants().getWss11();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -51,24 +51,24 @@ public class Wss11 extends Wss10 {
         if (!(object instanceof Wss11)) {
             return false;
         }
-        
+
         Wss11 that = (Wss11)object;
         if (mustSupportRefThumbprint != that.mustSupportRefThumbprint
             || mustSupportRefEncryptedKey != that.mustSupportRefEncryptedKey
             || requireSignatureConfirmation != that.requireSignatureConfirmation) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + Boolean.hashCode(mustSupportRefThumbprint);
         result = 31 * result + Boolean.hashCode(mustSupportRefEncryptedKey);
         result = 31 * result + Boolean.hashCode(requireSignatureConfirmation);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -88,7 +88,7 @@ public class Wss11 extends Wss10 {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName mustSupportRefThumbprint = getVersion().getSPConstants().getMustSupportRefThumbprint();
                 if (mustSupportRefThumbprint.getLocalPart().equals(assertionName)
                     && mustSupportRefThumbprint.getNamespaceURI().equals(assertionNamespace)) {
@@ -98,7 +98,7 @@ public class Wss11 extends Wss10 {
                     wss11.setMustSupportRefThumbprint(true);
                     continue;
                 }
-                
+
                 QName mustSupportRefEncryptedKey = getVersion().getSPConstants().getMustSupportRefEncryptedKey();
                 if (mustSupportRefEncryptedKey.getLocalPart().equals(assertionName)
                     && mustSupportRefEncryptedKey.getNamespaceURI().equals(assertionNamespace)) {
@@ -108,7 +108,7 @@ public class Wss11 extends Wss10 {
                     wss11.setMustSupportRefEncryptedKey(true);
                     continue;
                 }
-                
+
                 QName requireSigConf = getVersion().getSPConstants().getRequireSignatureConfirmation();
                 if (requireSigConf.getLocalPart().equals(assertionName)
                     && requireSigConf.getNamespaceURI().equals(assertionNamespace)) {

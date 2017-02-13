@@ -96,7 +96,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -126,7 +126,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         //
         // This test fails with the IBM JDK
         //
@@ -171,7 +171,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -210,7 +210,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -241,7 +241,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss4jcertdsa", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -316,7 +316,7 @@ public class SignatureCertTest extends org.junit.Assert {
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40exp.jks");
 
         Crypto clientCrypto = new Merlin(clientProperties, this.getClass().getClassLoader(), null);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -359,7 +359,7 @@ public class SignatureCertTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40exp", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);

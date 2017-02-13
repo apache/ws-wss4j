@@ -701,7 +701,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -769,7 +769,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");

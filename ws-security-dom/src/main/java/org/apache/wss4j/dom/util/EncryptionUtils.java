@@ -118,9 +118,9 @@ public final class EncryptionUtils {
         String symEncAlgo,
         CallbackHandler attachmentCallbackHandler
     ) throws WSSecurityException {
-        return decryptEncryptedData(doc, dataRefURI, encData, symmetricKey, 
+        return decryptEncryptedData(doc, dataRefURI, encData, symmetricKey,
                                     symEncAlgo, attachmentCallbackHandler, null);
-        
+
     }
     /**
      * Decrypt the EncryptedData argument using a SecretKey.
@@ -146,8 +146,8 @@ public final class EncryptionUtils {
         // See if it is an attachment, and handle that differently
         String typeStr = encData.getAttributeNS(null, "Type");
         String xopURI = getXOPURIFromEncryptedData(encData);
-        if (typeStr != null 
-            && (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) 
+        if (typeStr != null
+            && (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr)
                 || WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
 
             Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
@@ -360,7 +360,7 @@ public final class EncryptionUtils {
     private static Node decryptXopAttachment(
        SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
        String xopURI, Element encData
-   ) throws WSSecurityException, IOException, UnsupportedCallbackException, NoSuchAlgorithmException, 
+   ) throws WSSecurityException, IOException, UnsupportedCallbackException, NoSuchAlgorithmException,
         NoSuchPaddingException, ParserConfigurationException, SAXException {
 
         if (attachmentCallbackHandler == null) {
@@ -388,7 +388,7 @@ public final class EncryptionUtils {
         InputStream attachmentInputStream =
                 AttachmentUtils.setupAttachmentDecryptionStream(
                         symEncAlgo, cipher, symmetricKey, attachment.getSourceStream());
-        
+
         // For the xop:Include case, we need to replace the xop:Include Element with the
         // decrypted Element
         DocumentBuilder db =
@@ -408,7 +408,7 @@ public final class EncryptionUtils {
                 throw ex;
             }
         }
-        
+
         Node decryptedNode =
             encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
         encData.getParentNode().appendChild(decryptedNode);
@@ -422,12 +422,12 @@ public final class EncryptionUtils {
      */
     private static String setParentPrefixes(Element target, String str) {
         Node parent = target;
-        
+
         // Get the point at where to insert new prefix definitions
         int insertionIndex = str.indexOf('>');
         StringBuilder prefix = new StringBuilder(str.substring(0, insertionIndex));
         StringBuilder suffix = new StringBuilder(str.substring(insertionIndex, str.length()));
-        
+
         // Don't add more than 20 prefixes
         int prefixAddedCount = 0;
         while (parent.getParentNode() != null && prefixAddedCount < 20

@@ -132,7 +132,7 @@ public final class WSConstants extends WSS4JConstants {
     /**
      * An unsupported signature or encryption algorithm was used
      */
-    public static final QName UNSUPPORTED_ALGORITHM  =
+    public static final QName UNSUPPORTED_ALGORITHM =
         new QName(WSSE_NS, "UnsupportedAlgorithm");
 
     /**

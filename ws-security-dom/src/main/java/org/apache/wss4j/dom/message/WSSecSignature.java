@@ -109,7 +109,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         super(securityHeader);
         init();
     }
-    
+
     public WSSecSignature(Document doc) {
         super(doc);
         init();
@@ -582,7 +582,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             sig.sign(signContext);
 
             signatureValue = sig.getSignatureValue().getValue();
-            
+
             cleanup();
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);

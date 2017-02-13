@@ -46,7 +46,7 @@ public class SecureConversationToken extends SecurityContextToken {
     public QName getName() {
         return getVersion().getSPConstants().getSecureConversationToken();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -55,24 +55,24 @@ public class SecureConversationToken extends SecurityContextToken {
         if (!(object instanceof SecureConversationToken)) {
             return false;
         }
-        
+
         SecureConversationToken that = (SecureConversationToken)object;
         if (mustNotSendCancel != that.mustNotSendCancel
             || mustNotSendAmend != that.mustNotSendAmend
             || mustNotSendRenew != that.mustNotSendRenew) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + Boolean.hashCode(mustNotSendCancel);
         result = 31 * result + Boolean.hashCode(mustNotSendAmend);
         result = 31 * result + Boolean.hashCode(mustNotSendRenew);
-        
+
         return 31 * result + super.hashCode();
     }
 

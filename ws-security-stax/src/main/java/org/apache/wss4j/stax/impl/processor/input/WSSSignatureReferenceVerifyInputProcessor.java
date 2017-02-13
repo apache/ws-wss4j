@@ -217,15 +217,15 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                         securityContext.handleBSPRule(BSPRule.R5423);
-                        if (j == transformTypes.size() - 1 
+                        if (j == transformTypes.size() - 1
                             && !WSSConstants.NS_C14N_EXCL.equals(algorithm)
                             && !WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                             securityContext.handleBSPRule(BSPRule.R5412);
                         }
-                        InclusiveNamespaces inclusiveNamespacesType = 
-                            XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                        InclusiveNamespaces inclusiveNamespacesType =
+                            XMLSecurityUtils.getQNameType(transformType.getContent(),
                                                           XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                         if (WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                 && inclusiveNamespacesType != null
@@ -238,13 +238,13 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                 securityContext.handleBSPRule(BSPRule.R5413);
                             }
                             TransformationParametersType transformationParametersType =
-                                    XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                                    XMLSecurityUtils.getQNameType(transformType.getContent(),
                                                                   WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
                             if (transformationParametersType == null) {
                                 securityContext.handleBSPRule(BSPRule.R3065);
                             } else {
                                 CanonicalizationMethodType canonicalizationMethodType =
-                                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), 
+                                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(),
                                                                       WSSConstants.TAG_dsig_CanonicalizationMethod);
                                 if (canonicalizationMethodType == null) {
                                     securityContext.handleBSPRule(BSPRule.R3065);
@@ -313,7 +313,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
         if (timestampSecurityEvent != null && replayCache != null) {
             final String cacheKey =
-                    timestampSecurityEvent.getCreated().getTimeInMillis() 
+                    timestampSecurityEvent.getCreated().getTimeInMillis()
                     + "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
             if (replayCache.contains(cacheKey)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
@@ -358,14 +358,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
             if (transformationParametersType != null) {
                 CanonicalizationMethodType canonicalizationMethodType =
-                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), 
+                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(),
                                                       WSSConstants.TAG_dsig_CanonicalizationMethod);
                 if (canonicalizationMethodType != null) {
 
                     algorithm = canonicalizationMethodType.getAlgorithm();
 
                     InclusiveNamespaces inclusiveNamespacesType =
-                            XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), 
+                            XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(),
                                                           XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
 
                     Map<String, Object> transformerProperties = null;
@@ -387,7 +387,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
             InclusiveNamespaces inclusiveNamespacesType =
-                    XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                    XMLSecurityUtils.getQNameType(transformType.getContent(),
                                                   XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
 
             Map<String, Object> transformerProperties = null;

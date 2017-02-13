@@ -146,7 +146,7 @@ public class SignatureAction implements Action {
 
             List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(parts);
 
-            if (signBST 
+            if (signBST
                 || reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
                 wsSign.computeSignature(referenceList, false, null);
             } else {

@@ -55,7 +55,7 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
         inputProcessorChain.getSecurityContext().registerSecurityEvent(signatureConfirmationSecurityEvent);
     }
 
-    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureConfirmationType signatureConfirmationType) 
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureConfirmationType signatureConfirmationType)
         throws WSSecurityException {
         if (signatureConfirmationType.getId() == null) {
             ((WSInboundSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(BSPRule.R5441);

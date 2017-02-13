@@ -76,7 +76,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
         SamlToken samlToken = (SamlToken) abstractToken;
 
         if (samlToken.getIssuerName() != null && !samlToken.getIssuerName().equals(samlTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" 
+            setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken ("
                 + samlTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
@@ -86,7 +86,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
         if (samlToken.isRequireKeyIdentifierReference()) {
             KeyIdentifier keyIdentifier = samlTokenSecurityEvent.getSecurityToken().getKeyIdentifier();
             if (!WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(keyIdentifier)) {
-                setErrorMessage("Policy enforces KeyIdentifierReference but we got " 
+                setErrorMessage("Policy enforces KeyIdentifierReference but we got "
                     + samlTokenSecurityEvent.getSecurityToken().getTokenType());
                 getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE),
                                                  getErrorMessage());

@@ -55,17 +55,17 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
 
         parseNestedSymmetricAsymmetricBindingBasePolicy(nestedPolicy, this);
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
-        
+
         if (!(object instanceof AbstractSymmetricAsymmetricBinding)) {
             return false;
         }
-        
+
         AbstractSymmetricAsymmetricBinding that = (AbstractSymmetricAsymmetricBinding)object;
         if (protectionOrder != that.protectionOrder
             || encryptSignature != that.encryptSignature
@@ -73,10 +73,10 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
             || onlySignEntireHeadersAndBody != that.onlySignEntireHeadersAndBody) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -86,7 +86,7 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
         result = 31 * result + Boolean.hashCode(encryptSignature);
         result = 31 * result + Boolean.hashCode(protectTokens);
         result = 31 * result + Boolean.hashCode(onlySignEntireHeadersAndBody);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
                     asymmetricBindingBase.setProtectionOrder(protectionOrder);
                     continue;
                 }
-                
+
                 QName encryptSignature = getVersion().getSPConstants().getEncryptSignature();
                 if (encryptSignature.getLocalPart().equals(assertionName)
                     && encryptSignature.getNamespaceURI().equals(assertionNamespace)) {
@@ -121,7 +121,7 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
                     asymmetricBindingBase.setEncryptSignature(true);
                     continue;
                 }
-                
+
                 QName protectTokens = getVersion().getSPConstants().getProtectTokens();
                 if (protectTokens.getLocalPart().equals(assertionName)
                     && protectTokens.getNamespaceURI().equals(assertionNamespace)) {
@@ -131,8 +131,8 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
                     asymmetricBindingBase.setProtectTokens(true);
                     continue;
                 }
-                
-                QName onlySign = getVersion().getSPConstants().getOnlySignEntireHeadersAndBody(); 
+
+                QName onlySign = getVersion().getSPConstants().getOnlySignEntireHeadersAndBody();
                 if (onlySign.getLocalPart().equals(assertionName)
                     && onlySign.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBindingBase.isOnlySignEntireHeadersAndBody()) {

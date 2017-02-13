@@ -40,7 +40,7 @@ public class ResolverXPointer extends org.apache.xml.security.stax.impl.resource
     public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverXPointer(uri);
     }
-    
+
     @Override
     public boolean matches(XMLSecStartElement xmlSecStartElement) {
         return matches(xmlSecStartElement, XMLSecurityConstants.ATT_NULL_Id);

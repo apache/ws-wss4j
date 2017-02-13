@@ -45,7 +45,7 @@ public class WSSecTimestamp extends WSSecBase {
     public WSSecTimestamp(WSSecHeader securityHeader) {
         super(securityHeader);
     }
-    
+
     public WSSecTimestamp(Document doc) {
         super(doc);
     }

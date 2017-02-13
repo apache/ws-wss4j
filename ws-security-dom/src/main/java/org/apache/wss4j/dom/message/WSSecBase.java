@@ -64,16 +64,16 @@ public class WSSecBase {
             doc = null;
         }
     }
-    
+
     public WSSecBase(Document doc) {
         this.doc = doc;
         securityHeader = new WSSecHeader(doc);
     }
-    
+
     protected Document getDocument() {
         return doc;
     }
-    
+
     public WSSecHeader getSecurityHeader() {
         return securityHeader;
     }

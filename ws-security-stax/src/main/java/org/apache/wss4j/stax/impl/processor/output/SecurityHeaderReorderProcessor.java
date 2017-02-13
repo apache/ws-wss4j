@@ -87,11 +87,11 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
         throws XMLStreamException, XMLSecurityException {
 
         int documentLevel = xmlSecEvent.getDocumentLevel();
-        if (documentLevel < 3 
+        if (documentLevel < 3
             || !WSSUtils.isInSecurityHeader(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
             outputProcessorChain.processEvent(xmlSecEvent);
             return;
@@ -103,7 +103,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
             if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(WSSConstants.TAG_WSSE_SECURITY)) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator = 
+                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator =
                     actionEventMap.entrySet().iterator();
                 loop:
                 while (iterator.hasNext()) {
@@ -158,15 +158,15 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                 case XMLStreamConstants.START_ELEMENT:
                     XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
 
-                    List<SecurityHeaderOrder> securityHeaderOrderList = 
+                    List<SecurityHeaderOrder> securityHeaderOrderList =
                         outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                     SecurityHeaderOrder securityHeaderOrder = securityHeaderOrderList.get(securityHeaderIndex);
-                    if (!xmlSecStartElement.getName().equals(WSSConstants.TAG_xenc_EncryptedData) 
+                    if (!xmlSecStartElement.getName().equals(WSSConstants.TAG_xenc_EncryptedData)
                         && !xmlSecStartElement.getName().equals(securityHeaderOrder.getSecurityHeaderElementName())) {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.FAILURE, "empty",
-                                new Object[] {"Invalid security header order. Expected " 
-                                + securityHeaderOrder.getSecurityHeaderElementName() 
+                                new Object[] {"Invalid security header order. Expected "
+                                + securityHeaderOrder.getSecurityHeaderElementName()
                                 + " but got " + xmlSecStartElement.getName()});
                     }
 

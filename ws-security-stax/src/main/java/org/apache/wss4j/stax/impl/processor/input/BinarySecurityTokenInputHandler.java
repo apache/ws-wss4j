@@ -66,13 +66,13 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             binarySecurityTokenType.setId(IDGenerator.generateID(null));
         }
 
-        final WSInboundSecurityContext wsInboundSecurityContext = 
+        final WSInboundSecurityContext wsInboundSecurityContext =
             (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
         final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
 
-        final TokenContext tokenContext = 
+        final TokenContext tokenContext =
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         BinarySecurityTokenValidator binarySecurityTokenValidator =

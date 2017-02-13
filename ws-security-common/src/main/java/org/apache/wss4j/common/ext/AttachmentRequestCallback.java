@@ -51,7 +51,7 @@ public class AttachmentRequestCallback implements Callback {
     }
 
     /**
-     * Set whether to remove the attachments when we're reading them. 
+     * Set whether to remove the attachments when we're reading them.
      * The default is "true".
      */
     public void setRemoveAttachments(boolean removeAttachments) {

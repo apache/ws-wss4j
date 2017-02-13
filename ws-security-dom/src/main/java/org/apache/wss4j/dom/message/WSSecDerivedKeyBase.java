@@ -106,7 +106,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         super(securityHeader);
         setKeyIdentifierType(0);
     }
-    
+
     public WSSecDerivedKeyBase(Document doc) {
         super(doc);
         setKeyIdentifierType(0);

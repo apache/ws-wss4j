@@ -49,7 +49,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
         throws XMLStreamException, XMLSecurityException {
 
         boolean eventHandled = false;
@@ -126,7 +126,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     //so output one and add securityHeader
 
                     //create subchain and output soap-header and securityHeader
-                    OutputProcessorChain subOutputProcessorChain = 
+                    OutputProcessorChain subOutputProcessorChain =
                         outputProcessorChain.createSubChain(this, xmlSecStartElement.getParentXMLSecStartElement());
                     createStartElementAndOutputAsEvent(subOutputProcessorChain,
                             new QName(soapMessageVersion, WSSConstants.TAG_SOAP_HEADER_LN, WSSConstants.PREFIX_SOAPENV), true, null);
@@ -146,7 +146,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             case XMLStreamConstants.END_ELEMENT:
                 XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
                 int documentLevel = xmlSecEndElement.getDocumentLevel();
-                String soapMessageVersionNS = 
+                String soapMessageVersionNS =
                     WSSUtils.getSOAPMessageVersionNamespace(xmlSecEndElement.getParentXMLSecStartElement());
                 if (documentLevel == 2 && WSSConstants.TAG_SOAP_HEADER_LN.equals(xmlSecEndElement.getName().getLocalPart())
                         && xmlSecEndElement.getName().getNamespaceURI().equals(soapMessageVersionNS)) {

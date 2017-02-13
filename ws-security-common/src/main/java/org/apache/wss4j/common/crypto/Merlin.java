@@ -671,7 +671,7 @@ public class Merlin extends CryptoBase {
                                               new Object[] {msg});
             } catch (KeyStoreException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey", 
+                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey",
                         new Object[] {ex.getMessage()}
                 );
             }
@@ -679,7 +679,7 @@ public class Merlin extends CryptoBase {
         String password = getPassword(identifier, callbackHandler);
         return getPrivateKey(identifier, password);
     }
-    
+
     /**
      * Gets the private key corresponding to the given PublicKey.
      *
@@ -710,7 +710,7 @@ public class Merlin extends CryptoBase {
                                               new Object[] {msg});
             } catch (KeyStoreException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey", 
+                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey",
                         new Object[] {ex.getMessage()}
                 );
             }
@@ -718,7 +718,7 @@ public class Merlin extends CryptoBase {
         String password = getPassword(identifier, callbackHandler);
         return getPrivateKey(identifier, password);
     }
-    
+
     /**
      * Gets the private key corresponding to the identifier.
      *
@@ -823,7 +823,7 @@ public class Merlin extends CryptoBase {
         List<Certificate[]> foundIssuingCertChains = null;
         String issuerString = certs[0].getIssuerX500Principal().getName();
         if (certs.length == 1) {
-            
+
             Object subject = convertSubjectToPrincipal(issuerString);
 
             if (keystore != null) {
@@ -835,7 +835,7 @@ public class Merlin extends CryptoBase {
                 foundIssuingCertChains = getCertificates(subject, truststore);
             }
 
-            if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty() 
+            if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()
                 || foundIssuingCertChains.get(0).length < 1) {
                 String subjectString = certs[0].getSubjectX500Principal().getName();
                 if (LOG.isDebugEnabled()) {
@@ -905,7 +905,7 @@ public class Merlin extends CryptoBase {
             }
 
             PKIXParameters param = createPKIXParameters(set, enableRevocation);
-            
+
             // Generate cert path
             if (foundIssuingCertChains != null && !foundIssuingCertChains.isEmpty()) {
                 java.security.cert.CertPathValidatorException validatorException = null;
@@ -914,10 +914,10 @@ public class Merlin extends CryptoBase {
                     X509Certificate[] x509certs = new X509Certificate[foundCertChain.length + 1];
                     x509certs[0] = certs[0];
                     System.arraycopy(foundCertChain, 0, x509certs, 1, foundCertChain.length);
-                    
+
                     List<X509Certificate> certList = Arrays.asList(certs);
                     CertPath path = getCertificateFactory().generateCertPath(certList);
-                    
+
                     try {
                         validator.validate(path, param);
                         // We have a valid cert path at this point so break
@@ -927,14 +927,14 @@ public class Merlin extends CryptoBase {
                         validatorException = e;
                     }
                 }
-                
+
                 if (validatorException != null) {
                     throw validatorException;
                 }
             } else {
                 List<X509Certificate> certList = Arrays.asList(certs);
                 CertPath path = getCertificateFactory().generateCertPath(certList);
-                
+
                 validator.validate(path, param);
             }
         } catch (NoSuchProviderException | NoSuchAlgorithmException
@@ -950,10 +950,10 @@ public class Merlin extends CryptoBase {
         if (!matchesSubjectDnPattern(certs[0], subjectCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-    }   
+    }
 
     @Override
-    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation, 
+    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation,
                             Collection<Pattern> subjectCertConstraints,
                             Collection<Pattern> issuerCertConstraints) throws WSSecurityException {
         verifyTrust(certs, enableRevocation, subjectCertConstraints);
@@ -1070,7 +1070,7 @@ public class Merlin extends CryptoBase {
 
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) certs[0];
-                    LOG.debug("Keystore alias {} has issuer {} and serial {}", alias, 
+                    LOG.debug("Keystore alias {} has issuer {} and serial {}", alias,
                               x509cert.getIssuerX500Principal().getName(), x509cert.getSerialNumber());
                     if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                         Object certName =
@@ -1087,7 +1087,7 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
+
         LOG.debug("No issuer serial match found in keystore");
         return new Certificate[]{};
     }
@@ -1173,7 +1173,7 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
+
         LOG.debug("No thumbprint match found in keystore");
         return new Certificate[]{};
     }
@@ -1240,7 +1240,7 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
+
         LOG.debug("No SKI match found in keystore");
         return new Certificate[]{};
     }
@@ -1272,7 +1272,7 @@ public class Merlin extends CryptoBase {
         // We just choose the first entry
         return Arrays.copyOf(certs.get(0), certs.get(0).length, X509Certificate[].class);
     }
-    
+
     private Object convertSubjectToPrincipal(String subjectDN) {
         //
         // Convert the subject DN to a java X500Principal object first. This is to ensure
@@ -1289,7 +1289,7 @@ public class Merlin extends CryptoBase {
         } catch (java.lang.IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
-        
+
         return subject;
     }
 
@@ -1368,7 +1368,7 @@ public class Merlin extends CryptoBase {
         } catch (KeyStoreException e) {
             return false;
         }
-        
+
         LOG.debug("No PublicKey match found in keystore");
         return false;
     }
@@ -1411,7 +1411,7 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
+
         if (foundCerts.isEmpty()) {
             LOG.debug("No Subject match found in keystore");
         }
@@ -1467,7 +1467,7 @@ public class Merlin extends CryptoBase {
         }
         return null;
     }
-    
+
     private String getIdentifier(PublicKey publicKey, KeyStore store)
         throws WSSecurityException {
         try {

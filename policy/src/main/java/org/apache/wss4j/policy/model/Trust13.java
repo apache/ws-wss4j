@@ -44,7 +44,7 @@ public class Trust13 extends Trust10 {
     public QName getName() {
         return getVersion().getSPConstants().getTrust13();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (object == this) {
@@ -53,7 +53,7 @@ public class Trust13 extends Trust10 {
         if (!(object instanceof Trust13)) {
             return false;
         }
-        
+
         Trust13 that = (Trust13)object;
         if (requireRequestSecurityTokenCollection != that.requireRequestSecurityTokenCollection
             || requireAppliesTo != that.requireAppliesTo
@@ -61,10 +61,10 @@ public class Trust13 extends Trust10 {
             || mustSupportInteractiveChallenge != that.mustSupportInteractiveChallenge) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -72,7 +72,7 @@ public class Trust13 extends Trust10 {
         result = 31 * result + Boolean.hashCode(requireAppliesTo);
         result = 31 * result + Boolean.hashCode(scopePolicy15);
         result = 31 * result + Boolean.hashCode(mustSupportInteractiveChallenge);
-        
+
         return 31 * result + super.hashCode();
     }
 
@@ -92,7 +92,7 @@ public class Trust13 extends Trust10 {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName requireRSTC = getVersion().getSPConstants().getRequireRequestSecurityTokenCollection();
                 if (requireRSTC.getLocalPart().equals(assertionName)
                     && requireRSTC.getNamespaceURI().equals(assertionNamespace)) {
@@ -102,7 +102,7 @@ public class Trust13 extends Trust10 {
                     trust13.setRequireRequestSecurityTokenCollection(true);
                     continue;
                 }
-                
+
                 QName requireAppliesTo = getVersion().getSPConstants().getRequireAppliesTo();
                 if (requireAppliesTo.getLocalPart().equals(assertionName)
                     && requireAppliesTo.getNamespaceURI().equals(assertionNamespace)) {
@@ -112,7 +112,7 @@ public class Trust13 extends Trust10 {
                     trust13.setRequireAppliesTo(true);
                     continue;
                 }
-                
+
                 QName scopePolicy15 = getVersion().getSPConstants().getScopePolicy15();
                 if (scopePolicy15.getLocalPart().equals(assertionName)
                     && scopePolicy15.getNamespaceURI().equals(assertionNamespace)) {
@@ -122,8 +122,8 @@ public class Trust13 extends Trust10 {
                     trust13.setScopePolicy15(true);
                     continue;
                 }
-                
-                QName supportInteractiveChallenge = 
+
+                QName supportInteractiveChallenge =
                     getVersion().getSPConstants().getMustSupportInteractiveChallenge();
                 if (supportInteractiveChallenge.getLocalPart().equals(assertionName)
                     && supportInteractiveChallenge.getNamespaceURI().equals(assertionNamespace)) {

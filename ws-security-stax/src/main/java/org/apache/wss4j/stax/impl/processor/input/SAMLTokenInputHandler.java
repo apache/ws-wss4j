@@ -121,7 +121,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         final Element samlElement = samlTokenDocument.getDocumentElement();
         final SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlElement);
 
-        SamlTokenValidator samlTokenValidator = 
+        SamlTokenValidator samlTokenValidator =
             wssSecurityProperties.getValidator(new QName(samlElement.getNamespaceURI(), samlElement.getLocalName()));
         if (samlTokenValidator == null) {
             samlTokenValidator = new SamlTokenValidatorImpl();
@@ -195,7 +195,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
         final List<QName> elementPath = getElementPath(eventQueue);
-        final TokenContext tokenContext = 
+        final TokenContext tokenContext =
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         final SamlSecurityToken samlSecurityToken =
@@ -245,11 +245,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
                         if (elementPath.size() >= 4) {
                             int lastIndex = elementPath.size() - 2;
-                            if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart()) 
-                                && "SubjectConfirmation".equals(elementPath.get(lastIndex - 1).getLocalPart()) 
+                            if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart())
+                                && "SubjectConfirmation".equals(elementPath.get(lastIndex - 1).getLocalPart())
                                 && "Subject".equals(elementPath.get(lastIndex - 2).getLocalPart())) {
                                 return idx;
-                            } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart()) 
+                            } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart())
                                 && "Subject".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
                                 return idx;
                             }
@@ -273,7 +273,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
                         if (elementPath.size() >= 4) {
                             int lastIndex = elementPath.size() - 2;
-                            if ("Signature".equals(elementPath.get(lastIndex).getLocalPart()) 
+                            if ("Signature".equals(elementPath.get(lastIndex).getLocalPart())
                                 && "Assertion".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
                                 return idx;
                             }
@@ -541,9 +541,9 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<>();
         private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
-        SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, 
+        SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties,
                                         SamlAssertionWrapper samlAssertionWrapper,
-                                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider, 
+                                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider,
                                         InboundSecurityToken subjectSecurityToken) {
             super(securityProperties);
             this.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
@@ -656,7 +656,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                             PublicKey publicKey = securityToken.getPublicKey();
                             Map<String, Key> keyMap = securityToken.getSecretKey();
                             if (x509Certificates != null && x509Certificates.length > 0
-                                && subjectCertificates != null && subjectCertificates.length > 0 
+                                && subjectCertificates != null && subjectCertificates.length > 0
                                 && subjectCertificates[0].equals(x509Certificates[0])) {
                                 return;
                             }
@@ -690,15 +690,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         SignedElementSecurityEvent samlTokenSignedElementSecurityEvent = null;
                         for (int j = 0; j < samlTokenSignedElementSecurityEvents.size(); j++) {
                             SignedElementSecurityEvent signedElementSecurityEvent = samlTokenSignedElementSecurityEvents.get(j);
-                            if (securityTokenProvider.getSecurityToken().getXMLSecEvent() 
+                            if (securityTokenProvider.getSecurityToken().getXMLSecEvent()
                                 == signedElementSecurityEvent.getXmlSecEvent()) {
 
                                 samlTokenSignedElementSecurityEvent = signedElementSecurityEvent;
                             }
                         }
-                        if (bodySignedPartSecurityEvent != null 
-                            && samlTokenSignedElementSecurityEvent != null 
-                            && bodySignedPartSecurityEvent.getSecurityToken() 
+                        if (bodySignedPartSecurityEvent != null
+                            && samlTokenSignedElementSecurityEvent != null
+                            && bodySignedPartSecurityEvent.getSecurityToken()
                                 == samlTokenSignedElementSecurityEvent.getSecurityToken()) {
                             return;
                         }
@@ -727,7 +727,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             return null;
         }
-        
+
         private boolean containsSignature(List<TokenUsage> tokenUses) {
             return tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)
                 || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_Signature)

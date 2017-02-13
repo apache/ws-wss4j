@@ -64,7 +64,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
         if (!(object instanceof Trust10)) {
             return false;
         }
-        
+
         Trust10 that = (Trust10)object;
         if (mustSupportClientChallenge != that.mustSupportClientChallenge
             || mustSupportServerChallenge != that.mustSupportServerChallenge
@@ -73,10 +73,10 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
             || mustSupportIssuedTokens != that.mustSupportIssuedTokens) {
             return false;
         }
-        
+
         return super.equals(object);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -85,10 +85,10 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
         result = 31 * result + Boolean.hashCode(requireClientEntropy);
         result = 31 * result + Boolean.hashCode(requireServerEntropy);
         result = 31 * result + Boolean.hashCode(mustSupportIssuedTokens);
-        
+
         return 31 * result + super.hashCode();
     }
-    
+
     @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
@@ -115,7 +115,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                
+
                 QName mustSupportClientChallenge = getVersion().getSPConstants().getMustSupportClientChallenge();
                 if (mustSupportClientChallenge.getLocalPart().equals(assertionName)
                     && mustSupportClientChallenge.getNamespaceURI().equals(assertionNamespace)) {
@@ -125,7 +125,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                     trust10.setMustSupportClientChallenge(true);
                     continue;
                 }
-                
+
                 QName mustSupportServerChallenge = getVersion().getSPConstants().getMustSupportServerChallenge();
                 if (mustSupportServerChallenge.getLocalPart().equals(assertionName)
                     && mustSupportServerChallenge.getNamespaceURI().equals(assertionNamespace)) {
@@ -135,7 +135,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                     trust10.setMustSupportServerChallenge(true);
                     continue;
                 }
-                
+
                 QName requireClientEntropy = getVersion().getSPConstants().getRequireClientEntropy();
                 if (requireClientEntropy.getLocalPart().equals(assertionName)
                     && requireClientEntropy.getNamespaceURI().equals(assertionNamespace)) {
@@ -145,7 +145,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                     trust10.setRequireClientEntropy(true);
                     continue;
                 }
-                
+
                 QName requireServerEntropy = getVersion().getSPConstants().getRequireServerEntropy();
                 if (requireServerEntropy.getLocalPart().equals(assertionName)
                     && requireServerEntropy.getNamespaceURI().equals(assertionNamespace)) {
@@ -155,7 +155,7 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                     trust10.setRequireServerEntropy(true);
                     continue;
                 }
-                
+
                 QName mustSupportIssuedTokens = getVersion().getSPConstants().getMustSupportIssuedTokens();
                 if (mustSupportIssuedTokens.getLocalPart().equals(assertionName)
                     && mustSupportIssuedTokens.getNamespaceURI().equals(assertionNamespace)) {
