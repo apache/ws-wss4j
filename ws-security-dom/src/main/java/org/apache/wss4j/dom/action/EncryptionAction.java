@@ -81,7 +81,7 @@ public class EncryptionAction implements Action {
                 crypto.verifyTrust(certs, enableRevocation, null, null);
             }
         }
-        if (encryptionToken.getParts().size() > 0) {
+        if (!encryptionToken.getParts().isEmpty()) {
             wsEncrypt.getParts().addAll(encryptionToken.getParts());
         }
 

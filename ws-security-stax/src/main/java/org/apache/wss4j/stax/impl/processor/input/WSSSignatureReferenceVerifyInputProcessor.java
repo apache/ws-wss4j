@@ -203,7 +203,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             ReferenceType referenceType = references.get(i);
             if (referenceType.getTransforms() == null) {
                 securityContext.handleBSPRule(BSPRule.R5416);
-            } else if (referenceType.getTransforms().getTransform().size() == 0) {
+            } else if (referenceType.getTransforms().getTransform().isEmpty()) {
                 securityContext.handleBSPRule(BSPRule.R5411);
             } else {
                 List<TransformType> transformTypes = referenceType.getTransforms().getTransform();
@@ -229,12 +229,12 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                                           XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                         if (WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                 && inclusiveNamespacesType != null
-                                && inclusiveNamespacesType.getPrefixList().size() == 0) {
+                                && inclusiveNamespacesType.getPrefixList().isEmpty()) {
                             securityContext.handleBSPRule(BSPRule.R5407);
                         }
                         if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)) {
                             if (inclusiveNamespacesType != null
-                                    && inclusiveNamespacesType.getPrefixList().size() == 0) {
+                                    && inclusiveNamespacesType.getPrefixList().isEmpty()) {
                                 securityContext.handleBSPRule(BSPRule.R5413);
                             }
                             TransformationParametersType transformationParametersType =
@@ -339,7 +339,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier internalSignatureReferenceVerifier)
             throws XMLSecurityException {
 
-        if (referenceType.getTransforms() == null || referenceType.getTransforms().getTransform().size() == 0) {
+        if (referenceType.getTransforms() == null || referenceType.getTransforms().getTransform().isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();

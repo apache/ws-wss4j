@@ -514,7 +514,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                         assertionStateMapIterator.next();
                     // every list entry counts as an alternative...
                     Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
-                    if (assertionListMap != null && assertionListMap.size() > 0) {
+                    if (assertionListMap != null && !assertionListMap.isEmpty()) {
                         Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator =
                             assertionListMap.entrySet().iterator();
                         while (assertionStateIterator.hasNext()) {
@@ -546,7 +546,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map =
                     assertionStateMapIterator.next();
                 Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
-                if (assertionListMap != null && assertionListMap.size() > 0) {
+                if (assertionListMap != null && !assertionListMap.isEmpty()) {
                     Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator =
                         assertionListMap.entrySet().iterator();
                     while (assertionStateIterator.hasNext()) {

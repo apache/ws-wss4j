@@ -119,7 +119,7 @@ public class Encryptor {
             }
             List<Element> elementsToEncrypt =
                 WSSecurityUtil.findElements(encPart, callbackLookup, doc);
-            if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
+            if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
                 if (!encPart.isRequired()) {
                     continue;
                 }

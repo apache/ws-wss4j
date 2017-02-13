@@ -176,7 +176,7 @@ public class WSSecSignatureBase extends WSSecBase {
                         elementsToSign =
                             WSSecurityUtil.findElements(encPart, callbackLookup, doc);
                     }
-                    if (elementsToSign == null || elementsToSign.size() == 0) {
+                    if (elementsToSign == null || elementsToSign.isEmpty()) {
                         if (!encPart.isRequired()) {
                             continue;
                         }

@@ -238,7 +238,7 @@ public abstract class WSHandler {
          * other actors.
          */
         if (reqData.isEnableSignatureConfirmation()
-            && isRequest && reqData.getSignatureValues().size() > 0) {
+            && isRequest && !reqData.getSignatureValues().isEmpty()) {
             @SuppressWarnings("unchecked")
             Set<Integer> savedSignatures =
                 (Set<Integer>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
@@ -450,7 +450,7 @@ public abstract class WSHandler {
                     );
 
                 if (sc != null && sc.getSignatureValue() != null) {
-                    if (savedSignatures == null || savedSignatures.size() == 0) {
+                    if (savedSignatures == null || savedSignatures.isEmpty()) {
                         //
                         // If there are no stored signature values, and we've received a
                         // SignatureConfirmation element then throw an Exception

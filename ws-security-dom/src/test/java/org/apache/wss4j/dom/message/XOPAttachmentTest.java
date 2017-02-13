@@ -598,7 +598,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);
-        assertTrue(encryptedAttachments.size() == 0);
+        assertTrue(encryptedAttachments.isEmpty());
 
         AttachmentCallbackHandler inboundAttachmentCallback =
             new AttachmentCallbackHandler(encryptedAttachments);

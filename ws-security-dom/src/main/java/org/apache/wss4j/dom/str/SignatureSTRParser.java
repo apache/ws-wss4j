@@ -110,7 +110,7 @@ public class SignatureSTRParser implements STRParser {
         SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
         String confirmMethod = null;
         List<String> methods = samlAssertion.getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && samlAssertion.isSigned()) {

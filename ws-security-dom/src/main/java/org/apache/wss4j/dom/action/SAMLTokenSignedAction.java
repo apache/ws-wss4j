@@ -113,7 +113,7 @@ public class SAMLTokenSignedAction implements Action {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
 
-        if (signatureToken.getParts().size() > 0) {
+        if (!signatureToken.getParts().isEmpty()) {
             wsSign.getParts().addAll(signatureToken.getParts());
         }
 

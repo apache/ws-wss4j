@@ -325,24 +325,24 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 supportingTokensIterator.remove();
                 messageTokens.messageEncryptionTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.messageEncryptionTokens);
-            } else if (signsSignature && signingSecurityTokens.size() > 0 && encryptingSecurityTokens.size() > 0) {
+            } else if (signsSignature && !signingSecurityTokens.isEmpty() && !encryptingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedEndorsingEncryptedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedEndorsingEncryptedSupportingTokens);
-            } else if (transportSecurityActive && signsTimestamp && signingSecurityTokens.size() > 0
-                && encryptingSecurityTokens.size() > 0) {
+            } else if (transportSecurityActive && signsTimestamp && !signingSecurityTokens.isEmpty()
+                && !encryptingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedEndorsingEncryptedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedEndorsingEncryptedSupportingTokens);
-            } else if (signsSignature && signingSecurityTokens.size() == 0 && encryptingSecurityTokens.size() > 0) {
+            } else if (signsSignature && signingSecurityTokens.isEmpty() && !encryptingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.endorsingEncryptedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.endorsingEncryptedSupportingTokens);
-            } else if (signsSignature && signingSecurityTokens.size() > 0) {
+            } else if (signsSignature && !signingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedEndorsingSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedEndorsingSupportingTokens);
-            } else if (signatureUsage && signingSecurityTokens.size() > 0) {
+            } else if (signatureUsage && !signingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedEndorsingSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedEndorsingSupportingTokens);
@@ -350,15 +350,15 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 supportingTokensIterator.remove();
                 messageTokens.endorsingSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.endorsingSupportingTokens);
-            } else if (signingSecurityTokens.size() > 0 && encryptingSecurityTokens.size() > 0) {
+            } else if (!signingSecurityTokens.isEmpty() && !encryptingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedEncryptedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedEncryptedSupportingTokens);
-            } else if (signingSecurityTokens.size() > 0) {
+            } else if (!signingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.signedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.signedSupportingTokens);
-            } else if (encryptingSecurityTokens.size() > 0) {
+            } else if (!encryptingSecurityTokens.isEmpty()) {
                 supportingTokensIterator.remove();
                 messageTokens.encryptedSupportingTokens =
                     addTokenSecurityEvent(tokenSecurityEvent, messageTokens.encryptedSupportingTokens);

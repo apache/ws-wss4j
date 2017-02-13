@@ -614,7 +614,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         PublicKey subjectPublicKey = subjectSecurityToken.getPublicKey();
                         Key subjectSecretKey = null;
                         Map<String, Key> subjectKeyMap = subjectSecurityToken.getSecretKey();
-                        if (subjectKeyMap.size() > 0) {
+                        if (!subjectKeyMap.isEmpty()) {
                             subjectSecretKey = subjectKeyMap.values().toArray(new Key[subjectKeyMap.size()])[0];
                         }
 

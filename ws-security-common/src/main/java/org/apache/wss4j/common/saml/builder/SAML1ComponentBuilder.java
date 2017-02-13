@@ -397,7 +397,7 @@ public final class SAML1ComponentBuilder {
                 builderFactory.getBuilder(SubjectLocality.DEFAULT_ELEMENT_NAME);
         }
 
-        if (authBeans != null && authBeans.size() > 0) {
+        if (authBeans != null && !authBeans.isEmpty()) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthenticationStatement authenticationStatement =
                     authenticationStatementV1Builder.buildObject(
@@ -472,7 +472,7 @@ public final class SAML1ComponentBuilder {
 
         List<AttributeStatement> attributeStatements = new ArrayList<>();
 
-        if (attributeData != null && attributeData.size() > 0) {
+        if (attributeData != null && !attributeData.isEmpty()) {
             for (AttributeStatementBean statementBean : attributeData) {
                 // Create the attribute statementBean and set the subject
                 AttributeStatement attributeStatement = attributeStatementV1Builder.buildObject();
@@ -557,7 +557,7 @@ public final class SAML1ComponentBuilder {
 
         }
 
-        if (decisionData != null && decisionData.size() > 0) {
+        if (decisionData != null && !decisionData.isEmpty()) {
             for (AuthDecisionStatementBean decisionStatementBean : decisionData) {
                 AuthorizationDecisionStatement authDecision =
                     authorizationDecisionStatementV1Builder.buildObject();

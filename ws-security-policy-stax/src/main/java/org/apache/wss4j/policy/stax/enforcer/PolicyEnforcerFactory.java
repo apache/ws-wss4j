@@ -296,7 +296,7 @@ public class PolicyEnforcerFactory {
             policies.add(portTypePolicy);
         }
 
-        if (policies.size() == 0) {
+        if (policies.isEmpty()) {
             return new Policy();
         }
 
@@ -340,7 +340,7 @@ public class PolicyEnforcerFactory {
             }
         }
 
-        if (policies.size() == 0) {
+        if (policies.isEmpty()) {
             return new Policy();
         }
 
@@ -394,7 +394,7 @@ public class PolicyEnforcerFactory {
             }
         }
 
-        if (policies.size() == 0) {
+        if (policies.isEmpty()) {
             return new Policy();
         }
 

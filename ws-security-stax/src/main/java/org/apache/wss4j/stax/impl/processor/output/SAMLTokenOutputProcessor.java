@@ -99,7 +99,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             boolean senderVouches = false;
             boolean hok = false;
             List<String> methods = samlAssertionWrapper.getConfirmationMethods();
-            if (methods != null && methods.size() > 0) {
+            if (methods != null && !methods.isEmpty()) {
                 String confirmMethod = methods.get(0);
                 if (OpenSAMLUtil.isMethodSenderVouches(confirmMethod)) {
                     senderVouches = true;

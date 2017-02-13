@@ -465,7 +465,7 @@ public final class SAML2ComponentBuilder {
             builderFactory.getBuilder(SubjectLocality.DEFAULT_ELEMENT_NAME);
         }
 
-        if (authBeans != null && authBeans.size() > 0) {
+        if (authBeans != null && !authBeans.isEmpty()) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthnStatement authnStatement = authnStatementBuilder.buildObject();
                 DateTime authInstant = statementBean.getAuthenticationInstant();
@@ -727,7 +727,7 @@ public final class SAML2ComponentBuilder {
             builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
         }
 
-        if (attributeData != null && attributeData.size() > 0) {
+        if (attributeData != null && !attributeData.isEmpty()) {
             for (AttributeStatementBean statementBean : attributeData) {
                 AttributeStatement attributeStatement = attributeStatementBuilder.buildObject();
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
@@ -792,7 +792,7 @@ public final class SAML2ComponentBuilder {
                     builderFactory.getBuilder(AuthzDecisionStatement.DEFAULT_ELEMENT_NAME);
         }
 
-        if (decisionData != null && decisionData.size() > 0) {
+        if (decisionData != null && !decisionData.isEmpty()) {
             for (AuthDecisionStatementBean decisionStatementBean : decisionData) {
                 AuthzDecisionStatement authDecision =
                     authorizationDecisionStatementBuilder.buildObject();

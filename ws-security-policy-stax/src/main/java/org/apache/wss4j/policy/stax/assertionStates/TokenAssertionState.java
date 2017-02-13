@@ -267,7 +267,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             return true;
         }
 
-        if (securityToken.getWrappedTokens().size() == 0) {
+        if (securityToken.getWrappedTokens().isEmpty()) {
             return false;
         }
 

@@ -123,7 +123,7 @@ public class UsernameTokenSignedAction implements Action {
         // builder.prependToHeader(reqData.getSecHeader());
 
         List<WSEncryptionPart> parts = null;
-        if (signatureToken.getParts().size() > 0) {
+        if (!signatureToken.getParts().isEmpty()) {
             parts = signatureToken.getParts();
         } else {
             parts = new ArrayList<>(1);

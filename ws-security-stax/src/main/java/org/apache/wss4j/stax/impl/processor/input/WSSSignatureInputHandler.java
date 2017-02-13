@@ -139,7 +139,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(),
                 WSSConstants.TAG_c14nExcl_InclusiveNamespaces);
-        if (inclusiveNamespacesType != null && inclusiveNamespacesType.getPrefixList().size() == 0) {
+        if (inclusiveNamespacesType != null && inclusiveNamespacesType.getPrefixList().isEmpty()) {
             securityContext.handleBSPRule(BSPRule.R5406);
         }
     }

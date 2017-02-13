@@ -495,7 +495,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                         "WSS4JHandler: security processing failed", ex
                 );
             }
-            if (wsResult == null || wsResult.size() == 0) {
+            if (wsResult == null || wsResult.isEmpty()) {
                 // no security header found
                 if (actions.isEmpty()) {
                     return true;

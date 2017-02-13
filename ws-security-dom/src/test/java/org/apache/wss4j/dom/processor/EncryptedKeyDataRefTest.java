@@ -159,7 +159,7 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
                 .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
 
             //We want check only the DATA_REF_URIS
-            if (dataRefs != null && dataRefs.size() > 0) {
+            if (dataRefs != null && !dataRefs.isEmpty()) {
                 for (int j = 0; j < dataRefs.size(); j++) {
                     Object obj = dataRefs.get(i);
 

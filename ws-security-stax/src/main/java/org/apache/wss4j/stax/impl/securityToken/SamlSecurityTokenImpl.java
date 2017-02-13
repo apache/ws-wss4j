@@ -196,7 +196,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         }
         String confirmMethod = null;
         List<String> methods = samlAssertionWrapper.getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         // If HOK + Token is signed then we don't need to verify the subject cert, as we

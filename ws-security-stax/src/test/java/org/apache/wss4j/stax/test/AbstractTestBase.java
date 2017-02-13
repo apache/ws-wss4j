@@ -513,7 +513,7 @@ public abstract class AbstractTestBase extends Assert {
                                               new Object[] {"WSS4JHandler: security processing failed"}
                 );
             }
-            if (wsResult.getResults() == null || wsResult.getResults().size() == 0) {
+            if (wsResult.getResults() == null || wsResult.getResults().isEmpty()) {
                 // no security header found
                 if (actions.isEmpty()) {
                     return true;
