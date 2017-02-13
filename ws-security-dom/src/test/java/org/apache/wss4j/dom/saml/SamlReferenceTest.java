@@ -798,7 +798,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
-        actionResult =  results.getActionResults().get(WSConstants.SIGN).get(0);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -873,7 +873,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
-        actionResult =  results.getActionResults().get(WSConstants.ENCR).get(0);
+        actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -949,7 +949,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
-        actionResult =  results.getActionResults().get(WSConstants.ENCR).get(0);
+        actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =

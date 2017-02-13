@@ -48,7 +48,7 @@ public final class ConversationConstants {
     /**
      * Token type of DerivedKeyToken
      */
-    public static final String TOKEN_TYPE_DERIVED_KEY_TOKEN =  "/dk";
+    public static final String TOKEN_TYPE_DERIVED_KEY_TOKEN = "/dk";
 
     /**
      * Token type of SecurityContextToken

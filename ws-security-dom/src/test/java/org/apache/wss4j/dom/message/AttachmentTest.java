@@ -609,7 +609,7 @@ public class AttachmentTest extends Assert {
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment attachment =  new Attachment();
+        final Attachment attachment = new Attachment();
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
