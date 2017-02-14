@@ -626,11 +626,13 @@ public abstract class WSHandler {
             decodeBooleanConfigValue(mc, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false);
         actionToken.setIncludeToken(includeToken);
         
-        boolean expandXOP =
-            decodeBooleanConfigValue(
-                reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE, false
-        );
-        reqData.setExpandXopInclude(expandXOP);
+        if (!reqData.isExpandXopInclude()) {
+            boolean expandXOP =
+                decodeBooleanConfigValue(
+                    reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE, false
+            );
+            reqData.setExpandXopInclude(expandXOP);
+        }
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
