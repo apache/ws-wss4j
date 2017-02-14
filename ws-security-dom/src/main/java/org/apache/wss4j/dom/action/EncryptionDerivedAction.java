@@ -60,6 +60,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsEncrypt.setWsDocInfo(reqData.getWsDocInfo());
+        wsEncrypt.setExpandXopInclude(reqData.isExpandXopInclude());
 
         if (encryptionToken.getKeyIdentifierId() != 0) {
             wsEncrypt.setKeyIdentifierType(encryptionToken.getKeyIdentifierId());

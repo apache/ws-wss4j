@@ -56,6 +56,7 @@ public class UsernameTokenAction implements Action {
         builder.setPasswordsAreEncoded(reqData.isEncodePasswords());
         builder.setUserInfo(username, password);
         builder.setWsDocInfo(reqData.getWsDocInfo());
+        builder.setExpandXopInclude(reqData.isExpandXopInclude());
 
         if (reqData.isAddUsernameTokenNonce()) {
             builder.addNonce();

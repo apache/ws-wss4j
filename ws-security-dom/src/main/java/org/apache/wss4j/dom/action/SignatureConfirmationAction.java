@@ -58,6 +58,7 @@ public class SignatureConfirmationAction implements Action {
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(reqData.getSecHeader());
         wsc.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsc.setWsDocInfo(reqData.getWsDocInfo());
+        wsc.setExpandXopInclude(reqData.isExpandXopInclude());
         SignatureActionToken signatureToken = (SignatureActionToken)actionToken;
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();

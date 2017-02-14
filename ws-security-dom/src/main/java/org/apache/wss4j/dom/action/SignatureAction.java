@@ -60,6 +60,7 @@ public class SignatureAction implements Action {
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
         wsSign.setWsDocInfo(reqData.getWsDocInfo());
+        wsSign.setExpandXopInclude(reqData.isExpandXopInclude());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());

@@ -425,7 +425,7 @@ public class SignatureProcessor implements Processor {
                 // We don't write out the xop:Include bytes into the BinarySecurityToken by default
                 // But if the BST is signed, then we have to, or else Signature validation fails...
                 handleXopInclude(element, wsDocInfo);
-            } else if (data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
+            } else if (data.isExpandXopInclude() && element.getFirstChild() != null) {
                 // Look for xop:Include Nodes
                 List<Element> includeElements =
                     XMLUtils.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);

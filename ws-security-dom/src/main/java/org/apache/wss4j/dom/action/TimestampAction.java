@@ -38,6 +38,7 @@ public class TimestampAction implements Action {
         timeStampBuilder.setTimeToLive(reqData.getTimeStampTTL());
         timeStampBuilder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
         timeStampBuilder.setWsDocInfo(reqData.getWsDocInfo());
+        timeStampBuilder.setExpandXopInclude(reqData.isExpandXopInclude());
         timeStampBuilder.build();
     }
 }

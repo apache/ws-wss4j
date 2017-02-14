@@ -63,6 +63,7 @@ public class UsernameTokenSignedAction implements Action {
         builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
         builder.setWsDocInfo(reqData.getWsDocInfo());
+        builder.setExpandXopInclude(reqData.isExpandXopInclude());
 
         int iterations = reqData.getDerivedKeyIterations();
         boolean useMac = reqData.isUseDerivedKeyForMAC();

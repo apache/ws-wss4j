@@ -611,8 +611,20 @@ CallbackHandler must be set on RequestData that can handle attachments.
 <tr>
 <td><b>WSS4J 2.1.2/2.0.5</b> EXPAND_XOP_INCLUDE_FOR_SIGNATURE</td>
 <td>expandXOPIncludeForSignature</td>
-<td>Whether to expand xop:Include Elements encountered when verifying a
+<td>(Deprecated in 2.2.0). Whether to expand xop:Include Elements encountered when verifying a
 Signature. The default is true, meaning that the relevant attachment bytes are
+BASE-64 encoded and inserted into the Element. This ensures that the actual
+bytes are signed, and not just the reference.
+</td>
+</tr>
+<tr>
+<td><b>WSS4J 2.2.0</b> EXPAND_XOP_INCLUDE</td>
+<td>expandXOPInclude</td>
+<td>
+Whether to search for and expand xop:Include Elements for encryption and
+signature (on the outbound side) or for signature verification (on the inbound
+side). The default is false on the outbound side and true on the inbound side.
+What this means on the inbound side, is that the relevant attachment bytes are
 BASE-64 encoded and inserted into the Element. This ensures that the actual
 bytes are signed, and not just the reference.
 </td>

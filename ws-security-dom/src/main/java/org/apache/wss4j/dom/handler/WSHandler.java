@@ -625,6 +625,12 @@ public abstract class WSHandler {
         boolean includeToken =
             decodeBooleanConfigValue(mc, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false);
         actionToken.setIncludeToken(includeToken);
+        
+        boolean expandXOP =
+            decodeBooleanConfigValue(
+                reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE, false
+        );
+        reqData.setExpandXopInclude(expandXOP);
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
@@ -1309,6 +1315,7 @@ public abstract class WSHandler {
         }
     }
 
+    @SuppressWarnings("deprecation")
     protected void decodeSignatureParameter2(RequestData reqData)
         throws WSSecurityException {
         if (reqData.getSigVerCrypto() == null) {
@@ -1336,11 +1343,20 @@ public abstract class WSHandler {
             reqData.setIssuerDNPatterns(issuerCertConstraints);
         }
 
-        boolean expandXOP =
-            decodeBooleanConfigValue(
-                reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, true
+        String value = getString(WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, reqData.getMsgContext());
+        boolean expandXOP = false;
+        if (value != null) {
+            expandXOP =
+                decodeBooleanConfigValue(
+                    reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, true
+                );
+        } else {
+            expandXOP =
+                decodeBooleanConfigValue(
+                    reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE, true
             );
-        reqData.setExpandXopIncludeForSignature(expandXOP);
+        }
+        reqData.setExpandXopInclude(expandXOP);
     }
 
     private Collection<Pattern> getCertConstraints(String certConstraints) throws WSSecurityException {

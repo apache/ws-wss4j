@@ -192,7 +192,7 @@ public class RequestData {
      */
     private boolean validateSamlSubjectConfirmation = true;
 
-    private boolean expandXopIncludeForSignature = true;
+    private boolean expandXopInclude;
 
     public Object getMsgContext() {
         return msgContext;
@@ -721,12 +721,12 @@ public class RequestData {
         this.storeBytesInAttachment = storeBytesInAttachment;
     }
 
-    public boolean isExpandXopIncludeForSignature() {
-        return expandXopIncludeForSignature;
+    public boolean isExpandXopInclude() {
+        return expandXopInclude;
     }
 
-    public void setExpandXopIncludeForSignature(boolean expandXopIncludeForSignature) {
-        this.expandXopIncludeForSignature = expandXopIncludeForSignature;
+    public void setExpandXopInclude(boolean expandXopInclude) {
+        this.expandXopInclude = expandXopInclude;
     }
 
     public Serializer getEncryptionSerializer() {

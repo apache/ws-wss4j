@@ -41,6 +41,7 @@ public class EncryptionAction implements Action {
         WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsEncrypt.setWsDocInfo(reqData.getWsDocInfo());
+        wsEncrypt.setExpandXopInclude(reqData.isExpandXopInclude());
 
         EncryptionActionToken encryptionToken = null;
         if (actionToken instanceof EncryptionActionToken) {

@@ -534,9 +534,20 @@ public class ConfigurationConstants {
     /**
      * Whether to expand xop:Include Elements encountered when verifying a Signature. The default is true,
      * meaning that the relevant attachment bytes are BASE-64 encoded and inserted into the Element. This
-     * ensures that the actual bytes are signed, and not just the reference.
+     * ensures that the actual bytes are signed, and not just the reference. This configuration tag has
+     * been deprecated in favour of EXPAND_XOP_INCLUDE.
      */
+    @Deprecated
     public static final String EXPAND_XOP_INCLUDE_FOR_SIGNATURE = "expandXOPIncludeForSignature";
+    
+    /**
+     * Whether to search for and expand xop:Include Elements for encryption and signature (on the outbound
+     * side) or for signature verification (on the inbound side). The default is false on the outbound 
+     * side and true on the inbound side. What this means on the inbound side, is that the relevant attachment 
+     * bytes are BASE-64 encoded and inserted into the Element. This ensures that the actual bytes are signed, 
+     * and not just the reference.
+     */
+    public static final String EXPAND_XOP_INCLUDE = "expandXOPInclude";
 
     //
     // (Non-boolean) Configuration parameters for the actions/processors

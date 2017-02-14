@@ -38,6 +38,7 @@ public class SAMLTokenUnsignedAction implements Action {
         WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         builder.setWsDocInfo(reqData.getWsDocInfo());
+        builder.setExpandXopInclude(reqData.isExpandXopInclude());
 
         CallbackHandler samlCallbackHandler =
                 handler.getCallbackHandler(
