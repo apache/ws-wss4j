@@ -69,9 +69,9 @@ public class SecureConversationToken extends SecurityContextToken {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(mustNotSendCancel);
-        result = 31 * result + Boolean.hashCode(mustNotSendAmend);
-        result = 31 * result + Boolean.hashCode(mustNotSendRenew);
+        result = 31 * result + Boolean.valueOf(mustNotSendCancel).hashCode();
+        result = 31 * result + Boolean.valueOf(mustNotSendAmend).hashCode();
+        result = 31 * result + Boolean.valueOf(mustNotSendRenew).hashCode();
         
         return 31 * result + super.hashCode();
     }

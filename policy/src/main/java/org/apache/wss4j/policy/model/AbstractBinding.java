@@ -88,7 +88,7 @@ public abstract class AbstractBinding extends AbstractSecurityAssertion implemen
         if (layout != null) {
             result = 31 * result + layout.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(includeTimestamp);
+        result = 31 * result + Boolean.valueOf(includeTimestamp).hashCode();
         
         return 31 * result + super.hashCode();
     }

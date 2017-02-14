@@ -80,11 +80,11 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(mustSupportClientChallenge);
-        result = 31 * result + Boolean.hashCode(mustSupportServerChallenge);
-        result = 31 * result + Boolean.hashCode(requireClientEntropy);
-        result = 31 * result + Boolean.hashCode(requireServerEntropy);
-        result = 31 * result + Boolean.hashCode(mustSupportIssuedTokens);
+        result = 31 * result + Boolean.valueOf(mustSupportClientChallenge).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportServerChallenge).hashCode();
+        result = 31 * result + Boolean.valueOf(requireClientEntropy).hashCode();
+        result = 31 * result + Boolean.valueOf(requireServerEntropy).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportIssuedTokens).hashCode();
         
         return 31 * result + super.hashCode();
     }

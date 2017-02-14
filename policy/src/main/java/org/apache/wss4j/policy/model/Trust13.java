@@ -68,10 +68,10 @@ public class Trust13 extends Trust10 {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(requireRequestSecurityTokenCollection);
-        result = 31 * result + Boolean.hashCode(requireAppliesTo);
-        result = 31 * result + Boolean.hashCode(scopePolicy15);
-        result = 31 * result + Boolean.hashCode(mustSupportInteractiveChallenge);
+        result = 31 * result + Boolean.valueOf(requireRequestSecurityTokenCollection).hashCode();
+        result = 31 * result + Boolean.valueOf(requireAppliesTo).hashCode();
+        result = 31 * result + Boolean.valueOf(scopePolicy15).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportInteractiveChallenge).hashCode();
         
         return 31 * result + super.hashCode();
     }

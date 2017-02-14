@@ -60,7 +60,7 @@ public class SignedParts extends AbstractSecuredParts {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(signAllHeaders);
+        result = 31 * result + Boolean.valueOf(signAllHeaders).hashCode();
         
         return 31 * result + super.hashCode();
     }

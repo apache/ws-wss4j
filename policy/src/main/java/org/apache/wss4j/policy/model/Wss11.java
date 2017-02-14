@@ -65,9 +65,9 @@ public class Wss11 extends Wss10 {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(mustSupportRefThumbprint);
-        result = 31 * result + Boolean.hashCode(mustSupportRefEncryptedKey);
-        result = 31 * result + Boolean.hashCode(requireSignatureConfirmation);
+        result = 31 * result + Boolean.valueOf(mustSupportRefThumbprint).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportRefEncryptedKey).hashCode();
+        result = 31 * result + Boolean.valueOf(requireSignatureConfirmation).hashCode();
         
         return 31 * result + super.hashCode();
     }

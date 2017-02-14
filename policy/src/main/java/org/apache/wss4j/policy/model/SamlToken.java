@@ -89,7 +89,7 @@ public class SamlToken extends AbstractToken {
         if (samlTokenType != null) {
             result = 31 * result + samlTokenType.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
+        result = 31 * result + Boolean.valueOf(requireKeyIdentifierReference).hashCode();
         
         return 31 * result + super.hashCode();
     }

@@ -87,7 +87,7 @@ public class KerberosToken extends AbstractToken {
         if (apReqTokenType != null) {
             result = 31 * result + apReqTokenType.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
+        result = 31 * result + Boolean.valueOf(requireKeyIdentifierReference).hashCode();
         
         return 31 * result + super.hashCode();
     }

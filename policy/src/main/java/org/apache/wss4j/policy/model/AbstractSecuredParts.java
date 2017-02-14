@@ -71,7 +71,7 @@ public abstract class AbstractSecuredParts extends RequiredParts {
         if (attachments != null) {
             result = 31 * result + attachments.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(body);
+        result = 31 * result + Boolean.valueOf(body).hashCode();
         
         return 31 * result + super.hashCode();
     }

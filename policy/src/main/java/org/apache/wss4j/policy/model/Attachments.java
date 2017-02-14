@@ -68,8 +68,8 @@ public class Attachments extends AbstractSecurityAssertion {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(contentSignatureTransform);
-        result = 31 * result + Boolean.hashCode(attachmentCompleteSignatureTransform);
+        result = 31 * result + Boolean.valueOf(contentSignatureTransform).hashCode();
+        result = 31 * result + Boolean.valueOf(attachmentCompleteSignatureTransform).hashCode();
         
         return 31 * result + super.hashCode();
     }

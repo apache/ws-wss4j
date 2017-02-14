@@ -350,12 +350,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 result = 31 * result + signatureKeyDerivation.hashCode();
             }
             
-            result = 31 * result + Integer.hashCode(encryptionDerivedKeyLength);
-            result = 31 * result + Integer.hashCode(signatureDerivedKeyLength);
-            result = 31 * result + Integer.hashCode(minimumSymmetricKeyLength);
-            result = 31 * result + Integer.hashCode(maximumSymmetricKeyLength);
-            result = 31 * result + Integer.hashCode(minimumAsymmetricKeyLength);
-            result = 31 * result + Integer.hashCode(maximumAsymmetricKeyLength);
+            result = 31 * result + Integer.valueOf(encryptionDerivedKeyLength).hashCode();
+            result = 31 * result + Integer.valueOf(signatureDerivedKeyLength).hashCode();
+            result = 31 * result + Integer.valueOf(minimumSymmetricKeyLength).hashCode();
+            result = 31 * result + Integer.valueOf(maximumSymmetricKeyLength).hashCode();
+            result = 31 * result + Integer.valueOf(minimumAsymmetricKeyLength).hashCode();
+            result = 31 * result + Integer.valueOf(maximumAsymmetricKeyLength).hashCode();
             
             if (mgfAlgo != null) {
                 result = 31 * result + mgfAlgo.hashCode();

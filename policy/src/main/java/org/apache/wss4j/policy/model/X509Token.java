@@ -101,10 +101,10 @@ public class X509Token extends AbstractToken {
         if (tokenType != null) {
             result = 31 * result + tokenType.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
-        result = 31 * result + Boolean.hashCode(requireIssuerSerialReference);
-        result = 31 * result + Boolean.hashCode(requireEmbeddedTokenReference);
-        result = 31 * result + Boolean.hashCode(requireThumbprintReference);
+        result = 31 * result + Boolean.valueOf(requireKeyIdentifierReference).hashCode();
+        result = 31 * result + Boolean.valueOf(requireIssuerSerialReference).hashCode();
+        result = 31 * result + Boolean.valueOf(requireEmbeddedTokenReference).hashCode();
+        result = 31 * result + Boolean.valueOf(requireThumbprintReference).hashCode();
         
         return 31 * result + super.hashCode();
     }

@@ -108,8 +108,8 @@ public class UsernameToken extends AbstractToken {
         if (usernameTokenType != null) {
             result = 31 * result + usernameTokenType.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(created);
-        result = 31 * result + Boolean.hashCode(nonce);
+        result = 31 * result + Boolean.valueOf(created).hashCode();
+        result = 31 * result + Boolean.valueOf(nonce).hashCode();
         
         return 31 * result + super.hashCode();
     }

@@ -104,8 +104,8 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         if (version != null) {
             result = 31 * result + version.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(isOptional);
-        result = 31 * result + Boolean.hashCode(isIgnorable);
+        result = 31 * result + Boolean.valueOf(isOptional).hashCode();
+        result = 31 * result + Boolean.valueOf(isIgnorable).hashCode();
         
         return result;
     }

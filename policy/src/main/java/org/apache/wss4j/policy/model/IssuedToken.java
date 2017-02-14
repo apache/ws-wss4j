@@ -86,8 +86,8 @@ public class IssuedToken extends AbstractToken {
         if (requestSecurityTokenTemplate != null) {
             result = 31 * result + DOM2Writer.nodeToString(requestSecurityTokenTemplate).hashCode();
         }
-        result = 31 * result + Boolean.hashCode(requireExternalReference);
-        result = 31 * result + Boolean.hashCode(requireInternalReference);
+        result = 31 * result + Boolean.valueOf(requireExternalReference).hashCode();
+        result = 31 * result + Boolean.valueOf(requireInternalReference).hashCode();
         
         return 31 * result + super.hashCode();
     }

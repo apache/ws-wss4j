@@ -88,7 +88,7 @@ public class RelToken extends AbstractToken {
         if (relTokenType != null) {
             result = 31 * result + relTokenType.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
+        result = 31 * result + Boolean.valueOf(requireKeyIdentifierReference).hashCode();
         
         return 31 * result + super.hashCode();
     }

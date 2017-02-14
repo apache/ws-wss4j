@@ -83,9 +83,9 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
         if (protectionOrder != null) {
             result = 31 * result + protectionOrder.hashCode();
         }
-        result = 31 * result + Boolean.hashCode(encryptSignature);
-        result = 31 * result + Boolean.hashCode(protectTokens);
-        result = 31 * result + Boolean.hashCode(onlySignEntireHeadersAndBody);
+        result = 31 * result + Boolean.valueOf(encryptSignature).hashCode();
+        result = 31 * result + Boolean.valueOf(protectTokens).hashCode();
+        result = 31 * result + Boolean.valueOf(onlySignEntireHeadersAndBody).hashCode();
         
         return 31 * result + super.hashCode();
     }

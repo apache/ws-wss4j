@@ -78,10 +78,10 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(mustSupportRefKeyIdentifier);
-        result = 31 * result + Boolean.hashCode(mustSupportRefIssuerSerial);
-        result = 31 * result + Boolean.hashCode(mustSupportRefExternalURI);
-        result = 31 * result + Boolean.hashCode(mustSupportRefEmbeddedToken);
+        result = 31 * result + Boolean.valueOf(mustSupportRefKeyIdentifier).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportRefIssuerSerial).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportRefExternalURI).hashCode();
+        result = 31 * result + Boolean.valueOf(mustSupportRefEmbeddedToken).hashCode();
         
         return 31 * result + super.hashCode();
     }

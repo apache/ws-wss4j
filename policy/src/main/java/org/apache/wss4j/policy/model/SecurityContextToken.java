@@ -67,9 +67,9 @@ public class SecurityContextToken extends AbstractToken {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(requireExternalUriReference);
-        result = 31 * result + Boolean.hashCode(sc13SecurityContextToken);
-        result = 31 * result + Boolean.hashCode(sc10SecurityContextToken);
+        result = 31 * result + Boolean.valueOf(requireExternalUriReference).hashCode();
+        result = 31 * result + Boolean.valueOf(sc13SecurityContextToken).hashCode();
+        result = 31 * result + Boolean.valueOf(sc10SecurityContextToken).hashCode();
         
         return 31 * result + super.hashCode();
     }

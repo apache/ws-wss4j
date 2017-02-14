@@ -63,7 +63,7 @@ public class KeyValueToken extends AbstractToken {
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + Boolean.hashCode(rsaKeyValue);
+        result = 31 * result + Boolean.valueOf(rsaKeyValue).hashCode();
         
         return 31 * result + super.hashCode();
     }
