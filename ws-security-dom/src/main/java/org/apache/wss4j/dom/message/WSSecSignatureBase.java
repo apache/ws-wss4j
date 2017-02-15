@@ -186,7 +186,8 @@ public class WSSecSignatureBase extends WSSecBase {
                             new Object[] {nmSpace + ", " + elemName});
                     }
                     for (Element elementToSign : elementsToSign) {
-
+                        String wsuId = setWsuId(elementToSign);
+                        
                         cloneElement(elementToSign);
 
                         TransformParameterSpec transformSpec = null;
@@ -203,7 +204,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             );
                         javax.xml.crypto.dsig.Reference reference =
                             signatureFactory.newReference(
-                                "#" + setWsuId(elementToSign),
+                                "#" + wsuId,
                                 digestMethod,
                                 Collections.singletonList(transform),
                                 null,

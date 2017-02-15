@@ -126,9 +126,11 @@ public abstract class WSHandler {
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
 
-        boolean storeBytesInAttachment =
-            decodeBooleanConfigValue(mc, WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, false);
-        reqData.setStoreBytesInAttachment(storeBytesInAttachment);
+        if (!reqData.isStoreBytesInAttachment()) {
+            boolean storeBytesInAttachment =
+                decodeBooleanConfigValue(mc, WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, false);
+            reqData.setStoreBytesInAttachment(storeBytesInAttachment);
+        }
 
         // Perform configuration
         boolean encryptionFound = false;
@@ -154,7 +156,7 @@ public abstract class WSHandler {
                     actionToken.setCrypto(loadSignatureCrypto(reqData));
                 }
                 decodeSignatureParameter(reqData);
-                if (encryptionFound && storeBytesInAttachment) {
+                if (encryptionFound && reqData.isStoreBytesInAttachment()) {
                     LOG.warn("Turning off storeBytesInAttachment as we have encryption before signature."
                              + " The danger here is that the actual encryption bytes will not be signed");
                     reqData.setStoreBytesInAttachment(false);
