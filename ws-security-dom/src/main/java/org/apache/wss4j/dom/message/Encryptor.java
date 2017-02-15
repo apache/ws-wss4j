@@ -143,12 +143,7 @@ public class Encryptor {
                             // If so then replace the existing Element to encrypt in the SOAP Envelope
                             encrElement.getParentNode().replaceChild(matchingElement, encrElement);
                             encrElement = matchingElement;
-                        }
-
-                        if (encrElement == elementToEncrypt) {
-                            // Here we didn't find an already expanded Element, so inline the attachment bytes
-                            WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, true);
-                        } else {
+                            
                             // We already have an expanded Element, but might need to delete the attachments
                             for (Element includeElement : includeElements) {
                                 String xopURI = includeElement.getAttributeNS(null, "href");
@@ -165,6 +160,9 @@ public class Encryptor {
                                     }
                                 }
                             }
+                        } else {
+                            // Here we didn't find an already expanded Element, so inline the attachment bytes
+                            WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, true);
                         }
                     }
 
