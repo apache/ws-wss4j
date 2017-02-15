@@ -128,7 +128,7 @@ public class ReferenceTest extends org.junit.Assert {
         assertTrue(refEqual.equals(ref));
         assertFalse(ref.equals(refNotEqual));
         assertFalse(ref.equals(null));
-        assertFalse(ref.equals("string"));
+        assertFalse("string".equals(ref));
     }
 
     @Test

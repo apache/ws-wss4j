@@ -76,7 +76,7 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
         assertTrue(tokenEqual.equals(token));
         assertFalse(token.equals(tokenNotEqual));
         assertFalse(token.equals(null));
-        assertFalse(token.equals("string"));
+        assertFalse("string".equals(token));
     }
 
     @Test

@@ -238,8 +238,8 @@ public final class DOM2Writer {
                                            PrintWriter out) {
         String namespaceURI = node.getNamespaceURI();
         String prefix = node.getPrefix();
-        if (!(namespaceURI.equals(XMLUtils.XMLNS_NS) && prefix.equals("xmlns"))
-            && !(namespaceURI.equals(XMLUtils.XML_NS) && prefix.equals("xml"))) {
+        if (!(namespaceURI.equals(XMLUtils.XMLNS_NS) && "xmlns".equals(prefix))
+            && !(namespaceURI.equals(XMLUtils.XML_NS) && "xml".equals(prefix))) {
             if (XMLUtils.getNamespace(prefix, owner) == null) {
                 out.print(" xmlns:" + prefix + "=\"" + namespaceURI + '\"');
             }
