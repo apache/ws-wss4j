@@ -317,7 +317,7 @@ public class Merlin extends CryptoBase {
                     if (DO_DEBUG) {
                         LOG.debug(e.getMessage(), e);
                     }
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,e, "ioError00");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "ioError00");
                 }
             }
             try {
@@ -340,7 +340,7 @@ public class Merlin extends CryptoBase {
                 if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,e, "ioError00");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "ioError00");
             }
             if (DO_DEBUG) {
                 LOG.debug(

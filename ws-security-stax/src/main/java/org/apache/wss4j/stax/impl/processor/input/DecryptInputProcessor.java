@@ -250,7 +250,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             Map<String, ReferenceType> references = getReferences();
             List<ReferenceType> processedReferences = getProcessedReferences();
             if (references != null) {
-                Iterator<Map.Entry<String,ReferenceType>> iterator = references.entrySet().iterator();
+                Iterator<Map.Entry<String, ReferenceType>> iterator = references.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String, ReferenceType> next = iterator.next();
                     final ReferenceType referenceType = next.getValue();

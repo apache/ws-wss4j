@@ -214,7 +214,7 @@ public interface Crypto {
      */
     void verifyTrust(
         X509Certificate[] certs, boolean enableRevocation,
-        Collection<Pattern> subjectCertConstraints,Collection<Pattern> issuerCertConstraints
+        Collection<Pattern> subjectCertConstraints, Collection<Pattern> issuerCertConstraints
     ) throws WSSecurityException;
 
     /**

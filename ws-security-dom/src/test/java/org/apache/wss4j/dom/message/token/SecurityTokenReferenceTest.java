@@ -265,7 +265,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on an Embedded Child with a SecurityTokenReference child");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);

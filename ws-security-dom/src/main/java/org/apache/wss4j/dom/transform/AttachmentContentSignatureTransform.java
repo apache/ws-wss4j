@@ -183,7 +183,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                     || mimeType.matches("(?i)(application|image)/.*\\+xml.*"))) {
                 /* 5.4.2:
                  * Content of an XML Content-Type MUST be XML canonicalized using
-                 * Exclusive XML Canonicalization without comments,as specified by
+                 * Exclusive XML Canonicalization without comments, as specified by
                  * the URI http://www.w3.org/2001/10/xml-exc-c14n# [Excl-Canon].
                  * The reason for requiring Exclusive Canonicalization is that many
                  * implementations will support Exclusive Canonicalization for other
