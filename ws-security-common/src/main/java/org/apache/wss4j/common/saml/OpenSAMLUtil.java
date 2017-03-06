@@ -70,9 +70,7 @@ public final class OpenSAMLUtil {
      */
     public static synchronized void initSamlEngine() {
         if (!samlEngineInitialized) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Initializing the opensaml2 library...");
-            }
+            LOG.debug("Initializing the opensaml2 library...");
             WSProviderConfig.init();
 
             Configuration configuration = new MapBasedConfiguration();
@@ -102,9 +100,7 @@ public final class OpenSAMLUtil {
                 }
 
                 samlEngineInitialized = true;
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("opensaml3 library bootstrap complete");
-                }
+                LOG.debug("opensaml3 library bootstrap complete");
             } catch (XMLConfigurationException ex) {
                 LOG.error("Unable to bootstrap the opensaml3 library - all SAML operations will fail", ex);
             }

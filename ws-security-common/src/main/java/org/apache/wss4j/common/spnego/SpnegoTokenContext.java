@@ -121,16 +121,12 @@ public class SpnegoTokenContext {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError",
                 new Object[] {ex.getMessage()});
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully authenticated to the TGT");
-        }
+        LOG.debug("Successfully authenticated to the TGT");
 
         Subject clientSubject = loginContext.getSubject();
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
@@ -186,9 +182,7 @@ public class SpnegoTokenContext {
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully retrieved a service ticket");
-        }
+        LOG.debug("Successfully retrieved a service ticket");
     }
 
     /**
@@ -233,16 +227,12 @@ public class SpnegoTokenContext {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError",
                 new Object[] {ex.getMessage()});
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully authenticated to the TGT");
-        }
+        LOG.debug("Successfully authenticated to the TGT");
 
         // Get the service name to use - fall back on the principal
         Subject subject = loginContext.getSubject();
@@ -295,9 +285,7 @@ public class SpnegoTokenContext {
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully validated a service ticket");
-        }
+        LOG.debug("Successfully validated a service ticket");
     }
 
     /**
@@ -332,9 +320,7 @@ public class SpnegoTokenContext {
         try {
             return secContext.unwrap(secret, 0, secret.length, mProp);
         } catch (GSSException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in cleaning up a GSS context", e);
-            }
+            LOG.debug("Error in cleaning up a GSS context", e);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, e, "spnegoKeyError"
             );
@@ -349,9 +335,7 @@ public class SpnegoTokenContext {
         try {
             return secContext.wrap(secret, 0, secret.length, mProp);
         } catch (GSSException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in cleaning up a GSS context", e);
-            }
+            LOG.debug("Error in cleaning up a GSS context", e);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, e, "spnegoKeyError"
             );
@@ -380,9 +364,7 @@ public class SpnegoTokenContext {
         try {
             secContext.dispose();
         } catch (GSSException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in cleaning up a GSS context", e);
-            }
+            LOG.debug("Error in cleaning up a GSS context", e);
         }
     }
 

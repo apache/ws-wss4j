@@ -220,9 +220,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     }
 
                     String calculatedDigest = Base64.getMimeEncoder().encodeToString(digestOutputStream.getDigestValue());
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Calculated Digest: " + calculatedDigest);
-                    }
+                    LOG.debug("Calculated Digest: {}", calculatedDigest);
 
                     signaturePartDef.setDigestValue(calculatedDigest);
 

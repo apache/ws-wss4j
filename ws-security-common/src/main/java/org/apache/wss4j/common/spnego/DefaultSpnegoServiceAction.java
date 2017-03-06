@@ -67,9 +67,7 @@ public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
 
             return secContext.acceptSecContext(ticket, 0, ticket.length);
         } catch (GSSException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in obtaining a Kerberos token", e);
-            }
+            LOG.debug("Error in obtaining a Kerberos token", e);
         }
 
         return null;

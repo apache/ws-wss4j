@@ -145,9 +145,7 @@ public abstract class X509SecurityTokenImpl
             for (Pattern subjectDNPattern : subjectDNPatterns) {
                 final Matcher matcher = subjectDNPattern.matcher(subjectName);
                 if (matcher.matches()) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
-                    }
+                    LOG.debug("Subject DN {} matches with pattern {}", subjectName, subjectDNPattern);
                     subjectMatch = true;
                     break;
                 }

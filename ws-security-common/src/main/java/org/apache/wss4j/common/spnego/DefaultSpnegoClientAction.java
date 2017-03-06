@@ -70,9 +70,7 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
             byte[] token = new byte[0];
             return secContext.initSecContext(token, 0, token.length);
         } catch (GSSException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error in obtaining a Kerberos token", e);
-            }
+            LOG.debug("Error in obtaining a Kerberos token", e);
         }
 
         return null;

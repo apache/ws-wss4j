@@ -178,11 +178,9 @@ public class CertificateStore extends CryptoBase {
             // to ensure against phony DNs (compare encoded form including signature)
             //
             if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
-                    );
-                }
+                LOG.debug(
+                    "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
+                );
                 return;
             }
         }
@@ -201,12 +199,9 @@ public class CertificateStore extends CryptoBase {
         // As a direct result, do not trust the transmitted certificate
         if (foundCerts == null || foundCerts.length < 1) {
             String subjectString = certs[0].getSubjectX500Principal().getName();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "No certs found in keystore for issuer " + issuerString
-                    + " of certificate for " + subjectString
-                );
-            }
+            LOG.debug(
+                "No certs found in keystore for issuer {} of certificate for {}", issuerString, subjectString
+            );
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "certpath",
                 new Object[] {"No trusted certs found"}
@@ -217,11 +212,9 @@ public class CertificateStore extends CryptoBase {
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
         //
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Preparing to validate certificate path for issuer " + issuerString
-            );
-        }
+        LOG.debug(
+            "Preparing to validate certificate path for issuer {}", issuerString
+        );
 
         //
         // Form a certificate chain from the transmitted certificate

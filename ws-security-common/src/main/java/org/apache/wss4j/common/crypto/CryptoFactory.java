@@ -71,9 +71,7 @@ public abstract class CryptoFactory {
      */
     public static Crypto getInstance(Properties properties) throws WSSecurityException {
         if (properties == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Cannot load Crypto instance as properties object is null");
-            }
+            LOG.debug("Cannot load Crypto instance as properties object is null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", new Object[] {"Cannot load Crypto instance as properties object is null"});
         }
@@ -103,9 +101,7 @@ public abstract class CryptoFactory {
         PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
         if (properties == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Cannot load Crypto instance as properties object is null");
-            }
+            LOG.debug("Cannot load Crypto instance as properties object is null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", new Object[] {"Cannot load Crypto instance as properties object is null"});
         }
@@ -122,9 +118,7 @@ public abstract class CryptoFactory {
             try {
                 return new Merlin(properties, classLoader, passwordEncryptor);
             } catch (java.lang.Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unable to instantiate Merlin", e);
-                }
+                LOG.debug("Unable to instantiate Merlin", e);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                               new Object[] {"Cannot create Crypto class " + cryptoClassName});
             }
@@ -133,9 +127,7 @@ public abstract class CryptoFactory {
                 // instruct the class loader to load the crypto implementation
                 cryptoClass = Loader.loadClass(cryptoClassName, Crypto.class);
             } catch (ClassNotFoundException ex) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(ex.getMessage(), ex);
-                }
+                LOG.debug(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
                         "empty", new Object[] {cryptoClassName + " Not Found"});
             }
@@ -207,9 +199,7 @@ public abstract class CryptoFactory {
         Map<Object, Object> map,
         ClassLoader loader
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
-        }
+        LOG.debug("Using Crypto Engine [{}]", cryptoClass);
         try {
             Constructor<? extends Crypto> c = null;
             try {
@@ -243,9 +233,7 @@ public abstract class CryptoFactory {
         Properties map,
         ClassLoader loader
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
-        }
+        LOG.debug("Using Crypto Engine [{}]", cryptoClass);
         try {
             Constructor<? extends Crypto> c = null;
             try {
