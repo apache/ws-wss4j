@@ -116,7 +116,6 @@ public class Merlin extends CryptoBase {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(Merlin.class);
-    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
     private static final String COMMA_SEPARATOR = ",";
 
     protected Properties properties;
@@ -218,21 +217,16 @@ public class Merlin extends CryptoBase {
                     type = type.trim();
                 }
                 keystore = load(is, passwd, keystoreProvider, type);
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The KeyStore " + keyStoreLocation + " of type " + type
-                        + " has been loaded"
-                    );
-                }
+                LOG.debug(
+                    "The KeyStore {} of type {} has been loaded", keyStoreLocation, type
+                );
                 String privatePasswd = properties.getProperty(prefix + KEYSTORE_PRIVATE_PASSWORD);
                 if (privatePasswd != null) {
                     privatePasswordSet = true;
                 }
             }
         } else {
-            if (DO_DEBUG) {
-                LOG.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
-            }
+            LOG.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
         }
 
         //
@@ -268,12 +262,9 @@ public class Merlin extends CryptoBase {
                     type = type.trim();
                 }
                 truststore = load(is, passwd, trustProvider, type);
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The TrustStore " + trustStoreLocation + " of type " + type
-                        + " has been loaded"
-                    );
-                }
+                LOG.debug(
+                    "The TrustStore {} of type {} has been loaded", trustStoreLocation, type
+                );
                 loadCACerts = false;
             }
         } else {
@@ -293,9 +284,7 @@ public class Merlin extends CryptoBase {
                         cacertsPasswd = decryptPassword(cacertsPasswd, passwordEncryptor);
                     }
                     truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
-                    if (DO_DEBUG) {
-                        LOG.debug("CA certs have been loaded");
-                    }
+                    LOG.debug("CA certs have been loaded");
                     loadCACerts = true;
                 }
             }
@@ -314,9 +303,7 @@ public class Merlin extends CryptoBase {
                     X509CRL crl = (X509CRL)cf.generateCRL(is);
                     crls.add(crl);
                 } catch (Exception e) {
-                    if (DO_DEBUG) {
-                        LOG.debug(e.getMessage(), e);
-                    }
+                    LOG.debug(e.getMessage(), e);
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "ioError00");
                 }
             }
@@ -337,17 +324,10 @@ public class Merlin extends CryptoBase {
                             );
                 }
             } catch (Exception e) {
-                if (DO_DEBUG) {
-                    LOG.debug(e.getMessage(), e);
-                }
+                LOG.debug(e.getMessage(), e);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "ioError00");
             }
-            if (DO_DEBUG) {
-                LOG.debug(
-                        "The CRL files " + crlLocations + " have been loaded"
-                );
-            }
-
+            LOG.debug("The CRL files {} have been loaded", crlLocations);
         }
     }
 
@@ -380,9 +360,7 @@ public class Merlin extends CryptoBase {
                 try {
                     is = new FileInputStream(location);
                 } catch (Exception e) {
-                    if (DO_DEBUG) {
-                        LOG.debug(e.getMessage(), e);
-                    }
+                    LOG.debug(e.getMessage(), e);
                     throw new WSSecurityException(
                             WSSecurityException.ErrorCode.FAILURE, e, "proxyNotFound", new Object[] {location}
                     );
@@ -414,9 +392,7 @@ public class Merlin extends CryptoBase {
             ks.load(input, storepass == null || storepass.length() == 0
                 ? new char[0] : storepass.toCharArray());
         } catch (IOException | GeneralSecurityException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "failedCredentialLoad");
         }
         return ks;
@@ -807,11 +783,9 @@ public class Merlin extends CryptoBase {
                         WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
                     );
                 }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
-                    );
-                }
+                LOG.debug(
+                    "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
+                );
                 return;
             }
         }
@@ -838,12 +812,10 @@ public class Merlin extends CryptoBase {
             if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()
                 || foundIssuingCertChains.get(0).length < 1) {
                 String subjectString = certs[0].getSubjectX500Principal().getName();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "No certs found in keystore for issuer " + issuerString
-                        + " of certificate for " + subjectString
-                    );
-                }
+                LOG.debug(
+                    "No certs found in keystore for issuer {} of certificate for {}",
+                     issuerString, subjectString
+                );
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", new Object[] {"No trusted certs found"}
                 );
@@ -854,11 +826,9 @@ public class Merlin extends CryptoBase {
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
         //
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Preparing to validate certificate path for issuer " + issuerString
-            );
-        }
+        LOG.debug(
+            "Preparing to validate certificate path for issuer {}", issuerString
+        );
 
         try {
             Set<TrustAnchor> set = new HashSet<>();

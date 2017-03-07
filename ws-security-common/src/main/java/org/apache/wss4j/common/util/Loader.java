@@ -92,9 +92,7 @@ public final class Loader {
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
         // code below.
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
-        }
+        LOG.debug("Trying to find [{}] using ClassLoader.getSystemResource().", resource);
         return ClassLoader.getSystemResource(resource);
     }
 
@@ -150,9 +148,7 @@ public final class Loader {
         try {
             return (url != null) ? url.openStream() : null;
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
             return null;
         }
     }

@@ -109,11 +109,9 @@ public class MerlinAKI extends Merlin {
                         WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
                     );
                 }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
-                    );
-                }
+                LOG.debug(
+                    "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
+                );
                 return;
             }
         }
@@ -134,12 +132,10 @@ public class MerlinAKI extends Merlin {
                 // As a direct result, do not trust the transmitted certificate
                 if (foundCerts == null || foundCerts.length < 1) {
                     String subjectString = certs[0].getSubjectX500Principal().getName();
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(
-                            "No certs found in keystore for issuer " + issuerString
-                            + " of certificate for " + subjectString
-                        );
-                    }
+                    LOG.debug(
+                        "No certs found in keystore for issuer {} of certificate for {}",
+                         issuerString, subjectString
+                    );
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "certpath", new Object[] {"No trusted certs found"}
                     );
@@ -161,11 +157,9 @@ public class MerlinAKI extends Merlin {
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
         //
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Preparing to validate certificate path for issuer " + issuerString
-            );
-        }
+        LOG.debug(
+            "Preparing to validate certificate path for issuer {}", issuerString
+        );
 
         try {
             // Generate cert path

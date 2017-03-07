@@ -363,9 +363,7 @@ public abstract class CryptoBase implements Crypto {
             for (Pattern subjectDNPattern : patterns) {
                 final Matcher matcher = subjectDNPattern.matcher(name);
                 if (matcher.matches()) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Name " + name + " matches with pattern " + subjectDNPattern);
-                    }
+                    LOG.debug("Name {} matches with pattern {}", name, subjectDNPattern);
                     subjectMatch = true;
                     break;
                 }

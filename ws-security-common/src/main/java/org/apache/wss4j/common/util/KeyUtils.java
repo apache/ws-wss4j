@@ -68,9 +68,7 @@ public final class KeyUtils {
             size = getKeyLength(algorithm);
         } catch (Exception e) {
             // ignore - some unknown (to JCEMapper) encryption algorithm
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage());
-            }
+            LOG.debug(e.getMessage());
         }
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
         SecretKeySpec keySpec;

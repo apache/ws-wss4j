@@ -41,7 +41,6 @@ public class MerlinDevice extends Merlin {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(MerlinDevice.class);
-    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     public MerlinDevice() {
         super();
@@ -111,12 +110,9 @@ public class MerlinDevice extends Merlin {
 
             try (InputStream is = loadInputStream(loader, keyStoreLocation)) {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The KeyStore " + keyStoreLocation + " of type " + keyStoreType
-                        + " has been loaded"
-                    );
-                }
+                LOG.debug(
+                    "The KeyStore {} of type {} has been loaded", keyStoreLocation, keyStoreType
+                );
             }
         } else {
             keystore = load(null, keyStorePassword, provider, keyStoreType);
@@ -144,12 +140,9 @@ public class MerlinDevice extends Merlin {
 
             try (InputStream is = loadInputStream(loader, trustStoreLocation)) {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The TrustStore " + trustStoreLocation + " of type " + trustStoreType
-                        + " has been loaded"
-                    );
-                }
+                LOG.debug(
+                    "The TrustStore {} of type {} has been loaded", trustStoreLocation, trustStoreType
+                );
                 loadCACerts = false;
             }
         } else if (Boolean.valueOf(loadCacerts)) {
@@ -164,9 +157,7 @@ public class MerlinDevice extends Merlin {
                     cacertsPasswd = decryptPassword(cacertsPasswd, passwordEncryptor);
                 }
                 truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
-                if (DO_DEBUG) {
-                    LOG.debug("CA certs have been loaded");
-                }
+                LOG.debug("CA certs have been loaded");
                 loadCACerts = true;
             }
         } else {
@@ -197,15 +188,9 @@ public class MerlinDevice extends Merlin {
                             provider
                         );
                 }
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The CRL " + crlLocation + " has been loaded"
-                    );
-                }
+                LOG.debug("The CRL {} has been loaded", crlLocation);
             } catch (Exception e) {
-                if (DO_DEBUG) {
-                    LOG.debug(e.getMessage(), e);
-                }
+                LOG.debug(e.getMessage(), e);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "failedCredentialLoad");
             }
         }

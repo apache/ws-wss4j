@@ -497,9 +497,8 @@ public class SamlAssertionWrapper {
             c14nAlgo = defaultCanonicalizationAlgorithm;
         }
         signature.setCanonicalizationAlgorithm(c14nAlgo);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Using Canonicalization algorithm " + c14nAlgo);
-        }
+        LOG.debug("Using Canonicalization algorithm {}", c14nAlgo);
+
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
@@ -518,15 +517,11 @@ public class SamlAssertionWrapper {
             sigAlgo = defaultRSASignatureAlgorithm;
         }
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
-        }
+        LOG.debug("automatic sig algo detection: {}", pubKeyAlgo);
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = defaultDSASignatureAlgorithm;
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Using Signature algorithm " + sigAlgo);
-        }
+        LOG.debug("Using Signature algorithm {}", sigAlgo);
         PrivateKey privateKey;
         try {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
@@ -683,11 +678,8 @@ public class SamlAssertionWrapper {
     public SAMLVersion getSamlVersion() {
         if (samlVersion == null) {
             // Try to set the version.
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "The SAML version was null in getSamlVersion(). Recomputing SAML version..."
-                );
-            }
+            LOG.debug(
+                "The SAML version was null in getSamlVersion(). Recomputing SAML version...");
             if (samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
                 samlVersion = SAMLVersion.VERSION_11;
             } else if (samlObject instanceof org.opensaml.saml.saml2.core.Assertion) {

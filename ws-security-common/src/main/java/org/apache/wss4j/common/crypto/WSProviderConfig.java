@@ -297,12 +297,10 @@ public final class WSProviderConfig {
                 Provider provider = clazz.newInstance();
 
                 int ret = Security.addProvider(provider);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "The provider " + provider.getName()
-                        + " was added at position: " + ret
-                    );
-                }
+                LOG.debug(
+                    "The provider {} was added at position: {}",
+                     provider.getName(), ret
+                );
                 return provider.getName();
             } catch (Throwable t) {
                 if (LOG.isDebugEnabled()) {
@@ -332,12 +330,10 @@ public final class WSProviderConfig {
         if (currentProvider == null) {
             try {
                 int ret = Security.addProvider(provider);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "The provider " + provider.getName()
-                        + " was added at position: " + ret
-                    );
-                }
+                LOG.debug(
+                    "The provider {} was added at position: {}",
+                     provider.getName(), ret
+                );
                 return provider.getName();
             } catch (Throwable t) {
                 if (LOG.isDebugEnabled()) {

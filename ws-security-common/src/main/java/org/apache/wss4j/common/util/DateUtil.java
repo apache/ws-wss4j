@@ -53,9 +53,7 @@ public final class DateUtil {
         }
         // Check to see if the created time is in the future
         if (createdDate.after(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Created: The message was created in the future!");
-            }
+            LOG.debug("Validation of Created: The message was created in the future!");
             return false;
         }
 
@@ -65,15 +63,11 @@ public final class DateUtil {
 
         // Validate the time it took the message to travel
         if (createdDate.before(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Created: The message was created too long ago");
-            }
+            LOG.debug("Validation of Created: The message was created too long ago");
             return false;
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Validation of Created: Everything is ok");
-        }
+        LOG.debug("Validation of Created: Everything is ok");
         return true;
     }
 
