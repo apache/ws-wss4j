@@ -67,16 +67,12 @@ public class UsernameTokenValidator implements Validator {
         usernameToken.setPasswordsAreEncoded(passwordsAreEncoded);
 
         String pwType = usernameToken.getPasswordType();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("UsernameToken user " + usernameToken.getName());
-            LOG.debug("UsernameToken password type " + pwType);
-        }
+        LOG.debug("UsernameToken user {}", usernameToken.getName());
+        LOG.debug("UsernameToken password type {}", pwType);
 
         if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Authentication failed as the received password type does not "
-                    + "match the required password type of: " + requiredPasswordType);
-            }
+            LOG.debug("Authentication failed as the received password type does not "
+                + "match the required password type of: {}", requiredPasswordType);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
@@ -93,9 +89,7 @@ public class UsernameTokenValidator implements Validator {
             verifyPlaintextPassword(usernameToken, data);
         } else if (password != null) {
             if (!handleCustomPasswordTypes) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Authentication failed as handleCustomUsernameTokenTypes is false");
-                }
+                LOG.debug("Authentication failed as handleCustomUsernameTokenTypes is false");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             verifyCustomPassword(usernameToken, data);
@@ -160,18 +154,14 @@ public class UsernameTokenValidator implements Validator {
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException | UnsupportedCallbackException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         }
         String origPassword = pwCb.getPassword();
         if (origPassword == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Callback supplied no password for: " + user);
-            }
+            LOG.debug("Callback supplied no password for: {}", user);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         if (usernameToken.isHashed()) {
@@ -203,10 +193,8 @@ public class UsernameTokenValidator implements Validator {
 
         boolean allowUsernameTokenDerivedKeys = data.isAllowUsernameTokenNoPassword();
         if (!allowUsernameTokenDerivedKeys) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Authentication failed as the received UsernameToken does not "
-                    + "contain any password element");
-            }
+            LOG.debug("Authentication failed as the received UsernameToken does not "
+                + "contain any password element");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }

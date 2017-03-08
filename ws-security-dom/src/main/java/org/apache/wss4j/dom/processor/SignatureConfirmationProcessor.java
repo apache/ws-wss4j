@@ -36,9 +36,7 @@ public class SignatureConfirmationProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found SignatureConfirmation list element");
-        }
+        LOG.debug("Found SignatureConfirmation list element");
         //
         // Decode SignatureConfirmation, just store in result
         //

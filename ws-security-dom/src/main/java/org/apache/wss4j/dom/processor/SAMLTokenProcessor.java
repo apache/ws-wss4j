@@ -72,9 +72,7 @@ public class SAMLTokenProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found SAML Assertion element");
-        }
+        LOG.debug("Found SAML Assertion element");
 
         Validator validator =
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));

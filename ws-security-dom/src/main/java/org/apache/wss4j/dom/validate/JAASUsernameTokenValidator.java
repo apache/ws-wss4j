@@ -77,10 +77,8 @@ public class JAASUsernameTokenValidator implements Validator {
 
         user = usernameToken.getName();
         String pwType = usernameToken.getPasswordType();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("UsernameToken user " + usernameToken.getName());
-            LOG.debug("UsernameToken password type " + pwType);
-        }
+        LOG.debug("UsernameToken user {}", usernameToken.getName());
+        LOG.debug("UsernameToken password type {}", pwType);
 
         if (usernameToken.isHashed()) {
             LOG.warn("Authentication failed as hashed username token not supported");

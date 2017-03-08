@@ -59,9 +59,7 @@ public class ReferenceListProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found reference list element");
-        }
+        LOG.debug("Found reference list element");
         List<WSDataRef> dataRefs = handleReferenceList(elem, data);
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
@@ -116,9 +114,7 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found data reference: " + dataRefURI);
-        }
+        LOG.debug("Found data reference: {}", dataRefURI);
         //
         // Find the encrypted data element referenced by dataRefURI
         //

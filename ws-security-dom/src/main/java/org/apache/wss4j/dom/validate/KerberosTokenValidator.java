@@ -161,18 +161,14 @@ public class KerberosTokenValidator implements Validator {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex,
                 "kerberosLoginError",
                 new Object[] {ex.getMessage()}
             );
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully authenticated to the TGT");
-        }
+        LOG.debug("Successfully authenticated to the TGT");
 
         byte[] token = binarySecurity.getToken();
 
@@ -244,9 +240,7 @@ public class KerberosTokenValidator implements Validator {
             LOG.debug("KerberosTokenDecoder is not set.");
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully validated a ticket");
-        }
+        LOG.debug("Successfully validated a ticket");
 
         return credential;
     }

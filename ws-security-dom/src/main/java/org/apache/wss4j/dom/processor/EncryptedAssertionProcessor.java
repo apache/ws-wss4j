@@ -46,9 +46,7 @@ public class EncryptedAssertionProcessor implements Processor {
         Element elem,
         RequestData request
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found EncryptedAssertion element");
-        }
+        LOG.debug("Found EncryptedAssertion element");
 
         Element encryptedDataElement =
             XMLUtils.getDirectChildElement(elem, WSConstants.ENC_DATA_LN, WSConstants.ENC_NS);
@@ -93,9 +91,7 @@ public class EncryptedAssertionProcessor implements Processor {
                             QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
                             Processor proc = request.getWssConfig().getProcessor(el);
                             if (proc != null) {
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
-                                }
+                                LOG.debug("Processing decrypted element with: {}", proc.getClass().getName());
                                 List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, request);
                                 completeResults.addAll(0, results);
                                 return completeResults;
@@ -122,9 +118,7 @@ public class EncryptedAssertionProcessor implements Processor {
             new QName(encryptedDataElement.getNamespaceURI(), encryptedDataElement.getLocalName());
         Processor proc = request.getWssConfig().getProcessor(el);
         if (proc != null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
-            }
+            LOG.debug("Processing decrypted element with: {}", proc.getClass().getName());
             return proc.handleToken(encryptedDataElement, request);
         }
 

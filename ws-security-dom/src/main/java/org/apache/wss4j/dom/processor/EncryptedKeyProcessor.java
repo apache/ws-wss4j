@@ -84,9 +84,7 @@ public class EncryptedKeyProcessor implements Processor {
         RequestData data,
         AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found encrypted key element");
-        }
+        LOG.debug("Found encrypted key element");
 
         // See if this key has already been processed. If so then just return the result
         String id = elem.getAttributeNS(null, "Id");
@@ -533,9 +531,7 @@ public class EncryptedKeyProcessor implements Processor {
         byte[] decryptedData,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("found data reference: " + dataRefURI);
-        }
+        LOG.debug("found data reference: {}", dataRefURI);
         //
         // Find the encrypted data element referenced by dataRefURI
         //

@@ -43,9 +43,7 @@ public class UsernameTokenProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found UsernameToken list element");
-        }
+        LOG.debug("Found UsernameToken list element");
         // See if the token has been previously processed
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         if (!"".equals(id)) {

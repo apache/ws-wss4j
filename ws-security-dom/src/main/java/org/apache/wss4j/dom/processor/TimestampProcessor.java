@@ -38,9 +38,7 @@ public class TimestampProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found Timestamp list element");
-        }
+        LOG.debug("Found Timestamp list element");
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //

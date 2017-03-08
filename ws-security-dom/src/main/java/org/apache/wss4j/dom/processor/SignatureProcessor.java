@@ -108,9 +108,7 @@ public class SignatureProcessor implements Processor {
         Element elem,
         RequestData data
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found signature element");
-        }
+        LOG.debug("Found signature element");
         Element keyInfoElement =
             XMLUtils.getDirectChildElement(
                 elem,
@@ -172,7 +170,7 @@ public class SignatureProcessor implements Processor {
                 referenceType = parserResult.getCertificatesReferenceType();
 
                 boolean trusted = parserResult.isTrustedCredential();
-                if (trusted && LOG.isDebugEnabled()) {
+                if (trusted) {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }
                 if (!trusted && (publicKey != null || certs != null) && validator != null) {
@@ -320,9 +318,7 @@ public class SignatureProcessor implements Processor {
         final RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Verify XML Signature");
-        }
+        LOG.debug("Verify XML Signature");
 
         //
         // Perform the signature verification and build up a List of elements that the
