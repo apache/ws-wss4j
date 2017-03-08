@@ -64,9 +64,7 @@ public final class STRTransformUtil {
         // reference to the BST or Assertion. Copying is done by the caller.
         //
         if (secRef.containsReference()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("STR: Reference");
-            }
+            LOG.debug("STR: Reference");
 
             Reference reference = secRef.getReference();
             return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
@@ -75,9 +73,7 @@ public final class STRTransformUtil {
             // second case: IssuerSerial, lookup in keystore, wrap in BST according
             // to specification
             //
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("STR: IssuerSerial");
-            }
+            LOG.debug("STR: IssuerSerial");
             X509Certificate[] certs =
                 secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
@@ -90,9 +86,7 @@ public final class STRTransformUtil {
             // BST according to specification. Otherwise if it's a wsse:KeyIdentifier it could
             // be a SAML assertion, so try and find the referenced element.
             //
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("STR: KeyIdentifier");
-            }
+            LOG.debug("STR: KeyIdentifier");
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(),

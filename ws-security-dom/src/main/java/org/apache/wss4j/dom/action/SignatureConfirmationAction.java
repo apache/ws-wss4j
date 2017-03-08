@@ -40,9 +40,7 @@ public class SignatureConfirmationAction implements Action {
     @SuppressWarnings("unchecked")
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Perform Signature confirmation");
-        }
+        LOG.debug("Perform Signature confirmation");
 
         List<WSHandlerResult> results =
             (List<WSHandlerResult>) handler.getProperty(

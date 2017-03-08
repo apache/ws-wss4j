@@ -165,13 +165,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public Document build(Crypto crypto)
         throws WSSecurityException {
-        doDebug = LOG.isDebugEnabled();
 
         prepare(crypto);
 
-        if (doDebug) {
-            LOG.debug("Beginning Encryption...");
-        }
+        LOG.debug("Beginning Encryption...");
 
         Element refs = encrypt();
 

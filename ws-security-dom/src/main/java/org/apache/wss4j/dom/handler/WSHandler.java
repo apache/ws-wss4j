@@ -66,8 +66,6 @@ public abstract class WSHandler {
         org.slf4j.LoggerFactory.getLogger(WSHandler.class);
     protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 
-    private boolean doDebug = LOG.isDebugEnabled();
-
     /**
      * Performs all defined security actions to set-up the SOAP request.
      *
@@ -230,9 +228,7 @@ public abstract class WSHandler {
          * action(s).
          */
         for (HandlerAction actionToDo : actionsToPerform) {
-            if (doDebug) {
-                LOG.debug("Performing Action: " + actionToDo.getAction());
-            }
+            LOG.debug("Performing Action: {}", actionToDo.getAction());
 
             if (WSConstants.NO_SECURITY != actionToDo.getAction()) {
                 wssConfig.getAction(actionToDo.getAction()).execute(
@@ -428,9 +424,7 @@ public abstract class WSHandler {
         RequestData reqData,
         WSHandlerResult handlerResults
     ) throws WSSecurityException {
-        if (doDebug) {
-            LOG.debug("Check Signature confirmation");
-        }
+        LOG.debug("Check Signature confirmation");
         //
         // First get all Signature values stored during sending the request
         //
@@ -1234,9 +1228,7 @@ public abstract class WSHandler {
             String[] partDef = rawParts[i].split("}");
 
             if (partDef.length == 1) {
-                if (doDebug) {
-                    LOG.debug("single partDef: '" + partDef[0] + "'");
-                }
+                LOG.debug("single partDef: '{}'", partDef[0]);
                 encPart =
                     new WSEncryptionPart(partDef[0].trim(),
                             reqData.getSoapConstants().getEnvelopeURI(),
@@ -1262,7 +1254,7 @@ public abstract class WSHandler {
                     }
                 }
                 String element = partDef[2].trim();
-                if (doDebug) {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug(
                         "partDefs: '" + mode + "' ,'" + nmSpace + "' ,'" + element + "'"
                     );

@@ -122,9 +122,7 @@ public final class WSSConfig {
                 org.apache.wss4j.dom.action.CustomTokenAction.class
             );
         } catch (final Exception ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
         }
         DEFAULT_ACTIONS = java.util.Collections.unmodifiableMap(tmp);
     }
@@ -197,9 +195,7 @@ public final class WSSConfig {
                 org.apache.wss4j.dom.processor.EncryptedDataProcessor.class
             );
         } catch (final Exception ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
     }
@@ -232,9 +228,7 @@ public final class WSSConfig {
                 org.apache.wss4j.dom.validate.UsernameTokenValidator.class
             );
         } catch (final Exception ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
         }
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
     }
@@ -305,9 +299,7 @@ public final class WSSConfig {
             Transform.register(WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS,
                     AttachmentCiphertextTransform.class);
         } catch (Exception e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
         }
 
         ResourceResolver.register(new ResolverAttachment(), false);
@@ -417,9 +409,7 @@ public final class WSSConfig {
             try {
                 return (Action)((Class<?>)actionObject).newInstance();
             } catch (Exception ex) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(ex.getMessage(), ex);
-                }
+                LOG.debug(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
                         "unableToLoadClass", new Object[] {((Class<?>)actionObject).getName()});
             }
@@ -509,9 +499,7 @@ public final class WSSConfig {
             try {
                 return (Validator)((Class<?>)validatorObject).newInstance();
             } catch (Exception ex) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(ex.getMessage(), ex);
-                }
+                LOG.debug(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
                     "unableToLoadClass", new Object[] {((Class<?>)validatorObject).getName()});
             }
@@ -535,9 +523,7 @@ public final class WSSConfig {
             try {
                 return (Processor)((Class<?>)processorObject).newInstance();
             } catch (Exception ex) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(ex.getMessage(), ex);
-                }
+                LOG.debug(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
                         "unableToLoadClass", new Object[] {((Class<?>)processorObject).getName()});
             }

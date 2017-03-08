@@ -73,9 +73,7 @@ public final class X509Util {
                 );
             }
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Sym Enc Algo: " + symEncAlgo);
-        }
+        LOG.debug("Sym Enc Algo: {}", symEncAlgo);
         return symEncAlgo;
     }
 

@@ -72,7 +72,6 @@ public class UsernameToken {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
-    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     private Element element;
     private Element elementUsername;
@@ -539,9 +538,7 @@ public class UsernameToken {
                 elementPassword.setAttributeNS(null, "Type", passwordType);
             }
         } catch (Exception e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
         }
     }
 
@@ -562,9 +559,7 @@ public class UsernameToken {
         try {
             callbackHandler.handle(new Callback[]{pwCb});
         } catch (IOException | UnsupportedCallbackException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
@@ -605,9 +600,7 @@ public class UsernameToken {
             byte[] digestBytes = KeyUtils.generateDigest(b4);
             passwdDigest = Base64.getMimeEncoder().encodeToString(digestBytes);
         } catch (Exception e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
         }
         return passwdDigest;
     }
@@ -617,9 +610,7 @@ public class UsernameToken {
         try {
             passwdDigest = doPasswordDigest(nonce, created, password.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
+            LOG.debug(e.getMessage(), e);
         }
         return passwdDigest;
     }
@@ -783,9 +774,7 @@ public class UsernameToken {
                 result = 31 * result + Arrays.hashCode(salt);
             }
         } catch (WSSecurityException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
         }
         result = 31 * result + Integer.valueOf(getIteration()).hashCode();
 
@@ -819,9 +808,7 @@ public class UsernameToken {
                 return false;
             }
         } catch (WSSecurityException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
         }
         int iteration = usernameToken.getIteration();
         if (iteration != getIteration()) {
@@ -850,9 +837,7 @@ public class UsernameToken {
             );
         // We can only have one password element
         if (passwordElements.size() > 1) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("The Username Token had more than one password element");
-            }
+            LOG.debug("The Username Token had more than one password element");
             bspEnforcer.handleBSPRule(BSPRule.R4222);
         }
 
@@ -861,9 +846,7 @@ public class UsernameToken {
             Element passwordChild = passwordElements.get(0);
             String type = passwordChild.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
             if (type == null || "".equals(type)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("The Username Token password does not have a Type attribute");
-                }
+                LOG.debug("The Username Token password does not have a Type attribute");
                 bspEnforcer.handleBSPRule(BSPRule.R4201);
             }
         }
@@ -874,9 +857,7 @@ public class UsernameToken {
             );
         // We can only have one created element
         if (createdElements.size() > 1) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("The Username Token has more than one created element");
-            }
+            LOG.debug("The Username Token has more than one created element");
             bspEnforcer.handleBSPRule(BSPRule.R4223);
         }
 
@@ -886,9 +867,7 @@ public class UsernameToken {
             );
         // We can only have one nonce element
         if (nonceElements.size() > 1) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("The Username Token has more than one nonce element");
-            }
+            LOG.debug("The Username Token has more than one nonce element");
             bspEnforcer.handleBSPRule(BSPRule.R4225);
         }
 
@@ -899,9 +878,7 @@ public class UsernameToken {
             if (encodingType == null || "".equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R4220);
             } else if (!WSConstants.BASE64_ENCODING.equals(encodingType)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("The Username Token's nonce element has a bad encoding type");
-                }
+                LOG.debug("The Username Token's nonce element has a bad encoding type");
                 bspEnforcer.handleBSPRule(BSPRule.R4221);
             }
         }

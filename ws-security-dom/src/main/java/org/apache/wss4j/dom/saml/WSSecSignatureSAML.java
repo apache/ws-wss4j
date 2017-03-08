@@ -78,12 +78,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public WSSecSignatureSAML(WSSecHeader securityHeader) {
         super(securityHeader);
-        doDebug = LOG.isDebugEnabled();
     }
 
     public WSSecSignatureSAML(Document doc) {
         super(doc);
-        doDebug = LOG.isDebugEnabled();
     }
 
     /**
@@ -187,9 +185,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         String iKeyName, String iKeyPW
     ) throws WSSecurityException {
 
-        if (doDebug) {
-            LOG.debug("Beginning ST signing...");
-        }
+        LOG.debug("Beginning ST signing...");
 
         userCrypto = uCrypto;
         issuerCrypto = iCrypto;
@@ -281,9 +277,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
 
             String pubKeyAlgo = key.getAlgorithm();
-            if (doDebug) {
-                LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
-            }
+            LOG.debug("automatic sig algo detection: {}", pubKeyAlgo);
             if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                 setSignatureAlgorithm(WSConstants.DSA);
             } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {

@@ -353,11 +353,8 @@ public class WSSecSignature extends WSSecSignatureBase {
      */
     public Document build(Crypto cr)
         throws WSSecurityException {
-        doDebug = LOG.isDebugEnabled();
 
-        if (doDebug) {
-            LOG.debug("Beginning signing...");
-        }
+        LOG.debug("Beginning signing...");
 
         prepare(cr);
         if (getParts().isEmpty()) {
@@ -830,9 +827,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             //
             if (sigAlgo == null) {
                 String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
-                }
+                LOG.debug("Automatic signature algorithm detection: {}", pubKeyAlgo);
                 if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                     sigAlgo = WSConstants.DSA;
                 } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {

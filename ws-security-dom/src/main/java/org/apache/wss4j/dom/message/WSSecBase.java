@@ -44,7 +44,6 @@ public class WSSecBase {
     protected String user;
     protected String password;
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
-    protected boolean doDebug;
     protected CallbackLookup callbackLookup;
     protected CallbackHandler attachmentCallbackHandler;
     protected boolean storeBytesInAttachment;

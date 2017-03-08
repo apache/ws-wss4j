@@ -156,10 +156,7 @@ public class WSSecurityEngine {
         Crypto sigVerCrypto,
         Crypto decCrypto
     ) throws WSSecurityException {
-        doDebug = LOG.isDebugEnabled();
-        if (doDebug) {
-            LOG.debug("enter processSecurityHeader()");
-        }
+        LOG.debug("enter processSecurityHeader()");
 
         if (actor == null) {
             actor = "";
@@ -167,9 +164,7 @@ public class WSSecurityEngine {
         WSHandlerResult wsResult = null;
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
-            if (doDebug) {
-                LOG.debug("Processing WS-Security header for '" + actor + "' actor.");
-            }
+            LOG.debug("Processing WS-Security header for '{}' actor.", actor);
             wsResult = processSecurityHeader(elem, actor, cb, sigVerCrypto, decCrypto);
         }
         return wsResult;

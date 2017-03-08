@@ -291,10 +291,8 @@ public final class STRParserUtil {
         Document doc, WSDocInfo docInfo, CallbackHandler cb,
         String uri, String valueType
     ) throws WSSecurityException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Token reference uri: " + uri);
-            LOG.debug("Token reference ValueType: " + valueType);
-        }
+        LOG.debug("Token reference uri: {}", uri);
+        LOG.debug("Token reference ValueType: {}", valueType);
 
         if (uri == null) {
             throw new WSSecurityException(

@@ -282,9 +282,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             );
         }
         int blockSize = cipher.getBlockSize();
-        if (doDebug) {
-            LOG.debug("cipher blksize: " + blockSize);
-        }
+        LOG.debug("cipher blksize: {}", blockSize);
 
         try {
             encryptedEphemeralKey = cipher.wrap(keyToBeEncrypted);

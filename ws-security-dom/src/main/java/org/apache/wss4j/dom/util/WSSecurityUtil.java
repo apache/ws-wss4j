@@ -129,11 +129,9 @@ public final class WSSecurityUtil {
 
                 if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                     if (foundSecurityHeader != null) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug(
-                                "Two or more security headers have the same actor name: " + actor
-                            );
-                        }
+                        LOG.debug(
+                            "Two or more security headers have the same actor name: {}", actor
+                        );
                         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
                     foundSecurityHeader = elem;
@@ -356,11 +354,9 @@ public final class WSSecurityUtil {
 
                 if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                     if (foundSecurityHeader != null) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug(
-                                "Two or more security headers have the same actor name: " + actor
-                            );
-                        }
+                        LOG.debug(
+                            "Two or more security headers have the same actor name: {}", actor
+                        );
                         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
                     foundSecurityHeader = elem;

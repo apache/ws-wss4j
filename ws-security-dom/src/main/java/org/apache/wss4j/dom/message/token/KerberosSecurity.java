@@ -195,18 +195,14 @@ public class KerberosSecurity extends BinarySecurity {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
+            LOG.debug(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex,
                 "kerberosLoginError",
                 new Object[] {ex.getMessage()}
             );
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully authenticated to the TGT");
-        }
+        LOG.debug("Successfully authenticated to the TGT");
 
         Subject clientSubject = loginContext.getSubject();
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
@@ -239,12 +235,10 @@ public class KerberosSecurity extends BinarySecurity {
                 }
             }
 
-            if (LOG.isDebugEnabled()) {
-                if (secretKey == null) {
-                    LOG.debug("No secret key for kerberos was found");
-                } else {
-                    LOG.debug("Successfully retrieved a secret key for kerberos");
-                }
+            if (secretKey == null) {
+                LOG.debug("No secret key for kerberos was found");
+            } else {
+                LOG.debug("Successfully retrieved a secret key for kerberos");
             }
 
             setToken(krbCtx.getKerberosToken());
@@ -262,9 +256,7 @@ public class KerberosSecurity extends BinarySecurity {
                 krbCtx.dispose();
             }
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully retrieved a service ticket");
-        }
+        LOG.debug("Successfully retrieved a service ticket");
 
         if ("".equals(getValueType())) {
             setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
@@ -280,9 +272,7 @@ public class KerberosSecurity extends BinarySecurity {
     private KerberosTicket getKerberosTicket(Subject clientSubject, KerberosTicket previousTicket) {
         Set<KerberosTicket> privateCredentials = clientSubject.getPrivateCredentials(KerberosTicket.class);
         if (privateCredentials == null || privateCredentials.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Kerberos client subject private credentials are null");
-            }
+            LOG.debug("Kerberos client subject private credentials are null");
             return null;
         }
 
