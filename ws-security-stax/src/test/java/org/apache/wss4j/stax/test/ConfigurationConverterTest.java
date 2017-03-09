@@ -39,7 +39,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testUsernameTokenConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
         config.put(ConfigurationConstants.USER, "testuser");
         config.put(ConfigurationConstants.PW_CALLBACK_CLASS, "org.apache.wss4j.stax.test.CallbackHandlerImpl");
@@ -62,7 +62,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testOutboundSignatureConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
         config.put(ConfigurationConstants.USER, "transmitter");
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
@@ -97,7 +97,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testInboundSignatureConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
         config.put(ConfigurationConstants.ADD_INCLUSIVE_PREFIXES, "false");
@@ -119,7 +119,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testOutboundEncryptionConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         config.put(ConfigurationConstants.USER, "transmitter");
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
@@ -152,7 +152,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testInboundEncryptionConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
         config.put(ConfigurationConstants.DEC_PROP_FILE, "receiver-crypto.properties");
@@ -170,7 +170,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
     @Test
     public void testSAMLConfiguration() throws Exception {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         config.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAMLCallbackHandlerImpl());
 
@@ -185,7 +185,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
     @Test
     public void testTimestampConfiguration() throws Exception {
         // Outbound
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         config.put(ConfigurationConstants.TTL_TIMESTAMP, "180");
 

@@ -1589,7 +1589,7 @@ public class SignatureTest extends AbstractTestBase {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
             config.put(ConfigurationConstants.SIGNATURE_USER, "transmitter");
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
@@ -1646,7 +1646,7 @@ public class SignatureTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
             config.put(ConfigurationConstants.SIG_VER_PROP_FILE, "transmitter-crypto.properties");
 

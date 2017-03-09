@@ -797,7 +797,7 @@ public class SAMLTokenTest extends AbstractTestBase {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
 
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
@@ -852,7 +852,7 @@ public class SAMLTokenTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
             config.put(ConfigurationConstants.SIG_VER_PROP_FILE, "receiver-crypto.properties");
 

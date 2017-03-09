@@ -667,7 +667,7 @@ public class TimestampTest extends AbstractTestBase {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
 
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
@@ -724,7 +724,7 @@ public class TimestampTest extends AbstractTestBase {
 
         //done timestamp; now test timestamp-verification:
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);

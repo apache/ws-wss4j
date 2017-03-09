@@ -76,7 +76,7 @@ public class EmbeddedType {
     @XmlSchemaType(name = "anyURI")
     private String valueType;
     @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+    private Map<QName, String> otherAttributes = new HashMap<>();
 
     /**
      * Gets the value of the any property.

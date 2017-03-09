@@ -94,7 +94,7 @@ public class TimestampType {
     @XmlSchemaType(name = "ID")
     private String id;
     @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+    private Map<QName, String> otherAttributes = new HashMap<>();
 
     /**
      * Gets the value of the created property.

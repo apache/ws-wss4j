@@ -40,7 +40,7 @@ import java.util.Map;
 public class AttachmentCallbackHandler implements CallbackHandler {
 
     private final List<Attachment> originalRequestAttachments;
-    private Map<String, Attachment> attachmentMap = new HashMap<String, Attachment>();
+    private Map<String, Attachment> attachmentMap = new HashMap<>();
     private List<Attachment> responseAttachments = new ArrayList<>();
 
     public AttachmentCallbackHandler(List<Attachment> attachments) {

@@ -40,7 +40,7 @@ public class X509Token extends AbstractToken {
         WssX509Pkcs7Token11,
         WssX509PkiPathV1Token11;
 
-        private static final Map<String, TokenType> LOOKUP = new HashMap<String, TokenType>();
+        private static final Map<String, TokenType> LOOKUP = new HashMap<>();
 
         static {
             for (TokenType u : EnumSet.allOf(TokenType.class)) {

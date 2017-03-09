@@ -294,7 +294,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     }
 
     protected Map<String, Object> getMessageContext(InputStream inputStream) {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         try {
             context.put(SECURED_DOCUMENT, SOAPUtil.toSOAPPart(inputStream));
         } catch (Exception e) {
@@ -304,7 +304,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     }
 
     private Map<String, Object> getMessageContext(Document document) {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         context.put(SECURED_DOCUMENT, document);
         return context;
     }

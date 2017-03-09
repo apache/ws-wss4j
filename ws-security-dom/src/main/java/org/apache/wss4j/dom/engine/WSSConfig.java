@@ -276,7 +276,7 @@ public final class WSSConfig {
      * The known actions are initialized from a set of defaults,
      * but the list may be modified via the setAction operations.
      */
-    private final Map<Integer, Object> actionMap = new HashMap<Integer, Object>(DEFAULT_ACTIONS);
+    private final Map<Integer, Object> actionMap = new HashMap<>(DEFAULT_ACTIONS);
 
     /**
      * The known processors. This map is of the form <QName, Class<?>> or
@@ -284,7 +284,7 @@ public final class WSSConfig {
      * The known processors are initialized from a set of defaults,
      * but the list may be modified via the setProcessor operations.
      */
-    private final Map<QName, Object> processorMap = new HashMap<QName, Object>(DEFAULT_PROCESSORS);
+    private final Map<QName, Object> processorMap = new HashMap<>(DEFAULT_PROCESSORS);
 
     /**
      * The known validators. This map is of the form <QName, Class<?>> or
@@ -292,7 +292,7 @@ public final class WSSConfig {
      * The known validators are initialized from a set of defaults,
      * but the list may be modified via the setValidator operations.
      */
-    private final Map<QName, Object> validatorMap = new HashMap<QName, Object>(DEFAULT_VALIDATORS);
+    private final Map<QName, Object> validatorMap = new HashMap<>(DEFAULT_VALIDATORS);
 
     static {
         try {

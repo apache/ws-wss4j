@@ -762,7 +762,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
             config.put(ConfigurationConstants.USER, "transmitter");
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
@@ -813,7 +813,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);

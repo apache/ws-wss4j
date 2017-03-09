@@ -2372,7 +2372,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         ByteArrayOutputStream baos;
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
             config.put(ConfigurationConstants.ENCRYPTION_USER, "receiver");
             config.put(ConfigurationConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
@@ -2439,7 +2439,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         }
         //test streaming decryption
         {
-            Map<String, Object> config = new HashMap<String, Object>();
+            Map<String, Object> config = new HashMap<>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
             config.put(ConfigurationConstants.DEC_PROP_FILE, "receiver-crypto.properties");
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
