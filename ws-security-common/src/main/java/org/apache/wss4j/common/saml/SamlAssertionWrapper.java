@@ -21,6 +21,8 @@ package org.apache.wss4j.common.saml;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -252,6 +254,21 @@ public class SamlAssertionWrapper {
             return DOM2Writer.nodeToString(element);
         }
         return DOM2Writer.nodeToString(assertionElement);
+    }
+
+    public ZonedDateTime getNotOnOrAfter() {
+        DateTime validTill = null;
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            validTill = getSaml2().getConditions().getNotOnOrAfter();
+        } else {
+            validTill = getSaml1().getConditions().getNotOnOrAfter();
+        }
+
+        // Now conver to a Java ZonedDateTime Object
+        if (validTill != null) {
+            return ZonedDateTime.ofInstant(validTill.toDate().toInstant(), ZoneOffset.UTC);
+        }
+        return null;
     }
 
     /**
