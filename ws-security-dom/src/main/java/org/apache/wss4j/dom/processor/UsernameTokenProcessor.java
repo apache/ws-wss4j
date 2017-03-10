@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.processor;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -148,7 +148,7 @@ public class UsernameTokenProcessor implements Processor {
             // If no Created, then just cache for the default time
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
-            Date created = ut.getCreatedDate();
+            ZonedDateTime created = ut.getCreatedDate();
             if (created == null || utTTL <= 0) {
                 replayCache.add(ut.getNonce());
             } else {

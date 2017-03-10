@@ -25,11 +25,12 @@ import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
-import java.text.DateFormat;
+import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +82,6 @@ import org.apache.wss4j.dom.transform.STRTransformUtil;
 import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Document;
@@ -660,9 +660,7 @@ public class SignatureProcessor implements Processor {
         }
 
         // Test for replay attacks
-        Date created = timeStamp.getCreated();
-        DateFormat zulu = new XmlSchemaDateFormat();
-        String identifier = zulu.format(created) + "" + Arrays.hashCode(signatureValue)
+        String identifier = timeStamp.getCreatedString() + "" + Arrays.hashCode(signatureValue)
             + "" + Arrays.hashCode(key.getEncoded());
 
         if (replayCache.contains(identifier)) {
@@ -673,12 +671,10 @@ public class SignatureProcessor implements Processor {
         }
 
         // Store the Timestamp/SignatureValue/Key combination in the cache
-        Date expires = timeStamp.getExpires();
+        ZonedDateTime expires = timeStamp.getExpires();
         if (expires != null) {
-            Date rightNow = new Date();
-            long currentTime = rightNow.getTime();
-            long expiresTime = expires.getTime();
-            replayCache.add(identifier, 1L + (expiresTime - currentTime) / 1000L);
+            ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
+            replayCache.add(identifier, 1L + Duration.between(currentTime, expires).getSeconds());
         } else {
             replayCache.add(identifier);
         }

@@ -18,15 +18,13 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 
 import org.apache.wss4j.binding.wsu10.TimestampType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.stax.ext.WSSConstants;
 
 public class TimestampValidatorImpl implements TimestampValidator {
 
@@ -42,46 +40,42 @@ public class TimestampValidatorImpl implements TimestampValidator {
         try {
             // Validate whether the security semantics have expired
             //created and expires is optional per spec. But we enforce the created element in the validation
-            Date createdDate = null;
+            ZonedDateTime createdDate = null;
             if (timestampType.getCreated() != null) {
-                XMLGregorianCalendar created;
                 try {
-                    created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
-                } catch (IllegalArgumentException e) {
+                    createdDate = ZonedDateTime.parse(timestampType.getCreated().getValue());
+                } catch (DateTimeParseException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                LOG.debug("Timestamp created: " + created);
-                createdDate = created.toGregorianCalendar().getTime();
+                LOG.debug("Timestamp created: {}", createdDate.toString());
             }
 
-            Date expiresDate = null;
+            ZonedDateTime expiresDate = null;
             if (timestampType.getExpires() != null) {
-                XMLGregorianCalendar expires;
                 try {
-                    expires = WSSConstants.datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
-                } catch (IllegalArgumentException e) {
+                    expiresDate = ZonedDateTime.parse(timestampType.getExpires().getValue());
+                } catch (DateTimeParseException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                LOG.debug("Timestamp expires: " + expires);
-                expiresDate = expires.toGregorianCalendar().getTime();
+                LOG.debug("Timestamp expires: {}", expiresDate.toString());
             } else if (tokenContext.getWssSecurityProperties().isRequireTimestampExpires()) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
                                               new Object[] {"The received Timestamp does not contain an expires Element"});
             }
 
-            Date rightNow = new Date();
             int ttl = tokenContext.getWssSecurityProperties().getTimestampTTL();
             int futureTTL = tokenContext.getWssSecurityProperties().getTimeStampFutureTTL();
 
+            ZonedDateTime rightNow = ZonedDateTime.now(ZoneOffset.UTC);
             if (expiresDate != null && tokenContext.getWssSecurityProperties().isStrictTimestampCheck()
-                && expiresDate.before(rightNow)) {
-                LOG.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                && expiresDate.isBefore(rightNow)) {
+                LOG.debug("Time now: {}", rightNow.toString());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});
             }
 
             if (createdDate != null && !DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
-                LOG.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                LOG.debug("Time now: {}", rightNow.toString());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});
             }

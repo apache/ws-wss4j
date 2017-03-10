@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -1122,10 +1123,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
-            public Date now() {
-                Date currentTime = new Date();
-                currentTime.setTime(currentTime.getTime() - (500L * 1000L));
-                return currentTime;
+            public LocalDateTime now() {
+                return LocalDateTime.now().minusSeconds(500L);
             }
 
         };

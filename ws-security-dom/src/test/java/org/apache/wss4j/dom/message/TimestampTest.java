@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -806,10 +807,8 @@ public class TimestampTest extends org.junit.Assert {
 
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
-            public Date now() {
-                Date currentTime = new Date();
-                currentTime.setTime(currentTime.getTime() - (500L * 1000L));
-                return currentTime;
+            public LocalDateTime now() {
+                return LocalDateTime.now().minusSeconds(500L);
             }
 
         };

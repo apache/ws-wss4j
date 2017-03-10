@@ -19,11 +19,10 @@
 
 package org.apache.wss4j.dom.message.token;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -38,7 +37,6 @@ import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,8 +49,9 @@ import org.w3c.dom.Text;
 public class Timestamp {
 
     private Element element;
-    private Date createdDate;
-    private Date expiresDate;
+    private ZonedDateTime createdDate;
+    private ZonedDateTime expiresDate;
+    private String createdString;
 
     /**
      * Constructs a <code>Timestamp</code> object and parses the
@@ -66,7 +65,6 @@ public class Timestamp {
 
         element = timestampElement;
 
-        String strCreated = null;
         String strExpires = null;
 
         for (Node currentChild = element.getFirstChild();
@@ -77,20 +75,20 @@ public class Timestamp {
                 Element currentChildElement = (Element) currentChild;
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName())
                     && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    if (strCreated == null) {
+                    if (createdString == null) {
                         String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3225);
                         }
-                        strCreated = ((Text)currentChildElement.getFirstChild()).getData();
+                        createdString = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
                         // Test for multiple Created elements
                         bspEnforcer.handleBSPRule(BSPRule.R3203);
                     }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName())
                     && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    if (strCreated == null) {
+                    if (createdString == null) {
                         // Created must appear before Expires
                         bspEnforcer.handleBSPRule(BSPRule.R3221);
                     }
@@ -112,16 +110,16 @@ public class Timestamp {
         }
 
         // We must have a Created element
-        if (strCreated == null) {
+        if (createdString == null) {
             bspEnforcer.handleBSPRule(BSPRule.R3203);
         }
 
         // Parse the dates
-        if (strCreated != null) {
+        if (createdString != null) {
             XMLGregorianCalendar createdCalendar = null;
             try {
                 createdCalendar =
-                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(strCreated);
+                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdString);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
@@ -136,7 +134,11 @@ public class Timestamp {
             if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                 bspEnforcer.handleBSPRule(BSPRule.R3217);
             }
-            createdDate = createdCalendar.toGregorianCalendar().getTime();
+            try {
+                createdDate = ZonedDateTime.parse(createdString);
+            } catch (DateTimeParseException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
         }
 
         if (strExpires != null) {
@@ -158,7 +160,11 @@ public class Timestamp {
             if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                 bspEnforcer.handleBSPRule(BSPRule.R3223);
             }
-            expiresDate = expiresCalendar.toGregorianCalendar().getTime();
+            try {
+                expiresDate = ZonedDateTime.parse(strExpires);
+            } catch (DateTimeParseException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
         }
     }
 
@@ -188,29 +194,24 @@ public class Timestamp {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = null;
-        if (milliseconds) {
-            zulu = new XmlSchemaDateFormat();
-        } else {
-            zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
-            zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
-        }
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        createdDate = timeSource.now();
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        createdDate = timeSource.now().atZone(ZoneOffset.UTC);
+        
+        DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
+        elementCreated.appendChild(doc.createTextNode(createdDate.format(formatter)));
+
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            expiresDate = timeSource.now();
-            expiresDate.setTime(createdDate.getTime() + (long)ttl * 1000L);
+            expiresDate = timeSource.now().atZone(ZoneOffset.UTC).plusSeconds((long)ttl);
 
             Element elementExpires =
                 doc.createElementNS(
                     WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
                 );
-            elementExpires.appendChild(doc.createTextNode(zulu.format(expiresDate)));
+            elementExpires.appendChild(doc.createTextNode(expiresDate.format(formatter)));
             element.appendChild(elementExpires);
         }
     }
@@ -246,11 +247,17 @@ public class Timestamp {
      *
      * @return the "created" time
      */
-    public Date getCreated() {
-        if (createdDate != null) {
-            return new Date(createdDate.getTime());
-        }
-        return null;
+    public ZonedDateTime getCreated() {
+        return createdDate;
+    }
+
+    /**
+     * Get the time of creation as a String
+     *
+     * @return the time of creation as a String
+     */
+    public String getCreatedString() {
+        return createdString;
     }
 
     /**
@@ -258,11 +265,8 @@ public class Timestamp {
      *
      * @return the "expires" time
      */
-    public Date getExpires() {
-        if (expiresDate != null) {
-            return new Date(expiresDate.getTime());
-        }
-        return null;
+    public ZonedDateTime getExpires() {
+        return expiresDate;
     }
 
     /**
@@ -286,8 +290,8 @@ public class Timestamp {
      */
     public boolean isExpired() {
         if (expiresDate != null) {
-            Date rightNow = new Date();
-            return expiresDate.before(rightNow);
+            ZonedDateTime rightNow = ZonedDateTime.now(ZoneOffset.UTC);
+            return expiresDate.isBefore(rightNow);
         }
         return false;
     }
@@ -336,7 +340,7 @@ public class Timestamp {
         return true;
     }
 
-    private boolean compare(Date item1, Date item2) {
+    private boolean compare(ZonedDateTime item1, ZonedDateTime item2) {
         if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {

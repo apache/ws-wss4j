@@ -42,11 +42,11 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Deque;
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         // Verify Created
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
-        Date createdDate = verifyCreated(wssSecurityProperties, usernameTokenType);
+        ZonedDateTime createdDateTime = verifyCreated(wssSecurityProperties, usernameTokenType);
 
         ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();
         final EncodedString encodedNonce =
@@ -89,7 +89,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
             int utTTL = wssSecurityProperties.getUtTTL();
-            if (createdDate == null || utTTL <= 0) {
+            if (createdDateTime == null || utTTL <= 0) {
                 replayCache.add(nonce);
             } else {
                 replayCache.add(nonce, utTTL + 1L);
@@ -187,7 +187,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     }
 
-    private Date verifyCreated(
+    private ZonedDateTime verifyCreated(
         WSSSecurityProperties wssSecurityProperties,
         UsernameTokenType usernameTokenType
     ) throws WSSecurityException {
@@ -200,19 +200,18 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         if (attributedDateTimeCreated != null) {
             // Parse the Date
-            XMLGregorianCalendar created;
+            ZonedDateTime created;
             try {
-                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(attributedDateTimeCreated.getValue());
-            } catch (IllegalArgumentException e) {
+                created = ZonedDateTime.parse(attributedDateTimeCreated.getValue());
+            } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            Date createdDate = created.toGregorianCalendar().getTime();
 
             // Validate whether the security semantics have expired
-            if (!DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
+            if (!DateUtil.verifyCreated(created, ttl, futureTTL)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
-            return createdDate;
+            return created;
         }
         return null;
     }

@@ -22,18 +22,18 @@ package org.apache.wss4j.dom.message.token;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
@@ -49,9 +49,7 @@ import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -84,7 +82,7 @@ public class UsernameToken {
     private boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded;
-    private Date createdDate;
+    private ZonedDateTime createdDate;
 
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -212,18 +210,11 @@ public class UsernameToken {
         if (elementCreated != null) {
             String createdString = getCreated();
             if (createdString != null && !"".equals(createdString)) {
-                XMLGregorianCalendar createdCalendar = null;
                 try {
-                    createdCalendar =
-                        WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdString);
-                } catch (IllegalArgumentException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e,
-                        "badUsernameToken",
-                        new Object[] {"Error parsing UsernameToken Created value"}
-                    );
+                    createdDate = ZonedDateTime.parse(createdString);
+                } catch (DateTimeParseException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                createdDate = createdCalendar.toGregorianCalendar().getTime();
             }
         }
     }
@@ -329,19 +320,14 @@ public class UsernameToken {
         if (elementCreated != null) {
             return;
         }
-        DateFormat zulu = null;
-        if (milliseconds) {
-            zulu = new XmlSchemaDateFormat();
-        } else {
-            zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
-        }
         elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date currentTime = timeSource.now();
-        elementCreated.appendChild(doc.createTextNode(zulu.format(currentTime)));
+        LocalDateTime currentTime = timeSource.now();
+        
+        DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
+        elementCreated.appendChild(doc.createTextNode(currentTime.atZone(ZoneOffset.UTC).format(formatter)));
         element.appendChild(elementCreated);
     }
 
@@ -427,11 +413,8 @@ public class UsernameToken {
      * Return the Created Element as a Date object
      * @return the Created Date
      */
-    public Date getCreatedDate() {
-        if (createdDate != null) {
-            return new Date(createdDate.getTime());
-        }
-        return null;
+    public ZonedDateTime getCreatedDate() {
+        return createdDate;
     }
 
     /**

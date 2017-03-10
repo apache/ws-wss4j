@@ -19,11 +19,18 @@
 
 package org.apache.wss4j.common.util;
 
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class DateUtil {
+    
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(DateUtil.class);
+    
+    private static final DateTimeFormatter MILLISECOND_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    
+    private static final DateTimeFormatter SECOND_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private DateUtil() {
         // complete
@@ -38,31 +45,29 @@ public final class DateUtil {
      * @return true if the Date is before (now-timeToLive), false otherwise
      */
     public static boolean verifyCreated(
-        Date createdDate,
+        ZonedDateTime createdDateTime,
         int timeToLive,
         int futureTimeToLive
     ) {
-        if (createdDate == null) {
+        if (createdDateTime == null) {
             return true;
         }
 
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
+        ZonedDateTime validCreation = ZonedDateTime.now(ZoneOffset.UTC);
         if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + (long)futureTimeToLive * 1000L);
+            validCreation = validCreation.plusSeconds((long)futureTimeToLive);
         }
         // Check to see if the created time is in the future
-        if (createdDate.after(validCreation)) {
+        if (createdDateTime.isAfter(validCreation)) {
             LOG.debug("Validation of Created: The message was created in the future!");
             return false;
         }
 
         // Calculate the time that is allowed for the message to travel
-        currentTime -= (long)timeToLive * 1000L;
-        validCreation.setTime(currentTime);
+        validCreation = ZonedDateTime.now(ZoneOffset.UTC).minusSeconds((long)timeToLive);
 
         // Validate the time it took the message to travel
-        if (createdDate.before(validCreation)) {
+        if (createdDateTime.isBefore(validCreation)) {
             LOG.debug("Validation of Created: The message was created too long ago");
             return false;
         }
@@ -71,4 +76,10 @@ public final class DateUtil {
         return true;
     }
 
+    public static DateTimeFormatter getDateTimeFormatter(boolean milliseconds) {
+        if (milliseconds) {
+            return MILLISECOND_FORMATTER;
+        }
+        return SECOND_FORMATTER;
+    }
 }
