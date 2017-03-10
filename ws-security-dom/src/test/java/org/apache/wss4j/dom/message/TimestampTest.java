@@ -19,17 +19,18 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -41,7 +42,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.NoOpValidator;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -256,15 +256,12 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 30000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30L);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeaderElement().appendChild(timestampElement);
@@ -304,15 +301,12 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 120000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeaderElement().appendChild(timestampElement);
@@ -350,25 +344,20 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime();
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
-
-        Date expiresDate = new Date();
-        expiresDate.setTime(expiresDate.getTime() - 300000);
 
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        elementExpires.appendChild(doc.createTextNode(zulu.format(expiresDate)));
+        now = now.minusSeconds(300L);
+        elementExpires.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeaderElement().appendChild(timestampElement);
@@ -442,13 +431,12 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
         timestampElement.appendChild(elementCreated.cloneNode(true));
 
@@ -488,16 +476,13 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
-        Element elementCreated =
+        Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
-        timestampElement.appendChild(elementCreated);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(300L);
+        elementExpires.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
+        timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
@@ -538,24 +523,20 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime();
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
 
-        zulu = new XmlSchemaDateFormat();
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        createdDate.setTime(currentTime + 300000);
-        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        now = now.plusSeconds(300L);
+        elementExpires.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementExpires);
         timestampElement.appendChild(elementExpires.cloneNode(true));
 
@@ -595,22 +576,20 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        Date expiresDate = new Date();
-        long currentTime = expiresDate.getTime() + 300000;
-        expiresDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(expiresDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(300L);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
 
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        elementExpires.appendChild(doc.createTextNode(zulu.format(new Date())));
+        now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementExpires.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeaderElement().appendChild(timestampElement);
@@ -695,15 +674,12 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         elementCreated.setAttributeNS(null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE);
         timestampElement.appendChild(elementCreated);
 
@@ -748,21 +724,20 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
 
-        DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date createdDate = new Date();
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementCreated);
 
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        createdDate.setTime(createdDate.getTime() + 300000);
-        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        now = now.plusSeconds(300L);
+        elementExpires.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         timestampElement.appendChild(elementExpires);
 
         Element elementCustom =

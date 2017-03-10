@@ -19,13 +19,11 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -35,6 +33,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -48,7 +47,6 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -543,15 +541,10 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Element timestampElement = timestamp.getElement();
         Element createdValue =
             XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
-        DateFormat zulu = new XmlSchemaDateFormat();
 
-        XMLGregorianCalendar createdCalendar =
-            WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdValue.getTextContent());
         // Add 5 seconds
-        Duration duration = WSSConfig.DATATYPE_FACTORY.newDuration(5000L);
-        createdCalendar.add(duration);
-        Date createdDate = createdCalendar.toGregorianCalendar().getTime();
-        createdValue.setTextContent(zulu.format(createdDate));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5L);
+        createdValue.setTextContent(DateUtil.getDateTimeFormatter(true).format(now));
 
         if (LOG.isDebugEnabled()) {
             String outputString =

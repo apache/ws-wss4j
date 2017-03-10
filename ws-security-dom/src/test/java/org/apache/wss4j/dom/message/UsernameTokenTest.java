@@ -22,11 +22,11 @@ package org.apache.wss4j.dom.message;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -36,6 +36,7 @@ import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -51,7 +52,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -334,11 +334,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        DateFormat zulu = new XmlSchemaDateFormat();
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 30000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30L);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         usernameTokenElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeaderElement().appendChild(usernameTokenElement);
@@ -399,11 +396,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        DateFormat zulu = new XmlSchemaDateFormat();
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 120000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+        elementCreated.appendChild(doc.createTextNode(DateUtil.getDateTimeFormatter(true).format(now)));
         usernameTokenElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeaderElement().appendChild(usernameTokenElement);
