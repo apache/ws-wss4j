@@ -18,33 +18,23 @@
  */
 package org.apache.wss4j.binding.wsu10;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
+
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 @XmlTransient
 public abstract class AbstractAttributedDateTime {
 
-    private static final DatatypeFactory datatypeFactory;
-
-    static {
-        try {
-            datatypeFactory = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @XmlTransient
-    private XMLGregorianCalendar xmlGregorianCalendar;
+    private ZonedDateTime zonedDateTime;
 
     public abstract String getValue();
 
-    public XMLGregorianCalendar getAsXMLGregorianCalendar() throws IllegalArgumentException {
-        if (xmlGregorianCalendar == null && getValue() != null) {
-            xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(getValue());
+    public ZonedDateTime getAsZonedDateTime() throws DateTimeParseException {
+        if (zonedDateTime == null && getValue() != null) {
+            zonedDateTime = ZonedDateTime.parse(getValue());
         }
-        return xmlGregorianCalendar;
+        return zonedDateTime;
     }
 }

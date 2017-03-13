@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.impl.processor.output;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -35,14 +36,13 @@ import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -97,12 +97,11 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 nonceValue = WSSConstants.generateBytes(16);
             }
 
-            XMLGregorianCalendar created = null;
             String createdStr = "";
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenCreated()) {
-                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
-                createdStr = created.toXMLFormat();
+                ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
+                createdStr = DateUtil.getDateTimeFormatter(true).format(created);
             }
 
             final OutputProcessor outputProcessor = this;
@@ -136,7 +135,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
             }
             final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor =
-                new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, created, salt, derivedIterations, getAction());
+                new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, createdStr, salt, derivedIterations, getAction());
             finalUsernameTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalUsernameTokenOutputProcessor.setAction(getAction());
             finalUsernameTokenOutputProcessor.init(outputProcessorChain);
@@ -152,13 +151,13 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         private String wsuId;
         private byte[] nonceValue;
         private String password;
-        private XMLGregorianCalendar created;
+        private String created;
         private byte[] salt;
         private int iterations;
         private XMLSecurityConstants.Action action;
 
         FinalUsernameTokenOutputProcessor(String wsuId, byte[] nonceValue, String password,
-                                          XMLGregorianCalendar created, byte[] salt,
+                                          String created, byte[] salt,
                                           int iterations, XMLSecurityConstants.Action action)
                 throws XMLSecurityException {
             super();
@@ -205,7 +204,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
                             ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType()
                                 == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                                    ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
+                                    ? WSSUtils.doPasswordDigest(this.nonceValue, created, this.password)
                                     : this.password);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_PASSWORD);
                 }
@@ -231,9 +230,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE);
                 }
 
-                if (created != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                if (!"".equals(created)) {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, created);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);
                 }
 

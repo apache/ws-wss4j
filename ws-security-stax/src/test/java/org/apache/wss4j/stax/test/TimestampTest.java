@@ -22,16 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -41,6 +39,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -84,17 +83,14 @@ public class TimestampTest extends AbstractTestBase {
             Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
             Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
-            GregorianCalendar gregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(expires.getTextContent()).toGregorianCalendar();
+            ZonedDateTime createdDateTime = ZonedDateTime.parse(created.getTextContent());
+            ZonedDateTime expiresDateTime = ZonedDateTime.parse(expires.getTextContent());
 
-            Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
-            GregorianCalendar now = new GregorianCalendar();
-            Assert.assertFalse(now.before(gregorianCalendarCreated));
-            Assert.assertTrue(now.before(gregorianCalendarExpires));
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            Assert.assertFalse(now.isBefore(createdDateTime));
+            Assert.assertTrue(now.isBefore(expiresDateTime));
 
-            gregorianCalendarCreated.add(Calendar.SECOND, 301);
-            Assert.assertTrue(gregorianCalendarCreated.after(gregorianCalendarExpires));
+            Assert.assertTrue(createdDateTime.plusSeconds(301L).isAfter(expiresDateTime));
         }
 
         //done timestamp; now test timestamp verification:
@@ -161,17 +157,16 @@ public class TimestampTest extends AbstractTestBase {
             Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
             Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
-            GregorianCalendar gregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(expires.getTextContent()).toGregorianCalendar();
+            ZonedDateTime createdDateTime = ZonedDateTime.parse(created.getTextContent());
+            ZonedDateTime expiresDateTime = ZonedDateTime.parse(expires.getTextContent());
+            
+            Assert.assertTrue(createdDateTime.isBefore(expiresDateTime));
+            
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            Assert.assertFalse(now.isBefore(createdDateTime));
+            Assert.assertTrue(now.isBefore(expiresDateTime));
 
-            Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
-            GregorianCalendar now = new GregorianCalendar();
-            Assert.assertFalse(now.before(gregorianCalendarCreated));
-            Assert.assertTrue(now.before(gregorianCalendarExpires));
-
-            gregorianCalendarCreated.add(Calendar.SECOND, 3601);
-            Assert.assertTrue(gregorianCalendarCreated.after(gregorianCalendarExpires));
+            Assert.assertTrue(createdDateTime.plusSeconds(3601L).isAfter(expiresDateTime));
         }
 
         //done timestamp; now test timestamp verification:
@@ -278,17 +273,11 @@ public class TimestampTest extends AbstractTestBase {
             Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
             Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            GregorianCalendar gregorianCalendarCreated = new GregorianCalendar();
-            gregorianCalendarCreated.add(Calendar.SECOND, 40);
-            XMLGregorianCalendar xmlGregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarCreated);
-            created.setTextContent(xmlGregorianCalendarCreated.toXMLFormat());
+            ZonedDateTime createdDateTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(40L);
+            created.setTextContent(DateUtil.getDateTimeFormatter(true).format(createdDateTime));
 
-            GregorianCalendar gregorianCalendarExpires = new GregorianCalendar();
-            gregorianCalendarExpires.add(Calendar.SECOND, 300);
-            XMLGregorianCalendar xmlGregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarExpires);
-
-            expires.setTextContent(xmlGregorianCalendarExpires.toXMLFormat());
+            ZonedDateTime expiresDateTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(300L);
+            expires.setTextContent(DateUtil.getDateTimeFormatter(true).format(expiresDateTime));
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -322,19 +311,12 @@ public class TimestampTest extends AbstractTestBase {
             Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
             Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            GregorianCalendar gregorianCalendarCreated = new GregorianCalendar();
-            gregorianCalendarCreated.add(Calendar.HOUR, 2);
-            XMLGregorianCalendar xmlGregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarCreated);
-            created.setTextContent(xmlGregorianCalendarCreated.toXMLFormat());
+            ZonedDateTime createdDateTime = ZonedDateTime.now(ZoneOffset.UTC).plusHours(2L);
+            created.setTextContent(DateUtil.getDateTimeFormatter(true).format(createdDateTime));
 
-            GregorianCalendar gregorianCalendarExpires = new GregorianCalendar();
-            gregorianCalendarExpires.add(Calendar.HOUR, 2);
-            gregorianCalendarExpires.add(Calendar.SECOND, 300);
-            XMLGregorianCalendar xmlGregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarExpires);
-
-            expires.setTextContent(xmlGregorianCalendarExpires.toXMLFormat());
-
+            ZonedDateTime expiresDateTime = ZonedDateTime.now(ZoneOffset.UTC).plusHours(2L).plusSeconds(300L);
+            expires.setTextContent(DateUtil.getDateTimeFormatter(true).format(expiresDateTime));
+            
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
@@ -685,17 +667,16 @@ public class TimestampTest extends AbstractTestBase {
             Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
             Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
-            GregorianCalendar gregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(expires.getTextContent()).toGregorianCalendar();
+            ZonedDateTime createdDateTime = ZonedDateTime.parse(created.getTextContent());
+            ZonedDateTime expiresDateTime = ZonedDateTime.parse(expires.getTextContent());
+            
+            Assert.assertTrue(createdDateTime.isBefore(expiresDateTime));
+            
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            Assert.assertFalse(now.isBefore(createdDateTime));
+            Assert.assertTrue(now.isBefore(expiresDateTime));
 
-            Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
-            GregorianCalendar now = new GregorianCalendar();
-            Assert.assertFalse(now.before(gregorianCalendarCreated));
-            Assert.assertTrue(now.before(gregorianCalendarExpires));
-
-            gregorianCalendarCreated.add(Calendar.SECOND, 301);
-            Assert.assertTrue(gregorianCalendarCreated.after(gregorianCalendarExpires));
+            Assert.assertTrue(createdDateTime.plusSeconds(301L).isAfter(expiresDateTime));
         }
 
         //done timestamp; now test timestamp verification:

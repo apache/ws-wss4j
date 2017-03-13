@@ -23,9 +23,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.temporal.ChronoField;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -36,7 +34,6 @@ import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -116,54 +113,40 @@ public class Timestamp {
 
         // Parse the dates
         if (createdString != null) {
-            XMLGregorianCalendar createdCalendar = null;
-            try {
-                createdCalendar =
-                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdString);
-            } catch (IllegalArgumentException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-            }
-
-            if (createdCalendar.getFractionalSecond() != null
-                && createdCalendar.getFractionalSecond().scale() > 3) {
-                bspEnforcer.handleBSPRule(BSPRule.R3220);
-            }
-            if (createdCalendar.getSecond() > 59) {
-                bspEnforcer.handleBSPRule(BSPRule.R3213);
-            }
-            if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                bspEnforcer.handleBSPRule(BSPRule.R3217);
-            }
             try {
                 createdDate = ZonedDateTime.parse(createdString);
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
+            
+            if (!ZoneOffset.UTC.equals(createdDate.getZone())) {
+                bspEnforcer.handleBSPRule(BSPRule.R3217);
+            }
+            
+            if (createdDate.getNano() > 0) {
+                int milliseconds = createdDate.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != createdDate.getNano()) {
+                    bspEnforcer.handleBSPRule(BSPRule.R3220);
+                }
+            }
         }
 
         if (strExpires != null) {
-            XMLGregorianCalendar expiresCalendar = null;
-            try {
-                expiresCalendar =
-                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(strExpires);
-            } catch (IllegalArgumentException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-            }
-
-            if (expiresCalendar.getFractionalSecond() != null
-                && expiresCalendar.getFractionalSecond().scale() > 3) {
-                bspEnforcer.handleBSPRule(BSPRule.R3229);
-            }
-            if (expiresCalendar.getSecond() > 59) {
-                bspEnforcer.handleBSPRule(BSPRule.R3215);
-            }
-            if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                bspEnforcer.handleBSPRule(BSPRule.R3223);
-            }
             try {
                 expiresDate = ZonedDateTime.parse(strExpires);
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            
+            if (!ZoneOffset.UTC.equals(expiresDate.getZone())) {
+                bspEnforcer.handleBSPRule(BSPRule.R3223);
+            }
+            
+            if (expiresDate.getNano() > 0) {
+                int milliseconds = expiresDate.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != expiresDate.getNano()) {
+                    bspEnforcer.handleBSPRule(BSPRule.R3229);
+                }
             }
         }
     }
@@ -205,7 +188,7 @@ public class Timestamp {
 
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            expiresDate = timeSource.now().atZone(ZoneOffset.UTC).plusSeconds((long)ttl);
+            expiresDate = createdDate.plusSeconds((long)ttl);
 
             Element elementExpires =
                 doc.createElementNS(

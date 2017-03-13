@@ -18,14 +18,13 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.utils.WSSUtils;
@@ -66,21 +65,19 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
             final QName headerElementName = WSSConstants.TAG_WSU_TIMESTAMP;
             OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-            XMLGregorianCalendar created =
-                WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
+            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
 
-            GregorianCalendar expiresCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-            expiresCalendar.add(Calendar.SECOND, ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL());
-            XMLGregorianCalendar expires = WSSConstants.datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
+            int ttl = ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL();
+            ZonedDateTime expires = created.plusSeconds(ttl);
 
             OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
             //wsu:id is optional and will be added when signing...
             createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, null);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, DateUtil.getDateTimeFormatter(true).format(created));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES, false, null);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, DateUtil.getDateTimeFormatter(true).format(expires));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
 

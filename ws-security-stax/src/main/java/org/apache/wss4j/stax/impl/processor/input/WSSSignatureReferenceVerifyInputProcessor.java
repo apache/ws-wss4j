@@ -22,9 +22,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -313,19 +315,17 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
         if (timestampSecurityEvent != null && replayCache != null) {
             final String cacheKey =
-                    timestampSecurityEvent.getCreated().getTimeInMillis()
+                    timestampSecurityEvent.getCreated().get(ChronoField.MILLI_OF_SECOND)
                     + "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
             if (replayCache.contains(cacheKey)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
 
             // Store the Timestamp/SignatureValue combination in the cache
-            Calendar expiresCal = timestampSecurityEvent.getExpires();
-            if (expiresCal != null) {
-                Date rightNow = new Date();
-                long currentTime = rightNow.getTime();
-                long expiresTime = expiresCal.getTimeInMillis();
-                replayCache.add(cacheKey, 1L + (expiresTime - currentTime) / 1000L);
+            ZonedDateTime expires = timestampSecurityEvent.getExpires();
+            if (expires != null) {
+                ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
+                replayCache.add(cacheKey, 1L + Duration.between(currentTime, expires).getSeconds());
             } else {
                 replayCache.add(cacheKey);
             }

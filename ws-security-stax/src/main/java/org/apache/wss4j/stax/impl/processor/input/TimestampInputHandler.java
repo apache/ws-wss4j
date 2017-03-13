@@ -37,11 +37,13 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.Deque;
 import java.util.List;
 
@@ -87,7 +89,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         if (timestampType.getCreated() != null) {
             try {
                 timestampSecurityEvent.setCreated(
-                        timestampType.getCreated().getAsXMLGregorianCalendar().toGregorianCalendar());
+                        timestampType.getCreated().getAsZonedDateTime());
             } catch (IllegalArgumentException e) { //NOPMD
                 //ignore
             }
@@ -95,7 +97,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         if (timestampType.getExpires() != null) {
             try {
                 timestampSecurityEvent.setExpires(
-                        timestampType.getExpires().getAsXMLGregorianCalendar().toGregorianCalendar());
+                        timestampType.getExpires().getAsZonedDateTime());
             } catch (IllegalArgumentException e) { //NOPMD
                 //ignore
             }
@@ -144,52 +146,56 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         if (timestampType.getCreated() != null) {
-            XMLGregorianCalendar createdCalendar;
+            ZonedDateTime createdDate;
             try {
-                createdCalendar = timestampType.getCreated().getAsXMLGregorianCalendar();
-            } catch (IllegalArgumentException e) {
+                createdDate = timestampType.getCreated().getAsZonedDateTime();
+            } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (createdCalendar.getFractionalSecond() != null
-                && createdCalendar.getFractionalSecond().scale() > 3) {
-                securityContext.handleBSPRule(BSPRule.R3220);
+            
+            if (!ZoneOffset.UTC.equals(createdDate.getZone())) {
+                securityContext.handleBSPRule(BSPRule.R3217);
             }
-            if (createdCalendar.getSecond() > 59) {
-                securityContext.handleBSPRule(BSPRule.R3213);
+            
+            if (createdDate.getNano() > 0) {
+                int milliseconds = createdDate.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != createdDate.getNano()) {
+                    securityContext.handleBSPRule(BSPRule.R3220);
+                }
             }
+            
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(),
                                                                   WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3225);
-            }
-            if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                securityContext.handleBSPRule(BSPRule.R3217);
             }
         } else {
             securityContext.handleBSPRule(BSPRule.R3203);
         }
 
         if (timestampType.getExpires() != null) {
-            XMLGregorianCalendar expiresCalendar;
+            ZonedDateTime expiresDate;
             try {
-                expiresCalendar = timestampType.getExpires().getAsXMLGregorianCalendar();
-            } catch (IllegalArgumentException e) {
+                expiresDate = timestampType.getExpires().getAsZonedDateTime();
+            } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (expiresCalendar.getFractionalSecond() != null
-                && expiresCalendar.getFractionalSecond().scale() > 3) {
-                securityContext.handleBSPRule(BSPRule.R3229);
+            
+            if (!ZoneOffset.UTC.equals(expiresDate.getZone())) {
+                securityContext.handleBSPRule(BSPRule.R3223);
             }
-            if (expiresCalendar.getSecond() > 59) {
-                securityContext.handleBSPRule(BSPRule.R3215);
+            
+            if (expiresDate.getNano() > 0) {
+                int milliseconds = expiresDate.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != expiresDate.getNano()) {
+                    securityContext.handleBSPRule(BSPRule.R3229);
+                }
             }
+            
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(),
                                                                   WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3226);
-            }
-            if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                securityContext.handleBSPRule(BSPRule.R3223);
             }
         }
     }

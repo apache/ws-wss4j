@@ -18,32 +18,32 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 public class TimestampSecurityEvent extends SecurityEvent {
 
-    private Calendar created;
-    private Calendar expires;
+    private ZonedDateTime created;
+    private ZonedDateTime expires;
 
     public TimestampSecurityEvent() {
         super(WSSecurityEventConstants.TIMESTAMP);
     }
 
-    public Calendar getCreated() {
+    public ZonedDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(Calendar created) {
+    public void setCreated(ZonedDateTime created) {
         this.created = created;
     }
 
-    public Calendar getExpires() {
+    public ZonedDateTime getExpires() {
         return expires;
     }
 
-    public void setExpires(Calendar expires) {
+    public void setExpires(ZonedDateTime expires) {
         this.expires = expires;
     }
 }

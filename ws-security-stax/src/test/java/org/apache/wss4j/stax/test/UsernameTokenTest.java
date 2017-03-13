@@ -22,16 +22,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -42,6 +41,7 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -242,9 +242,8 @@ public class UsernameTokenTest extends AbstractTestBase {
     @Test
     public void testReusedNonce() throws Exception {
 
-        XMLGregorianCalendar created =
-            WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
-        String createdString = created.toXMLFormat();
+        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
+        String createdString = DateUtil.getDateTimeFormatter(true).format(created);
         String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
                 "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
@@ -292,11 +291,8 @@ public class UsernameTokenTest extends AbstractTestBase {
     @Test
     public void testOldUsernameToken() throws Exception {
 
-        GregorianCalendar createdCalendar = new GregorianCalendar();
-        createdCalendar.add(Calendar.SECOND, -301);
-        XMLGregorianCalendar created =
-            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
-        String createdString = created.toXMLFormat();
+        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(301L);
+        String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
@@ -339,11 +335,8 @@ public class UsernameTokenTest extends AbstractTestBase {
      */
     @Test
     public void testNearFutureCreated() throws Exception {
-        GregorianCalendar createdCalendar = new GregorianCalendar();
-        createdCalendar.add(Calendar.SECOND, 30);
-        XMLGregorianCalendar created =
-            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
-        String createdString = created.toXMLFormat();
+        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30L);
+        String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
@@ -379,11 +372,8 @@ public class UsernameTokenTest extends AbstractTestBase {
      */
     @Test
     public void testFutureCreated() throws Exception {
-        GregorianCalendar createdCalendar = new GregorianCalendar();
-        createdCalendar.add(Calendar.SECOND, 120);
-        XMLGregorianCalendar created =
-            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
-        String createdString = created.toXMLFormat();
+        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+        String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
