@@ -256,6 +256,21 @@ public class SamlAssertionWrapper {
         return DOM2Writer.nodeToString(assertionElement);
     }
 
+    public ZonedDateTime getNotBefore() {
+        DateTime validFrom = null;
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            validFrom = getSaml2().getConditions().getNotBefore();
+        } else {
+            validFrom = getSaml1().getConditions().getNotBefore();
+        }
+
+        // Now convert to a Java ZonedDateTime Object
+        if (validFrom != null) {
+            return ZonedDateTime.ofInstant(validFrom.toDate().toInstant(), ZoneOffset.UTC);
+        }
+        return null;
+    }
+    
     public ZonedDateTime getNotOnOrAfter() {
         DateTime validTill = null;
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
@@ -264,7 +279,7 @@ public class SamlAssertionWrapper {
             validTill = getSaml1().getConditions().getNotOnOrAfter();
         }
 
-        // Now conver to a Java ZonedDateTime Object
+        // Now convert to a Java ZonedDateTime Object
         if (validTill != null) {
             return ZonedDateTime.ofInstant(validTill.toDate().toInstant(), ZoneOffset.UTC);
         }
