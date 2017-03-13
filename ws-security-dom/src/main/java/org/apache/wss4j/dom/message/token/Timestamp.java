@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -181,11 +182,12 @@ public class Timestamp {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        createdDate = timeSource.now().atZone(ZoneOffset.UTC);
+        Instant now = timeSource.now();
+        createdDate = ZonedDateTime.ofInstant(now, ZoneOffset.UTC);
         
         DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
         elementCreated.appendChild(doc.createTextNode(createdDate.format(formatter)));
-
+        
         element.appendChild(elementCreated);
         if (ttl != 0) {
             expiresDate = createdDate.plusSeconds((long)ttl);

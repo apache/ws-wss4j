@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Base64;
@@ -1117,8 +1117,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
-            public LocalDateTime now() {
-                return LocalDateTime.now().minusSeconds(500L);
+            public Instant now() {
+                return ZonedDateTime.now().minusSeconds(500L).toInstant();
             }
 
         };

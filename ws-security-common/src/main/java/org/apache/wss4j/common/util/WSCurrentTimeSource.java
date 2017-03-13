@@ -19,16 +19,17 @@
 
 package org.apache.wss4j.common.util;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 
 public class WSCurrentTimeSource implements WSTimeSource {
 
    /**
     * Get the current date time
-    * @return the current date/time as a LocalDateTime object
+    * @return the current date/time as a Instant object
     */
-   public LocalDateTime now() {
-       return LocalDateTime.now();
+   public Instant now() {
+       return ZonedDateTime.now().toInstant();
    }
 
 }

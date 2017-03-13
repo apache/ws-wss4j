@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -782,8 +782,8 @@ public class TimestampTest extends org.junit.Assert {
 
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
-            public LocalDateTime now() {
-                return LocalDateTime.now().minusSeconds(500L);
+            public Instant now() {
+                return ZonedDateTime.now().minusSeconds(500L).toInstant();
             }
 
         };

@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.message.token;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -324,7 +324,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        LocalDateTime currentTime = timeSource.now();
+        Instant currentTime = timeSource.now();
         
         DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
         elementCreated.appendChild(doc.createTextNode(currentTime.atZone(ZoneOffset.UTC).format(formatter)));

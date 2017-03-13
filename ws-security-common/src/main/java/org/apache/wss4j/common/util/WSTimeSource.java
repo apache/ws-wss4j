@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.common.util;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * This interface allows the Time Source used to set dates and times to be
@@ -30,8 +30,8 @@ public interface WSTimeSource {
 
    /**
     * Get the current date time
-    * @return the current date/time as a LocalDateTime object
+    * @return the current date/time as a Instant object
     */
-    LocalDateTime now();
+    Instant now();
 
 }
