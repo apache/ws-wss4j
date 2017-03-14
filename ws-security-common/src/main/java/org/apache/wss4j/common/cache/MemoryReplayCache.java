@@ -20,9 +20,11 @@
 package org.apache.wss4j.common.cache;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +41,7 @@ public class MemoryReplayCache implements ReplayCache {
 
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private final SortedMap<Date, List<String>> cache = new TreeMap<>();
+    private final SortedMap<Instant, List<String>> cache = new TreeMap<>();
     private final Set<String> ids = Collections.synchronizedSet(new HashSet<>());
 
     /**
@@ -65,15 +67,13 @@ public class MemoryReplayCache implements ReplayCache {
             ttl = DEFAULT_TTL;
         }
 
-        Date expires = new Date();
-        long currentTime = expires.getTime();
-        expires.setTime(currentTime + ttl * 1000L);
+        ZonedDateTime expires = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(ttl);
 
         synchronized (cache) {
             List<String> list = cache.get(expires);
             if (list == null) {
                 list = new ArrayList<>(1);
-                cache.put(expires, list);
+                cache.put(expires.toInstant(), list);
             }
             list.add(identifier);
         }
@@ -94,12 +94,12 @@ public class MemoryReplayCache implements ReplayCache {
     }
 
     protected void processTokenExpiry() {
-        Date current = new Date();
+        Instant current = ZonedDateTime.now(ZoneOffset.UTC).toInstant();
         synchronized (cache) {
-            Iterator<Entry<Date, List<String>>> it = cache.entrySet().iterator();
+            Iterator<Entry<Instant, List<String>>> it = cache.entrySet().iterator();
             while (it.hasNext()) {
-                Entry<Date, List<String>> entry = it.next();
-                if (entry.getKey().before(current)) {
+                Entry<Instant, List<String>> entry = it.next();
+                if (entry.getKey().isBefore(current)) {
                     for (String id : entry.getValue()) {
                         ids.remove(id);
                     }

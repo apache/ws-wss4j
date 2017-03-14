@@ -18,7 +18,9 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -259,10 +261,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
 
             DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
             if (expires != null) {
-                Date rightNow = new Date();
-                long currentTime = rightNow.getTime();
-                long expiresTime = expires.getMillis();
-                replayCache.add(identifier, 1L + (expiresTime - currentTime) / 1000L);
+                ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
+                ZonedDateTime zonedExpires = ZonedDateTime.ofInstant(expires.toDate().toInstant(), ZoneOffset.UTC);
+                replayCache.add(identifier, 1L + Duration.between(currentTime, zonedExpires).getSeconds());
             } else {
                 replayCache.add(identifier);
             }

@@ -22,7 +22,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
@@ -140,9 +142,11 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent usernameTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_WSSE_USERNAME_TOKEN, null, null);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
@@ -352,9 +356,11 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(encryptedSupportingTokenEncryptedElementSecurityEvent);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
@@ -610,9 +616,11 @@ public class InboundWSSecurityContextImplTest {
         usernameTokenPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(usernamePath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);

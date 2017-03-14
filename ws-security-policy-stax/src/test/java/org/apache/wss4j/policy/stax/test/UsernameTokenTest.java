@@ -19,6 +19,7 @@
 package org.apache.wss4j.policy.stax.test;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -36,7 +37,8 @@ import org.junit.Test;
 
 import javax.xml.namespace.QName;
 
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,9 +82,11 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         UsernameTokenSecurityEvent initiatorTokenSecurityEvent = new UsernameTokenSecurityEvent();
         initiatorTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
@@ -92,7 +96,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
@@ -158,9 +162,11 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -170,7 +176,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);

@@ -18,7 +18,8 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import javax.xml.namespace.QName;
 
@@ -28,6 +29,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.DsaKeyValueSecurityTokenImpl;
@@ -279,9 +281,11 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -291,7 +295,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -321,9 +325,11 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -333,7 +339,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -367,9 +373,11 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -379,7 +387,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -409,9 +417,11 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        String created = DateUtil.getDateTimeFormatter(true).format(now);
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
-                "username", "password", new Date().toString(), null, new byte[10], 10L,
+                "username", "password", created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
@@ -421,7 +431,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE,
-                "username", null, new Date().toString(), null, new byte[10], 10L,
+                "username", null, created, null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
