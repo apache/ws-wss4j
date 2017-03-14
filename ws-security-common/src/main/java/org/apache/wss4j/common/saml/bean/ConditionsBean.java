@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.saml.bean;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -56,6 +58,24 @@ public class ConditionsBean {
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }
+    
+    /**
+     * Constructor ConditionsBean creates a new ConditionsBean instance.
+     *
+     * @param notBefore The notBefore instance
+     * @param notAfter The notAfter instance
+     */
+    public ConditionsBean(
+        ZonedDateTime notBefore,
+        ZonedDateTime notAfter
+    ) {
+        if (notBefore != null) {
+            this.notBefore = new DateTime(Date.from(notBefore.toInstant()));
+        }
+        if (notAfter != null) {
+            this.notAfter = new DateTime(Date.from(notAfter.toInstant()));
+        }
+    }
 
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
@@ -85,6 +105,19 @@ public class ConditionsBean {
     public void setNotBefore(DateTime notBefore) {
         this.notBefore = notBefore;
     }
+    
+    /**
+     * Set the notBefore instance
+     *
+     * @param notBefore the notBefore instance to set
+     */
+    public void setNotBefore(ZonedDateTime notBefore) {
+        if (notBefore != null) {
+            this.notBefore = new DateTime(Date.from(notBefore.toInstant()));
+        } else {
+            this.notBefore = null;
+        }
+    }
 
     /**
      * Get the notAfter instance
@@ -102,6 +135,19 @@ public class ConditionsBean {
      */
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
+    }
+    
+    /**
+     * Set the notAfter instance
+     *
+     * @param notAfter the notAfter instance to set
+     */
+    public void setNotAfter(ZonedDateTime notAfter) {
+        if (notAfter != null) {
+            this.notAfter = new DateTime(Date.from(notAfter.toInstant()));
+        } else {
+            this.notAfter = null;
+        }
     }
 
     /**

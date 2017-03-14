@@ -19,6 +19,9 @@
 
 package org.apache.wss4j.common.saml.bean;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 import org.joda.time.DateTime;
 
 /**
@@ -39,6 +42,14 @@ public class DelegateBean {
 
     public void setDelegationInstant(DateTime delegationInstant) {
         this.delegationInstant = delegationInstant;
+    }
+    
+    public void setDelegationInstant(ZonedDateTime delegationInstant) {
+        if (delegationInstant != null) {
+            this.delegationInstant = new DateTime(Date.from(delegationInstant.toInstant()));
+        } else {
+            this.delegationInstant = null;
+        }
     }
 
     public String getConfirmationMethod() {
