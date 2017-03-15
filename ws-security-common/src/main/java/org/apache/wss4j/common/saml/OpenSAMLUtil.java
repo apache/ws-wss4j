@@ -22,6 +22,7 @@ package org.apache.wss4j.common.saml;
 import javax.xml.namespace.QName;
 
 import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.ParserPool;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -56,6 +57,7 @@ public final class OpenSAMLUtil {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(OpenSAMLUtil.class);
 
+    private static XMLObjectProviderRegistry providerRegistry;
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;
     private static UnmarshallerFactory unmarshallerFactory;
@@ -78,7 +80,7 @@ public final class OpenSAMLUtil {
             Configuration configuration = new MapBasedConfiguration();
             ConfigurationService.setConfiguration(configuration);
 
-            XMLObjectProviderRegistry providerRegistry = new XMLObjectProviderRegistry();
+            providerRegistry = new XMLObjectProviderRegistry();
             configuration.register(XMLObjectProviderRegistry.class, providerRegistry, 
                                    ConfigurationService.DEFAULT_PARTITION_NAME);
 
@@ -95,7 +97,7 @@ public final class OpenSAMLUtil {
                 unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
 
                 try {
-                    configureParserPool(providerRegistry);
+                    configureParserPool();
                 } catch (Throwable t) {
                     LOG.warn("Unable to bootstrap the parser pool part of the opensaml library "
                              + "- some SAML operations may fail", t);
@@ -111,19 +113,28 @@ public final class OpenSAMLUtil {
         }
     }
 
-    private static void configureParserPool(XMLObjectProviderRegistry reg) throws Throwable {
+    private static void configureParserPool() throws Throwable {
         BasicParserPool pp = new BasicParserPool();
         pp.setMaxPoolSize(50);
         pp.initialize();
-        reg.setParserPool(pp);
+        providerRegistry.setParserPool(pp);
     }
 
+    /**
+     * Get the configured ParserPool.
+     * 
+     * @return the configured ParserPool
+     */
+    public static ParserPool getParserPool() {
+        return providerRegistry.getParserPool();
+    }    
+    
     /**
      * Convert a SAML Assertion from a DOM Element to an XMLObject
      *
      * @param root of type Element
      * @return XMLObject
-     * @throws UnmarshallingException
+     * @throws WSSecurityException
      */
     public static XMLObject fromDom(Element root) throws WSSecurityException {
         if (root == null) {
@@ -151,7 +162,7 @@ public final class OpenSAMLUtil {
      * @param xmlObject of type XMLObject
      * @param doc  of type Document
      * @return Element
-     * @throws MarshallingException
+     * @throws WSSecurityException
      */
     public static Element toDom(
         XMLObject xmlObject,
@@ -167,7 +178,7 @@ public final class OpenSAMLUtil {
      * @param doc  of type Document
      * @param signObject whether to sign the XMLObject during marshalling
      * @return Element
-     * @throws MarshallingException
+     * @throws WSSecurityException
      */
     public static Element toDom(
         XMLObject xmlObject,
