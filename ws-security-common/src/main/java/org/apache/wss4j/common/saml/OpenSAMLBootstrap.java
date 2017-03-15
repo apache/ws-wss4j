@@ -73,9 +73,13 @@ public final class OpenSAMLBootstrap {
     /**
      * Initializes the OpenSAML library, loading default configurations.
      *
-     * @throws ConfigurationException thrown if there is a problem initializing the OpenSAML library
+     * @throws XMLConfigurationException thrown if there is a problem initializing the OpenSAML library
      */
     public static synchronized void bootstrap() throws XMLConfigurationException {
+        bootstrap(true);
+    }
+
+    public static synchronized void bootstrap(boolean includeXacml) throws XMLConfigurationException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
             XMLConfigurator configurator = new XMLConfigurator();
@@ -83,18 +87,20 @@ public final class OpenSAMLBootstrap {
             Thread.currentThread().setContextClassLoader(XMLObjectProviderRegistrySupport.class.getClassLoader());
 
             for (String config : XML_CONFIGS) {
-                //most are found in the Configuration.class classloader
-                InputStream ins = Configuration.class.getResourceAsStream(config);
-                if (ins == null) {
-                    //some are from us
-                    ins = OpenSAMLBootstrap.class.getResourceAsStream(config);
-                }
-                if (ins != null) {
-                    configurator.load(ins);
-                    try {
-                        ins.close();
-                    } catch (IOException ex) { //NOPMD
-                        // Do nothing
+                if (includeXacml || !config.contains("xacml")) {
+                    //most are found in the Configuration.class classloader
+                    InputStream ins = Configuration.class.getResourceAsStream(config);
+                    if (ins == null) {
+                        //some are from us
+                        ins = OpenSAMLBootstrap.class.getResourceAsStream(config);
+                    }
+                    if (ins != null) {
+                        configurator.load(ins);
+                        try {
+                            ins.close();
+                        } catch (IOException ex) { //NOPMD
+                            // Do nothing
+                        }
                     }
                 }
             }

@@ -71,6 +71,10 @@ public final class OpenSAMLUtil {
      * Initialise the SAML library
      */
     public static synchronized void initSamlEngine() {
+        initSamlEngine(true);
+    }
+
+    public static synchronized void initSamlEngine(boolean includeXacml) {
         if (!samlEngineInitialized) {
             LOG.debug("Initializing the opensaml2 library...");
             WSProviderConfig.init();
@@ -83,7 +87,7 @@ public final class OpenSAMLUtil {
                                    ConfigurationService.DEFAULT_PARTITION_NAME);
 
             try {
-                OpenSAMLBootstrap.bootstrap();
+                OpenSAMLBootstrap.bootstrap(includeXacml);
 
                 SAMLConfiguration samlConfiguration = new SAMLConfiguration();
 
