@@ -89,7 +89,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         if (timestampType.getCreated() != null) {
             try {
                 timestampSecurityEvent.setCreated(
-                        timestampType.getCreated().getAsZonedDateTime());
+                        timestampType.getCreated().getAsZonedDateTime().toInstant());
             } catch (IllegalArgumentException e) { //NOPMD
                 //ignore
             }
@@ -97,7 +97,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         if (timestampType.getExpires() != null) {
             try {
                 timestampSecurityEvent.setExpires(
-                        timestampType.getExpires().getAsZonedDateTime());
+                        timestampType.getExpires().getAsZonedDateTime().toInstant());
             } catch (IllegalArgumentException e) { //NOPMD
                 //ignore
             }

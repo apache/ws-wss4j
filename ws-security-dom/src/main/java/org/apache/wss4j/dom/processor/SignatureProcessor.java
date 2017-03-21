@@ -26,8 +26,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.time.Duration;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -671,10 +670,8 @@ public class SignatureProcessor implements Processor {
         }
 
         // Store the Timestamp/SignatureValue/Key combination in the cache
-        ZonedDateTime expires = timeStamp.getExpires();
-        if (expires != null) {
-            ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
-            replayCache.add(identifier, 1L + Duration.between(currentTime, expires).getSeconds());
+        if (timeStamp.getExpires() != null) {
+            replayCache.add(identifier, 1L + Duration.between(Instant.now(), timeStamp.getExpires()).getSeconds());
         } else {
             replayCache.add(identifier);
         }

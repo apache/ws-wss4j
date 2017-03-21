@@ -47,8 +47,8 @@ import org.w3c.dom.Text;
 public class Timestamp {
 
     private Element element;
-    private ZonedDateTime createdDate;
-    private ZonedDateTime expiresDate;
+    private Instant created;
+    private Instant expires;
     private String createdString;
 
     /**
@@ -115,18 +115,19 @@ public class Timestamp {
         // Parse the dates
         if (createdString != null) {
             try {
-                createdDate = ZonedDateTime.parse(createdString);
+                ZonedDateTime createdDateTime = ZonedDateTime.parse(createdString);
+                if (!ZoneOffset.UTC.equals(createdDateTime.getZone())) {
+                    bspEnforcer.handleBSPRule(BSPRule.R3217);
+                }
+                
+                created = createdDateTime.toInstant();
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             
-            if (!ZoneOffset.UTC.equals(createdDate.getZone())) {
-                bspEnforcer.handleBSPRule(BSPRule.R3217);
-            }
-            
-            if (createdDate.getNano() > 0) {
-                int milliseconds = createdDate.get(ChronoField.MILLI_OF_SECOND);
-                if (milliseconds * 1000000 != createdDate.getNano()) {
+            if (created.getNano() > 0) {
+                int milliseconds = created.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != created.getNano()) {
                     bspEnforcer.handleBSPRule(BSPRule.R3220);
                 }
             }
@@ -134,18 +135,19 @@ public class Timestamp {
 
         if (strExpires != null) {
             try {
-                expiresDate = ZonedDateTime.parse(strExpires);
+                ZonedDateTime expiresDateTime = ZonedDateTime.parse(strExpires);
+                if (!ZoneOffset.UTC.equals(expiresDateTime.getZone())) {
+                    bspEnforcer.handleBSPRule(BSPRule.R3223);
+                }
+                
+                expires = expiresDateTime.toInstant();
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             
-            if (!ZoneOffset.UTC.equals(expiresDate.getZone())) {
-                bspEnforcer.handleBSPRule(BSPRule.R3223);
-            }
-            
-            if (expiresDate.getNano() > 0) {
-                int milliseconds = expiresDate.get(ChronoField.MILLI_OF_SECOND);
-                if (milliseconds * 1000000 != expiresDate.getNano()) {
+            if (expires.getNano() > 0) {
+                int milliseconds = expires.get(ChronoField.MILLI_OF_SECOND);
+                if (milliseconds * 1000000 != expires.getNano()) {
                     bspEnforcer.handleBSPRule(BSPRule.R3229);
                 }
             }
@@ -182,21 +184,20 @@ public class Timestamp {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Instant now = timeSource.now();
-        createdDate = ZonedDateTime.ofInstant(now, ZoneOffset.UTC);
+        created = timeSource.now();
         
         DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
-        elementCreated.appendChild(doc.createTextNode(createdDate.format(formatter)));
+        elementCreated.appendChild(doc.createTextNode(created.atZone(ZoneOffset.UTC).format(formatter)));
         
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            expiresDate = createdDate.plusSeconds((long)ttl);
+            expires = created.plusSeconds((long)ttl);
 
             Element elementExpires =
                 doc.createElementNS(
                     WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
                 );
-            elementExpires.appendChild(doc.createTextNode(expiresDate.format(formatter)));
+            elementExpires.appendChild(doc.createTextNode(expires.atZone(ZoneOffset.UTC).format(formatter)));
             element.appendChild(elementExpires);
         }
     }
@@ -232,8 +233,8 @@ public class Timestamp {
      *
      * @return the "created" time
      */
-    public ZonedDateTime getCreated() {
-        return createdDate;
+    public Instant getCreated() {
+        return created;
     }
 
     /**
@@ -250,8 +251,8 @@ public class Timestamp {
      *
      * @return the "expires" time
      */
-    public ZonedDateTime getExpires() {
-        return expiresDate;
+    public Instant getExpires() {
+        return expires;
     }
 
     /**
@@ -274,9 +275,9 @@ public class Timestamp {
      * is before the current time. It returns false if there is no Expires value.
      */
     public boolean isExpired() {
-        if (expiresDate != null) {
-            ZonedDateTime rightNow = ZonedDateTime.now(ZoneOffset.UTC);
-            return expiresDate.isBefore(rightNow);
+        if (expires != null) {
+            Instant rightNow = Instant.now();
+            return expires.isBefore(rightNow);
         }
         return false;
     }
@@ -294,18 +295,18 @@ public class Timestamp {
         int timeToLive,
         int futureTimeToLive
     ) {
-        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
+        return DateUtil.verifyCreated(created, timeToLive, futureTimeToLive);
     }
 
 
     @Override
     public int hashCode() {
         int result = 17;
-        if (createdDate != null) {
-            result = 31 * result + createdDate.hashCode();
+        if (created != null) {
+            result = 31 * result + created.hashCode();
         }
-        if (expiresDate != null) {
-            result = 31 * result + expiresDate.hashCode();
+        if (expires != null) {
+            result = 31 * result + expires.hashCode();
         }
         return result;
     }
@@ -325,7 +326,7 @@ public class Timestamp {
         return true;
     }
 
-    private boolean compare(ZonedDateTime item1, ZonedDateTime item2) {
+    private boolean compare(Instant item1, Instant item2) {
         if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {

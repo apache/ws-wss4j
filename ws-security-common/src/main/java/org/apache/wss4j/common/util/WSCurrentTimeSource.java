@@ -20,7 +20,6 @@
 package org.apache.wss4j.common.util;
 
 import java.time.Instant;
-import java.time.ZonedDateTime;
 
 public class WSCurrentTimeSource implements WSTimeSource {
 
@@ -29,7 +28,7 @@ public class WSCurrentTimeSource implements WSTimeSource {
     * @return the current date/time as a Instant object
     */
    public Instant now() {
-       return ZonedDateTime.now().toInstant();
+       return Instant.now();
    }
 
 }

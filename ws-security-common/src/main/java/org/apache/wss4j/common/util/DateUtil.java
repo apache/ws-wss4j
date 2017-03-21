@@ -19,8 +19,7 @@
 
 package org.apache.wss4j.common.util;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 public final class DateUtil {
@@ -45,29 +44,29 @@ public final class DateUtil {
      * @return true if the Date is before (now-timeToLive), false otherwise
      */
     public static boolean verifyCreated(
-        ZonedDateTime createdDateTime,
+        Instant created,
         int timeToLive,
         int futureTimeToLive
     ) {
-        if (createdDateTime == null) {
+        if (created == null) {
             return true;
         }
 
-        ZonedDateTime validCreation = ZonedDateTime.now(ZoneOffset.UTC);
+        Instant validCreation = Instant.now();
         if (futureTimeToLive > 0) {
             validCreation = validCreation.plusSeconds((long)futureTimeToLive);
         }
         // Check to see if the created time is in the future
-        if (createdDateTime.isAfter(validCreation)) {
+        if (created.isAfter(validCreation)) {
             LOG.debug("Validation of Created: The message was created in the future!");
             return false;
         }
 
         // Calculate the time that is allowed for the message to travel
-        validCreation = ZonedDateTime.now(ZoneOffset.UTC).minusSeconds((long)timeToLive);
+        validCreation = Instant.now().minusSeconds((long)timeToLive);
 
         // Validate the time it took the message to travel
-        if (createdDateTime.isBefore(validCreation)) {
+        if (created.isBefore(validCreation)) {
             LOG.debug("Validation of Created: The message was created too long ago");
             return false;
         }

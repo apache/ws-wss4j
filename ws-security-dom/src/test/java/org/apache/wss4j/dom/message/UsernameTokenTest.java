@@ -1118,7 +1118,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Instant now() {
-                return ZonedDateTime.now().minusSeconds(500L).toInstant();
+                return Instant.now().minusSeconds(500L);
             }
 
         };

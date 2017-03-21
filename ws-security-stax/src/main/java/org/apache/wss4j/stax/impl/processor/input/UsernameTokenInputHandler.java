@@ -45,6 +45,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Deque;
@@ -73,7 +74,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         // Verify Created
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
-        ZonedDateTime createdDateTime = verifyCreated(wssSecurityProperties, usernameTokenType);
+        Instant created = verifyCreated(wssSecurityProperties, usernameTokenType);
 
         ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();
         final EncodedString encodedNonce =
@@ -89,7 +90,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
             int utTTL = wssSecurityProperties.getUtTTL();
-            if (createdDateTime == null || utTTL <= 0) {
+            if (created == null || utTTL <= 0) {
                 replayCache.add(nonce);
             } else {
                 replayCache.add(nonce, utTTL + 1L);
@@ -187,7 +188,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     }
 
-    private ZonedDateTime verifyCreated(
+    private Instant verifyCreated(
         WSSSecurityProperties wssSecurityProperties,
         UsernameTokenType usernameTokenType
     ) throws WSSecurityException {
@@ -208,10 +209,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
 
             // Validate whether the security semantics have expired
-            if (!DateUtil.verifyCreated(created, ttl, futureTTL)) {
+            if (!DateUtil.verifyCreated(created.toInstant(), ttl, futureTTL)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
-            return created;
+            return created.toInstant();
         }
         return null;
     }

@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -66,15 +66,15 @@ public class TimestampValidatorImpl implements TimestampValidator {
             int ttl = tokenContext.getWssSecurityProperties().getTimestampTTL();
             int futureTTL = tokenContext.getWssSecurityProperties().getTimeStampFutureTTL();
 
-            ZonedDateTime rightNow = ZonedDateTime.now(ZoneOffset.UTC);
+            Instant rightNow = Instant.now();
             if (expiresDate != null && tokenContext.getWssSecurityProperties().isStrictTimestampCheck()
-                && expiresDate.isBefore(rightNow)) {
+                && expiresDate.toInstant().isBefore(rightNow)) {
                 LOG.debug("Time now: {}", rightNow.toString());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});
             }
 
-            if (createdDate != null && !DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
+            if (createdDate != null && !DateUtil.verifyCreated(createdDate.toInstant(), ttl, futureTTL)) {
                 LOG.debug("Time now: {}", rightNow.toString());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});

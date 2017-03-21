@@ -82,7 +82,7 @@ public class UsernameToken {
     private boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded;
-    private ZonedDateTime createdDate;
+    private Instant created;
 
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -211,7 +211,7 @@ public class UsernameToken {
             String createdString = getCreated();
             if (createdString != null && !"".equals(createdString)) {
                 try {
-                    createdDate = ZonedDateTime.parse(createdString);
+                    created = ZonedDateTime.parse(createdString).toInstant();
                 } catch (DateTimeParseException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
@@ -413,8 +413,8 @@ public class UsernameToken {
      * Return the Created Element as a Date object
      * @return the Created Date
      */
-    public ZonedDateTime getCreatedDate() {
-        return createdDate;
+    public Instant getCreatedDate() {
+        return created;
     }
 
     /**
@@ -725,7 +725,7 @@ public class UsernameToken {
         int timeToLive,
         int futureTimeToLive
     ) {
-        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
+        return DateUtil.verifyCreated(created, timeToLive, futureTimeToLive);
     }
 
     @Override

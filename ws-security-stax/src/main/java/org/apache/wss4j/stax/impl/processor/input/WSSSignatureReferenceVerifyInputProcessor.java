@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -322,9 +321,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             }
 
             // Store the Timestamp/SignatureValue combination in the cache
-            ZonedDateTime expires = timestampSecurityEvent.getExpires();
+            Instant expires = timestampSecurityEvent.getExpires();
             if (expires != null) {
-                ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
+                Instant currentTime = Instant.now();
                 replayCache.add(cacheKey, 1L + Duration.between(currentTime, expires).getSeconds());
             } else {
                 replayCache.add(cacheKey);

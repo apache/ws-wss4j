@@ -21,8 +21,6 @@ package org.apache.wss4j.common.cache;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -67,13 +65,13 @@ public class MemoryReplayCache implements ReplayCache {
             ttl = DEFAULT_TTL;
         }
 
-        ZonedDateTime expires = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(ttl);
+        Instant expires = Instant.now().plusSeconds(ttl);
 
         synchronized (cache) {
             List<String> list = cache.get(expires);
             if (list == null) {
                 list = new ArrayList<>(1);
-                cache.put(expires.toInstant(), list);
+                cache.put(expires, list);
             }
             list.add(identifier);
         }
@@ -94,7 +92,7 @@ public class MemoryReplayCache implements ReplayCache {
     }
 
     protected void processTokenExpiry() {
-        Instant current = ZonedDateTime.now(ZoneOffset.UTC).toInstant();
+        Instant current = Instant.now();
         synchronized (cache) {
             Iterator<Entry<Instant, List<String>>> it = cache.entrySet().iterator();
             while (it.hasNext()) {

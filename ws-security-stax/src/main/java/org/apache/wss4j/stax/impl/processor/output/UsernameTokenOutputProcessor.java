@@ -39,8 +39,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,8 +100,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             String createdStr = "";
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenCreated()) {
-                ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-                createdStr = DateUtil.getDateTimeFormatter(true).format(created);
+                Instant created = Instant.now();
+                createdStr = created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true));
             }
 
             final OutputProcessor outputProcessor = this;

@@ -18,8 +18,9 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -65,19 +66,20 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
             final QName headerElementName = WSSConstants.TAG_WSU_TIMESTAMP;
             OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
+            Instant created = Instant.now();
 
             int ttl = ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL();
-            ZonedDateTime expires = created.plusSeconds(ttl);
+            Instant expires = created.plusSeconds(ttl);
 
             OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
             //wsu:id is optional and will be added when signing...
             createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, null);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, DateUtil.getDateTimeFormatter(true).format(created));
+            DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(true);
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, created.atZone(ZoneOffset.UTC).format(formatter));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES, false, null);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, DateUtil.getDateTimeFormatter(true).format(expires));
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.atZone(ZoneOffset.UTC).format(formatter));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
 
