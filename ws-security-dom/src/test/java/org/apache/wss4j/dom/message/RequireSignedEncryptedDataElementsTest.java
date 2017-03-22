@@ -275,7 +275,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     private RequestData getRequestData(boolean reqSignedEncData) throws WSSecurityException {
         RequestData reqData = new RequestData();
         Map<String, Object> messageContext = new TreeMap<>();
-        messageContext = new TreeMap<String, Object>();
+        messageContext = new TreeMap<>();
         messageContext.put(WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, Boolean.toString(reqSignedEncData));
         reqData.setMsgContext(messageContext);
         CustomHandler handler = new CustomHandler();
