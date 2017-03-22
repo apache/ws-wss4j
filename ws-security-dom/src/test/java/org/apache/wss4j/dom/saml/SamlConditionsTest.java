@@ -214,7 +214,39 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
     }
     
-    @org.junit.Test
+    @Test
+    public void testSAML2NoNotOnOrAfter() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        DateTime issueInstant = new DateTime().minusSeconds(5);
+        samlAssertion.getSaml2().setIssueInstant(issueInstant);
+        samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString =
+                XMLUtils.prettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+
+        verify(unsignedDoc);
+    }
+
+    @Test
     public void testSAML2StaleIssueInstantButWithNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
