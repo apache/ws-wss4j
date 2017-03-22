@@ -829,8 +829,7 @@ public class SamlAssertionWrapper {
 
         // Check the IssueInstant is not in the future, subject to the future TTL
         if (issueInstant != null) {
-            DateTime currentTime = new DateTime();
-            currentTime = currentTime.plusSeconds(futureTTL);
+            DateTime currentTime = new DateTime().plusSeconds(futureTTL);
             if (issueInstant.isAfter(currentTime)) {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -838,8 +837,7 @@ public class SamlAssertionWrapper {
 
             // If there is no NotOnOrAfter, then impose a TTL on the IssueInstant.
             if (validTill == null) {
-                currentTime = new DateTime();
-                currentTime.minusSeconds(ttl);
+                currentTime = new DateTime().minusSeconds(ttl);
 
                 if (issueInstant.isBefore(currentTime)) {
                     LOG.debug("SAML Token IssueInstant not met. The assertion was created too long ago.");
