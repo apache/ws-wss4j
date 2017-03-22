@@ -22,7 +22,12 @@ package org.apache.wss4j.dom.saml;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -50,6 +55,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPath2FilterContainer;
@@ -115,6 +121,68 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         // This should pass as we are disabling signature profile validation in the Validator
         verifyWithoutProfile(doc);
+    }
+    
+    @Test
+    public void testSAML1AuthnAssertionValidatorMap() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        Element assertionElement = samlAssertion.toDOM(doc);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        secHeader.getSecurityHeader().appendChild(assertionElement);
+
+        // Sign
+        signAssertion(doc, assertionElement);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1.1 Authn Assertion (Bearer):");
+            String outputString = XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        try {
+            verify(doc);
+            fail("Failure expected on a signature that doesn't conform with the signature profile");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
+        }
+
+        // This should pass as we are disabling signature profile validation in the Validator,
+        // which is configured via ConfigurationConstants.VALIDATOR_MAP
+        
+        SamlAssertionValidator validator = new SamlAssertionValidator();
+        validator.setValidateSignatureAgainstProfile(false);
+        Map<QName, Validator> validatorMap = new HashMap<>();
+        validatorMap.put(WSConstants.SAML_TOKEN, validator);
+
+        RequestData requestData = new RequestData();
+        Map<String, Object> config = new TreeMap<>();
+        config.put(WSHandlerConstants.SIG_VER_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.VALIDATOR_MAP, validatorMap);
+        requestData.setMsgContext(config);
+        requestData.setSigVerCrypto(crypto);
+        
+        CustomHandler handler = new CustomHandler();
+
+        List<Integer> actions = new ArrayList<>();
+        actions.add(WSConstants.ST_SIGNED);
+        handler.receive(actions, requestData);
+        
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.processSecurityHeader(doc, requestData);
+        
+        String outputString = XMLUtils.prettyDocumentToString(doc);
+        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
     }
 
     /**
@@ -210,7 +278,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        Map<String, Object> config = new TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");

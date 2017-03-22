@@ -71,13 +71,6 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityDnsAddress = null;
     protected DateTime sessionNotOnOrAfter = null;
     protected DateTime authenticationInstant;
-    public DateTime getAuthenticationInstant() {
-        return authenticationInstant;
-    }
-
-    public void setAuthenticationInstant(DateTime authenticationInstant) {
-        this.authenticationInstant = authenticationInstant;
-    }
 
     protected String resource = null;
     protected List<Object> customAttributeValues = null;
@@ -143,6 +136,14 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
+    }
+    
+    public DateTime getAuthenticationInstant() {
+        return authenticationInstant;
+    }
+
+    public void setAuthenticationInstant(DateTime authenticationInstant) {
+        this.authenticationInstant = authenticationInstant;
     }
 
     /**

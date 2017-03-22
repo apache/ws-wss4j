@@ -25,11 +25,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
@@ -404,6 +406,15 @@ public class RequestData {
      * @throws WSSecurityException
      */
     public Validator getValidator(QName qName) throws WSSecurityException {
+        // Check the custom Validator Map first
+        if (getMsgContext() instanceof Map<?,?>) {
+            @SuppressWarnings("unchecked")
+            Map<QName, Validator> validatorMap =
+                (Map<QName, Validator>)((Map<?,?>)getMsgContext()).get(ConfigurationConstants.VALIDATOR_MAP);
+            if (validatorMap != null && validatorMap.containsKey(qName)) {
+                return validatorMap.get(qName);
+            }
+        }
         if (wssConfig != null)  {
             return wssConfig.getValidator(qName);
         }
