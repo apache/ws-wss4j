@@ -263,7 +263,7 @@ public class SamlAssertionWrapper {
             validFrom = getSaml1().getConditions().getNotBefore();
         }
 
-        // Now convert to a Java ZonedDateTime Object
+        // Now convert to a Java Instant Object
         if (validFrom != null) {
             return validFrom.toDate().toInstant();
         }
@@ -278,7 +278,7 @@ public class SamlAssertionWrapper {
             validTill = getSaml1().getConditions().getNotOnOrAfter();
         }
 
-        // Now convert to a Java ZonedDateTime Object
+        // Now convert to a Java Instant Object
         if (validTill != null) {
             return validTill.toDate().toInstant();
         }

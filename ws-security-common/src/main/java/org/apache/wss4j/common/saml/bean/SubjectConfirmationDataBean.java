@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.common.saml.bean;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Date;
 
 import org.joda.time.DateTime;
@@ -110,9 +110,9 @@ public class SubjectConfirmationDataBean {
      *
      * @param notBefore the notBefore instance to set
      */
-    public void setNotBefore(ZonedDateTime notBefore) {
+    public void setNotBefore(Instant notBefore) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore.toInstant()));
+            this.notBefore = new DateTime(Date.from(notBefore));
         } else {
             this.notBefore = null;
         }
@@ -139,9 +139,9 @@ public class SubjectConfirmationDataBean {
      *
      * @param notAfter the notAfter instance to set
      */
-    public void setNotAfter(ZonedDateTime notAfter) {
+    public void setNotAfter(Instant notAfter) {
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter.toInstant()));
+            this.notAfter = new DateTime(Date.from(notAfter));
         } else {
             this.notAfter = null;
         }

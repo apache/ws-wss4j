@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.common.saml.bean;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -66,14 +66,14 @@ public class ConditionsBean {
      * @param notAfter The notAfter instance
      */
     public ConditionsBean(
-        ZonedDateTime notBefore,
-        ZonedDateTime notAfter
+        Instant notBefore,
+        Instant notAfter
     ) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore.toInstant()));
+            this.notBefore = new DateTime(Date.from(notBefore));
         }
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter.toInstant()));
+            this.notAfter = new DateTime(Date.from(notAfter));
         }
     }
 
@@ -111,9 +111,9 @@ public class ConditionsBean {
      *
      * @param notBefore the notBefore instance to set
      */
-    public void setNotBefore(ZonedDateTime notBefore) {
+    public void setNotBefore(Instant notBefore) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore.toInstant()));
+            this.notBefore = new DateTime(Date.from(notBefore));
         } else {
             this.notBefore = null;
         }
@@ -142,9 +142,9 @@ public class ConditionsBean {
      *
      * @param notAfter the notAfter instance to set
      */
-    public void setNotAfter(ZonedDateTime notAfter) {
+    public void setNotAfter(Instant notAfter) {
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter.toInstant()));
+            this.notAfter = new DateTime(Date.from(notAfter));
         } else {
             this.notAfter = null;
         }
