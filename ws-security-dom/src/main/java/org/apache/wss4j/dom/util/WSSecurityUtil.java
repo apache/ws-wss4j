@@ -474,6 +474,8 @@ public final class WSSecurityUtil {
                 return actions;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 actions.add(new HandlerAction(WSConstants.UT));
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
+                actions.add(new HandlerAction(WSConstants.UT_NOPASSWORD));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 actions.add(new HandlerAction(WSConstants.SIGN));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE_DERIVED)) {
