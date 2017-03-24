@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.processor;
 
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,12 +60,24 @@ public class SAMLTokenProcessor implements Processor {
     private XMLSignatureFactory signatureFactory;
 
     public SAMLTokenProcessor() {
-        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-        // not work
-        try {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        init(null);
+    }
+
+    public SAMLTokenProcessor(Provider provider) {
+        init(provider);
+    }
+
+    private void init(Provider provider) {
+        if (provider == null) {
+            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+            // not work
+            try {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+            } catch (NoSuchProviderException ex) {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            }
+        } else {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
         }
     }
 

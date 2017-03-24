@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
@@ -144,13 +145,19 @@ public class WSSecEncryptedKey extends WSSecBase {
     private boolean bstAddedToSecurityHeader;
     private boolean includeEncryptionToken;
     private Element customEKKeyInfoElement;
+    private Provider provider;
 
     public WSSecEncryptedKey(WSSecHeader securityHeader) {
         super(securityHeader);
     }
 
     public WSSecEncryptedKey(Document doc) {
+        this(doc, null);
+    }
+
+    public WSSecEncryptedKey(Document doc, Provider provider) {
         super(doc);
+        this.provider = provider;
     }
 
     /**
@@ -536,10 +543,16 @@ public class WSSecEncryptedKey extends WSSecBase {
             default:
                 try {
                     XMLSignatureFactory signatureFactory;
-                    try {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                    } catch (NoSuchProviderException ex) {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                    if (provider == null) {
+                        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+                        // not work
+                        try {
+                            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                        } catch (NoSuchProviderException ex) {
+                            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                        }
+                    } else {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
                     }
 
                     KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();

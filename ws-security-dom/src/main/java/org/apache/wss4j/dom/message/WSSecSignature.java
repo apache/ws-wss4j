@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
@@ -107,21 +108,29 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     public WSSecSignature(WSSecHeader securityHeader) {
         super(securityHeader);
-        init();
+        init(null);
     }
 
     public WSSecSignature(Document doc) {
-        super(doc);
-        init();
+        this(doc, null);
     }
 
-    private void init() {
-        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-        // not work
-        try {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    public WSSecSignature(Document doc, Provider provider) {
+        super(doc);
+        init(provider);
+    }
+
+    private void init(Provider provider) {
+        if (provider == null) {
+            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+            // not work
+            try {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+            } catch (NoSuchProviderException ex) {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            }
+        } else {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
         }
     }
 
