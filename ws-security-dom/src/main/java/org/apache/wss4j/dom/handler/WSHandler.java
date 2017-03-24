@@ -123,9 +123,13 @@ public abstract class WSHandler {
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {
                 wssConfig.setEnableSignatureConfirmation(true);
-            } else if (actionToDo.getAction() == WSConstants.UT 
+            } else if ((actionToDo.getAction() == WSConstants.UT
+                || actionToDo.getAction() == WSConstants.UT_NOPASSWORD)
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);
+                if (actionToDo.getAction() == WSConstants.UT_NOPASSWORD) {
+                    reqData.setPwType(null);
+                }
             } else if (actionToDo.getAction() == WSConstants.UT_SIGN 
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);

@@ -80,6 +80,10 @@ public class WSSConfig {
                 org.apache.wss4j.dom.action.UsernameTokenAction.class
             );
             tmp.put(
+                WSConstants.UT_NOPASSWORD,
+                org.apache.wss4j.dom.action.UsernameTokenAction.class
+            );
+            tmp.put(
                 WSConstants.ENCR,
                 org.apache.wss4j.dom.action.EncryptionAction.class
             );
