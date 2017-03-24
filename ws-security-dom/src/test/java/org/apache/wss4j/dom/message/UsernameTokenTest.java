@@ -866,6 +866,35 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     }
 
     /**
+     * Test that adds a UserNameToken with no password via WSHandler
+     */
+    @Test
+    public void testUsernameTokenWSHandlerNoPassword2() throws Exception {
+        CustomHandler handler = new CustomHandler();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        RequestData reqData = new RequestData();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        reqData.setUsername("wernerd");
+        reqData.setMsgContext(config);
+
+        HandlerAction action = new HandlerAction(WSConstants.UT_NOPASSWORD);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Username Token via WSHandler");
+            String outputString =
+                XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+    }
+
+    /**
      * Test that adds a UserNameToken with an empty password via WSHandler
      */
     @Test

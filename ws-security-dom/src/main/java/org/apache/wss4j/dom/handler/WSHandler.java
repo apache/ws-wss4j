@@ -88,7 +88,7 @@ public abstract class WSHandler {
             wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
         }
-        
+
         if (reqData.getWsDocInfo() == null) {
             WSDocInfo wsDocInfo = new WSDocInfo(doc);
             reqData.setWsDocInfo(wsDocInfo);
@@ -135,9 +135,13 @@ public abstract class WSHandler {
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {
                 reqData.setEnableSignatureConfirmation(true);
-            } else if (actionToDo.getAction() == WSConstants.UT
+            } else if ((actionToDo.getAction() == WSConstants.UT
+                || actionToDo.getAction() == WSConstants.UT_NOPASSWORD)
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);
+                if (actionToDo.getAction() == WSConstants.UT_NOPASSWORD) {
+                    reqData.setPwType(null);
+                }
             } else if (actionToDo.getAction() == WSConstants.UT_SIGN
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);
@@ -621,7 +625,7 @@ public abstract class WSHandler {
         boolean includeToken =
             decodeBooleanConfigValue(mc, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false);
         actionToken.setIncludeToken(includeToken);
-        
+
         if (!reqData.isExpandXopInclude()) {
             boolean expandXOP =
                 decodeBooleanConfigValue(
