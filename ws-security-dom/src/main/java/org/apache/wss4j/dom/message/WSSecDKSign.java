@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -78,17 +79,25 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private boolean addInclusivePrefixes = true;
 
     public WSSecDKSign() {
-        super();
-        init();
+        this(null);
     }
 
-    private void init() {
-        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-        // not work
-        try {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    public WSSecDKSign(Provider provider) {
+        super();
+        init(provider);
+    }
+
+    private void init(Provider provider) {
+        if (provider == null) {
+            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+            // not work
+            try {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+            } catch (NoSuchProviderException ex) {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            }
+        } else {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
         }
     }
 

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
@@ -72,6 +73,16 @@ import org.apache.xml.security.encryption.XMLCipher;
 public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
+
+    private Provider provider;
+
+    public EncryptedKeyProcessor() {
+        // complete
+    }
+
+    public EncryptedKeyProcessor(Provider provider) {
+        this.provider = provider;
+    }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
@@ -160,10 +171,16 @@ public class EncryptedKeyProcessor implements Processor {
                 certs = getCertificatesFromX509Data(keyInfoChildElement, data);
                 if (certs == null) {
                     XMLSignatureFactory signatureFactory;
-                    try {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                    } catch (NoSuchProviderException ex) {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                    if (provider == null) {
+                        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+                        // not work
+                        try {
+                            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                        } catch (NoSuchProviderException ex) {
+                            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                        }
+                    } else {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
                     }
                     
                     publicKey = X509Util.parseKeyValue((Element)keyInfoChildElement.getParentNode(), 

@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.processor;
 import java.security.Key;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -95,12 +96,24 @@ public class SignatureProcessor implements Processor {
     private XMLSignatureFactory signatureFactory;
 
     public SignatureProcessor() {
-        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-        // not work
-        try {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        init(null);
+    }
+
+    public SignatureProcessor(Provider provider) {
+        init(provider);
+    }
+
+    private void init(Provider provider) {
+        if (provider == null) {
+            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+            // not work
+            try {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+            } catch (NoSuchProviderException ex) {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            }
+        } else {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
         }
     }
 
