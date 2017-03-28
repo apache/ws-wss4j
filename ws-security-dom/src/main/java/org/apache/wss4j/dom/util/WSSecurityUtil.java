@@ -494,6 +494,8 @@ public final class WSSecurityUtil {
                 actions.add(new HandlerAction(WSConstants.UT_SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 actions.add(new HandlerAction(WSConstants.SC));
+            } else if (single[i].equals(WSHandlerConstants.CUSTOM_TOKEN)) {
+                actions.add(new HandlerAction(WSConstants.CUSTOM_TOKEN));
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
