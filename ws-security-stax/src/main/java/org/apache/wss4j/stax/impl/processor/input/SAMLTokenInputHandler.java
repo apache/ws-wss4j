@@ -36,6 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
@@ -443,15 +444,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 }
                 currentNode = currentNode.appendChild(element);
                 @SuppressWarnings("unchecked")
-                Iterator<XMLSecNamespace> namespaceIterator = xmlSecStartElement.getNamespaces();
+                Iterator<Namespace> namespaceIterator = xmlSecStartElement.getNamespaces();
                 while (namespaceIterator.hasNext()) {
-                    XMLSecNamespace next = namespaceIterator.next();
+                    XMLSecNamespace next = (XMLSecNamespace)namespaceIterator.next();
                     parseXMLEvent(next, currentNode, document);
                 }
                 @SuppressWarnings("unchecked")
-                Iterator<XMLSecAttribute> attributesIterator = xmlSecStartElement.getAttributes();
+                Iterator<Attribute> attributesIterator = xmlSecStartElement.getAttributes();
                 while (attributesIterator.hasNext()) {
-                    XMLSecAttribute next = attributesIterator.next();
+                    XMLSecAttribute next = (XMLSecAttribute)attributesIterator.next();
                     parseXMLEvent(next, currentNode, document);
                 }
                 //add namespace which is not declared on current element but must be on a parent element:
