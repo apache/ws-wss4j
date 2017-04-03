@@ -26,6 +26,7 @@ public class NameIDBean {
     private String nameValue;
     private String nameIDFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     private String nameQualifier;
+    private String spProvidedID;
 
     /**
      * Constructor NameIDBean creates a new NameIDBean instance.
@@ -73,6 +74,14 @@ public class NameIDBean {
         this.nameQualifier = nameQualifier;
     }
 
+    public String getSPProvidedID() {
+        return spProvidedID;
+    }
+
+    public void setSPProvidedID(String spProvidedID) {
+        this.spProvidedID = spProvidedID;
+    }
+
     /**
      * Method equals ...
      *
@@ -108,6 +117,12 @@ public class NameIDBean {
             return false;
         }
 
+        if (spProvidedID == null && that.spProvidedID != null) {
+            return false;
+        } else if (spProvidedID != null && !spProvidedID.equals(that.spProvidedID)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -125,6 +140,9 @@ public class NameIDBean {
         }
         if (nameQualifier != null) {
             result = 31 * result + nameQualifier.hashCode();
+        }
+        if (spProvidedID != null) {
+            result = 31 * result + spProvidedID.hashCode();
         }
         return result;
     }

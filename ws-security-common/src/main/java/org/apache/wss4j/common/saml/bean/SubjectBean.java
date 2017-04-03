@@ -71,6 +71,26 @@ public class SubjectBean {
     }
 
     /**
+     * Constructor SubjectBean creates a new SubjectBean instance.
+     *
+     * @param subjectName of type String
+     * @param subjectNameQualifier of type String
+     * @param subjectConfirmationMethod of type String
+     * @param subjectNameIDFormat of type String
+     * @param subjectNameSPProvidedID of type String
+     */
+    public SubjectBean(
+            String subjectName,
+            String subjectNameQualifier,
+            String subjectConfirmationMethod,
+            String subjectNameIDFormat,
+            String subjectNameSPProvidedID
+    ) {
+        this(subjectName, subjectNameQualifier, subjectConfirmationMethod, subjectNameIDFormat);
+        nameID.setSPProvidedID(subjectNameSPProvidedID);
+    }
+
+    /**
      * Method getSubjectName returns the subjectName of this SubjectBean object.
      *
      * @return the subjectName (type String) of this SubjectBean object.
@@ -145,6 +165,14 @@ public class SubjectBean {
      */
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
         nameID.setNameIDFormat(subjectNameIDFormat);
+    }
+
+    public String getSubjectNameSPProvidedID() {
+        return nameID.getSPProvidedID();
+    }
+    
+    public void setSubjectNameSPProvidedID(String subjectNameSPProvidedID) {
+        nameID.setSPProvidedID(subjectNameSPProvidedID);
     }
 
     /**
