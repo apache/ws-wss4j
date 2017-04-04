@@ -98,9 +98,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <inherited>true</inherited>
                 <configuration>
                     <groups>${test.groups}</groups>
-                    <argLine>-Xmx2000m</argLine>
                     <systemPropertyVariables>
                         <log4j.configuration>log4j-wss.xml</log4j.configuration>
                     </systemPropertyVariables>
