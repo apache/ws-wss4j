@@ -42,10 +42,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+//import com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,17 +60,41 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+
 /**
  * WS-Security Utility methods. <p/>
  */
 public final class WSSecurityUtil {
+    
+    private static boolean isJava9SAAJ = false;
+        
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
+    
+    static {
+        if (System.getProperty("java.version").startsWith("9")) {
+            
+            try {
+                Method[] methods = WSSecurityUtil.class.getClassLoader().
+                    loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+                for (Method method : methods) {
+                    if (method.getName().equals("register")) {
+                        //this is the SAAJ impl in JDK9
+                        isJava9SAAJ = true;
+                        break;
+                    }
+                }
+            } catch (ClassNotFoundException cnfe) {
+                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", cnfe);
+            }
+        }
+    }
 
     private WSSecurityUtil() {
         // Complete
     }
-
+    
+    
     public static Element getSOAPHeader(Document doc) {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         return
@@ -251,7 +278,7 @@ public final class WSSecurityUtil {
      * @param localName of the new element
      * @return the new element
      */
-    private static Element createElementInSameNamespace(Element parent, String localName) {
+    private static Element createElementInSameNamespace(Node parent, String localName) {
         String qName = localName;
         String prefix = parent.getPrefix();
         if (prefix != null && prefix.length() > 0) {
@@ -261,6 +288,8 @@ public final class WSSecurityUtil {
         String nsUri = parent.getNamespaceURI();
         return parent.getOwnerDocument().createElementNS(nsUri, qName);
     }
+    
+    
 
 
     /**
@@ -275,10 +304,16 @@ public final class WSSecurityUtil {
         Element child
     ) {
         Node firstChild = parent.getFirstChild();
+        Element domChild = null;
+        try {
+            domChild = (Element)getDomElement(child);
+        } catch (WSSecurityException e) {
+            LOG.debug("Error when try to get Dom Element from the child", e);
+        }
         if (firstChild == null) {
-            return (Element)parent.appendChild(child);
+            return (Element)parent.appendChild(domChild);
         } else {
-            return (Element)parent.insertBefore(child, firstChild);
+            return (Element)parent.insertBefore(domChild, firstChild);
         }
     }
 
@@ -323,8 +358,34 @@ public final class WSSecurityUtil {
             );
         if (header == null) { // no SOAP header at all
             if (doCreate) {
-                header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
-                header = prependChildElement(envelope, header);
+                if (isJava9SAAJ) {
+                    try {
+                        Node node = null;
+                        try {
+                            Method method = doc.getClass().getMethod("getEnvelope");
+                            node = (Node)method.invoke(doc);
+                        } catch (java.lang.NoSuchMethodException nsme) {
+                            //node the SAAJ node, use
+                            node = null;
+                        }
+                        if (node != null) {
+                            header = createElementInSameNamespace(node, WSConstants.ELEM_HEADER);
+                        } else {
+                            header = createElementInSameNamespace(doc.getDocumentElement(), WSConstants.ELEM_HEADER);
+                        }
+                        doc.importNode(header, true);
+                        header = (Element)getDomElement(header);
+                        header = prependChildElement(envelope, header);
+                        
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                    }
+                    
+                } else {
+                    header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
+                    header = prependChildElement(envelope, header);
+                }
             } else {
                 return null;
             }
@@ -368,6 +429,9 @@ public final class WSSecurityUtil {
         } else if (doCreate) {
             foundSecurityHeader = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
             foundSecurityHeader.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
+            doc.importNode(foundSecurityHeader, true);
+            foundSecurityHeader = (Element)getDomElement(foundSecurityHeader);
+            
             return prependChildElement(header, foundSecurityHeader);
         }
         return null;
@@ -542,6 +606,44 @@ public final class WSSecurityUtil {
                 includeElement.getParentNode().replaceChild(encodedChild, includeElement);
             }
         }
+    }
+    
+    /**
+     * Register the javax.xml.soap.Node with new Cloned Dom Node with java9
+     * @param doc The SOAPDocumentImpl
+     * @param clonedElement The cloned Element
+     * @return new clonedElement which already associated with the SAAJ Node 
+     * @throws WSSecurityException
+     */
+    public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
+        clonedElement = (Element)clonedElement.cloneNode(true);
+        if (isJava9SAAJ) {
+            // here we need regiter the javax.xml.soap.Node with new instance
+            clonedElement = (Element)doc.importNode(clonedElement, true);
+            clonedElement = (Element)getDomElement(clonedElement);
+        }
+        return clonedElement;
+    }
+    
+    /**
+     * Try to get the DOM Node from the SAAJ Node with JAVA9 
+     * @param node The original node we need check
+     * @return The DOM node
+     * @throws WSSecurityException
+     */
+    private static Node getDomElement(Node node) throws WSSecurityException {
+        if (node != null && isJava9SAAJ) {
+            
+            try {
+                Method method = node.getClass().getMethod("getDomElement");
+                node = (Node)method.invoke(node);
+            } catch (NoSuchMethodException e) {
+                LOG.debug("Not the saaj node with java9");
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            }
+        }
+        return node;
     }
 
     public static byte[] getBytesFromAttachment(

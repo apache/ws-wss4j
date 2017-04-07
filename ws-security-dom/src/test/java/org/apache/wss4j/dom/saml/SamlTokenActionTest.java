@@ -104,6 +104,43 @@ public class SamlTokenActionTest extends org.junit.Assert {
     }
 
     @Test
+    public void testAssertionActionWithSAAJ() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+
+        CallbackHandler callbackHandler = new KeystoreCallbackHandler();
+
+        SAML1CallbackHandler samlCallbackHandler = new SAML1CallbackHandler();
+        samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        samlCallbackHandler.setIssuer("www.example.com");
+
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
+        reqData.setMsgContext(config);
+
+        final Document doc = SOAPUtil.toSAAJSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        verify(doc, callbackHandler);
+    }
+    
+    
+    @Test
     public void testSignedAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

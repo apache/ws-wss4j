@@ -34,6 +34,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
@@ -238,10 +239,10 @@ public class WSSecSignatureBase extends WSSecBase {
                 // Clone the Element to be signed + insert the clone into the tree at the same level
                 // We will expand the xop:Include for one of the nodes + sign that (and then remove it),
                 // while leaving the original in the tree to be sent in the message
-                Element clonedElement = (Element)element.cloneNode(true);
-                element.getParentNode().appendChild(clonedElement);
+                                
                 clonedElements.add(element);
-
+                Document doc = this.getSecurityHeader().getSecurityHeaderDoc();
+                element.getParentNode().appendChild(WSSecurityUtil.cloneElement(doc, element));
                 WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, false);
             }
         }

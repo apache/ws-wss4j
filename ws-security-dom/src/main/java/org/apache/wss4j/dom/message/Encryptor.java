@@ -266,7 +266,7 @@ public class Encryptor {
         encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
         encryptedData.appendChild(encryptionMethod);
-        encryptedData.appendChild(keyInfo.getElement().cloneNode(true));
+        encryptedData.appendChild(WSSecurityUtil.cloneElement(doc, keyInfo.getElement()));
 
         Element cipherData =
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
@@ -375,7 +375,7 @@ public class Encryptor {
             encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
             encryptedData.appendChild(encryptionMethod);
-            encryptedData.appendChild(keyInfo.getElement().cloneNode(true));
+            encryptedData.appendChild(WSSecurityUtil.cloneElement(doc, keyInfo.getElement()));
 
             Element cipherData =
                 doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");

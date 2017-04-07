@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.common;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.MessageFactory;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -39,11 +41,20 @@ public class SOAPUtil {
         +       "</add>"
         +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
+    
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
 
     private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    private static MessageFactory saajFactory = null;
 
     static {
         factory.setNamespaceAware(true);
+        try {
+            saajFactory = MessageFactory.newInstance();
+        } catch (Exception e) {
+            LOG.debug("can't create SAAJ MessageFactory", e);
+        }
     }
 
     /**
@@ -53,6 +64,16 @@ public class SOAPUtil {
         try (InputStream in = new ByteArrayInputStream(xml.getBytes())) {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(in);
+        }
+    }
+    
+    
+    /**
+     * Convert an SOAP Envelope as a String to a javax.xml.soap.SOAPPart.
+     */
+    public static javax.xml.soap.SOAPPart toSAAJSOAPPart(String xml) throws Exception {
+        try (InputStream in = new ByteArrayInputStream(xml.getBytes())) {
+            return saajFactory.createMessage(null, in).getSOAPPart();
         }
     }
 

@@ -396,7 +396,7 @@
                                 <includes>
                                     <include>**/*Test.java</include>
                                 </includes>
-                                <argLine>-Xmx2000m --add-modules java.xml.bind --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+                                <argLine>-Xmx2000m --add-modules java.xml.bind,java.xml.ws --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap.impl=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap=ALL-UNNAMED</argLine>
                                 <systemPropertyVariables>
                                     <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
                                 </systemPropertyVariables>

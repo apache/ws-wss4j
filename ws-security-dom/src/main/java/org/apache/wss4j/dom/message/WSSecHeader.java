@@ -92,6 +92,15 @@ public class WSSecHeader {
     public void setMustUnderstand(boolean mu) {
         mustunderstand = mu;
     }
+    
+    /**
+     * Get the security header document of this instance.
+     *
+     * @return The security header element.
+     */
+    public Document getSecurityHeaderDoc() {
+        return this.doc;
+    }
 
     /**
      * Get the security header element of this instance.
