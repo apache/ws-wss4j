@@ -68,12 +68,12 @@ import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
 import org.apache.xml.security.stax.impl.transformer.canonicalizer.Canonicalizer20010315_Excl;
 import org.apache.xml.security.stax.impl.util.DigestOutputStream;
-import org.apache.xml.security.stax.impl.util.UnsynchronizedBufferedOutputStream;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.UnsyncBufferedOutputStream;
 
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
@@ -134,8 +134,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             try {
                 DigestOutputStream digestOutputStream =
                         createMessageDigestOutputStream(referenceType, inputProcessorChain.getSecurityContext());
-                UnsynchronizedBufferedOutputStream bufferedDigestOutputStream =
-                        new UnsynchronizedBufferedOutputStream(digestOutputStream);
+                UnsyncBufferedOutputStream bufferedDigestOutputStream =
+                        new UnsyncBufferedOutputStream(digestOutputStream);
 
                 if (referenceType.getTransforms() != null) {
                     Transformer transformer =

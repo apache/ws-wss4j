@@ -35,7 +35,7 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
+import org.apache.xml.security.utils.UnsyncByteArrayInputStream;
 
 public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
 
@@ -49,7 +49,7 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
         super(WSSecurityTokenConstants.X509PkiPathV1Token, wsInboundSecurityContext, crypto,
                 callbackHandler, id, keyIdentifier, securityProperties, true);
 
-        try (InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent)) {
+        try (InputStream in = new UnsyncByteArrayInputStream(binaryContent)) {
             CertPath certPath = getCrypto().getCertificateFactory().generateCertPath(in);
             List<? extends Certificate> l = certPath.getCertificates();
             X509Certificate[] certs = new X509Certificate[l.size()];

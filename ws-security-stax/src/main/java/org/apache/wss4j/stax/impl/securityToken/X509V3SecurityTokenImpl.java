@@ -25,7 +25,7 @@ import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
+import org.apache.xml.security.utils.UnsyncByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -44,7 +44,7 @@ public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
         super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
                 WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier, securityProperties, true);
 
-        try (InputStream inputStream = new UnsynchronizedByteArrayInputStream(binaryContent)) {
+        try (InputStream inputStream = new UnsyncByteArrayInputStream(binaryContent)) {
             X509Certificate x509Certificate = getCrypto().loadCertificate(inputStream);
             setX509Certificates(new X509Certificate[]{x509Certificate});
         } catch (IOException e) {
