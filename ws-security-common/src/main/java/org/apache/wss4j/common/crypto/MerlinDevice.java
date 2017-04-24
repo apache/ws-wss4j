@@ -19,9 +19,10 @@
 
 package org.apache.wss4j.common.crypto;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.cert.CertStore;
 import java.security.cert.CertificateFactory;
@@ -157,7 +158,7 @@ public class MerlinDevice extends Merlin {
             if (cacertsPath != null) {
                 cacertsPath = cacertsPath.trim();
             }
-            try (InputStream is = new FileInputStream(cacertsPath)) {
+            try (InputStream is = Files.newInputStream(Paths.get(cacertsPath))) {
                 String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (cacertsPasswd != null) {
                     cacertsPasswd = cacertsPasswd.trim();
