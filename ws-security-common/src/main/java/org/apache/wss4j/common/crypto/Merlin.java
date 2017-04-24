@@ -19,11 +19,12 @@
 
 package org.apache.wss4j.common.crypto;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -136,7 +137,7 @@ public class Merlin extends CryptoBase {
         if (truststore == null && loadCACerts) {
             String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
 
-            try (InputStream cacertsIs = new FileInputStream(cacertsPath)) {
+            try (InputStream cacertsIs = Files.newInputStream(Paths.get(cacertsPath))) {
 
                 truststore = KeyStore.getInstance(KeyStore.getDefaultType());
                 truststore.load(cacertsIs, cacertsPasswd.toCharArray());
@@ -277,7 +278,7 @@ public class Merlin extends CryptoBase {
                 if (cacertsPath != null) {
                     cacertsPath = cacertsPath.trim();
                 }
-                try (InputStream is = new FileInputStream(cacertsPath)) {
+                try (InputStream is = Files.newInputStream(Paths.get(cacertsPath))) {
                     String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                     if (cacertsPasswd != null) {
                         cacertsPasswd = cacertsPasswd.trim();
@@ -358,7 +359,7 @@ public class Merlin extends CryptoBase {
             //
             if (is == null) {
                 try {
-                    is = new FileInputStream(location);
+                    is = Files.newInputStream(Paths.get(location));
                 } catch (Exception e) {
                     LOG.debug(e.getMessage(), e);
                     throw new WSSecurityException(
