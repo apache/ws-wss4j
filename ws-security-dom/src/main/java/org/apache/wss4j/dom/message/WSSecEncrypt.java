@@ -41,6 +41,7 @@ import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.utils.Base64;
@@ -247,8 +248,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
         //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider
         //so create a new secretKeySpec to make everybody happy.
-        SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
-        
+        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(getSymmetricEncAlgorithm());
+        SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), keyAlgorithm);
+
         Encryptor encryptor = new Encryptor();
         encryptor.setDoc(document);
         encryptor.setSecurityHeader(secHeader);
