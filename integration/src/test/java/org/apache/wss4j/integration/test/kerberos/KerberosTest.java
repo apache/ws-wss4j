@@ -23,9 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -46,16 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.directory.server.annotations.CreateKdcServer;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreateIndex;
-import org.apache.directory.server.core.annotations.CreatePartition;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
-import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
+import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
@@ -88,53 +76,12 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-@RunWith(FrameworkRunner.class)
-
-//Define the DirectoryService
-@CreateDS(name = "KerberosTest-class",
-    enableAccessControl = false,
-    allowAnonAccess = false,
-    enableChangeLog = true,
-    partitions = {
-        @CreatePartition(
-            name = "example",
-            suffix = "dc=example,dc=com",
-            indexes = {
-                @CreateIndex(attribute = "objectClass"),
-                @CreateIndex(attribute = "dc"),
-                @CreateIndex(attribute = "ou")
-            } )
-        },
-    additionalInterceptors = {
-       KeyDerivationInterceptor.class
-    }
-)
-
-@CreateLdapServer(
-    transports = {
-        @CreateTransport(protocol = "LDAP")
-    }
-)
-
-@CreateKdcServer(
-    transports = {
-        @CreateTransport(protocol = "KRB", address = "127.0.0.1") //NOPMD
-    },
-    primaryRealm = "service.ws.apache.org",
-    kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
-)
-
-//Inject an file containing entries
-@ApplyLdifFiles("kerberos/kerberos.ldif")
-
-public class KerberosTest extends AbstractLdapTestUnit {
+public class KerberosTest {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosTest.class);
@@ -143,27 +90,45 @@ public class KerberosTest extends AbstractLdapTestUnit {
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static DocumentBuilderFactory dbf;
 
-    private static boolean runTests;
-    private static boolean portUpdated;
+    private static boolean runTests = true;
+
+    private static SimpleKdcServer kerbyServer;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
         WSSConfig.init();
 
-        //
-        // This test fails with the IBM JDK
-        //
-        if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            runTests = true;
-            String basedir = System.getProperty("basedir");
-            if (basedir == null) {
-                basedir = new File(".").getCanonicalPath();
-            }
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
 
-            // System.setProperty("sun.security.krb5.debug", "true");
-            System.setProperty("java.security.auth.login.config", basedir + "/src/test/resources/kerberos/kerberos.jaas");
+        // System.setProperty("sun.security.krb5.debug", "true");
+        System.setProperty("java.security.auth.login.config", basedir + "/target/test-classes/kerberos/kerberos.jaas");
+        System.setProperty("java.security.krb5.conf", basedir + "/target/krb5.conf");
 
+        kerbyServer = new SimpleKdcServer();
+
+        kerbyServer.setKdcRealm("service.ws.apache.org");
+        kerbyServer.setAllowUdp(false);
+        kerbyServer.setWorkDir(new File(basedir + "/target"));
+
+        //kerbyServer.setInnerKdcImpl(new NettyKdcServerImpl(kerbyServer.getKdcSetting()));
+
+        kerbyServer.init();
+
+        // Create principals
+        String alice = "alice@service.ws.apache.org";
+        String bob = "bob/service.ws.apache.org@service.ws.apache.org";
+
+        kerbyServer.createPrincipal(alice, "alice");
+        kerbyServer.createPrincipal(bob, "bob");
+
+        kerbyServer.start();
+
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            runTests = false;
         }
 
         dbf = DocumentBuilderFactory.newInstance();
@@ -179,27 +144,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
     @AfterClass
     public static void tearDown() throws Exception {
         SecurityTestUtil.cleanup();
-    }
-
-    @Before
-    public void updatePort() throws Exception {
-        if (!portUpdated) {
-            String basedir = System.getProperty("basedir");
-            if (basedir == null) {
-                basedir = new File(".").getCanonicalPath();
-            }
-
-            // Read in krb5.conf and substitute in the correct port
-            Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/kerberos/krb5.conf");
-            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-
-            Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/kerberos/krb5.conf");
-            Files.write(path2, content.getBytes());
-
-            System.setProperty("java.security.krb5.conf", path2.toString());
-
-            portUpdated = true;
+        if (kerbyServer != null) {
+            kerbyServer.stop();
         }
     }
 
@@ -497,7 +443,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
         Assert.assertTrue(principal.getName().contains("alice"));
     }
 
-
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
@@ -540,6 +485,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
+        try {
         Document encryptedDoc = builder.build(null);
 
         if (LOG.isDebugEnabled()) {
@@ -568,6 +514,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     /**
