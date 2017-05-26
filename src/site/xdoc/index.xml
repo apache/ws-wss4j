@@ -18,7 +18,7 @@
 <document>
 <body>
 
-<section name="Apache WSS4J - Web Services Security for Java">
+<section name="Apache WSS4J&#8482; - Web Services Security for Java">
 <subsection name="The Project">
 <p> 
 The <b>Apache WSS4J&#8482;</b> project provides a Java implementation of the
@@ -55,10 +55,6 @@ Profile 1.1</a>
 <a href="http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html">Basic Security Profile 1.1</a>
 </li>
 </ul>
-<p> 
-Apache WSS4J, Apache, and the Apache feather logo are trademarks of The Apache
-Software Foundation.
-</p>
 </subsection>
 <subsection name="News">
 <ul>
