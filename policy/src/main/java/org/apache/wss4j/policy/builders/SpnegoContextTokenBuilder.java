@@ -48,9 +48,6 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         
         Policy nestedPolicy = null;
         if (nestedPolicyElement == null) {
-            if (spVersion != SPConstants.SPVersion.SP11) {
-                throw new IllegalArgumentException("sp:SpnegoContextToken must have an inner wsp:Policy element");
-            }
             nestedPolicy = new Policy();
         } else {
             nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
