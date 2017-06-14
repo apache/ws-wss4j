@@ -5,6 +5,18 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.10
+==============
+
+Improvement
+
+    [WSS-608] - Allow policy tokens not to have a wsp:Policy child element
+
+New Feature
+
+    [WSS-606] - Possibility to configure the SAML attribute //Assertion/Subject/NameID/@SPProvidedID in a CallbackHandler
+
+
 Release 2.1.9
 =============
 
