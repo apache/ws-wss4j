@@ -5,6 +5,23 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.9
+=============
+
+Bug
+
+    [WSS-558] - org.apache.ws.security.message.WSSecSignature can't support custom provider
+    [WSS-602] - ConfigurationConstants.VALIDATOR_MAP is not supported
+    [WSS-603] - Improper date check in SamlAssertionWrapper.checkIssueInstant
+    [WSS-604] - UsernameTokenNoPassword does not work via WSHandler
+
+Improvement
+
+    [WSS-597] - Implement equals/hashCode for the WSS4J policy model
+    [WSS-600] - Get the configured ParserPool via OpenSAMLUtil
+    [WSS-601] - Optionally skip XACML initialization for OpenSAML
+
+
 Release 2.1.8
 =============
 
