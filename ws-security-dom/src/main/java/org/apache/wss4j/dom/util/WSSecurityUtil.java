@@ -959,7 +959,7 @@ public final class WSSecurityUtil {
         String single[] = actionToParse.split("\\s");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
-                return actions;
+                return Collections.emptyList();
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 actions.add(WSConstants.UT);
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
