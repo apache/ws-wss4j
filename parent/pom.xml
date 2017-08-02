@@ -36,7 +36,7 @@
         <bcprov.version>1.57</bcprov.version>
         <commons.compress.version>1.9</commons.compress.version>
         <ehcache.version>2.10.3</ehcache.version>
-        <geronimo.javamail.version>1.7.1</geronimo.javamail.version>
+        <geronimo.javamail.version>1.8.4</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
         <kerby.version>1.0.0</kerby.version>
@@ -87,8 +87,8 @@
                 <version>${woodstox.core.asl.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                <groupId>org.apache.geronimo.javamail</groupId>
+                <artifactId>geronimo-javamail_1.4_mail</artifactId>
                 <version>${geronimo.javamail.version}</version>
             </dependency>
             <dependency>
