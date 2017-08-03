@@ -18,7 +18,8 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
+
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -49,7 +50,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                     new Object[] {binarySecurityTokenType.getEncodingType()});
         }
 
-        byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
+        byte[] securityTokenData = Base64.getMimeDecoder().decode(binarySecurityTokenType.getValue());
 
         try {
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {

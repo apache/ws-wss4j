@@ -19,12 +19,12 @@
 package org.apache.wss4j.stax.impl.processor.output;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.utils.WSSUtils;
@@ -72,7 +72,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                     String base64SigValue =
-                        new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue());
+                        Base64.getMimeEncoder().encodeToString(signatureValueSecurityEvent.getSignatureValue());
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE, base64SigValue));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);

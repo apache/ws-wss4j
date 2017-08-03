@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
@@ -42,6 +41,7 @@ import javax.xml.stream.XMLStreamException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
@@ -211,7 +211,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
                 if (salt != null) {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT, true, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.salt));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.getMimeEncoder().encodeToString(this.salt));
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT);
 
                     if (iterations > 0) {
@@ -226,7 +226,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                                     new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
+                                                    Base64.getMimeEncoder().encodeToString(this.nonceValue));
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE);
                 }
 

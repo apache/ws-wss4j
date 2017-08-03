@@ -28,6 +28,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -40,7 +41,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -241,7 +241,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (oaepParams != null) {
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams,
                                                            false, null);
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(oaepParams));
+                        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.getMimeEncoder().encodeToString(oaepParams));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
                     }
 
@@ -331,7 +331,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     }
 
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                                     new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
+                                                     Base64.getMimeEncoder().encodeToString(encryptedEphemeralKey));
 
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
                     | InvalidKeyException | IllegalBlockSizeException

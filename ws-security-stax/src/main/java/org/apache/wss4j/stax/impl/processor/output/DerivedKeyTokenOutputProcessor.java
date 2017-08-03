@@ -22,13 +22,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -171,7 +171,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor =
                     new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length,
-                                                            new String(Base64.encodeBase64(nonce)),
+                                                            Base64.getMimeEncoder().encodeToString(nonce),
                                                             ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace(),
                                                             wrappingSecurityToken.getSha1Identifier());
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());

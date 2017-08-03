@@ -18,7 +18,8 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
+
 import org.apache.wss4j.binding.wss10.AttributedString;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
@@ -89,7 +90,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         byte[] nonceVal = null;
         if (encodedNonce != null && encodedNonce.getValue() != null) {
-            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+            nonceVal = Base64.getMimeDecoder().decode(encodedNonce.getValue());
         }
 
         final AttributedDateTime attributedDateTimeCreated =

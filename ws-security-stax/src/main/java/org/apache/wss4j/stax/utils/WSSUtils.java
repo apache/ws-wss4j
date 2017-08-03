@@ -29,6 +29,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,7 +40,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -131,7 +131,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             sha.reset();
             sha.update(b4);
-            return new String(Base64.encodeBase64(sha.digest()));
+            return new String(Base64.getMimeEncoder().encodeToString(sha.digest()));
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         }
@@ -253,14 +253,14 @@ public class WSSUtils extends XMLSecurityUtils {
         try {
             if (useSingleCertificate) {
                 String encodedCert =
-                    new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded());
+                    Base64.getMimeEncoder().encodeToString(x509Certificates[0].getEncoded());
                 abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, encodedCert);
             } else {
                 try {
                     CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
                     List<X509Certificate> certificates = Arrays.asList(x509Certificates);
                     String encodedCert =
-                        new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded());
+                        Base64.getMimeEncoder().encodeToString(certificateFactory.generateCertPath(certificates).getEncoded());
                     abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, encodedCert);
                 } catch (CertificateException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
@@ -292,7 +292,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                                    false, attributes);
         byte[] data = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain,
-                                                                 new Base64(76, new byte[]{'\n'}).encodeToString(data));
+                                                                 Base64.getMimeEncoder().encodeToString(data));
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
                                                                  WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
@@ -310,7 +310,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                                    WSSConstants.TAG_WSSE_KEY_IDENTIFIER,
                                                                    false, attributes);
         try {
-            String encodedCert = new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded());
+            String encodedCert = Base64.getMimeEncoder().encodeToString(x509Certificates[0].getEncoded());
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, encodedCert);
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
@@ -335,7 +335,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] data = sha.digest(x509Certificates[0].getEncoded());
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain,
-                                                                     new Base64(76, new byte[]{'\n'}).encodeToString(data));
+                                                                     Base64.getMimeEncoder().encodeToString(data));
         } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
@@ -350,7 +350,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] data = sha.digest(key.getEncoded());
             createEncryptedKeySha1IdentifierStructure(abstractOutputProcessor, outputProcessorChain,
-                                                      new Base64(76, new byte[]{'\n'}).encodeToString(data));
+                                                      Base64.getMimeEncoder().encodeToString(data));
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

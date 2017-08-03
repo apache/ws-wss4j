@@ -558,7 +558,7 @@ public final class AttachmentUtils {
 
         if (complete) {
             try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "US-ASCII");
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.US_ASCII);
 
                 Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
                 while (iterator.hasNext()) {

@@ -29,12 +29,12 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.KeyIdentifierType;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -253,7 +253,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
         byte[] binaryContent = null;
         if (WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
-            binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
+            binaryContent = Base64.getMimeDecoder().decode(keyIdentifierType.getValue());
         } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
             if (encodingType == null) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3070);

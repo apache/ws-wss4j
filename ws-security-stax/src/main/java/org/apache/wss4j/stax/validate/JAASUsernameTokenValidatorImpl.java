@@ -18,12 +18,13 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import java.util.Base64;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
@@ -106,7 +107,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
             if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "badTokenType01");
             }
-            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+            nonceVal = Base64.getMimeDecoder().decode(encodedNonce.getValue());
         }
 
         final AttributedDateTime attributedDateTimeCreated =

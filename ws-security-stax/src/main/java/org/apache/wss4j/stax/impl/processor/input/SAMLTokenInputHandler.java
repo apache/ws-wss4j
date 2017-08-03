@@ -22,6 +22,7 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +42,6 @@ import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.ObjectFactory;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -346,7 +346,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     Key key = super.getKey(algorithmURI, algorithmUsage, correlationID);
                     if (key == null) {
                         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                        key = new SecretKeySpec(Base64.decodeBase64(stringBuilder.toString()), algoFamily);
+                        key = new SecretKeySpec(Base64.getMimeDecoder().decode(stringBuilder.toString()), algoFamily);
                         setSecretKey(algorithmURI, key);
                     }
                     return key;
