@@ -119,6 +119,11 @@ public class SamlAssertionWrapper {
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
 
     /**
+     * Default ECDSA Signature algorithm used for signing.
+     */
+    private final String defaultECDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA1;
+
+    /**
      * Default Signature Digest algorithm
      */
     private final String defaultSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
@@ -524,6 +529,8 @@ public class SamlAssertionWrapper {
         }
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = defaultDSASignatureAlgorithm;
+        } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
+            sigAlgo = defaultECDSASignatureAlgorithm;
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Using Signature algorithm " + sigAlgo);
