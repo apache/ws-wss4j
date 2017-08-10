@@ -119,6 +119,11 @@ public class SamlAssertionWrapper {
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
 
     /**
+     * Default ECDSA Signature algorithm used for signing.
+     */
+    private final String defaultECDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA1;
+
+    /**
      * Default Signature Digest algorithm
      */
     private final String defaultSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
@@ -269,7 +274,7 @@ public class SamlAssertionWrapper {
         }
         return null;
     }
-    
+
     public Instant getNotOnOrAfter() {
         DateTime validTill = null;
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
@@ -551,6 +556,8 @@ public class SamlAssertionWrapper {
         LOG.debug("automatic sig algo detection: {}", pubKeyAlgo);
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = defaultDSASignatureAlgorithm;
+        } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
+            sigAlgo = defaultECDSASignatureAlgorithm;
         }
         LOG.debug("Using Signature algorithm {}", sigAlgo);
         PrivateKey privateKey;
