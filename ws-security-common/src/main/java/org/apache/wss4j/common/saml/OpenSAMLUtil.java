@@ -41,6 +41,7 @@ import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.Unmarshaller;
 import org.opensaml.core.xml.io.UnmarshallerFactory;
 import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.config.SAMLConfiguration;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
@@ -122,13 +123,13 @@ public final class OpenSAMLUtil {
 
     /**
      * Get the configured ParserPool.
-     * 
+     *
      * @return the configured ParserPool
      */
     public static ParserPool getParserPool() {
         return providerRegistry.getParserPool();
-    }    
-    
+    }
+
     /**
      * Convert a SAML Assertion from a DOM Element to an XMLObject
      *
@@ -244,27 +245,8 @@ public final class OpenSAMLUtil {
             }
 
             signObject(response.getSignature());
-        } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            org.opensaml.saml.saml2.core.Assertion saml2 =
-                    (org.opensaml.saml.saml2.core.Assertion) xmlObject;
-
-            signObject(saml2.getSignature());
-        } else if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            org.opensaml.saml.saml1.core.Assertion saml1 =
-                    (org.opensaml.saml.saml1.core.Assertion) xmlObject;
-
-            signObject(saml1.getSignature());
-        } else if (xmlObject instanceof org.opensaml.saml.saml2.core.RequestAbstractType) {
-            org.opensaml.saml.saml2.core.RequestAbstractType request =
-                    (org.opensaml.saml.saml2.core.RequestAbstractType) xmlObject;
-
-
-            signObject(request.getSignature());
-        } else if (xmlObject instanceof org.opensaml.saml.saml1.core.Request) {
-            org.opensaml.saml.saml1.core.Request request =
-                    (org.opensaml.saml.saml1.core.Request) xmlObject;
-
-            signObject(request.getSignature());
+        } else if (xmlObject instanceof SignableSAMLObject) {
+            signObject(((SignableSAMLObject)xmlObject).getSignature());
         }
     }
 
