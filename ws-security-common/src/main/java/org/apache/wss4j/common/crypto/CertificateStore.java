@@ -165,7 +165,7 @@ public class CertificateStore extends CryptoBase {
         //
         // FIRST step - Search the trusted certs for the transmitted certificate
         //
-        if (!enableRevocation) {
+        if (certs.length == 1 && !enableRevocation) {
             String issuerString = certs[0].getIssuerX500Principal().getName();
             BigInteger issuerSerial = certs[0].getSerialNumber();
 
@@ -192,25 +192,25 @@ public class CertificateStore extends CryptoBase {
         // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
         String issuerString = certs[0].getIssuerX500Principal().getName();
-        cryptoType.setSubjectDN(issuerString);
-        X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+        X509Certificate[] foundCerts = new X509Certificate[0];
+        if (certs.length == 1) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
+            cryptoType.setSubjectDN(issuerString);
+            foundCerts = getX509Certificates(cryptoType);
 
-        // If the certs have not been found, the issuer is not in the keystore/truststore
-        // As a direct result, do not trust the transmitted certificate
-        if (foundCerts == null || foundCerts.length < 1) {
-            String subjectString = certs[0].getSubjectX500Principal().getName();
-            if (LOG.isDebugEnabled()) {
+            // If the certs have not been found, the issuer is not in the keystore/truststore
+            // As a direct result, do not trust the transmitted certificate
+            if (foundCerts == null || foundCerts.length < 1) {
+                String subjectString = certs[0].getSubjectX500Principal().getName();
                 LOG.debug(
-                    "No certs found in keystore for issuer " + issuerString
-                    + " of certificate for " + subjectString
+                    "No certs found in keystore for issuer {} of certificate for {}", issuerString, subjectString
+                );
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath",
+                    new Object[] {"No trusted certs found"}
                 );
             }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "certpath",
-                new Object[] {"No trusted certs found"}
-            );
         }
 
         //
@@ -223,30 +223,15 @@ public class CertificateStore extends CryptoBase {
             );
         }
 
-        //
-        // Form a certificate chain from the transmitted certificate
-        // and the certificate(s) of the issuer from the keystore/truststore
-        //
-        X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
-        x509certs[0] = certs[0];
-        System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
-
         try {
-            // Generate cert path
-            List<X509Certificate> certList = Arrays.asList(x509certs);
-            CertPath path = getCertificateFactory().generateCertPath(certList);
-
             Set<TrustAnchor> set = new HashSet<>();
             if (trustedCerts != null) {
                 for (X509Certificate cert : trustedCerts) {
                     TrustAnchor anchor =
-                        new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                        new TrustAnchor(cert, null);
                     set.add(anchor);
                 }
             }
-
-            PKIXParameters param = new PKIXParameters(set);
-            param.setRevocationEnabled(enableRevocation);
 
             // Verify the trust path using the above settings
             String provider = getCryptoProvider();
@@ -256,7 +241,30 @@ public class CertificateStore extends CryptoBase {
             } else {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
-            validator.validate(path, param);
+
+            PKIXParameters param = new PKIXParameters(set);
+            param.setRevocationEnabled(enableRevocation);
+
+            if (foundCerts.length > 0) {
+                //
+                // Form a certificate chain from the transmitted certificate
+                // and the certificate(s) of the issuer from the keystore/truststore
+                //
+                X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
+                x509certs[0] = certs[0];
+                System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
+
+                // Generate cert path
+                List<X509Certificate> certList = Arrays.asList(x509certs);
+                CertPath path = getCertificateFactory().generateCertPath(certList);
+
+                validator.validate(path, param);
+            } else {
+                List<X509Certificate> certList = Arrays.asList(certs);
+                CertPath path = getCertificateFactory().generateCertPath(certList);
+
+                validator.validate(path, param);
+            }
         } catch (java.security.NoSuchProviderException | NoSuchAlgorithmException
             | java.security.cert.CertificateException
             | java.security.InvalidAlgorithmParameterException
