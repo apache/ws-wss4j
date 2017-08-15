@@ -376,4 +376,41 @@ public abstract class CryptoBase implements Crypto {
         return true;
     }
 
+    /**
+     * Extracts the NameConstraints sequence from the certificate.
+     * Handles the case where the data is encoded directly as {@link DERDecoder#TYPE_SEQUENCE}
+     * or where the sequence has been encoded as an {@link DERDecoder#TYPE_OCTET_STRING}.
+     * <p>
+     * By contract, the values retrieved from calls to {@link X509Certificate#getExtensionValue(String)}
+     * should always be DER-encoded OCTET strings; however, because of ambiguity in the RFC and
+     * the potential for a future breaking change to this contract, testing whether the bytes
+     * returned are tagged as a sequence or an encoded octet string is prudent. Considering the fact
+     * that it is a single byte comparison, the performance hit is negligible.
+     *
+     * @param cert the certificate to extract NameConstraints from
+     * @return the NameConstraints, or null if not present
+     * @throws WSSecurityException if a processing error occurs decoding the Octet String
+     */
+    protected byte[]
+    getNameConstraints(
+            final X509Certificate cert
+    ) throws WSSecurityException {
+        byte[] bytes = cert.getExtensionValue(NAME_CONSTRAINTS_OID);
+        if (bytes == null || bytes.length <= 0) {
+            return null;
+        }
+
+        switch (bytes[0]) {
+            case DERDecoder.TYPE_OCTET_STRING:
+                DERDecoder extVal = new DERDecoder(bytes);
+                extVal.expect(DERDecoder.TYPE_OCTET_STRING);
+                int seqLen = extVal.getLength();
+                return extVal.getBytes(seqLen);
+            case DERDecoder.TYPE_SEQUENCE:
+                return bytes;
+            default:
+                throw new IllegalArgumentException(
+                        "Invalid type for NameConstraints; must be Sequence or OctetString-encoded Sequence");
+        }
+    }
 }

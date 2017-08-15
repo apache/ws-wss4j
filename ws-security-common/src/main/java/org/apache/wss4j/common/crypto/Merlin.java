@@ -91,6 +91,8 @@ public class Merlin extends CryptoBase {
      */
     public static final String CRYPTO_KEYSTORE_PROVIDER = "keystore.provider";
     public static final String CRYPTO_CERT_PROVIDER = "cert.provider";
+    public static final String CRYPTO_CERT_PROVIDER_HANDLES_NAME_CONSTRAINTS =
+            "cert.provider.nameconstraints";
 
     /*
      * KeyStore configuration types
@@ -126,6 +128,8 @@ public class Merlin extends CryptoBase {
     protected boolean loadCACerts;
     protected boolean privatePasswordSet;
     protected PasswordEncryptor passwordEncryptor;
+
+    private boolean certProviderHandlesNameConstraints = false;
 
     public Merlin() {
         // default constructor
@@ -191,6 +195,11 @@ public class Merlin extends CryptoBase {
         String certProvider = properties.getProperty(prefix + CRYPTO_CERT_PROVIDER);
         if (certProvider != null) {
             setCryptoProvider(certProvider);
+        }
+        String cpNameConstraintsProp =
+                properties.getProperty(prefix + CRYPTO_CERT_PROVIDER_HANDLES_NAME_CONSTRAINTS);
+        if (cpNameConstraintsProp != null) {
+            certProviderHandlesNameConstraints = Boolean.parseBoolean(cpNameConstraintsProp);
         }
         //
         // Load the KeyStore
@@ -834,17 +843,7 @@ public class Merlin extends CryptoBase {
         try {
             Set<TrustAnchor> set = new HashSet<>();
             if (truststore != null) {
-                Enumeration<String> truststoreAliases = truststore.aliases();
-                while (truststoreAliases.hasMoreElements()) {
-                    String alias = truststoreAliases.nextElement();
-                    X509Certificate cert =
-                        (X509Certificate) truststore.getCertificate(alias);
-                    if (cert != null) {
-                        TrustAnchor anchor =
-                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                        set.add(anchor);
-                    }
-                }
+                addTrustAnchors(set, truststore);
             }
 
             //
@@ -853,17 +852,7 @@ public class Merlin extends CryptoBase {
             // for backwards compatibility reasons
             //
             if (keystore != null && (truststore == null || loadCACerts)) {
-                Enumeration<String> aliases = keystore.aliases();
-                while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    X509Certificate cert =
-                        (X509Certificate) keystore.getCertificate(alias);
-                    if (cert != null) {
-                        TrustAnchor anchor =
-                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                        set.add(anchor);
-                    }
-                }
+                addTrustAnchors(set, keystore);
             }
 
             // Verify the trust path using the above settings
@@ -886,7 +875,7 @@ public class Merlin extends CryptoBase {
                     x509certs[0] = certs[0];
                     System.arraycopy(foundCertChain, 0, x509certs, 1, foundCertChain.length);
 
-                    List<X509Certificate> certList = Arrays.asList(certs);
+                    List<X509Certificate> certList = Arrays.asList(x509certs);
                     CertPath path = getCertificateFactory().generateCertPath(certList);
 
                     try {
@@ -1405,6 +1394,42 @@ public class Merlin extends CryptoBase {
             + "] with size [" + keystore.size() + "] and aliases: {"
             + sb.toString() + "}";
         return msg;
+    }
+
+    /**
+     * Adds {@code TrustAnchor}s found in the provided key store to the set.
+     * <p>
+     * When the Trust Anchors are constructed, the value of the
+     * {@link #CRYPTO_CERT_PROVIDER_HANDLES_NAME_CONSTRAINTS} property will be checked.
+     * If it has been set to {@code true}, then {@code NameConstraint}s will be added
+     * to their Trust Anchors; if unset or set to false, the Name Constraints
+     * will be nulled out on their Trust Anchors.
+     *
+     * The default Sun PKIX Path Validator does not support Name Constraints on
+     * Trust Anchors and will throw an InvalidAlgorithmParameterException if they
+     * are provided. Other implementations may also be unsafe.
+     *
+     * @param set       the set to which to add the {@code TrustAnchor}s
+     * @param keyStore  the store to search for {@code X509Certificate}s
+     * @throws KeyStoreException if a problem occurs accessing the keyStore
+     */
+    protected void addTrustAnchors(Set<TrustAnchor> set, KeyStore keyStore)
+            throws KeyStoreException, WSSecurityException {
+        Enumeration<String> aliases = keyStore.aliases();
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            X509Certificate cert =
+                    (X509Certificate) keyStore.getCertificate(alias);
+            if (cert != null) {
+                if (certProviderHandlesNameConstraints) {
+                    TrustAnchor anchor = new TrustAnchor(cert, getNameConstraints(cert));
+                    set.add(anchor);
+                } else {
+                    TrustAnchor anchor = new TrustAnchor(cert, null);
+                    set.add(anchor);
+                }
+            }
+        }
     }
 
     /**

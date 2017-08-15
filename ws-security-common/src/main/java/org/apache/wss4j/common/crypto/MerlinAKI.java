@@ -168,17 +168,7 @@ public class MerlinAKI extends Merlin {
 
             Set<TrustAnchor> set = new HashSet<>();
             if (truststore != null) {
-                Enumeration<String> truststoreAliases = truststore.aliases();
-                while (truststoreAliases.hasMoreElements()) {
-                    String alias = truststoreAliases.nextElement();
-                    X509Certificate cert =
-                        (X509Certificate) truststore.getCertificate(alias);
-                    if (cert != null) {
-                        TrustAnchor anchor =
-                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                        set.add(anchor);
-                    }
-                }
+                addTrustAnchors(set, truststore);
             }
 
             //
@@ -187,17 +177,7 @@ public class MerlinAKI extends Merlin {
             // for backwards compatibility reasons
             //
             if (keystore != null && (truststore == null || loadCACerts)) {
-                Enumeration<String> aliases = keystore.aliases();
-                while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    X509Certificate cert =
-                        (X509Certificate) keystore.getCertificate(alias);
-                    if (cert != null) {
-                        TrustAnchor anchor =
-                            new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
-                        set.add(anchor);
-                    }
-                }
+                addTrustAnchors(set, keystore);
             }
 
             // Verify the trust path using the above settings
