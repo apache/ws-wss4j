@@ -53,7 +53,11 @@ public final class WSProviderConfig {
      * initialized.  This flag prevents repeated and unnecessary calls
      * to static initialization code at construction time.
      */
-    private static boolean staticallyInitialized = false;
+    private static boolean staticallyInitialized;
+
+    private static boolean santuarioProviderAdded;
+    private static boolean bcProviderAdded;
+    private static boolean tlProviderAdded;
 
     private WSProviderConfig() {
         // complete
@@ -70,6 +74,10 @@ public final class WSProviderConfig {
                         return true;
                     }
                 });
+
+                santuarioProviderAdded = true;
+                bcProviderAdded = false;
+                tlProviderAdded = false;
             }
             staticallyInitialized = true;
         }
@@ -79,6 +87,7 @@ public final class WSProviderConfig {
         if (!staticallyInitialized) {
             initializeResourceBundles();
             setXmlSecIgnoreLineBreak();
+            santuarioProviderAdded = addXMLDSigRIInternalProv;
             if (addXMLDSigRIInternalProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
@@ -87,6 +96,8 @@ public final class WSProviderConfig {
                     }
                 });
             }
+
+            bcProviderAdded = addBCProv;
             if (addBCProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
@@ -104,6 +115,8 @@ public final class WSProviderConfig {
                     }
                 });
             }
+
+            tlProviderAdded = addTLProv;
             if (addTLProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
@@ -113,6 +126,25 @@ public final class WSProviderConfig {
                 });
             }
             staticallyInitialized = true;
+        }
+    }
+
+    public static synchronized void cleanUp() {
+        if (staticallyInitialized) {
+            if (santuarioProviderAdded) {
+                Security.removeProvider("ApacheXMLDSig");
+                santuarioProviderAdded = false;
+            }
+            if (bcProviderAdded) {
+                Security.removeProvider("BC");
+                bcProviderAdded = false;
+            }
+            if (tlProviderAdded) {
+                Security.removeProvider("TLSP");
+                tlProviderAdded = false;
+            }
+
+            staticallyInitialized = false;
         }
     }
 

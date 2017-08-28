@@ -345,6 +345,19 @@ public final class WSSConfig {
         }
     }
 
+    public static synchronized void cleanUp() {
+        if (staticallyInitialized) {
+            if (addJceProviders) {
+                Security.removeProvider("STRTransform");
+                Security.removeProvider("AttachmentContentSignatureTransform");
+                Security.removeProvider("AttachmentCompleteSignatureTransform");
+            }
+            WSProviderConfig.cleanUp();
+
+            staticallyInitialized = false;
+        }
+    }
+
     /**
      * @return a new WSSConfig instance configured with the default values
      */
