@@ -25,7 +25,7 @@ public class AttachmentContentSignatureTransformProvider extends Provider {
     private static final long serialVersionUID = -9148982936620100249L;
 
     public AttachmentContentSignatureTransformProvider() {
-        super("AttachmentContentSignatureTransform", 2.0, "Attachment Content Signature Transform Provider");
+        super("AttachmentContentSignatureTransform", 2.2, "Attachment Content Signature Transform Provider");
         put(
                 "TransformService." + AttachmentContentSignatureTransform.TRANSFORM_URI,
                 "org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform"
