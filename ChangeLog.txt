@@ -5,6 +5,57 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.0
+==============
+
+Bug
+
+    [WSS-558] - org.apache.ws.security.message.WSSecSignature can't support custom provider
+    [WSS-560] - NullPointerException in WSSecEncrypt when encrypted header element has attributes
+    [WSS-562] - Support processing EncryptedAssertions that contain EncryptedKey children
+    [WSS-563] - Cannot decrypt non XML conform attachements
+    [WSS-564] - Allow WS-SecurityPolicy 1.1 tokens to have an optional policy element
+    [WSS-565] - Support the ability to create and process EncryptedKeys that reference a PublicKey
+    [WSS-580] - ThreadLocalSecurityProvider returns null instead of empty collection
+    [WSS-582] - Don't cache Crypto key references in WSHandler
+    [WSS-583] - crypto.verifyTrust can fail when the DN of the issuer is more than once in the truststore
+    [WSS-587] - Concurrency issue in EHCacheManagerHolder
+    [WSS-590] - WSS4J relies on deafult locale
+    [WSS-594] - Copy Security Header SOAP MustUnderstand/Actor to an EncryptedHeader element
+    [WSS-602] - ConfigurationConstants.VALIDATOR_MAP is not supported
+    [WSS-603] - Improper date check in SamlAssertionWrapper.checkIssueInstant
+    [WSS-604] - UsernameTokenNoPassword does not work via WSHandler
+    [WSS-610] - WSSecurityUtil.decodeAction misbehaving when sending NoSecurity
+    [WSS-611] - CAs with the NameConstraint extension cause exceptions when verifying trust
+    [WSS-612] - CertificateStore crypto implementation does not correctly handle certificate chains
+
+Improvement
+
+    [WSS-569] - Improvements to error messages
+    [WSS-570] - Typo in the constant name for "RSAOAEP"
+    [WSS-584] - Don't create ReplayCache instances internally
+    [WSS-586] - Don't query a CallbackHandler for a secret key when parsing a SAML Subject for credentials
+    [WSS-592] - Add support for a comma-separated list of crls
+    [WSS-596] - org.apache.wss4j.common.crypto.CryptoFactory add security provider always
+    [WSS-597] - Implement equals/hashCode for the WSS4J policy model
+    [WSS-599] - Upgrade to Java 8 DateTime API
+    [WSS-600] - Get the configured ParserPool via OpenSAMLUtil
+    [WSS-601] - Optionally skip XACML initialization for OpenSAML
+    [WSS-605] - Ensure the ws-security-dom can work with the saaj impl in latest Java9 EA kit
+    [WSS-608] - Allow policy tokens not to have a wsp:Policy child element
+    [WSS-613] - Update OpenSAMLUtil to be able to sign generic SignableSAMLObjects
+
+New Feature
+
+    [WSS-571] - Truststore Provider
+    [WSS-593] - Implement Certificate Issuer DN Constraint support
+    [WSS-598] - Add support for signing + encrypting messages using MTOM
+
+Wish
+
+    [WSS-573] - Ignore IntelliJ user files
+
+
 Release 2.1.10
 ==============
 
