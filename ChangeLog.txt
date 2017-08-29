@@ -5,6 +5,20 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.11
+==============
+
+Bug
+
+    [WSS-610] - WSSecurityUtil.decodeAction misbehaving when sending NoSecurity
+    [WSS-611] - CAs with the NameConstraint extension cause exceptions when verifying trust
+    [WSS-612] - CertificateStore crypto implementation does not correctly handle certificate chains
+
+Improvement
+
+    [WSS-613] - Update OpenSAMLUtil to be able to sign generic SignableSAMLObjects
+
+
 Release 2.1.10
 ==============
 
