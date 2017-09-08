@@ -215,6 +215,8 @@ public class KerberosSecurity extends BinarySecurity {
         // Store the TGT
         KerberosTicket tgt = getKerberosTicket(clientSubject, null);
 
+        decorateSubject(clientSubject);
+
         // Get the service ticket
         KerberosClientExceptionAction action =
             new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName,
@@ -263,7 +265,10 @@ public class KerberosSecurity extends BinarySecurity {
         }
     }
 
+    // Allow subclasses to decorate the Subject if required.
+    protected void decorateSubject(Subject subject) {
 
+    }
 
     /**
      * Get a KerberosTicket from the clientSubject parameter, that is not equal to the supplied KerberosTicket
