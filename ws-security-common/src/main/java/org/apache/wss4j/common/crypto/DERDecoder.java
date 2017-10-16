@@ -171,9 +171,6 @@ public class DERDecoder {
         int len;
         if ((arr[pos] & 0xFF) <= 0x7F) {
             len = arr[pos++];
-        } else if (arr[pos] == 0x80) {
-            len = -1;
-            pos++;
         } else {
             int nbytes = arr[pos++] & 0x7F;
             if (pos + nbytes > arr.length) {
