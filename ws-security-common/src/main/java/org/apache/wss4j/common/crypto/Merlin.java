@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -355,41 +354,7 @@ public class Merlin extends CryptoBase {
      */
     public static InputStream loadInputStream(ClassLoader loader, String location) 
         throws WSSecurityException, IOException {
-        InputStream is = null;
-        if (location != null) {
-            java.net.URL url = null;
-            // First see if it's a URL
-            try {
-                url = new java.net.URL(location);
-            } catch (MalformedURLException ex) { //NOPMD
-                // skip
-            }
-            // If not a URL, then try to load the resource
-            if (url == null) {
-                url = Loader.getResource(loader, location);
-            }
-            if (url != null) {
-                is = url.openStream();
-            }
-    
-            //
-            // If we don't find it, then look on the file system.
-            //
-            if (is == null) {
-                try {
-                    is = new FileInputStream(location);
-                } catch (Exception e) {
-                    if (DO_DEBUG) {
-                        LOG.debug(e.getMessage(), e);
-                    }
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "proxyNotFound", 
-                        new Object[] {location}
-                    );
-                }
-            }
-        }
-        return is;
+        return Loader.loadInputStream(loader, location);
     }
     
 

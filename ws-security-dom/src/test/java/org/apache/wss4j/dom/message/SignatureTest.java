@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -899,6 +900,52 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
     }
     
+    // See WSS-540
+    @org.junit.Test
+    public void testLoadSignaturePropertiesFromFileSystem() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
+        File propsFile = new File(basedir + "/src/test/resources/crypto.properties");
+
+        config.put(WSHandlerConstants.SIG_PROP_FILE, propsFile.getPath());
+        config.put("password", "security");
+        reqData.setMsgContext(config);
+
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+        String outputString =
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+
+        RequestData data = new RequestData();
+        data.setWssConfig(WSSConfig.getNewInstance());
+        data.setSigVerCrypto(crypto);
+
+        WSSecurityEngine newSecEngine = new WSSecurityEngine();
+        List<WSSecurityEngineResult> results = 
+            newSecEngine.processSecurityHeader(doc, "", data);
+        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
+    }
+
     @org.junit.Test
     public void testCommentInSOAPBody() throws Exception {
         WSSecSignature builder = new WSSecSignature();
