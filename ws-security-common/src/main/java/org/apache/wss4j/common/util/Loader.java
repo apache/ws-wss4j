@@ -22,9 +22,14 @@ package org.apache.wss4j.common.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * Load resources (or images) from various sources.
@@ -33,6 +38,42 @@ import java.security.PrivilegedAction;
 public class Loader {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(Loader.class);
+
+    public static InputStream loadInputStream(ClassLoader loader, String resource)
+        throws WSSecurityException, IOException {
+        InputStream is = null;
+        if (resource != null) {
+            URL url = null;
+            // First see if it's a URL
+            try {
+                url = new URL(resource);
+            } catch (MalformedURLException ex) { //NOPMD
+                // skip
+            }
+            // If not a URL, then try to load the resource
+            if (url == null) {
+                url = Loader.getResource(loader, resource);
+            }
+            if (url != null) {
+                is = url.openStream();
+            }
+
+            //
+            // If we don't find it, then look on the file system.
+            //
+            if (is == null) {
+                try {
+                    is = Files.newInputStream(Paths.get(resource));
+                } catch (Exception e) {
+                    LOG.debug(e.getMessage(), e);
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, e, "resourceNotFound", new Object[] {resource}
+                    );
+                }
+            }
+        }
+        return is;
+    }
 
     /**
      * This method will search for <code>resource</code> in different

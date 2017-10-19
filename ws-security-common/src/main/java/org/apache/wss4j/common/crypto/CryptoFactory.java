@@ -20,8 +20,8 @@
 package org.apache.wss4j.common.crypto;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
@@ -284,15 +284,16 @@ public abstract class CryptoFactory {
     ) throws WSSecurityException {
         Properties properties = new Properties();
         try {
-            URL url = Loader.getResource(loader, propFilename);
-            if (url == null) {
+            InputStream is = Loader.loadInputStream(loader, propFilename);
+            if (is == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "resourceNotFound",
                     new Object[] {propFilename}
                 );
             }
-            properties.load(url.openStream());
+            properties.load(is);
+            is.close();
         } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Cannot find resource: " + propFilename, e);
