@@ -103,6 +103,6 @@ public class XPath {
             result = 31 * result + filter.hashCode();
         }
 
-        return 31 * result + super.hashCode();
+        return result;
     }
 }
