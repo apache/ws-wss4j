@@ -90,9 +90,6 @@ public class SAMLTokenSignedAction implements Action {
 
         CallbackHandler callbackHandler =
             handler.getPasswordCallbackHandler(reqData);
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(reqData.getUsername(), WSConstants.ST_SIGNED, callbackHandler, reqData);
-        wsSign.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
 
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {
@@ -101,6 +98,10 @@ public class SAMLTokenSignedAction implements Action {
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
+
+        WSPasswordCallback passwordCallback =
+            handler.getPasswordCB(signatureToken.getUser(), WSConstants.ST_SIGNED, callbackHandler, reqData);
+        wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
