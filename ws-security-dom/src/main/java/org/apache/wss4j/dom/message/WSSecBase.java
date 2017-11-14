@@ -177,6 +177,9 @@ public class WSSecBase {
             } else if (WSConstants.SAML2_NS.equals(bodyElement.getNamespaceURI())
                 && "Assertion".equals(bodyElement.getLocalName())) {
                 id = bodyElement.getAttributeNS(null, "ID");
+            } else if (WSConstants.SIG_NS.equals(bodyElement.getNamespaceURI())
+                && "KeyInfo".equals(bodyElement.getLocalName())) {
+                id = bodyElement.getAttributeNS(null, "Id");
             }
         }
 
