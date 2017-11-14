@@ -723,7 +723,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      * Call this method after <code>prepare()</code>
      */
     public Element getKeyInfoElement() throws WSSecurityException {
-        Element parent = getDocument().createElement("temp");
+        Element parent = document.createElement("temp");
         DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
         cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
         try {
