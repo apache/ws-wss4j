@@ -383,19 +383,8 @@ public class WSSecSignature extends WSSecSignatureBase {
                     && part.getElement() == null) {
                     // Special code to sign the KeyInfo - we have to marshal the KeyInfo to a DOM Element
                     // before the signing process
-                    Element parent = secRef.getElement().getOwnerDocument().createElement("temp");
-                    DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
-                    cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
-                    try {
-                        keyInfo.marshal(new DOMStructure(parent), cryptoContext);
-                    } catch (MarshalException ex) {
-                        LOG.error(ex.getMessage(), ex);
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
-                        );
-                    }
-                    part.setElement((Element)parent.getFirstChild());
-                    break;
+                    Element keyInfoElement = getKeyInfoElement();
+                    part.setElement(keyInfoElement);
                 }
             }
         }
@@ -727,6 +716,26 @@ public class WSSecSignature extends WSSecSignatureBase {
      */
     public byte[] getSignatureValue() {
         return signatureValue;
+    }
+
+    /**
+     * Return the computed KeyInfo value as a DOM Element
+     * Call this method after <code>prepare()</code>
+     */
+    public Element getKeyInfoElement() throws WSSecurityException {
+        Element parent = getDocument().createElement("temp");
+        DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
+        cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
+        try {
+            keyInfo.marshal(new DOMStructure(parent), cryptoContext);
+        } catch (MarshalException ex) {
+            LOG.error(ex.getMessage(), ex);
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
+            );
+        }
+
+        return (Element)parent.getFirstChild();
     }
 
     /**
