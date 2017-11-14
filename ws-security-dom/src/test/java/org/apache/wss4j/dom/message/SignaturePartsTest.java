@@ -24,12 +24,16 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.HandlerAction;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -49,6 +53,7 @@ import org.w3c.dom.Element;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -605,6 +610,45 @@ public class SignaturePartsTest extends org.junit.Assert {
         List<String> transformAlgorithms = wsDataRef.getTransformAlgorithms();
         assertTrue(transformAlgorithms.size() == 1);
         assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
+    }
+
+    @Test
+    public void testSignedKeyInfoAction() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put("password", "security");
+        config.put(
+            WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.SIG_NS + "}KeyInfo"
+        );
+        reqData.setMsgContext(config);
+
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        handler.send(
+            doc,
+            reqData,
+            actions,
+            true
+        );
+        String outputString =
+            XMLUtils.prettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+
+        WSHandlerResult results = verify(doc);
+
+        List<Integer> receivedActions = new ArrayList<>();
+        receivedActions.add(WSConstants.SIGN);
+        assertTrue(handler.checkResults(results.getResults(), receivedActions));
     }
 
     /**

@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class SignatureAction implements Action {
+
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
@@ -132,6 +133,13 @@ public class SignatureAction implements Action {
                 } else if (WSConstants.WSSE_NS.equals(part.getNamespace())
                     && WSConstants.BINARY_TOKEN_LN.equals(part.getName())) {
                     signBST = true;
+                }  else if ("KeyInfo".equals(part.getName()) && WSConstants.SIG_NS.equals(part.getNamespace())
+                    && part.getElement() == null) {
+                    // Special code to sign the KeyInfo - we have to marshal the KeyInfo to a DOM Element
+                    // before the signing process
+                    Element keyInfoElement = wsSign.getKeyInfoElement();
+                    part.setElement(keyInfoElement);
+                    break;
                 }
             }
 
