@@ -25,7 +25,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -377,6 +379,23 @@ public class WSSecSignature extends WSSecSignatureBase {
             for (WSEncryptionPart part : getParts()) {
                 if (part.getId() == null && "STRTransform".equals(part.getName())) {
                     part.setId(strUri);
+                } else if ("KeyInfo".equals(part.getName()) && WSConstants.SIG_NS.equals(part.getNamespace())
+                    && part.getElement() == null) {
+                    // Special code to sign the KeyInfo - we have to marshal the KeyInfo to a DOM Element
+                    // before the signing process
+                    Element parent = secRef.getElement().getOwnerDocument().createElement("temp");
+                    DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
+                    cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
+                    try {
+                        keyInfo.marshal(new DOMStructure(parent), cryptoContext);
+                    } catch (MarshalException ex) {
+                        LOG.error(ex.getMessage(), ex);
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
+                        );
+                    }
+                    part.setElement((Element)parent.getFirstChild());
+                    break;
                 }
             }
         }
