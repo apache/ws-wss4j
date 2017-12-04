@@ -23,13 +23,10 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -377,81 +374,77 @@ public class WSSecSignatureSAML extends WSSecSignature {
         SecurityTokenReference secRef, X509Certificate cert,
         Crypto crypto, SamlAssertionWrapper samlAssertion
     ) throws WSSecurityException {
-        if (senderVouches) {
-            switch (keyIdentifierType) {
-            case WSConstants.BST_DIRECT_REFERENCE:
+        if (getCustomKeyInfoElement() == null) {
+            if (senderVouches) {
+                switch (keyIdentifierType) {
+                case WSConstants.BST_DIRECT_REFERENCE:
+                    Reference ref = new Reference(getDocument());
+                    ref.setURI("#" + certUri);
+                    BinarySecurity binarySecurity = new X509Security(getDocument());
+                    ((X509Security) binarySecurity).setX509Certificate(cert);
+                    binarySecurity.setID(certUri);
+                    bstToken = binarySecurity.getElement();
+                    getWsDocInfo().addTokenElement(bstToken, false);
+                    ref.setValueType(binarySecurity.getValueType());
+                    secRef.setReference(ref);
+                    break;
+
+                case WSConstants.X509_KEY_IDENTIFIER :
+                    secRef.setKeyIdentifier(cert);
+                    break;
+
+                case WSConstants.SKI_KEY_IDENTIFIER:
+                    secRef.setKeyIdentifierSKI(cert, crypto);
+                    break;
+
+                case WSConstants.THUMBPRINT_IDENTIFIER:
+                    secRef.setKeyIdentifierThumb(cert);
+                    break;
+
+                case WSConstants.ISSUER_SERIAL:
+                    final String issuer = cert.getIssuerDN().getName();
+                    final java.math.BigInteger serialNumber = cert.getSerialNumber();
+                    final DOMX509IssuerSerial domIssuerSerial =
+                            new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
+                    final DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
+                    secRef.setUnknownElement(domX509Data.getElement());
+                    break;
+
+                default:
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId"
+                    );
+                }
+            } else if (useDirectReferenceToAssertion) {
                 Reference ref = new Reference(getDocument());
-                ref.setURI("#" + certUri);
-                BinarySecurity binarySecurity = new X509Security(getDocument());
-                ((X509Security) binarySecurity).setX509Certificate(cert);
-                binarySecurity.setID(certUri);
-                bstToken = binarySecurity.getElement();
-                getWsDocInfo().addTokenElement(bstToken, false);
-                ref.setValueType(binarySecurity.getValueType());
+                ref.setURI("#" + samlAssertion.getId());
+                if (samlAssertion.getSaml1() != null) {
+                    ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                } else if (samlAssertion.getSaml2() != null) {
+                    secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                }
                 secRef.setReference(ref);
-                break;
-
-            case WSConstants.X509_KEY_IDENTIFIER :
-                secRef.setKeyIdentifier(cert);
-                break;
-
-            case WSConstants.SKI_KEY_IDENTIFIER:
-                secRef.setKeyIdentifierSKI(cert, crypto);
-                break;
-
-            case WSConstants.THUMBPRINT_IDENTIFIER:
-                secRef.setKeyIdentifierThumb(cert);
-                break;
-
-            case WSConstants.ISSUER_SERIAL:
-                final String issuer = cert.getIssuerDN().getName();
-                final java.math.BigInteger serialNumber = cert.getSerialNumber();
-                final DOMX509IssuerSerial domIssuerSerial =
-                        new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
-                final DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
-                secRef.setUnknownElement(domX509Data.getElement());
-                break;
-
-            default:
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId"
+            } else {
+                Element keyId = getDocument().createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+                String valueType = null;
+                if (samlAssertion.getSaml1() != null) {
+                    valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
+                    secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                } else if (samlAssertion.getSaml2() != null) {
+                    valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
+                    secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                }
+                keyId.setAttributeNS(
+                    null, "ValueType", valueType
                 );
+                keyId.appendChild(getDocument().createTextNode(samlAssertion.getId()));
+                Element elem = secRef.getElement();
+                elem.appendChild(keyId);
             }
-        } else if (useDirectReferenceToAssertion) {
-            Reference ref = new Reference(getDocument());
-            ref.setURI("#" + samlAssertion.getId());
-            if (samlAssertion.getSaml1() != null) {
-                ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (samlAssertion.getSaml2() != null) {
-                secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            }
-            secRef.setReference(ref);
-        } else {
-            Element keyId = getDocument().createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
-            String valueType = null;
-            if (samlAssertion.getSaml1() != null) {
-                valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
-                secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (samlAssertion.getSaml2() != null) {
-                valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
-                secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            }
-            keyId.setAttributeNS(
-                null, "ValueType", valueType
-            );
-            keyId.appendChild(getDocument().createTextNode(samlAssertion.getId()));
-            Element elem = secRef.getElement();
-            elem.appendChild(keyId);
         }
-        XMLStructure structure = new DOMStructure(secRef.getElement());
-        getWsDocInfo().addTokenElement(secRef.getElement(), false);
 
-        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-        keyInfo =
-            keyInfoFactory.newKeyInfo(
-                java.util.Collections.singletonList(structure), keyInfoUri
-            );
+        marshalKeyInfo(getWsDocInfo());
     }
 
     /**
