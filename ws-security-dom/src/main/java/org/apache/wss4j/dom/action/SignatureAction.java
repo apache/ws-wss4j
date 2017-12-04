@@ -96,6 +96,9 @@ public class SignatureAction implements Action {
         if (signatureToken.getSha1Value() != null) {
             wsSign.setEncrKeySha1value(signatureToken.getSha1Value());
         }
+        if (signatureToken.getKeyInfoElement() != null) {
+            wsSign.setCustomKeyInfoElement(signatureToken.getKeyInfoElement());
+        }
 
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());

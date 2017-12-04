@@ -23,6 +23,8 @@ import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
@@ -110,6 +112,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private boolean bstAddedToSecurityHeader;
     private boolean includeSignatureToken;
     private boolean addInclusivePrefixes = true;
+    private Element customKeyInfoElement;
 
     public WSSecSignature() {
         this(null);
@@ -184,7 +187,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
 
         keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
-        if (!useCustomSecRef) {
+        if (!useCustomSecRef && customKeyInfoElement == null) {
             secRef = new SecurityTokenReference(doc);
             strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.addWSSENamespace();
@@ -322,9 +325,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
                     KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
                     keyInfo =
-                        keyInfoFactory.newKeyInfo(
-                            java.util.Collections.singletonList(keyValue), keyInfoUri
-                        );
+                        keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue), keyInfoUri);
                 } catch (java.security.KeyException ex) {
                     LOG.error("", ex);
                     throw new WSSecurityException(
@@ -338,16 +339,28 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
 
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
-            XMLStructure structure = new DOMStructure(secRef.getElement());
-            wsDocInfo.addTokenElement(secRef.getElement(), false);
-            KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-            keyInfo =
-                keyInfoFactory.newKeyInfo(
-                    java.util.Collections.singletonList(structure), keyInfoUri
-                );
+            marshalKeyInfo(wsDocInfo);
         }
     }
 
+    protected void marshalKeyInfo(WSDocInfo wsDocInfo) throws WSSecurityException {
+        List<XMLStructure> kiChildren = null;
+        if (customKeyInfoElement == null) {
+            XMLStructure structure = new DOMStructure(secRef.getElement());
+            wsDocInfo.addTokenElement(secRef.getElement(), false);
+            kiChildren = Collections.singletonList(structure);
+        } else {
+            Node kiChild = customKeyInfoElement.getFirstChild();
+            kiChildren = new ArrayList<>();
+            while (kiChild != null) {
+                kiChildren.add(new DOMStructure(kiChild));
+                kiChild = kiChild.getNextSibling();
+            }
+        }
+
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+        keyInfo = keyInfoFactory.newKeyInfo(kiChildren, keyInfoUri);
+    }
 
     /**
      * Builds a signed soap envelope.
@@ -905,4 +918,11 @@ public class WSSecSignature extends WSSecSignatureBase {
         this.addInclusivePrefixes = addInclusivePrefixes;
     }
 
+    public void setCustomKeyInfoElement(Element keyInfoElement) {
+        this.customKeyInfoElement = keyInfoElement;
+    }
+
+    public Element getCustomKeyInfoElement() {
+        return customKeyInfoElement;
+    }
 }

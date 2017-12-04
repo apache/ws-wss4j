@@ -80,6 +80,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private String issuerName;
     private String issuerPassword;
     private Element assertionAdviceElement;
+    private Element keyInfoElement;
 
     public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
         this.subjectConfirmationData = subjectConfirmationData;
@@ -137,7 +138,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }
-    
+
     public DateTime getAuthenticationInstant() {
         return authenticationInstant;
     }
@@ -201,7 +202,9 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     protected KeyInfoBean createKeyInfo() throws Exception {
         KeyInfoBean keyInfo = new KeyInfoBean();
-        if (statement == Statement.AUTHN) {
+        if (keyInfoElement != null) {
+            keyInfo.setElement(keyInfoElement);
+        } else if (statement == Statement.AUTHN) {
             keyInfo.setCertificate(certs[0]);
             keyInfo.setCertIdentifer(certIdentifier);
         } else if (statement == Statement.ATTR) {
@@ -221,16 +224,16 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
             // Append the EncryptedKey to a KeyInfo element
-            Element keyInfoElement =
+            Element kiElement =
                 doc.createElementNS(
                     WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                 );
-            keyInfoElement.setAttributeNS(
+            kiElement.setAttributeNS(
                 WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
-            keyInfoElement.appendChild(encryptedKeyElement);
+            kiElement.appendChild(encryptedKeyElement);
 
-            keyInfo.setElement(keyInfoElement);
+            keyInfo.setElement(kiElement);
         }
         return keyInfo;
     }
@@ -265,5 +268,13 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     public void setAssertionAdviceElement(Element assertionAdviceElement) {
         this.assertionAdviceElement = assertionAdviceElement;
+    }
+
+    public Element getKeyInfoElement() {
+        return keyInfoElement;
+    }
+
+    public void setKeyInfoElement(Element keyInfoElement) {
+        this.keyInfoElement = keyInfoElement;
     }
 }

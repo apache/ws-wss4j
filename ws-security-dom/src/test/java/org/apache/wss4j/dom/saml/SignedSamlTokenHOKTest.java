@@ -30,7 +30,9 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -43,15 +45,29 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -671,6 +687,106 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+
+        WSDataRef wsDataRef = refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+
+    // Add both the X509Data and KeyValue for both the Subject + Signature KeyInfo
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testX509DataAndKeyValue() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setIssuer("www.example.com");
+
+        // Create the KeyInfo
+        DocumentBuilderFactory docBuilderFactory =
+            DocumentBuilderFactory.newInstance();
+        docBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        Document keyInfoDoc = docBuilder.newDocument();
+
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        java.security.PublicKey publicKey = certs[0].getPublicKey();
+
+        KeyInfoFactory keyInfoFactory =
+            XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig").getKeyInfoFactory();
+
+        // X.509
+        X509Data x509Data = keyInfoFactory.newX509Data(Collections.singletonList(certs[0]));
+
+        // KeyValue
+        KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
+        List<XMLStructure> keyInfoContent = Arrays.asList(x509Data, keyValue);
+        KeyInfo keyInfo = keyInfoFactory.newKeyInfo(keyInfoContent, null);
+
+        // Marshal the KeyInfo to DOM
+        Element parent = keyInfoDoc.createElement("temp");
+        DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
+        cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
+        keyInfo.marshal(new DOMStructure(parent), cryptoContext);
+
+        Element keyInfoElement = (Element)parent.getFirstChild();
+
+        callbackHandler.setKeyInfoElement(keyInfoElement);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setCustomKeyInfoElement(keyInfoElement);
+
+        Document signedDoc =
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML 2 Authn Assertion (key holder):");
+            LOG.debug(outputString);
+        }
+
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(userCrypto);
+
+        List<BSPRule> ignoredRules = new ArrayList<>();
+        ignoredRules.add(BSPRule.R5417);
+        ignoredRules.add(BSPRule.R5402);
+        data.setIgnoredBSPRules(ignoredRules);
+
+        Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
+        WSHandlerResult results =
+            secEngine.processSecurityHeader(securityHeader, data);
+
+        // Test we processed a SAML assertion
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
+
+        // Test we processed a signature (SOAP body)
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
