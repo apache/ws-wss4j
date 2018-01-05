@@ -22,6 +22,7 @@ package org.apache.wss4j.common.util;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.JavaUtils;
 
 import javax.crypto.Cipher;
@@ -32,11 +33,15 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
+    private static final Map<String, Integer> DEFAULT_DERIVED_KEY_LENGTHS = new HashMap<>();
+
     public static final String RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING = "RSA/ECB/OAEPWithSHA1AndMGF1Padding";
 
     /**
@@ -44,18 +49,39 @@ public final class KeyUtils {
      */
     private static MessageDigest digest;
 
+    static {
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5, 128);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_RIPEMD160, 160);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_SHA1, 160);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_SHA224, 224);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_SHA256, 256);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_SHA384, 384);
+        DEFAULT_DERIVED_KEY_LENGTHS.put(XMLSignature.ALGO_ID_MAC_HMAC_SHA512, 512);
+    }
+
     private KeyUtils() {
         // complete
     }
 
     /**
-     * Returns the length of the key in # of bytes
+     * Returns the length of the key in # of bytes. For the HMAC algorithms it guesses a default value that can be used
+     * based on the algorithm.
      *
      * @param algorithm the URI of the algorithm. See http://www.w3.org/TR/xmlenc-core1/
      * @return the key length
      */
     public static int getKeyLength(String algorithm) throws WSSecurityException {
-        return JCEMapper.getKeyLengthFromURI(algorithm) / 8;
+        if (algorithm == null) {
+            return 0;
+        }
+
+        int size = JCEMapper.getKeyLengthFromURI(algorithm);
+        if (size == 0 && DEFAULT_DERIVED_KEY_LENGTHS.containsKey(algorithm)) {
+            // Use a default derived key length for algorithms such as HMAC-SHA1, if none is specified
+            size = DEFAULT_DERIVED_KEY_LENGTHS.get(algorithm);
+        }
+
+        return size / 8;
     }
 
     /**
@@ -65,7 +91,7 @@ public final class KeyUtils {
         // Do an additional check on the keysize required by the encryption algorithm
         int size = 0;
         try {
-            size = getKeyLength(algorithm);
+            size = JCEMapper.getKeyLengthFromURI(algorithm) / 8;
         } catch (Exception e) {
             // ignore - some unknown (to JCEMapper) encryption algorithm
             LOG.debug(e.getMessage());

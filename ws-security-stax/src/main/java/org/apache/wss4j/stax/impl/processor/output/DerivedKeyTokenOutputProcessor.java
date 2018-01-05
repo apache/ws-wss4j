@@ -33,6 +33,7 @@ import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -86,12 +87,18 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     length = ((WSSSecurityProperties)getSecurityProperties()).getDerivedSignatureKeyLength();
                 } else {
                     length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
+                    if (length == 0) {
+                        length = KeyUtils.getKeyLength(getSecurityProperties().getSignatureAlgorithm()) / 8;
+                    }
                 }
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 if (((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength() > 0) {
                     length = ((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength();
                 } else {
                     length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
+                    if (length == 0) {
+                        length = KeyUtils.getKeyLength(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
+                    }
                 }
             }
 
