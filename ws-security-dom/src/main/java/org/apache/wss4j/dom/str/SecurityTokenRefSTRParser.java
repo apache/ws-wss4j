@@ -125,10 +125,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
         } else if (action != null && WSConstants.DKT == action.intValue()) {
             DerivedKeyToken dkt =
                 (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
-            byte[] secret =
-                (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-            byte[] secretKey = dkt.deriveKey(parameters.getDerivationKeyLength(), secret);
-            parserResult.setSecretKey(secretKey);
+            int keyLength = dkt.getLength();
+            if (keyLength <= 0 && parameters.getDerivationKeyLength() > 0) {
+                keyLength = parameters.getDerivationKeyLength();
+            }
+            byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            parserResult.setSecretKey(dkt.deriveKey(keyLength, secret));
             parserResult.setPrincipal(dkt.createPrincipal());
         } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
