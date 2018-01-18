@@ -126,6 +126,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             } else {
                 X509Certificate remoteCert = getUseThisCert();
                 if (remoteCert == null) {
+                    if (crypto == null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "encryptionCryptoFailure");
+                    }
                     CryptoType cryptoType = null;
                     if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
                         cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
