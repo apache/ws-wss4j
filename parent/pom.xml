@@ -34,7 +34,7 @@
     <properties>
         <apacheds.version>2.0.0-M24</apacheds.version>
         <bcprov.version>1.59</bcprov.version>
-        <commons.compress.version>1.14</commons.compress.version>
+        <commons.compress.version>1.15</commons.compress.version>
         <ehcache.version>2.10.4</ehcache.version>
         <geronimo.javamail.version>1.8.4</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
@@ -44,10 +44,10 @@
         <neethi.version>3.1.0</neethi.version>
         <opensaml.version>3.3.0</opensaml.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
+        <woodstox.core.version>5.0.3</woodstox.core.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
-        <xz.version>1.6</xz.version>
+        <xz.version>1.8</xz.version>
         <xmlsec.version>2.1.0</xmlsec.version>
         <xmlunit.version>1.6</xmlunit.version>
         
@@ -82,9 +82,9 @@
                 <version>${neethi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>${woodstox.core.asl.version}</version>
+                <groupId>com.fasterxml.woodstox</groupId>
+                <artifactId>woodstox-core</artifactId>
+                <version>${woodstox.core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.javamail</groupId>
