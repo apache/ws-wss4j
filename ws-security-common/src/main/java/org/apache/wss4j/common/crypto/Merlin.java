@@ -803,12 +803,12 @@ public class Merlin extends CryptoBase {
             Object subject = convertSubjectToPrincipal(issuerString);
 
             if (keystore != null) {
-                foundIssuingCertChains = getCertificates(subject, keystore);
+                foundIssuingCertChains = getCertificates(subject, keystore, false);
             }
 
             //If we can't find the issuer in the keystore then look at the truststore
             if ((foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()) && truststore != null) {
-                foundIssuingCertChains = getCertificates(subject, truststore);
+                foundIssuingCertChains = getCertificates(subject, truststore, true);
             }
 
             if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty() 
@@ -939,8 +939,8 @@ public class Merlin extends CryptoBase {
         // Search the keystore for the transmitted public key (direct trust). If not found
         // then search the truststore for the transmitted public key (direct trust)
         //
-        if (!findPublicKeyInKeyStore(publicKey, keystore)
-            && !findPublicKeyInKeyStore(publicKey, truststore)) {
+        if (!findPublicKeyInKeyStore(publicKey, keystore, false)
+            && !findPublicKeyInKeyStore(publicKey, truststore, true)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
@@ -974,12 +974,12 @@ public class Merlin extends CryptoBase {
         }
         Certificate[] certs = null;
         if (keystore != null) {
-            certs = getCertificates(issuerName, serialNumber, keystore);
+            certs = getCertificates(issuerName, serialNumber, keystore, false);
         }
 
         //If we can't find the issuer in the keystore then look at the truststore
         if ((certs == null || certs.length == 0) && truststore != null) {
-            certs = getCertificates(issuerName, serialNumber, truststore);
+            certs = getCertificates(issuerName, serialNumber, truststore, true);
         }
 
         if (certs == null || certs.length == 0) {
@@ -999,9 +999,14 @@ public class Merlin extends CryptoBase {
     private Certificate[] getCertificates(
         Object issuerRDN,
         BigInteger serialNumber,
-        KeyStore store
+        KeyStore store,
+        boolean truststore
     ) throws WSSecurityException {
-        LOG.debug("Searching keystore for cert with issuer {} and serial {}", issuerRDN, serialNumber);
+        String keystore = "keystore";
+        if (truststore) {
+            keystore = "truststore";
+        }
+        LOG.debug("Searching {} for cert with issuer {} and serial {}", keystore, issuerRDN, serialNumber);
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1033,8 +1038,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
-        LOG.debug("No issuer serial match found in keystore");
+
+        LOG.debug("No issuer serial match found in {}", keystore);
         return new Certificate[]{};
     }
 
@@ -1057,12 +1062,12 @@ public class Merlin extends CryptoBase {
         }
         Certificate[] certs = null;
         if (keystore != null) {
-            certs = getCertificates(thumbprint, keystore, sha);
+            certs = getCertificates(thumbprint, keystore, sha, false);
         }
 
         //If we can't find the issuer in the keystore then look at the truststore
         if ((certs == null || certs.length == 0) && truststore != null) {
-            certs = getCertificates(thumbprint, truststore, sha);
+            certs = getCertificates(thumbprint, truststore, sha, true);
         }
 
         if (certs == null || certs.length == 0) {
@@ -1082,9 +1087,14 @@ public class Merlin extends CryptoBase {
     private Certificate[] getCertificates(
         byte[] thumbprint,
         KeyStore store,
-        MessageDigest sha
+        MessageDigest sha,
+        boolean truststore
     ) throws WSSecurityException {
-        LOG.debug("Searching keystore for cert using a SHA-1 thumbprint");
+        String keystore = "keystore";
+        if (truststore) {
+            keystore = "truststore";
+        }
+        LOG.debug("Searching {} for cert using a SHA-1 thumbprint", keystore);
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1119,8 +1129,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
-        LOG.debug("No thumbprint match found in keystore");
+
+        LOG.debug("No thumbprint match found in {}", keystore);
         return new Certificate[]{};
     }
 
@@ -1133,12 +1143,12 @@ public class Merlin extends CryptoBase {
     private X509Certificate[] getX509CertificatesSKI(byte[] skiBytes) throws WSSecurityException {
         Certificate[] certs = null;
         if (keystore != null) {
-            certs = getCertificates(skiBytes, keystore);
+            certs = getCertificates(skiBytes, keystore, false);
         }
 
         //If we can't find the issuer in the keystore then look at the truststore
         if ((certs == null || certs.length == 0) && truststore != null) {
-            certs = getCertificates(skiBytes, truststore);
+            certs = getCertificates(skiBytes, truststore, true);
         }
 
         if (certs == null || certs.length == 0) {
@@ -1157,9 +1167,14 @@ public class Merlin extends CryptoBase {
      */
     private Certificate[] getCertificates(
         byte[] skiBytes,
-        KeyStore store
+        KeyStore store,
+        boolean truststore
     ) throws WSSecurityException {
-        LOG.debug("Searching keystore for cert using Subject Key Identifier bytes");
+        String keystore = "keystore";
+        if (truststore) {
+            keystore = "truststore";
+        }
+        LOG.debug("Searching {} for cert using Subject Key Identifier bytes", keystore);
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1186,8 +1201,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
-        
-        LOG.debug("No SKI match found in keystore");
+
+        LOG.debug("No SKI match found in {}", keystore);
         return new Certificate[]{};
     }
 
@@ -1203,12 +1218,12 @@ public class Merlin extends CryptoBase {
 
         List<Certificate[]> certs = null;
         if (keystore != null) {
-            certs = getCertificates(subject, keystore);
+            certs = getCertificates(subject, keystore, false);
         }
 
         //If we can't find the issuer in the keystore then look at the truststore
         if ((certs == null || certs.isEmpty()) && truststore != null) {
-            certs = getCertificates(subject, truststore);
+            certs = getCertificates(subject, truststore, true);
         }
 
         if (certs == null || certs.isEmpty()) {
@@ -1288,11 +1303,15 @@ public class Merlin extends CryptoBase {
     /**
      * Find the Public Key in a keystore.
      */
-    private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch) {
+    private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch, boolean truststore) {
         if (keyStoreToSearch == null) {
             return false;
         }
-        LOG.debug("Searching keystore for public key {}", publicKey);
+        String keystore = "keystore";
+        if (truststore) {
+            keystore = "truststore";
+        }
+        LOG.debug("Searching {} for public key {}", keystore, publicKey);
         try {
             for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1314,8 +1333,8 @@ public class Merlin extends CryptoBase {
         } catch (KeyStoreException e) {
             return false;
         }
-        
-        LOG.debug("No PublicKey match found in keystore");
+
+        LOG.debug("No PublicKey match found in {}", keystore);
         return false;
     }
 
@@ -1327,9 +1346,13 @@ public class Merlin extends CryptoBase {
      * @return an X509 Certificate (chain)
      * @throws WSSecurityException
      */
-    private List<Certificate[]> getCertificates(Object subjectRDN, KeyStore store)
+    private List<Certificate[]> getCertificates(Object subjectRDN, KeyStore store, boolean truststore)
         throws WSSecurityException {
-        LOG.debug("Searching keystore for cert with Subject {}", subjectRDN);
+        String keystore = "keystore";
+        if (truststore) {
+            keystore = "truststore";
+        }
+        LOG.debug("Searching {} for cert with Subject {}", keystore, subjectRDN);
         List<Certificate[]> foundCerts = new ArrayList<>();
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
@@ -1359,7 +1382,7 @@ public class Merlin extends CryptoBase {
         }
         
         if (foundCerts.isEmpty()) {
-            LOG.debug("No Subject match found in keystore");
+            LOG.debug("No Subject match found in {}", keystore);
         }
         return foundCerts;
     }
