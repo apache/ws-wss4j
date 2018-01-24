@@ -803,6 +803,10 @@ public class WSSecSignature extends WSSecSignatureBase {
         this.customTokenId = customTokenId;
     }
 
+    public String getCustomTokenId() {
+        return this.customTokenId;
+    }
+
     /**
      * Set the encrypted key sha1 value
      * @param encrKeySha1value the encrypted key sha1 value
