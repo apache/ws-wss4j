@@ -5,6 +5,20 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.1
+==============
+
+Bug
+
+    [WSS-540] - Need to load properties outside of classpath
+    [WSS-617] - Allow to configure the SAML Signed Action with "signatureUser"
+    [WSS-618] - Cannot create signature which includes KeyInfo
+    [WSS-620] - The SecurityTokenRefSTRParser should derive the key length from the DerivedKeyToken "Length" parameter
+
+Improvement
+
+    [WSS-619] - Support adding a custom KeyInfo Element for Signature
+
 Release 2.2.0
 ==============
 
