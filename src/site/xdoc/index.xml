@@ -59,18 +59,19 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>January 2018</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 2.2.1
+and 2.1.12.
+Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12341549">
+2.2.1 release notes</a> and the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12341548">2.1.12 release notes</a> for more information.
+</p>
+</li>
+<li>
 <p><b>September 2017</b> - 
 The Apache WSS4J team are pleased to announce the release of versions 2.2.0
 and 2.1.11.
 Please see the <a href="https://issues.apache.org/jira/projects/WSS/versions/12334018">
 2.2.0 release notes</a> and the <a href="https://issues.apache.org/jira/projects/WSS/versions/12340985">2.1.11 release notes</a> for more information.
-</p>
-</li>
-<li>
-<p><b>June 2017</b> - 
-The Apache WSS4J team are pleased to announce the release of version 2.1.10.
-Please see the <a href="https://issues.apache.org/jira/projects/WSS/versions/12340302">
-2.1.10 release notes</a> for more information.
 </p>
 </li>
 </ul>
