@@ -120,8 +120,7 @@ public class Layout extends AbstractSecurityAssertion implements PolicyContainin
         //in contrary to a normalized policy where just one alternative exists
         if (alternatives.hasNext()) {
             List<Assertion> assertions = alternatives.next();
-            for (int i = 0; i < assertions.size(); i++) {
-                Assertion assertion = assertions.get(i);
+            for (Assertion assertion : assertions) {
                 String assertionName = assertion.getName().getLocalPart();
                 LayoutType layoutType = LayoutType.lookUp(assertionName);
                 if (layoutType != null) {

@@ -102,7 +102,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = WSSE11_NS, name = "Salt")
     public JAXBElement<byte[]> createSalt(byte[] value) {
-        return new JAXBElement<byte[]>(_Salt_QNAME, byte[].class, null, ((byte[]) value));
+        return new JAXBElement<byte[]>(_Salt_QNAME, byte[].class, null, (byte[]) value);
     }
 
     /**

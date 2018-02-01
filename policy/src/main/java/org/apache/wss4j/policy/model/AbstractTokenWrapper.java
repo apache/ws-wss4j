@@ -92,8 +92,7 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
         //in contrary to a normalized policy where just one alternative exists
         if (alternatives.hasNext()) {
             List<Assertion> assertions = alternatives.next();
-            for (int i = 0; i < assertions.size(); i++) {
-                Assertion assertion = assertions.get(i);
+            for (Assertion assertion : assertions) {
                 if (assertion instanceof AbstractToken) {
                     if (tokenWrapper.getToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);

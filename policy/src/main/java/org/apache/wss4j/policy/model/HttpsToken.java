@@ -106,8 +106,7 @@ public class HttpsToken extends AbstractToken {
         //in contrary to a normalized policy where just one alternative exists
         if (alternatives.hasNext()) {
             List<Assertion> assertions = alternatives.next();
-            for (int i = 0; i < assertions.size(); i++) {
-                Assertion assertion = assertions.get(i);
+            for (Assertion assertion : assertions) {
                 String assertionName = assertion.getName().getLocalPart();
                 AuthenticationType authenticationType = AuthenticationType.lookUp(assertionName);
                 if (authenticationType != null) {

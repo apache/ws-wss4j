@@ -94,14 +94,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (securityTokenReferenceType != null) {
                 return getSecurityToken(securityTokenReferenceType, crypto, 
                                         ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext,
-                                        ((WSSSecurityProperties)securityProperties));
+                                        (WSSSecurityProperties)securityProperties);
             }
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
             if (keyValueType != null) {
                 return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), 
                                         inboundSecurityContext,
-                                        ((WSSSecurityProperties)securityProperties));
+                                        (WSSSecurityProperties)securityProperties);
             }
 
         } else if (crypto != null && crypto.getDefaultX509Identifier() != null) {
@@ -109,7 +109,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     (WSInboundSecurityContext) inboundSecurityContext, crypto, 
                     ((WSSSecurityProperties)securityProperties).getCallbackHandler(), crypto.getDefaultX509Identifier(),
                     crypto.getDefaultX509Identifier(), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, 
-                    ((WSSSecurityProperties)securityProperties)
+                    (WSSSecurityProperties)securityProperties
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");

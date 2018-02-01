@@ -74,7 +74,7 @@ public class EncryptedAssertionProcessor implements Processor {
                               ((Element)currentChild).getLocalName());
                 Processor proc = request.getWssConfig().getProcessor(el);
                 if (proc != null) {
-                    completeResults.addAll(proc.handleToken(((Element)currentChild), request, wsDocInfo));
+                    completeResults.addAll(proc.handleToken((Element)currentChild, request, wsDocInfo));
                 }
             }
         }

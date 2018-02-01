@@ -90,7 +90,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
 
-        Integer action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION));
+        Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
         if (action != null
             && (WSConstants.UT_NOPASSWORD == action.intValue() || WSConstants.UT == action.intValue())) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
