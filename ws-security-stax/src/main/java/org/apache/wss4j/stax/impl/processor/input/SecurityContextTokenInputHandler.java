@@ -49,7 +49,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
         @SuppressWarnings("unchecked")
         JAXBElement<AbstractSecurityContextTokenType> securityContextTokenTypeJAXBElement =
-                ((JAXBElement<AbstractSecurityContextTokenType>) parseStructure(eventQueue, index, securityProperties));
+                (JAXBElement<AbstractSecurityContextTokenType>) parseStructure(eventQueue, index, securityProperties);
         final AbstractSecurityContextTokenType securityContextTokenType = securityContextTokenTypeJAXBElement.getValue();
         if (securityContextTokenType.getId() == null) {
             securityContextTokenType.setId(IDGenerator.generateID(null));

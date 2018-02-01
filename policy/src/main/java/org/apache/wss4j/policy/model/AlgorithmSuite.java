@@ -672,8 +672,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         //in contrary to a normalized policy where just one alternative exists
         if (alternatives.hasNext()) {
             List<Assertion> assertions = alternatives.next();
-            for (int i = 0; i < assertions.size(); i++) {
-                Assertion assertion = assertions.get(i);
+            for (Assertion assertion : assertions) {
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
                 if (!getVersion().getNamespace().equals(assertionNamespace)) {

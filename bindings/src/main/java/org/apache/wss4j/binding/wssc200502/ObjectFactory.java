@@ -95,7 +95,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = WSSC_NS, name = "Nonce")
     public JAXBElement<byte[]> createNonce(byte[] value) {
-        return new JAXBElement<byte[]>(_Nonce_QNAME, byte[].class, null, ((byte[]) value));
+        return new JAXBElement<byte[]>(_Nonce_QNAME, byte[].class, null, (byte[]) value);
     }
 
     /**

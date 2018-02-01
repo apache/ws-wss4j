@@ -79,7 +79,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                     && securityEvent instanceof TokenSecurityEvent) {
                 @SuppressWarnings("unchecked")
                 TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
-                        ((TokenSecurityEvent<? extends InboundSecurityToken>) securityEvent);
+                        (TokenSecurityEvent<? extends InboundSecurityToken>) securityEvent;
 
                 if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Encryption)) {
                     InboundSecurityToken securityToken = WSSUtils.getRootToken(tokenSecurityEvent.getSecurityToken());

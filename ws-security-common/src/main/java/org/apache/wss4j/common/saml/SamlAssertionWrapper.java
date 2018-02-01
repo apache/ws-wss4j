@@ -396,7 +396,7 @@ public class SamlAssertionWrapper {
         } else if (samlVersion == SAMLVersion.VERSION_11) {
             List<SubjectStatement> subjectStatements = new ArrayList<>();
             org.opensaml.saml.saml1.core.Assertion saml1 =
-                ((org.opensaml.saml.saml1.core.Assertion)samlObject);
+                (org.opensaml.saml.saml1.core.Assertion)samlObject;
             subjectStatements.addAll(saml1.getSubjectStatements());
             subjectStatements.addAll(saml1.getAuthenticationStatements());
             subjectStatements.addAll(saml1.getAttributeStatements());

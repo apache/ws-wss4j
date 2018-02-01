@@ -103,8 +103,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
                                   writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
                                   Constants.ATTR_IGNORABLE, "true");
         }
-        for (int i = 0; i < xPaths.size(); i++) {
-            XPath xPath = xPaths.get(i);
+        for (XPath xPath : xPaths) {
             if (XPath.Version.V1 == xPath.getVersion()) {
                 writer.writeStartElement(
                         getVersion().getSPConstants().getXPathExpression().getPrefix(),

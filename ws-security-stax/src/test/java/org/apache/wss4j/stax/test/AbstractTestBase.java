@@ -234,7 +234,7 @@ public abstract class AbstractTestBase extends Assert {
 
     protected Document doInboundSecurityWithWSS4J(Document document, String action) throws Exception {
         Map<String, Object> messageContext = doInboundSecurityWithWSS4J_1(document, action);
-        return ((Document) messageContext.get(SECURED_DOCUMENT));
+        return (Document) messageContext.get(SECURED_DOCUMENT);
     }
 
     protected Map<String, Object> doInboundSecurityWithWSS4J_1(Document document, String action) throws Exception {
