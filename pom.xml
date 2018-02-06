@@ -44,7 +44,7 @@
             </unsubscribe>
             <post>dev@ws.apache.org</post>
             <archive>
-                http://mail-archives.apache.org/mod_mbox/ws-dev/
+                https://lists.apache.org/list.html?dev@ws.apache.org
             </archive>
         </mailingList>
         <mailingList>
@@ -55,7 +55,7 @@
             </unsubscribe>
             <post>users@ws.apache.org</post>
             <archive>
-                http://mail-archives.apache.org/mod_mbox/ws-users/
+                https://lists.apache.org/list.html?users@ws.apache.org
             </archive>
         </mailingList>
         <mailingList>
@@ -65,7 +65,7 @@
                 commits-unsubscribe@ws.apache.org
             </unsubscribe>
             <archive>
-                http://mail-archives.apache.org/mod_mbox/ws-commits/
+                https://lists.apache.org/list.html?commits@ws.apache.org
             </archive>
         </mailingList>
     </mailingLists>
