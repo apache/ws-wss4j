@@ -19,9 +19,6 @@
 
 package org.apache.wss4j.common.saml.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
@@ -41,6 +38,11 @@ import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSStringBuilder;
 import org.opensaml.saml.common.SAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.ext.saml2delrestrict.Delegate;
@@ -71,13 +73,11 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.core.SubjectLocality;
-import org.opensaml.core.xml.XMLObject;
-import org.opensaml.core.xml.XMLObjectBuilderFactory;
-import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.schema.XSString;
-import org.opensaml.core.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class SAML2ComponentBuilder provides builder methods that can be used
@@ -606,13 +606,18 @@ public final class SAML2ComponentBuilder {
                 );
         }
 
+        NameID subjectConfNameId = null;
+        if (subjectBean.getSubjectConfirmationNameID() != null) {
+            subjectConfNameId = SAML2ComponentBuilder.createNameID(subjectBean.getSubjectConfirmationNameID());
+        }
+
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         if (confirmationMethodStr == null) {
             confirmationMethodStr = SAML2Constants.CONF_SENDER_VOUCHES;
         }
         SubjectConfirmation subjectConfirmation =
             SAML2ComponentBuilder.createSubjectConfirmation(
-                confirmationMethodStr, subjectConfData
+                confirmationMethodStr, subjectConfData, subjectConfNameId
             );
 
         subject.getSubjectConfirmations().add(subjectConfirmation);
@@ -684,7 +689,8 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static SubjectConfirmation createSubjectConfirmation(
         String method,
-        SubjectConfirmationData subjectConfirmationData
+        SubjectConfirmationData subjectConfirmationData,
+        NameID subjectConfirmationNameId
     ) {
         if (subjectConfirmationBuilder == null) {
             subjectConfirmationBuilder = (SAMLObjectBuilder<SubjectConfirmation>)
@@ -694,6 +700,7 @@ public final class SAML2ComponentBuilder {
         SubjectConfirmation subjectConfirmation = subjectConfirmationBuilder.buildObject();
         subjectConfirmation.setMethod(method);
         subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
+        subjectConfirmation.setNameID(subjectConfirmationNameId);
         return subjectConfirmation;
     }
 

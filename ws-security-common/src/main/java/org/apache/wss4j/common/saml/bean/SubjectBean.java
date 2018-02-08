@@ -28,6 +28,7 @@ public class SubjectBean {
     private String subjectConfirmationMethod;
     private KeyInfoBean keyInfo;
     private SubjectConfirmationDataBean subjectConfirmationData;
+    private NameIDBean subjectConfirmationNameID;
 
     /**
      * Constructor SubjectBean creates a new SubjectBean instance.
@@ -209,6 +210,22 @@ public class SubjectBean {
         SubjectConfirmationDataBean subjectConfirmationData
     ) {
         this.subjectConfirmationData = subjectConfirmationData;
+    }
+
+    /**
+     * Get the NameId of the SubjectConfirmation object
+     * @return the NameId of the SubjectConfirmation object
+     */
+    public NameIDBean getSubjectConfirmationNameID() {
+        return subjectConfirmationNameID;
+    }
+
+    /**
+     * Set the NameID of the SubjectConfirmation object
+     * @param subjectConfirmationNameID the NameID of the SubjectConfirmation object
+     */
+    public void setSubjectConfirmationNameID(NameIDBean subjectConfirmationNameID) {
+        this.subjectConfirmationNameID = subjectConfirmationNameID;
     }
 
     /**
