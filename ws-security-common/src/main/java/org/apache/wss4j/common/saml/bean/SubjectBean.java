@@ -171,7 +171,7 @@ public class SubjectBean {
     public String getSubjectNameSPProvidedID() {
         return nameID.getSPProvidedID();
     }
-    
+
     public void setSubjectNameSPProvidedID(String subjectNameSPProvidedID) {
         nameID.setSPProvidedID(subjectNameSPProvidedID);
     }
@@ -269,6 +269,13 @@ public class SubjectBean {
             return false;
         }
 
+        if (subjectConfirmationNameID == null && that.subjectConfirmationNameID != null) {
+            return false;
+        } else if (subjectConfirmationNameID != null
+            && !subjectConfirmationNameID.equals(that.subjectConfirmationNameID)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -286,6 +293,9 @@ public class SubjectBean {
         }
         if (subjectConfirmationData != null) {
             result = 31 * result + subjectConfirmationData.hashCode();
+        }
+        if (subjectConfirmationNameID != null) {
+            result = 31 * result + subjectConfirmationNameID.hashCode();
         }
         return result;
     }
