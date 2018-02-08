@@ -735,9 +735,9 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
-        Document unsignedDoc = wsSign.build(samlAssertion);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
