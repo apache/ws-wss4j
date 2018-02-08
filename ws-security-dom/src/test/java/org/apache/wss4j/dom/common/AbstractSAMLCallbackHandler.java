@@ -30,6 +30,7 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
@@ -81,6 +82,15 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private String issuerPassword;
     private Element assertionAdviceElement;
     private Element keyInfoElement;
+    protected NameIDBean subjectConfirmationNameID;
+
+    public NameIDBean getSubjectConfirmationNameID() {
+        return subjectConfirmationNameID;
+    }
+
+    public void setSubjectConfirmationNameID(NameIDBean subjectConfirmationNameID) {
+        this.subjectConfirmationNameID = subjectConfirmationNameID;
+    }
 
     public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
         this.subjectConfirmationData = subjectConfirmationData;
