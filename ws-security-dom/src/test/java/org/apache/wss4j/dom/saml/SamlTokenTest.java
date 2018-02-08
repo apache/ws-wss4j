@@ -40,6 +40,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -699,6 +700,52 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("http://recipient.apache.org"));
+
+        WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
+     * a NameID in the Subject (see https://issues.apache.org/jira/browse/WSS-622)
+     */
+    @Test
+    public void testSAML2SubjectConfirmationNameID() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        NameIDBean nameID = new NameIDBean();
+        nameID.setNameIDFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified");
+        nameID.setNameQualifier("confirmationNameQualifier");
+        nameID.setNameValue("confirmationNameQualifierValue");
+        callbackHandler.setSubjectConfirmationNameID(nameID);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("confirmationNameQualifierValue"));
 
         WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
         WSSecurityEngineResult actionResult =

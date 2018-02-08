@@ -81,6 +81,9 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 if (subjectNameIDFormat != null) {
                     subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
                 }
+                if (subjectConfirmationNameID != null) {
+                    subjectBean.setSubjectConfirmationNameID(subjectConfirmationNameID);
+                }
                 subjectBean.setSubjectConfirmationData(subjectConfirmationData);
                 if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     try {
