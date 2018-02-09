@@ -725,6 +725,7 @@ public class SamlTokenTest extends org.junit.Assert {
         nameID.setNameIDFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified");
         nameID.setNameQualifier("confirmationNameQualifier");
         nameID.setNameValue("confirmationNameQualifierValue");
+        nameID.setSPNameQualifier("spNameQualifier");
         callbackHandler.setSubjectConfirmationNameID(nameID);
 
         SAMLCallback samlCallback = new SAMLCallback();
