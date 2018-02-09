@@ -126,6 +126,12 @@ public class NameIDBean {
             return false;
         }
 
+        if (spNameQualifier == null && that.spNameQualifier != null) {
+            return false;
+        } else if (spNameQualifier != null && !spNameQualifier.equals(that.spNameQualifier)) {
+            return false;
+        }
+
         if (spProvidedID == null && that.spProvidedID != null) {
             return false;
         } else if (spProvidedID != null && !spProvidedID.equals(that.spProvidedID)) {
@@ -149,6 +155,9 @@ public class NameIDBean {
         }
         if (nameQualifier != null) {
             result = 31 * result + nameQualifier.hashCode();
+        }
+        if (spNameQualifier != null) {
+            result = 31 * result + spNameQualifier.hashCode();
         }
         if (spProvidedID != null) {
             result = 31 * result + spProvidedID.hashCode();
