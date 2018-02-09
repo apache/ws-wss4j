@@ -723,6 +723,7 @@ public final class SAML2ComponentBuilder {
         NameIDBean nameIDBean = new NameIDBean();
         nameIDBean.setNameIDFormat(subject.getSubjectNameIDFormat());
         nameIDBean.setNameQualifier(subject.getSubjectNameQualifier());
+        nameIDBean.setSPNameQualifier(subject.getSubjectNameSPNameQualifier());
         nameIDBean.setSPProvidedID(subject.getSubjectNameSPProvidedID());
         nameIDBean.setNameValue(subject.getSubjectName());
         return createNameID(nameIDBean);
@@ -738,6 +739,7 @@ public final class SAML2ComponentBuilder {
         nameID.setNameQualifier(nameIDBean.getNameQualifier());
         nameID.setFormat(nameIDBean.getNameIDFormat());
         nameID.setValue(nameIDBean.getNameValue());
+        nameID.setSPNameQualifier(nameIDBean.getSPNameQualifier());
         nameID.setSPProvidedID(nameIDBean.getSPProvidedID());
         return nameID;
     }
