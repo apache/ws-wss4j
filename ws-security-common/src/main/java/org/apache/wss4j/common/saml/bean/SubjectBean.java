@@ -168,6 +168,14 @@ public class SubjectBean {
         nameID.setNameIDFormat(subjectNameIDFormat);
     }
 
+    public String getSubjectNameSPNameQualifier() {
+        return nameID.getSPNameQualifier();
+    }
+
+    public void setSubjectNameSPNameQualifier(String subjectNameSPNameQualifier) {
+        nameID.setSPNameQualifier(subjectNameSPNameQualifier);
+    }
+
     public String getSubjectNameSPProvidedID() {
         return nameID.getSPProvidedID();
     }

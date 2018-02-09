@@ -26,6 +26,7 @@ public class NameIDBean {
     private String nameValue;
     private String nameIDFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     private String nameQualifier;
+    private String spNameQualifier;
     private String spProvidedID;
 
     /**
@@ -72,6 +73,14 @@ public class NameIDBean {
 
     public void setNameQualifier(String nameQualifier) {
         this.nameQualifier = nameQualifier;
+    }
+
+    public String getSPNameQualifier() {
+        return spNameQualifier;
+    }
+
+    public void setSPNameQualifier(String spNameQualifier) {
+        this.spNameQualifier = spNameQualifier;
     }
 
     public String getSPProvidedID() {
