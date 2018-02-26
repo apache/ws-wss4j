@@ -67,7 +67,7 @@ public class IssuedToken extends AbstractToken {
         }
 
         if (requestSecurityTokenTemplate == null && that.requestSecurityTokenTemplate != null
-            || requestSecurityTokenTemplate != null && requestSecurityTokenTemplate == null) {
+            || requestSecurityTokenTemplate != null && that.requestSecurityTokenTemplate == null) {
             return false;
         }
 

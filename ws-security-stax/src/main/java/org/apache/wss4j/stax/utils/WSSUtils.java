@@ -131,7 +131,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             sha.reset();
             sha.update(b4);
-            return new String(Base64.getMimeEncoder().encodeToString(sha.digest()));
+            return Base64.getMimeEncoder().encodeToString(sha.digest());
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         }

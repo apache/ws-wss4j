@@ -336,6 +336,8 @@ public class KerberosSecurity extends BinarySecurity {
         if (secretKey != null) {
             hashCode *= 31 + secretKey.hashCode();
         }
-        return hashCode *= 31 + super.hashCode();
+        hashCode *= 31 + super.hashCode();
+
+        return hashCode;
     }
 }

@@ -1013,8 +1013,7 @@ public class SamlAssertionWrapper {
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
-                "SamlAssertionWrapper: found unexpected type "
-                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+                "SamlAssertionWrapper: found unexpected type " + xmlObject.getClass().getName()
             );
         }
 
