@@ -100,7 +100,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         }
         
         if (issuer == null && that.issuer != null
-            || issuer != null && issuer == null) {
+            || issuer != null && that.issuer == null) {
             return false;
         }
         
@@ -110,7 +110,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         }
         
         if (claims == null && that.claims != null
-            || claims != null && claims == null) {
+            || claims != null && that.claims == null) {
             return false;
         }
         
