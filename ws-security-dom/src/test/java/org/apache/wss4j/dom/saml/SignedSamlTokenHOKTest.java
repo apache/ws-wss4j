@@ -817,14 +817,14 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(userCrypto, samlAssertion, null, null, null);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
