@@ -63,6 +63,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -794,6 +795,70 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2SubjectWithComment() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setIssuer("www.example.com");
+        String principal = "uid=joe,ou=people<!---->o=example.com";
+        callbackHandler.setSubjectName(principal);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document signedDoc =
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML 2 Authn Assertion (key holder):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256"));
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
+
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
+
+        // Test we processed a SAML assertion
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
+
+        // Test we processed a signature (SOAP body)
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+
+        WSDataRef wsDataRef = refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+
+        Principal receivedPrincipal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertEquals(principal, receivedPrincipal.getName());
     }
 
     /**

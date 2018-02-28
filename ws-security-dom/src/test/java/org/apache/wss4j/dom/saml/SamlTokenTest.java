@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.saml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.Key;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1327,6 +1328,28 @@ public class SamlTokenTest extends org.junit.Assert {
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertFalse(receivedSamlAssertion.isSigned());
+    }
+
+    @Test
+    public void testSAML2SubjectWithComment() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        String principal = "uid=joe,ou=people<!---->o=example.com";
+        callbackHandler.setSubjectName(principal);
+
+        WSHandlerResult results =
+            createAndVerifyMessage(callbackHandler, true);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+
+        Principal receivedPrincipal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertEquals(principal, receivedPrincipal.getName());
     }
 
     private void encryptElement(
