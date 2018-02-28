@@ -84,6 +84,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private Element keyInfoElement;
     protected NameIDBean subjectConfirmationNameID;
 
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
     public NameIDBean getSubjectConfirmationNameID() {
         return subjectConfirmationNameID;
     }
