@@ -444,6 +444,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 try {
                     DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
                     outputDOMElement(samlAssertionWrapper.toDOM(db.newDocument()), subOutputProcessorChain);
+                    XMLUtils.repoolDocumentBuilder(db);
                 } catch (ParserConfigurationException ex) {
                     LOG.debug("Error writing out SAML Assertion", ex);
                     throw new XMLSecurityException(ex);

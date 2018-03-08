@@ -41,7 +41,7 @@ public class SOAPUtil {
         +       "</add>"
         +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
-    
+
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
 
@@ -66,8 +66,8 @@ public class SOAPUtil {
             return builder.parse(in);
         }
     }
-    
-    
+
+
     /**
      * Convert an SOAP Envelope as a String to a javax.xml.soap.SOAPPart.
      */
