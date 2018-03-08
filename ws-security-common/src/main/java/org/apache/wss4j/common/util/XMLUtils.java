@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -137,6 +138,7 @@ public final class XMLUtils {
         DOMSource source = new DOMSource(element);
         StreamResult result = new StreamResult(out);
         TransformerFactory transFactory = TransformerFactory.newInstance();
+        transFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transFactory.newTransformer();
         transformer.transform(source, result);
     }

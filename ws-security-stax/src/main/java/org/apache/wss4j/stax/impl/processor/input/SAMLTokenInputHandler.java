@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -83,6 +83,7 @@ import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenUsage;
+import org.apache.xml.security.utils.XMLUtils;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.opensaml.security.credential.BasicCredential;
@@ -100,13 +101,10 @@ import org.w3c.dom.Node;
  */
 public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-
     private static final List<QName> SAML1_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
     private static final List<QName> SAML2_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
 
     static {
-        DOC_BUILDER_FACTORY.setNamespaceAware(true);
         SAML1_TOKEN_PATH.add(WSSConstants.TAG_SAML_ASSERTION);
         SAML2_TOKEN_PATH.add(WSSConstants.TAG_SAML2_ASSERTION);
     }
@@ -446,9 +444,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     @Override
     protected <T> T parseStructure(Deque<XMLSecEvent> eventDeque, int index, XMLSecurityProperties securityProperties)
             throws XMLSecurityException {
-        Document document;
+        Document document = null;
         try {
-            document = DOC_BUILDER_FACTORY.newDocumentBuilder().newDocument();
+            DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
+            document = db.newDocument();
+            XMLUtils.repoolDocumentBuilder(db);
         } catch (ParserConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
