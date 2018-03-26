@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<S12:Envelope xmlns:S12="http://www.w3.org/2003/05/soap-envelope" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ebbp="http://docs.oasis-open.org/ebxml-bp/ebbp-signals-2.0" xmlns:eb="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	<S12:Header>
+		<eb:Messaging S12:mustUnderstand="true">
+			<eb:UserMessage>
+				<eb:MessageInfo>
+					<eb:Timestamp>2018-03-26T11:30:29.769+02:00</eb:Timestamp>
+					<eb:MessageId>MID-1522056240506@ponton.xp</eb:MessageId>
+				</eb:MessageInfo>
+				<eb:PartyInfo>
+					<eb:From>
+						<eb:PartyId type="AS4-Name">pontonxp</eb:PartyId>
+						<eb:Role>http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/defaultRole</eb:Role>
+					</eb:From>
+					<eb:To>
+						<eb:PartyId type="AS4-Name">domibus_plain</eb:PartyId>
+						<eb:Role>http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/defaultRole</eb:Role>
+					</eb:To>
+				</eb:PartyInfo>
+				<eb:CollaborationInfo>
+					<eb:AgreementRef>http://domibus.eu/agreement/plain</eb:AgreementRef>
+					<eb:Service type="http://docs.oasis-open.org/ebxml-msg/as4/200902/service">sendMessageService</eb:Service>
+					<eb:Action>http://docs.oasis-open.org/ebxml-msg/as4/200902/action</eb:Action>
+					<eb:ConversationId>MID-1522056240506@ponton.xp</eb:ConversationId>
+				</eb:CollaborationInfo>
+				<eb:PayloadInfo>
+					<eb:PartInfo href="cid:payload-1522056629904">
+						<eb:Schema location="http://www.efet.org/schemas/V3R2/EFET-BCN-V3R2.xsd" version="3.20"/>
+						<eb:Description xml:lang="en">Payload</eb:Description>
+						<eb:PartProperties>
+							<eb:Property name="MimeType">text/xml</eb:Property>
+						</eb:PartProperties>
+					</eb:PartInfo>
+				</eb:PayloadInfo>
+			</eb:UserMessage>
+		</eb:Messaging>
+	</S12:Header>
+	<S12:Body/>
+</S12:Envelope>
