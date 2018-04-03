@@ -20,12 +20,21 @@
 package org.apache.wss4j.dom.message;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.XMLValidateContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -34,9 +43,9 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -89,11 +98,19 @@ public class SignaturePrefixListTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
-        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType =
-            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
-        assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
+        Element receivedSignature = (Element)actionResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+        assertNotNull(receivedSignature);
+
+        // Check PrefixList
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("16c73ab6-b892-458f-abf5-2f875f74882e");
+        XMLValidateContext context = new DOMValidateContext(crypto.getX509Certificates(cryptoType)[0].getPublicKey(), receivedSignature);
+        XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
+
+        ExcC14NParameterSpec spec = (ExcC14NParameterSpec)xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
+        List<String> expectedPrefixes = new ArrayList<>(Arrays.asList("S12", "ds", "eb", "ebbp", "ns5"));
+        assertEquals(expectedPrefixes, spec.getPrefixList());
     }
 
     private WSHandlerResult verify(Document doc) throws Exception {

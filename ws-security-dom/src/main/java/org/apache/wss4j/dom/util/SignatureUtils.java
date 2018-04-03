@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -71,7 +73,7 @@ public final class SignatureUtils {
      * Get the List of inclusive prefixes from the DOM Element argument
      */
     public static List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List<String> result = new ArrayList<>();
+        Set<String> result = new TreeSet<>();
         Node parent = target;
         while (parent.getParentNode() != null
             && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
@@ -112,7 +114,7 @@ public final class SignatureUtils {
             }
         }
 
-        return result;
+        return new ArrayList<String>(result);
     }
 
     /**
