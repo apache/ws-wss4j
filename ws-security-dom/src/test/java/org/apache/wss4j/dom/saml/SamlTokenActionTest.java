@@ -138,8 +138,8 @@ public class SamlTokenActionTest extends org.junit.Assert {
 
         verify(doc, callbackHandler);
     }
-    
-    
+
+
     @Test
     public void testSignedAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();

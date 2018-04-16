@@ -65,15 +65,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * WS-Security Utility methods. <p/>
  */
 public final class WSSecurityUtil {
-    
+
     private static boolean isJava9SAAJ = false;
-        
+
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
-    
+
     static {
-        if (System.getProperty("java.version").startsWith("9")) {
-            
+        if (System.getProperty("java.version").startsWith("9") || System.getProperty("java.version").startsWith("10")) {
+
             try {
                 Method[] methods = WSSecurityUtil.class.getClassLoader().
                     loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
@@ -93,8 +93,8 @@ public final class WSSecurityUtil {
     private WSSecurityUtil() {
         // Complete
     }
-    
-    
+
+
     public static Element getSOAPHeader(Document doc) {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         return
@@ -288,8 +288,8 @@ public final class WSSecurityUtil {
         String nsUri = parent.getNamespaceURI();
         return parent.getOwnerDocument().createElementNS(nsUri, qName);
     }
-    
-    
+
+
 
 
     /**
@@ -376,12 +376,12 @@ public final class WSSecurityUtil {
                         doc.importNode(header, true);
                         header = (Element)getDomElement(header);
                         header = prependChildElement(envelope, header);
-                        
+
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
-                    
+
                 } else {
                     header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
                     header = prependChildElement(envelope, header);
@@ -431,7 +431,7 @@ public final class WSSecurityUtil {
             foundSecurityHeader.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
             doc.importNode(foundSecurityHeader, true);
             foundSecurityHeader = (Element)getDomElement(foundSecurityHeader);
-            
+
             return prependChildElement(header, foundSecurityHeader);
         }
         return null;
@@ -607,12 +607,12 @@ public final class WSSecurityUtil {
             }
         }
     }
-    
+
     /**
      * Register the javax.xml.soap.Node with new Cloned Dom Node with java9
      * @param doc The SOAPDocumentImpl
      * @param clonedElement The cloned Element
-     * @return new clonedElement which already associated with the SAAJ Node 
+     * @return new clonedElement which already associated with the SAAJ Node
      * @throws WSSecurityException
      */
     public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
@@ -624,16 +624,16 @@ public final class WSSecurityUtil {
         }
         return clonedElement;
     }
-    
+
     /**
-     * Try to get the DOM Node from the SAAJ Node with JAVA9 
+     * Try to get the DOM Node from the SAAJ Node with JAVA9
      * @param node The original node we need check
      * @return The DOM node
      * @throws WSSecurityException
      */
     private static Node getDomElement(Node node) throws WSSecurityException {
         if (node != null && isJava9SAAJ) {
-            
+
             try {
                 Method method = node.getClass().getMethod("getDomElement");
                 node = (Node)method.invoke(node);

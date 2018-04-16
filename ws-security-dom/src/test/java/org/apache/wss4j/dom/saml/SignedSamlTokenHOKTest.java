@@ -51,6 +51,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -727,7 +728,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         // KeyValue
         KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
-        List<Object> keyInfoContent = Arrays.asList(x509Data, keyValue);
+        List<? extends XMLStructure> keyInfoContent = Arrays.asList(x509Data, keyValue);
         KeyInfo keyInfo = keyInfoFactory.newKeyInfo(keyInfoContent, null);
 
         // Marshal the KeyInfo to DOM
