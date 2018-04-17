@@ -27,7 +27,6 @@ import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +78,7 @@ import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurit
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.utils.XMLUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
@@ -2189,7 +2189,7 @@ public class EncDecryptionTest extends AbstractTestBase {
                 securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2009/xmlenc11#rsa-oaep");
                 securityProperties.setEncryptionKeyTransportDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#sha384");
                 securityProperties.setEncryptionKeyTransportMGFAlgorithm("http://www.w3.org/2009/xmlenc11#mgf1sha384");
-                securityProperties.setEncryptionKeyTransportOAEPParams(Base64.getMimeDecoder().decode("ZHVtbXkxMjM=".getBytes(StandardCharsets.UTF_8)));
+                securityProperties.setEncryptionKeyTransportOAEPParams(XMLUtils.decode("ZHVtbXkxMjM=".getBytes(StandardCharsets.UTF_8)));
 
                 InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
                 baos = doOutboundSecurity(securityProperties, sourceDocument);

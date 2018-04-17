@@ -28,7 +28,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -301,7 +300,7 @@ public class UsernameToken {
             return;
         }
         elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
-        elementNonce.appendChild(doc.createTextNode(Base64.getMimeEncoder().encodeToString(nonceValue)));
+        elementNonce.appendChild(doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(nonceValue)));
         elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
     }
@@ -325,7 +324,7 @@ public class UsernameToken {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Instant currentTime = timeSource.now();
-        
+
         DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
         elementCreated.appendChild(doc.createTextNode(currentTime.atZone(ZoneOffset.UTC).format(formatter)));
         element.appendChild(elementCreated);
@@ -352,7 +351,7 @@ public class UsernameToken {
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-        elementSalt.appendChild(doc.createTextNode(Base64.getMimeEncoder().encodeToString(saltValue)));
+        elementSalt.appendChild(doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
     }
@@ -450,7 +449,7 @@ public class UsernameToken {
     public byte[] getSalt() throws WSSecurityException {
         String salt = XMLUtils.getElementText(elementSalt);
         if (salt != null) {
-            return Base64.getMimeDecoder().decode(salt);
+            return org.apache.xml.security.utils.XMLUtils.decode(salt);
         }
         return null;
     }
@@ -510,7 +509,8 @@ public class UsernameToken {
         try {
             if (hashed) {
                 if (passwordsAreEncoded) {
-                    node.setData(doPasswordDigest(getNonce(), getCreated(), Base64.getMimeDecoder().decode(pwd)));
+                    node.setData(doPasswordDigest(getNonce(), getCreated(),
+                                                  org.apache.xml.security.utils.XMLUtils.decode(pwd)));
                 } else {
                     node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
                 }
@@ -567,7 +567,7 @@ public class UsernameToken {
     public static String doPasswordDigest(String nonce, String created, byte[] password) {
         String passwdDigest = null;
         try {
-            byte[] b1 = nonce != null ? Base64.getMimeDecoder().decode(nonce) : new byte[0];
+            byte[] b1 = nonce != null ? org.apache.xml.security.utils.XMLUtils.decode(nonce) : new byte[0];
             byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
             byte[] b3 = password;
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
@@ -581,7 +581,7 @@ public class UsernameToken {
             System.arraycopy(b3, 0, b4, offset, b3.length);
 
             byte[] digestBytes = KeyUtils.generateDigest(b4);
-            passwdDigest = Base64.getMimeEncoder().encodeToString(digestBytes);
+            passwdDigest = org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes);
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);
         }
@@ -678,7 +678,8 @@ public class UsernameToken {
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
-            return UsernameTokenUtil.generateDerivedKey(Base64.getMimeDecoder().decode(rawPassword), salt, iteration);
+            return UsernameTokenUtil.generateDerivedKey(org.apache.xml.security.utils.XMLUtils.decode(rawPassword),
+                                                        salt, iteration);
         } else {
             return UsernameTokenUtil.generateDerivedKey(rawPassword, salt, iteration);
         }
@@ -706,7 +707,7 @@ public class UsernameToken {
             new WSUsernameTokenPrincipalImpl(getName(), isHashed());
         String nonce = getNonce();
         if (nonce != null) {
-            principal.setNonce(Base64.getMimeDecoder().decode(nonce));
+            principal.setNonce(org.apache.xml.security.utils.XMLUtils.decode(nonce));
         }
         principal.setPassword(getPassword());
         principal.setCreatedTime(getCreated());

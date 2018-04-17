@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -442,7 +441,7 @@ public class SignatureProcessor implements Processor {
                     if (xopURI != null) {
                         // Store the bytes in the attachment to calculate the signature
                         byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
-                        String encodedBytes = Base64.getMimeEncoder().encodeToString(attachmentBytes);
+                        String encodedBytes = org.apache.xml.security.utils.XMLUtils.encodeToString(attachmentBytes);
 
                         Node newCipherValueChild =
                             includeElement.getOwnerDocument().createTextNode(encodedBytes);

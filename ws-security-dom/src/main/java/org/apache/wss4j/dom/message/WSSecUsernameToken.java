@@ -21,8 +21,6 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
 
-import java.util.Base64;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
@@ -120,7 +118,8 @@ public class WSSecUsernameToken extends WSSecBase {
             return null;
         }
         if (passwordsAreEncoded) {
-            return UsernameTokenUtil.generateDerivedKey(Base64.getMimeDecoder().decode(password), saltValue, iteration);
+            return UsernameTokenUtil.generateDerivedKey(org.apache.xml.security.utils.XMLUtils.decode(password),
+                                                        saltValue, iteration);
         } else {
             return UsernameTokenUtil.generateDerivedKey(password, saltValue, iteration);
         }

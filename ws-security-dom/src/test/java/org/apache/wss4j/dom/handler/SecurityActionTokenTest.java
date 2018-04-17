@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.handler;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -150,7 +149,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         verify(doc, secretKeyCallbackHandler);
@@ -247,7 +246,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         verify(doc, secretKeyCallbackHandler);
@@ -360,7 +359,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         verify(doc, secretKeyCallbackHandler);
@@ -455,7 +454,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         CombinedCallbackHandler combinedCallbackHandler =
@@ -595,7 +594,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         verify(doc, secretKeyCallbackHandler);

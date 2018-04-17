@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.util.Base64;
-
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -32,6 +30,7 @@ import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl
 import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
@@ -50,7 +49,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                     new Object[] {binarySecurityTokenType.getEncodingType()});
         }
 
-        byte[] securityTokenData = Base64.getMimeDecoder().decode(binarySecurityTokenType.getValue());
+        byte[] securityTokenData = XMLUtils.decode(binarySecurityTokenType.getValue());
 
         try {
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {

@@ -54,7 +54,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.List;
 
 public final class EncryptionUtils {
@@ -557,6 +556,6 @@ public final class EncryptionUtils {
         if (text == null) {
             return null;
         }
-        return Base64.getMimeDecoder().decode(text);
+        return org.apache.xml.security.utils.XMLUtils.decode(text);
     }
 }

@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Base64;
 
 import javax.xml.namespace.QName;
 
@@ -191,7 +190,7 @@ public class SecurityTokenReference {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
             );
         }
-        Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
+        Text text = doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
 
         createKeyIdentifier(doc, X509_V3_TYPE, text, true);
     }
@@ -224,7 +223,7 @@ public class SecurityTokenReference {
         }
         byte[] data = skiCrypto.getSKIBytesFromCert(cert);
 
-        Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
+        Text text = doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
         createKeyIdentifier(doc, SKI_URI, text, true);
     }
 
@@ -250,7 +249,7 @@ public class SecurityTokenReference {
         }
         try {
             byte[] encodedBytes = KeyUtils.generateDigest(encodedCert);
-            Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(encodedBytes));
+            Text text = doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes));
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
@@ -334,7 +333,7 @@ public class SecurityTokenReference {
         } else if (THUMB_URI.equals(value)) {
             String text = XMLUtils.getElementText(getFirstElement());
             if (text != null) {
-                byte[] thumb = Base64.getMimeDecoder().decode(text);
+                byte[] thumb = org.apache.xml.security.utils.XMLUtils.decode(text);
 
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
                 cryptoType.setBytes(thumb);
@@ -397,7 +396,7 @@ public class SecurityTokenReference {
         }
         String text = XMLUtils.getElementText(getFirstElement());
         if (text != null) {
-            skiBytes = Base64.getMimeDecoder().decode(text);
+            skiBytes = org.apache.xml.security.utils.XMLUtils.decode(text);
         }
         return skiBytes;
     }

@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
@@ -163,7 +162,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         }
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 

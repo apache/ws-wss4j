@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -409,7 +408,7 @@ public class KerberosTest {
         sign.setSecretKey(keyData);
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-        sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
+        sign.setCustomTokenId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
         Document signedDoc = sign.build(null);
 
@@ -633,7 +632,7 @@ public class KerberosTest {
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-        builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
+        builder.setEncKeyId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
         Document encryptedDoc = builder.build(null);
 
@@ -882,7 +881,7 @@ public class KerberosTest {
             sign.setSecretKey(keyData);
 
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-            sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
+            sign.setCustomTokenId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
             sign.build(null);
 
@@ -1144,7 +1143,7 @@ public class KerberosTest {
             builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-            builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
+            builder.setEncKeyId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
             builder.build(null);
 

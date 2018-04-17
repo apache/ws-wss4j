@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.transform;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
@@ -129,7 +128,7 @@ public final class STRTransformUtil {
         if (secRefEncType != null) {
             elem.setAttributeNS(null, "EncodingType", secRefEncType);
         }
-        Text certText = doc.createTextNode(Base64.getMimeEncoder().encodeToString(data)); // no line wrap
+        Text certText = doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data)); // no line wrap
         elem.appendChild(certText);
         return elem;
     }

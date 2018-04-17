@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.util.Base64;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
@@ -37,6 +35,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * This class validates a processed UsernameToken, where Username/password validation is delegated
@@ -107,7 +106,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
             if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "badTokenType01");
             }
-            nonceVal = Base64.getMimeDecoder().decode(encodedNonce.getValue());
+            nonceVal = XMLUtils.decode(encodedNonce.getValue());
         }
 
         final AttributedDateTime attributedDateTimeCreated =

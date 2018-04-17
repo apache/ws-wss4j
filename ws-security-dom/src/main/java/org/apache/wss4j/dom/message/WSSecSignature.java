@@ -24,7 +24,6 @@ import java.security.Provider;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -256,7 +255,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     secRef.setKeyIdentifierEncKeySHA1(encrKeySha1value);
                 } else {
                     byte[] digestBytes = KeyUtils.generateDigest(secretKey);
-                    secRef.setKeyIdentifierEncKeySHA1(Base64.getMimeEncoder().encodeToString(digestBytes));
+                    secRef.setKeyIdentifierEncKeySHA1(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
                 }
                 secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 break;

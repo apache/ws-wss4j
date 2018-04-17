@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message;
 
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 import javax.crypto.SecretKey;
 
@@ -38,6 +37,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -223,7 +223,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
 
         dkt.setOffset(offset);
         dkt.setLength(length);
-        dkt.setNonce(Base64.getMimeEncoder().encodeToString(nonce));
+        dkt.setNonce(XMLUtils.encodeToString(nonce));
         dkt.setID(dktId);
 
         if (strElem == null) {

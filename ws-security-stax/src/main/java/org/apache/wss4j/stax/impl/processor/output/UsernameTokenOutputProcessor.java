@@ -33,6 +33,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.XMLUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -41,7 +42,6 @@ import javax.xml.stream.XMLStreamException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
@@ -211,7 +211,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
                 if (salt != null) {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT, true, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.getMimeEncoder().encodeToString(this.salt));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, XMLUtils.encodeToString(this.salt));
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT);
 
                     if (iterations > 0) {
@@ -226,7 +226,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                                    Base64.getMimeEncoder().encodeToString(this.nonceValue));
+                                                    XMLUtils.encodeToString(this.nonceValue));
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE);
                 }
 

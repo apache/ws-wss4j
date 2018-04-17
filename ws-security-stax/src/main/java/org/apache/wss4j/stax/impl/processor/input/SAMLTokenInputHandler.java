@@ -22,7 +22,6 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -344,7 +343,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     Key key = super.getKey(algorithmURI, algorithmUsage, correlationID);
                     if (key == null) {
                         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                        key = new SecretKeySpec(Base64.getMimeDecoder().decode(stringBuilder.toString()), algoFamily);
+                        key = new SecretKeySpec(XMLUtils.decode(stringBuilder.toString()), algoFamily);
                         setSecretKey(algorithmURI, key);
                     }
                     return key;

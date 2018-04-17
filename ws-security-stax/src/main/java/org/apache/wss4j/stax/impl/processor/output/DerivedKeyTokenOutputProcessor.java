@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -50,6 +49,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -178,7 +178,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor =
                     new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length,
-                                                            Base64.getMimeEncoder().encodeToString(nonce),
+                                                            XMLUtils.encodeToString(nonce),
                                                             ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace(),
                                                             wrappingSecurityToken.getSha1Identifier());
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());

@@ -22,7 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,7 @@ import org.apache.xml.security.stax.impl.SignaturePartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractSignatureOutputProcessor;
 import org.apache.xml.security.stax.impl.util.DigestOutputStream;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
@@ -219,7 +219,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                     }
 
-                    String calculatedDigest = Base64.getMimeEncoder().encodeToString(digestOutputStream.getDigestValue());
+                    String calculatedDigest = XMLUtils.encodeToString(digestOutputStream.getDigestValue());
                     LOG.debug("Calculated Digest: {}", calculatedDigest);
 
                     signaturePartDef.setDigestValue(calculatedDigest);

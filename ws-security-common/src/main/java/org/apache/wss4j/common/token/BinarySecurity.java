@@ -22,7 +22,6 @@ package org.apache.wss4j.common.token;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.UUID;
 
 import org.apache.wss4j.common.WSS4JConstants;
@@ -200,7 +199,7 @@ public class BinarySecurity {
             return null;
         }
 
-        return Base64.getMimeDecoder().decode(text);
+        return org.apache.xml.security.utils.XMLUtils.decode(text);
     }
 
     /**
@@ -237,7 +236,7 @@ public class BinarySecurity {
             }
         } else {
             Text node = getFirstNode();
-            node.setData(Base64.getMimeEncoder().encodeToString(data));
+            node.setData(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
             setRawToken(data);
         }
     }
@@ -257,7 +256,7 @@ public class BinarySecurity {
             throw new IllegalArgumentException("data == null");
         }
         Text node = getFirstNode();
-        node.setData(Base64.getMimeEncoder().encodeToString(data));
+        node.setData(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
     }
 
     /**

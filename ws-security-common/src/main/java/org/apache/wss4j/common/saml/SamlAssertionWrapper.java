@@ -23,7 +23,6 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -783,7 +782,7 @@ public class SamlAssertionWrapper {
                     XMLUtils.getNextElement(signedInfoElem.getNextSibling());
                 if (signatureValueElement != null) {
                     String base64Input = XMLUtils.getFullTextChildrenFromElement(signatureValueElement);
-                    return Base64.getMimeDecoder().decode(base64Input);
+                    return XMLUtils.decode(base64Input);
                 }
             }
         }

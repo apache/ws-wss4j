@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +56,7 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.utils.XMLUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -832,7 +832,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         byte[] nonceValue;
         try {
             nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + Base64.getEncoder().encodeToString(nonceValue);
+            String cacheKey = key + XMLUtils.encodeToString(nonceValue);
             return replayCacheFactory.newReplayCache(cacheKey, null);
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);

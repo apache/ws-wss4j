@@ -29,7 +29,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -67,6 +66,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * Factory to create InboundSecurityToken Objects from keys in XML
@@ -253,7 +253,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
         byte[] binaryContent = null;
         if (WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
-            binaryContent = Base64.getMimeDecoder().decode(keyIdentifierType.getValue());
+            binaryContent = XMLUtils.decode(keyIdentifierType.getValue());
         } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
             if (encodingType == null) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3070);

@@ -23,7 +23,6 @@ import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -214,7 +213,7 @@ public class SignatureSTRParser implements STRParser {
                         if (certs != null) {
                             try {
                                 byte[] digest = KeyUtils.generateDigest(certs[0].getEncoded());
-                                if (Arrays.equals(Base64.getMimeDecoder().decode(kiValue), digest)) {
+                                if (Arrays.equals(org.apache.xml.security.utils.XMLUtils.decode(kiValue), digest)) {
                                     parserResult.setPrincipal((Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL));
                                     foundCerts = certs;
                                     break;

@@ -28,7 +28,6 @@ import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -58,6 +57,7 @@ import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityTo
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
@@ -241,7 +241,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (oaepParams != null) {
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams,
                                                            false, null);
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.getMimeEncoder().encodeToString(oaepParams));
+                        createCharactersAndOutputAsEvent(subOutputProcessorChain, XMLUtils.encodeToString(oaepParams));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
                     }
 
@@ -331,7 +331,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     }
 
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                                     Base64.getMimeEncoder().encodeToString(encryptedEphemeralKey));
+                                                     XMLUtils.encodeToString(encryptedEphemeralKey));
 
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
                     | InvalidKeyException | IllegalBlockSizeException

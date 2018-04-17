@@ -43,7 +43,6 @@ import java.io.InputStream;
 import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 /**
  * This is a test for WSS-86 - "CryptoBase.splitAndTrim does not take into account the format of a
@@ -166,7 +165,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         // keytool -export -rfc -keystore wss86.keystore -alias wss86 -file wss86.cer
         //
         byte[] certBytes =
-            Base64.getMimeDecoder().decode(
+            org.apache.xml.security.utils.XMLUtils.decode(
                 "MIIDqTCCApGgAwIBAgIEePiYTTANBgkqhkiG9w0BAQsFADCBhDELMAkGA1UEBhMCREUxDzANBgNV"
                 + "BAgTBkJheWVybjEPMA0GA1UEBxMGTXVuaWNoMQ8wDQYDVQQKEwZBcGFjaGUxDjAMBgNVBAsTBVdT"
                 + "UzRKMQ8wDQYDVQQDEwZXZXJuZXIxITAfBgkqhkiG9w0BCQEWEldlcm5lckBleGFtcGxlLmNvbTAe"
@@ -224,7 +223,7 @@ public class CryptoProviderTest extends org.junit.Assert {
     @Test
     public void testBadInterop() throws Exception {
         byte[] certBytes =
-            Base64.getMimeDecoder().decode(
+            org.apache.xml.security.utils.XMLUtils.decode(
                 "MIIDNDCCAp2gAwIBAgIBEDANBgkqhkiG9w0BAQQFADBmMQswCQYDVQQGEwJERTEPMA0GA1UECBMG"
                 + "QmF5ZXJuMQ8wDQYDVQQHEwZNdW5pY2gxDTALBgNVBAoTBEhvbWUxFTATBgNVBAsTDEFwYWNoZSBX"
                 + "U1M0SjEPMA0GA1UEAxMGV2VybmVyMB4XDTA4MDQwNDE5MzIxOFoXDTEwMDQwNDE5MzIxOFowYTEL"

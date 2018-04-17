@@ -52,7 +52,6 @@ import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -445,7 +444,7 @@ public final class WSSecurityUtil {
      * @return a Text node containing the base64 encoded data
      */
     public static Text createBase64EncodedTextNode(Document doc, byte[] data) {
-        return doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
+        return doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
     }
 
     public static SOAPConstants getSOAPConstants(Element startElement) {
@@ -599,7 +598,7 @@ public final class WSSecurityUtil {
                 // Retrieve the attachment bytes
                 byte[] attachmentBytes =
                     WSSecurityUtil.getBytesFromAttachment(xopURI, attachmentCallbackHandler, removeAttachments);
-                String encodedBytes = Base64.getMimeEncoder().encodeToString(attachmentBytes);
+                String encodedBytes = org.apache.xml.security.utils.XMLUtils.encodeToString(attachmentBytes);
 
                 Node encodedChild =
                     includeElement.getOwnerDocument().createTextNode(encodedBytes);

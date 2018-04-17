@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 import org.apache.wss4j.common.util.Loader;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -56,7 +55,7 @@ public class SKITest extends org.junit.Assert {
 
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
         String knownBase64Encoding = "VPWiTCLlm0OwNWTwrnRTUF3qcIk=";
-        assertTrue(knownBase64Encoding.equals(Base64.getMimeEncoder().encodeToString(skiBytes)));
+        assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class SKITest extends org.junit.Assert {
 
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
         String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
-        assertTrue(knownBase64Encoding.equals(Base64.getMimeEncoder().encodeToString(skiBytes)));
+        assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
     }
 
     @Test

@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.processor;
 
 import java.time.Instant;
-import java.util.Base64;
 import java.util.List;
 
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
@@ -34,6 +33,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class UsernameTokenProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
@@ -97,7 +97,7 @@ public class UsernameTokenProcessor implements Processor {
                 WSUsernameTokenPrincipalImpl principal =
                     new WSUsernameTokenPrincipalImpl(token.getName(), token.isHashed());
                 if (token.getNonce() != null) {
-                    principal.setNonce(Base64.getMimeDecoder().decode(token.getNonce()));
+                    principal.setNonce(XMLUtils.decode(token.getNonce()));
                 }
                 principal.setPassword(token.getPassword());
                 principal.setCreatedTime(token.getCreated());

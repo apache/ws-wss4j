@@ -22,13 +22,13 @@ package org.apache.wss4j.dom.common;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.xml.security.utils.XMLUtils;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +67,7 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
     public void setOutboundSecret(byte[] secret) throws WSSecurityException {
         outboundSecret = secret;
         byte[] encodedBytes = KeyUtils.generateDigest(outboundSecret);
-        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
+        String identifier = XMLUtils.encodeToString(encodedBytes);
         addSecretKey(identifier, outboundSecret);
     }
 }

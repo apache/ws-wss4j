@@ -19,7 +19,6 @@
 package org.apache.wss4j.stax.impl.processor.output;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -39,6 +38,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -170,7 +170,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, securityToken.getId()));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                            Base64.getMimeEncoder().encodeToString(
+                            XMLUtils.encodeToString(
                                 ((KerberosClientSecurityToken)securityToken).getTicket())
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);

@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.security.Principal;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -541,7 +540,7 @@ public class DerivedKeyToken {
      */
     public byte[] deriveKey(int length, byte[] secret) throws WSSecurityException {
         try {
-            byte[] nonce = Base64.getMimeDecoder().decode(getNonce());
+            byte[] nonce = org.apache.xml.security.utils.XMLUtils.decode(getNonce());
             return DerivedKeyUtils.deriveKey(getAlgorithm(), getLabel(), length, secret, nonce, getOffset());
         } catch (Exception e) {
             throw new WSSecurityException(

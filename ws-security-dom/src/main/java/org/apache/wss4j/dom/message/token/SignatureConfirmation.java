@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.util.Arrays;
-import java.util.Base64;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
@@ -59,7 +58,7 @@ public class SignatureConfirmation {
 
         String sv = element.getAttributeNS(null, SC_VALUE_ATTR);
         if (sv != null) {
-            signatureValue = Base64.getMimeDecoder().decode(sv);
+            signatureValue = org.apache.xml.security.utils.XMLUtils.decode(sv);
         }
     }
 
@@ -79,7 +78,7 @@ public class SignatureConfirmation {
             );
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
-            String sv = Base64.getMimeEncoder().encodeToString(signVal);
+            String sv = org.apache.xml.security.utils.XMLUtils.encodeToString(signVal);
             element.setAttributeNS(null, SC_VALUE_ATTR, sv);
         }
     }

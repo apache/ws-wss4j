@@ -25,7 +25,6 @@ import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.Collections;
 
 import javax.security.auth.callback.Callback;
@@ -184,8 +183,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("wernerd",
-                            Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8))));
+        byte[] bytes = MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8));
+        builder.setUserInfo("wernerd", org.apache.xml.security.utils.XMLUtils.encodeToString(bytes));
         LOG.info("Before adding UsernameToken PW Digest....");
         Document signedDoc = builder.build();
 
@@ -468,7 +467,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         MessageDigest sha = MessageDigest.getInstance("MD5");
         sha.reset();
         sha.update(password);
-        String passwdDigest = Base64.getMimeEncoder().encodeToString(sha.digest());
+        String passwdDigest = org.apache.xml.security.utils.XMLUtils.encodeToString(sha.digest());
 
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");
