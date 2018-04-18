@@ -143,7 +143,7 @@ public class Encryptor {
                             // If so then replace the existing Element to encrypt in the SOAP Envelope
                             encrElement.getParentNode().replaceChild(matchingElement, encrElement);
                             encrElement = matchingElement;
-                            
+
                             // We already have an expanded Element, but might need to delete the attachments
                             for (Element includeElement : includeElements) {
                                 String xopURI = includeElement.getAttributeNS(null, "href");
@@ -253,7 +253,7 @@ public class Encryptor {
 
         if ("Header".equals(encryptionPart.getEncModifier())
             && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-            createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, idAllocator);
+            createEncryptedHeaderElement(securityHeader, elementToEncrypt, idAllocator);
         }
 
         Element encryptedData =
@@ -455,9 +455,12 @@ public class Encryptor {
         //
         String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
         try {
-            if ("Header".equals(modifier)
-                && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-                createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, idAllocator);
+            if ("Header".equals(modifier)) {
+                String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+                if (elementToEncrypt.getParentNode().getNamespaceURI().equals(soapNamespace)
+                    && WSConstants.ELEM_HEADER.equals(elementToEncrypt.getParentNode().getLocalName())) {
+                    createEncryptedHeaderElement(securityHeader, elementToEncrypt, idAllocator);
+                }
             }
 
             xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
@@ -474,13 +477,12 @@ public class Encryptor {
     }
 
     private static void createEncryptedHeaderElement(
-        Document doc,
         WSSecHeader securityHeader,
         Element elementToEncrypt,
         WsuIdAllocator idAllocator
     ) {
         Element elem =
-            doc.createElementNS(
+            elementToEncrypt.getOwnerDocument().createElementNS(
                 WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
             );
         XMLUtils.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
