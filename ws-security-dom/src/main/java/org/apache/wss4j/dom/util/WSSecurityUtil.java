@@ -65,13 +65,24 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  */
 public final class WSSecurityUtil {
 
-    private static boolean isJava9SAAJ = false;
+    private static boolean isSAAJ14 = false;
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
     static {
-        if (System.getProperty("java.version").startsWith("9") || System.getProperty("java.version").startsWith("10")) {
+        try {
+            Method[] methods = WSSecurityUtil.class.getClassLoader().
+                loadClass("com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("register")) {
+                    //this is the 1.4+ SAAJ impl
+                    isSAAJ14 = true;
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            LOG.debug("Can't load class com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl", cnfe);
 
             try {
                 Method[] methods = WSSecurityUtil.class.getClassLoader().
@@ -79,12 +90,12 @@ public final class WSSecurityUtil {
                 for (Method method : methods) {
                     if (method.getName().equals("register")) {
                         //this is the SAAJ impl in JDK9
-                        isJava9SAAJ = true;
+                        isSAAJ14 = true;
                         break;
                     }
                 }
-            } catch (ClassNotFoundException cnfe) {
-                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", cnfe);
+            } catch (ClassNotFoundException cnfe1) {
+                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", cnfe1);
             }
         }
     }
@@ -357,7 +368,7 @@ public final class WSSecurityUtil {
             );
         if (header == null) { // no SOAP header at all
             if (doCreate) {
-                if (isJava9SAAJ) {
+                if (isSAAJ14) {
                     try {
                         Node node = null;
                         try {
@@ -616,7 +627,7 @@ public final class WSSecurityUtil {
      */
     public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
         clonedElement = (Element)clonedElement.cloneNode(true);
-        if (isJava9SAAJ) {
+        if (isSAAJ14) {
             // here we need regiter the javax.xml.soap.Node with new instance
             clonedElement = (Element)doc.importNode(clonedElement, true);
             clonedElement = (Element)getDomElement(clonedElement);
@@ -631,7 +642,7 @@ public final class WSSecurityUtil {
      * @throws WSSecurityException
      */
     private static Node getDomElement(Node node) throws WSSecurityException {
-        if (node != null && isJava9SAAJ) {
+        if (node != null && isSAAJ14) {
 
             try {
                 Method method = node.getClass().getMethod("getDomElement");
