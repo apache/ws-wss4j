@@ -72,7 +72,8 @@ public class WSSec {
                             org.apache.xml.security.binding.xmlenc11.ObjectFactory.class,
                             org.apache.xml.security.binding.xmldsig.ObjectFactory.class,
                             org.apache.xml.security.binding.xmldsig11.ObjectFactory.class,
-                            org.apache.xml.security.binding.excc14n.ObjectFactory.class
+                            org.apache.xml.security.binding.excc14n.ObjectFactory.class,
+                            org.apache.xml.security.binding.xop.ObjectFactory.class
                     )
             );
 
@@ -493,6 +494,7 @@ public class WSSec {
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/soap-1.2.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/exc-c14n.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig-core-schema.xsd", WSSec.class)),
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xop-include.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema-11.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig11-schema.xsd", WSSec.class)),

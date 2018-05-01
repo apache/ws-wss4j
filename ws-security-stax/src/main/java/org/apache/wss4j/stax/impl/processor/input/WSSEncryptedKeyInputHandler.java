@@ -23,6 +23,7 @@ import org.apache.wss4j.binding.wss10.ReferenceType;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
@@ -112,4 +113,11 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             }
         }
     }
+
+    @Override
+    protected byte[] getBytesFromAttachment(String xopUri, final XMLSecurityProperties securityProperties) throws XMLSecurityException {
+        WSSSecurityProperties securityProps = (WSSSecurityProperties)securityProperties;
+        return AttachmentUtils.getBytesFromAttachment(xopUri, securityProps.getAttachmentCallbackHandler(), true);
+    }
+
 }

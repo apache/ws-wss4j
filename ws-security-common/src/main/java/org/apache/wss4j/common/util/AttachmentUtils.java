@@ -19,14 +19,19 @@
 package org.apache.wss4j.common.util;
 
 import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.stax.impl.util.MultiInputStream;
+import org.apache.xml.security.utils.JavaUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.mail.internet.MimeUtility;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -600,5 +605,49 @@ public final class AttachmentUtils {
         final CipherInputStream cipherInputStream = new CipherInputStream(attachmentInputStream, cipher);
 
         return new MultiInputStream(ivInputStream, cipherInputStream);
+    }
+
+    public static byte[] getBytesFromAttachment(
+        String xopUri, CallbackHandler attachmentCallbackHandler, boolean removeAttachments
+    ) throws WSSecurityException {
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+
+        String attachmentId = getAttachmentId(xopUri);
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(attachmentId);
+        attachmentRequestCallback.setRemoveAttachments(removeAttachments);
+
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            if (attachments == null || attachments.isEmpty()
+                || !attachmentId.equals(attachments.get(0).getId())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", new Object[] {"Attachment not found: " + xopUri}
+                );
+            }
+            Attachment attachment = attachments.get(0);
+            InputStream inputStream = attachment.getSourceStream();
+
+            return JavaUtils.getBytesFromStream(inputStream);
+        } catch (UnsupportedCallbackException | IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+
+    public static String getAttachmentId(String xopUri) throws WSSecurityException {
+        try {
+            return URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
+            );
+        }
     }
 }

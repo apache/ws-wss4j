@@ -27,15 +27,14 @@ import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,19 +44,13 @@ import org.w3c.dom.Text;
 //import com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 
 /**
@@ -671,45 +664,11 @@ public final class WSSecurityUtil {
     public static byte[] getBytesFromAttachment(
         String xopUri, CallbackHandler attachmentCallbackHandler, boolean removeAttachments
     ) throws WSSecurityException {
-        if (attachmentCallbackHandler == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-        }
-
-        String attachmentId = getAttachmentId(xopUri);
-
-        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-        attachmentRequestCallback.setAttachmentId(attachmentId);
-        attachmentRequestCallback.setRemoveAttachments(removeAttachments);
-
-        try {
-            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-
-            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-            if (attachments == null || attachments.isEmpty()
-                || !attachmentId.equals(attachments.get(0).getId())) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", new Object[] {"Attachment not found: " + xopUri}
-                );
-            }
-            Attachment attachment = attachments.get(0);
-            InputStream inputStream = attachment.getSourceStream();
-
-            return JavaUtils.getBytesFromStream(inputStream);
-        } catch (UnsupportedCallbackException | IOException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
+        return AttachmentUtils.getBytesFromAttachment(xopUri, attachmentCallbackHandler, removeAttachments);
     }
 
     public static String getAttachmentId(String xopUri) throws WSSecurityException {
-        try {
-            return URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY,
-                "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
-            );
-        }
+        return AttachmentUtils.getAttachmentId(xopUri);
     }
 
     public static void storeBytesInAttachment(

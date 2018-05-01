@@ -206,6 +206,52 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     }
 
     @Override
+    protected InputStream handleXOPInclude(InputProcessorChain inputProcessorChain, EncryptedDataType encryptedDataType, String href,
+                                           Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
+        if (href == null || href.length() < 5) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+        if (!href.startsWith("cid:")) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+
+        final String attachmentId = href.substring(4);
+
+        CallbackHandler attachmentCallbackHandler =
+            ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"no attachment callbackhandler supplied"}
+            );
+        }
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(attachmentId);
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+        }
+        List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+        if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"Attachment not found"}
+            );
+        }
+
+        final Attachment attachment = attachments.get(0);
+
+        final String encAlgo = encryptedDataType.getEncryptionMethod().getAlgorithm();
+        final Key symmetricKey =
+            inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, encryptedDataType.getId());
+
+        return
+            AttachmentUtils.setupAttachmentDecryptionStream(encAlgo, cipher, symmetricKey, attachment.getSourceStream());
+    }
+
+    @Override
     protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProcessor(
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType encryptedDataType,
             InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext) throws XMLSecurityException {
