@@ -18,9 +18,14 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import java.util.Base64;
+
+import javax.xml.bind.JAXBElement;
+
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -28,9 +33,10 @@ import org.apache.wss4j.stax.impl.securityToken.X509V3SecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
+import org.apache.xml.security.binding.xop.Include;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.apache.xml.security.utils.XMLUtils;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
@@ -49,9 +55,10 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                     new Object[] {binarySecurityTokenType.getEncodingType()});
         }
 
-        byte[] securityTokenData = XMLUtils.decode(binarySecurityTokenType.getValue());
-
         try {
+            byte[] securityTokenData =
+                getBinarySecurityTokenBytes(binarySecurityTokenType, tokenContext.getWssSecurityProperties());
+
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
                 X509V3SecurityTokenImpl x509V3SecurityToken = new X509V3SecurityTokenImpl(
@@ -96,6 +103,30 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
+    }
+
+    private byte[] getBinarySecurityTokenBytes(BinarySecurityTokenType binarySecurityTokenType,
+                                               WSSSecurityProperties wssSecurityProperties) throws XMLSecurityException {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Object obj : binarySecurityTokenType.getContent()) {
+            if (obj instanceof String) {
+                sb.append((String)obj);
+            } else if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> element = (JAXBElement<?>)obj;
+                if (XMLSecurityConstants.TAG_XOP_INCLUDE.equals(element.getName())) {
+                    Include include = (Include)element.getValue();
+                    if (include != null && include.getHref() != null && include.getHref().startsWith("cid:")) {
+                        return AttachmentUtils.getBytesFromAttachment(include.getHref(),
+                                                                      wssSecurityProperties.getAttachmentCallbackHandler(),
+                                                                      true);
+                    }
+                }
+            }
+        }
+
+        return Base64.getMimeDecoder().decode(sb.toString());
     }
 
     protected Crypto getCrypto(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
