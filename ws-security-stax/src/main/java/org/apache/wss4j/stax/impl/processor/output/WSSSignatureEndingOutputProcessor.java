@@ -56,7 +56,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
     @Override
     protected SignedInfoProcessor newSignedInfoProcessor(
-            SignatureAlgorithm signatureAlgorithm, XMLSecStartElement xmlSecStartElement,
+            SignatureAlgorithm signatureAlgorithm, String signatureId, XMLSecStartElement xmlSecStartElement,
             OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
 
         //we have to search for the SecurityHeaderElement for InclusiveNamespaces (same behavior as in wss-dom):
@@ -64,7 +64,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             xmlSecStartElement = xmlSecStartElement.getParentXMLSecStartElement();
         }
 
-        this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm, xmlSecStartElement);
+        this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm, signatureId, xmlSecStartElement);
         this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         this.signedInfoProcessor.setAction(getAction());
         this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class.getName());
@@ -78,6 +78,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
         signatureValueSecurityEvent.setSignatureValue(this.signedInfoProcessor.getSignatureValue());
+        signatureValueSecurityEvent.setCorrelationID(this.signedInfoProcessor.getSignatureId());
         outputProcessorChain.getSecurityContext().registerSecurityEvent(signatureValueSecurityEvent);
     }
 
@@ -93,7 +94,10 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             return;
         }
 
-        WSSecurityTokenConstants.KeyIdentifier keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
+        WSSecurityTokenConstants.KeyIdentifier keyIdentifier = null;
+        if (!getSecurityProperties().getSignatureKeyIdentifiers().isEmpty()) {
+            keyIdentifier = getSecurityProperties().getSignatureKeyIdentifiers().get(0);
+        }
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
 

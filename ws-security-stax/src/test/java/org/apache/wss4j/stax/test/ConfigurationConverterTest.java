@@ -81,7 +81,8 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         Assert.assertEquals(properties.getActions().get(0), WSSConstants.SIGNATURE);
         Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
         Assert.assertEquals(properties.getSignatureAlgorithm(), sigAlgo);
-        Assert.assertEquals(properties.getSignatureKeyIdentifier(),
+        Assert.assertEquals(properties.getSignatureKeyIdentifiers().size(), 1);
+        Assert.assertEquals(properties.getSignatureKeyIdentifiers().get(0),
                             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
         Assert.assertFalse(properties.isAddExcC14NInclusivePrefixes());
         Assert.assertNotNull(properties.getSignatureCrypto());

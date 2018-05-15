@@ -77,9 +77,10 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
             boolean includeToken = false;
             WSSecurityTokenConstants.KeyIdentifier keyIdentifier = null;
-            if (WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
+            if ((WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action))
+                && !getSecurityProperties().getSignatureKeyIdentifiers().isEmpty()) {
                 includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
-                keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
+                keyIdentifier = getSecurityProperties().getSignatureKeyIdentifiers().get(0);
             } else if (WSSConstants.ENCRYPT.equals(action)) {
                 includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeEncryptionToken();
                 keyIdentifier = getSecurityProperties().getEncryptionKeyIdentifier();
