@@ -41,7 +41,9 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -74,6 +76,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     private String resource;
     private List<Object> customAttributeValues;
     private ConditionsBean conditions;
+    private SubjectConfirmationDataBean subjectConfirmationData;
 
     private boolean signAssertion = true;
 
@@ -107,6 +110,10 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
                         new SubjectBean(subjectName, subjectQualifier, confirmationMethod);
                 if (subjectNameIDFormat != null) {
                     subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
+                }
+                if (subjectConfirmationData != null) {
+                    subjectBean.setSubjectConfirmationNameID(new NameIDBean("dummy", null, null));
+                    subjectBean.setSubjectConfirmationData(subjectConfirmationData);
                 }
 
                 if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
@@ -324,5 +331,13 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
 
     public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
+    }
+
+    public SubjectConfirmationDataBean getSubjectConfirmationData() {
+        return subjectConfirmationData;
+    }
+
+    public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
+        this.subjectConfirmationData = subjectConfirmationData;
     }
 }

@@ -19,6 +19,10 @@
 
 package org.apache.wss4j.common.saml.builder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
@@ -76,14 +80,15 @@ import org.opensaml.saml.saml2.core.SubjectLocality;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Class SAML2ComponentBuilder provides builder methods that can be used
  * to construct SAML v2.0 statements using the OpenSaml library.
  */
 public final class SAML2ComponentBuilder {
+
+    private static final transient org.slf4j.Logger LOG =
+            org.slf4j.LoggerFactory.getLogger(SAML2ComponentBuilder.class);
+
     private static volatile SAMLObjectBuilder<Assertion> assertionBuilder;
 
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
@@ -647,6 +652,20 @@ public final class SAML2ComponentBuilder {
             }
             if (subjectConfirmationDataBean.getNotBefore() != null) {
                 subjectConfirmationData.setNotBefore(subjectConfirmationDataBean.getNotBefore());
+            }
+            if (subjectConfirmationDataBean.getAny() != null) {
+                List<XMLObject> unknownObjects = subjectConfirmationData.getUnknownXMLObjects();
+                for (Object obj : subjectConfirmationDataBean.getAny()) {
+                    if (obj == null) {
+                        LOG.warn("Ignore <null> object in SubjectConfirmationData.any");
+                    } else if (obj instanceof XMLObject) {
+                        unknownObjects.add((XMLObject) obj);
+                    } else if (obj instanceof AttributeStatementBean) {
+                        unknownObjects.addAll(createAttributeStatement(Collections.singletonList((AttributeStatementBean) obj)));
+                    } else {
+                        LOG.warn("Ignore object of the unsupported type {} in SubjectConfirmationData.any", obj.getClass());
+                    }
+                }
             }
         }
 

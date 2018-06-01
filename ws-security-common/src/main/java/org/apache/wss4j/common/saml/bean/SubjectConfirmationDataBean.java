@@ -20,7 +20,9 @@
 package org.apache.wss4j.common.saml.bean;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.joda.time.DateTime;
 
@@ -34,6 +36,7 @@ public class SubjectConfirmationDataBean {
     private String inResponseTo;
     private DateTime notBefore;
     private DateTime notAfter;
+    private List<Object> any;
 
     /**
      * Constructor SubjectConfirmationDataBean creates a new SubjectConfirmationDataBean instance.
@@ -148,6 +151,36 @@ public class SubjectConfirmationDataBean {
     }
 
     /**
+     * Get the list of additional elements
+     *
+     * @return list of additional elements
+     */
+    public List<Object> getAny() {
+        return any;
+    }
+
+    /**
+     * Set the list of additional elements
+     *
+     * @param any the list of additional elements
+     */
+    public void setAny(List<Object> any) {
+        this.any = any;
+    }
+
+    /**
+     * Adds an additional element
+     *
+     * @param obj additional element
+     */
+    public void addAny(Object obj) {
+        if (any == null) {
+            any = new ArrayList<>();
+        }
+        any.add(obj);
+    }
+
+    /**
      * Method equals ...
      *
      * @param o of type Object
@@ -194,6 +227,12 @@ public class SubjectConfirmationDataBean {
             return false;
         }
 
+        if (any == null && that.any != null) {
+            return false;
+        } else if (any != null && !any.equals(that.any)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -217,6 +256,9 @@ public class SubjectConfirmationDataBean {
         }
         if (notAfter != null) {
             result = 31 * result + notAfter.hashCode();
+        }
+        if (any != null) {
+            result = 31 * result + any.hashCode();
         }
         return result;
     }
