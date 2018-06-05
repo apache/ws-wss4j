@@ -32,7 +32,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -410,9 +409,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             throws XMLSecurityException {
         Document document = null;
         try {
-            DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
-            document = db.newDocument();
-            XMLUtils.repoolDocumentBuilder(db);
+            document = XMLUtils.newDocument(false);
         } catch (ParserConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
