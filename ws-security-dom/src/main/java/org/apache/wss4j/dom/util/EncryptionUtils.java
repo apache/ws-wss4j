@@ -47,6 +47,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.ByteArrayInputStream;
@@ -389,18 +390,19 @@ public final class EncryptionUtils {
 
         // For the xop:Include case, we need to replace the xop:Include Element with the
         // decrypted Element
+        DocumentBuilder db =
+                org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
         byte[] bytes = JavaUtils.getBytesFromStream(attachmentInputStream);
 
         Document document = null;
         try {
-            document = org.apache.xml.security.utils.XMLUtils.parse(new ByteArrayInputStream(bytes), false);
+            document = db.parse(new ByteArrayInputStream(bytes));
         } catch (SAXException ex) {
             // See if a prefix was not bound. Try to fix the DOM Element in this case.
             if (ex.getMessage() != null && ex.getMessage().startsWith("The prefix")
                 && ex.getMessage().endsWith("is not bound.")) {
                 String fixedElementStr = setParentPrefixes(encData, new String(bytes));
-                document = org.apache.xml.security.utils.XMLUtils.parse(new ByteArrayInputStream(fixedElementStr.getBytes()),
-                                                                        false);
+                document = db.parse(new ByteArrayInputStream(fixedElementStr.getBytes()));
             } else {
                 throw ex;
             }
@@ -409,6 +411,7 @@ public final class EncryptionUtils {
         Node decryptedNode =
             encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
         encData.getParentNode().appendChild(decryptedNode);
+        org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
         encData.getParentNode().removeChild(encData);
         return decryptedNode;
     }

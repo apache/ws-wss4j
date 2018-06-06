@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
@@ -62,7 +63,6 @@ import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.saml.common.SAMLVersion;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
@@ -442,8 +442,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 try {
-                    Document doc = XMLUtils.newDocument(false);
-                    outputDOMElement(samlAssertionWrapper.toDOM(doc), subOutputProcessorChain);
+                    DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
+                    outputDOMElement(samlAssertionWrapper.toDOM(db.newDocument()), subOutputProcessorChain);
+                    XMLUtils.repoolDocumentBuilder(db);
                 } catch (ParserConfigurationException ex) {
                     LOG.debug("Error writing out SAML Assertion", ex);
                     throw new XMLSecurityException(ex);
