@@ -40,7 +40,6 @@ The current stable release is Apache WSS4J 2.2.2:
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.2.2/wss4j-2.2.2-source-release.zip">wss4j-2.2.2-source-release.zip</a>
 (<a href="https://www.apache.org/dist/ws/wss4j/2.2.2/wss4j-2.2.2-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.2.2/wss4j-2.2.2-source-release.zip.md5">MD5</a>)
 (<a href="https://www.apache.org/dist/ws/wss4j/2.2.2/wss4j-2.2.2-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
@@ -51,7 +50,6 @@ The current release on the older 2.1.x-fixes branch is Apache WSS4J 2.1.12:
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip">wss4j-2.1.12-source-release.zip</a>
 (<a href="https://www.apache.org/dist/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.md5">MD5</a>)
 (<a href="https://www.apache.org/dist/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
@@ -62,7 +60,6 @@ The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.10:
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip">wss4j-2.0.10-source-release.zip</a>
 (<a href="https://www.apache.org/dist/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.md5">MD5</a>)
 (<a href="https://www.apache.org/dist/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
@@ -84,9 +81,8 @@ You can check the OpenPGP compatible signature with GnuPG via:
 </ul>
 </p>
 <p>
-You can check the SHA1/MD5 digests with:
+You can check the SHA1 digests with:
 <ul>
-<li>md5sum wss4j-*-source-release.zip (and compare output to wss4j-*-source.release.zip.md5)</li>
 <li>sha1sum wss4j-*-source-release.zip (and compare output to wss4j-*-source.release.zip.sha1)</li>
 </ul>
 </p>
