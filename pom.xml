@@ -110,6 +110,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <targetJdk>1.8</targetJdk>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
+        <maven-owasp-plugin-version>3.3.1</maven-owasp-plugin-version>
     </properties>
 
     <modules>
@@ -333,6 +334,19 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.6</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${maven-owasp-plugin-version}</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -479,6 +493,19 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>dependencycheck</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
     </profiles>
 
     <reporting>
@@ -507,6 +534,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <version>2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${maven-owasp-plugin-version}</version>
             </plugin>
         </plugins>
     </reporting>
