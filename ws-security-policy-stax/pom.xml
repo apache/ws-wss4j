@@ -30,7 +30,7 @@
     <name>Apache WSS4J Streaming WS-SecurityPolicy</name>
 
     <properties>
-        <wss4j.module.name>org.apache.wss4j.policy.stax</wss4j.module.name>
+        <wss4j.module.name>org.apache.wss4j.policystax</wss4j.module.name>
     </properties>
 
     <dependencies>
