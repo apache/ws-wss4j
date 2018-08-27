@@ -29,6 +29,10 @@
     <artifactId>wss4j-policy</artifactId>
     <name>Apache WSS4J WS-SecurityPolicy model</name>
 
+    <properties>
+        <wss4j.module.name>org.apache.wss4j.policy</wss4j.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.neethi</groupId>

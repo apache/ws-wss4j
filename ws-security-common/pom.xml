@@ -40,6 +40,7 @@
                               org.apache.wss4j.saml
                         </DynamicImport-Package>
        -->
+       <wss4j.module.name>org.apache.wss4j.common</wss4j.module.name>
     </properties>
     
     <build>

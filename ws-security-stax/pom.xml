@@ -29,6 +29,10 @@
     <artifactId>wss4j-ws-security-stax</artifactId>
     <name>Apache WSS4J Streaming WS-Security</name>
 
+    <properties>
+        <wss4j.module.name>org.apache.wss4j.stax</wss4j.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.wss4j</groupId>

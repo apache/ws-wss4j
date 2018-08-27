@@ -311,6 +311,7 @@
                                 <DynamicImport-Package>
                                     ${wss4j.osgi.dynamic.import}
                                 </DynamicImport-Package>
+                                <Automatic-Module-Name>${wss4j.module.name}</Automatic-Module-Name>
                             </instructions>
                         </configuration>
                     </execution>

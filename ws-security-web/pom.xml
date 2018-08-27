@@ -29,6 +29,10 @@
     <artifactId>wss4j-ws-security-web</artifactId>
     <name>Apache WSS4J Web WS-Security</name>
 
+    <properties>
+        <wss4j.module.name>org.apache.wss4j.web</wss4j.module.name>
+    </properties>
+
     <build>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <resources>
