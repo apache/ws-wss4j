@@ -31,6 +31,7 @@
 
     <properties>
         <cobertura.skip>true</cobertura.skip>
+        <wss4j.module.name>org.apache.wss4j.bindings</wss4j.module.name>
     </properties>
 
     <dependencies>
