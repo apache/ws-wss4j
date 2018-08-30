@@ -781,7 +781,7 @@ public class SamlAssertionWrapper {
                 Element signatureValueElement =
                     XMLUtils.getNextElement(signedInfoElem.getNextSibling());
                 if (signatureValueElement != null) {
-                    String base64Input = XMLUtils.getFullTextChildrenFromElement(signatureValueElement);
+                    String base64Input = XMLUtils.getFullTextChildrenFromNode(signatureValueElement);
                     return XMLUtils.decode(base64Input);
                 }
             }
