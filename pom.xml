@@ -239,24 +239,18 @@
                     <configuration>
                         <source>${targetJdk}</source>
                         <target>${targetJdk}</target>
-                        <compilerArgument>-Xlint:overrides</compilerArgument>
-                        <compilerId>javac-with-errorprone</compilerId>
-                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                        <compilerArgs>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>-Xplugin:ErrorProne</arg>
+                        </compilerArgs>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>2.3.2</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                            <version>2.8</version>
-                        </dependency>
-                        <!-- override plexus-compiler-javac-errorprone's dependency on
-                             Error Prone with the latest version -->
-                        <dependency>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>2.1.1</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.rat</groupId>
@@ -383,6 +377,16 @@
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <fork>true</fork>
+                                <compilerArgs combine.children="append">
+                                    <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/9+181-r4173-1/javac-9+181-r4173-1.jar</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-plugin</artifactId>
                             <version>2.21.0</version>
                             <configuration>
@@ -421,7 +425,7 @@
                                 <includes>
                                     <include>**/*Test.java</include>
                                 </includes>
-                                <argLine>-Xmx2000m --add-modules java.xml.bind,java.xml.ws --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap.impl=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap=ALL-UNNAMED</argLine>
+                                <argLine>-Xmx2000m --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
                                 <systemPropertyVariables>
                                     <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
                                 </systemPropertyVariables>
@@ -430,6 +434,40 @@
                     </plugins>
                 </pluginManagement>
             </build>
+            <dependencies>
+                 <dependency>
+                     <groupId>javax.activation</groupId>
+                     <artifactId>activation</artifactId>
+                     <version>1.1.1</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>javax.xml.bind</groupId>
+                     <artifactId>jaxb-api</artifactId>
+                     <version>2.2.11</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>javax.xml.ws</groupId>
+                     <artifactId>jaxws-api</artifactId>
+                     <version>2.2.9</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>com.sun.xml.bind</groupId>
+                     <artifactId>jaxb-impl</artifactId>
+                     <scope>test</scope>
+                     <version>2.2.11</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>com.sun.xml.bind</groupId>
+                     <artifactId>jaxb-core</artifactId>
+                     <version>2.2.11</version>
+                 </dependency>
+                 <dependency>
+                     <groupId>com.sun.xml.messaging.saaj</groupId>
+                     <artifactId>saaj-impl</artifactId>
+                     <scope>test</scope>
+                     <version>1.4.0-b03</version>
+                </dependency>
+             </dependencies>
          </profile>
 
          <profile>
