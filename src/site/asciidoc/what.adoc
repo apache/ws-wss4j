@@ -1,0 +1,79 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+== What is Apache WSS4J&#8482;?
+
+In this section we describe what Apache WSS4J is and what functionality it supports.
+For more information about how to use WSS4J, see the link:using.html[Using Apache WSS4J] page.
+
+=== The technical answer
+
+The technical answer is that Apache WSS4J provides a Java implementation of
+the primary security standards for Web Services, namely the OASIS Web Services
+Security (WS-Security) specifications from the 
+http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss[OASIS Web Services Security TC]. WSS4J provides an implementation of the following
+WS-Security standards:
+
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf[SOAP Message Security 1.1]
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf[UsernameToken Profile 1.1]
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf[X.509Certificate Token Profile 1.1]
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SAMLTokenProfile.pdf[SAML Token Profile 1.1]
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-KerberosTokenProfile.pdf[Kerberos Token Profile 1.1]
+ * http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SwAProfile.pdf[SOAP Messages with Attachments Profile 1.1]
+ * http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html[Basic Security Profile 1.1]
+
+=== The less technical answer
+
+Apache WSS4J is designed to be used with a Web Services stack such as Apache
+CXF or Apache Axis to secure SOAP messages. It offers the following high 
+level functionality:
+
+ * Message Confidentiality
+ * Message Integrity
+ * Message Authentication
+ * Message Authorization
+
+WSS4J uses the functionality of Apache Santuario to encrypt SOAP Messages.
+Typically, the SOAP Body as well as a UsernameToken in the security header are
+encrypted. WSS4J supports both Symmetric and Asymmetric encryption. Typically,
+a Symmetric Key is generated and used to encrypt the SOAP Body/UsernameToken,
+and then the Symmetric Key is in turn encrypted by the public key of the
+recipient and included in the security header of the request.
+
+WSS4J also provides the ability to ensure message integrity by applying XML
+Signature to a SOAP request. Typically, the SOAP Body, Timestamp,
+WS-Addressing headers, as well as any other token in the security header are
+signed. Both Symmetric and Asymmetric Signature are supported. WSS4J supports
+using a secret key associated with a token, such as a Kerberos Token or a key
+derived from a UsernameToken, to sign (as well as to encrypt) a request.
+
+As well as providing message confidentiality and integrity, WSS4J allows for
+client authentication in a number of different ways. The most common way is
+to include a username and password in a UsernameToken included in the security
+header. The message recipient can plug in a WSS4J Validator to validate the
+received credentials. Authentication is also supported via Kerberos Tokens,
+SAML Assertions (when used with "HolderOfKey"), and Asymmetric Signature.
+
+Finally, WSS4J supports message authorization using an RBAC approach. This can
+be supported via the use-case of UsernameTokens validated using the JAAS
+Validator that ships with WSS4J. This stores the JAAS Subject in the WSS4J
+results list, and can be used by the web services stack to populate a security
+context. Similarly, authorization can be supported using Claims extracted
+from a SAML (Attribute) Assertion.
+
