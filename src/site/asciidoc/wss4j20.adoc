@@ -1,0 +1,246 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+=== Apache WSS4J 2.0.0 Migration Guide
+
+This section is a migration guide for helping Apache WSS4J 1.6.x users to migrate
+to the 2.0.x releases. Also see the link:newfeatures20.html[new
+features] page for more information about the new functionality available in
+WSS4J 2.0.x.
+
+==== Migrating to using the streaming (StAX) code
+
+WSS4J 2.0.0 introduces a streaming (StAX-based) WS-Security implementation to
+complement the existing DOM-based implementation. The DOM-based implementation
+is quite performant and flexible, but having to read the entire request into
+memory carries performance penalties. The StAX-based code offers largely the
+same functionality as that available as part of the DOM code, and is
+configured in mostly the same way (via configuration tags that are shared
+between both stacks). 
+
+As of the time of writing, Apache CXF is the only web services stack to 
+integrate the new WS-Security streaming functionality. To switch to use the
+streaming code for the manual "Action" based approach, simply change the
+outbound and inbound interceptors as follows:
+
+ * "org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor".
+ * "org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor".
+
+For the WS-SecurityPolicy based approach of configuring WS-Security, simply
+set the JAX-WS property SecurityConstants.ENABLE_STREAMING_SECURITY
+("ws-security.enable.streaming") to "true".
+
+For more information on the streaming functionality available in WSS4J 2.0.0, 
+please see the link:../streaming.html[streaming documentation] page.
+
+==== Crypto/CallbackHandler changes
+
+Typically, a user configures Signature and Encryption keys via a Crypto
+properties file. In WSS4J 1.6.x, the property names all start with 
+"org.apache.ws.security.crypto.\*". In WSS4J 2.0.0, the new prefix is 
+"org.apache.wss4j.crypto.\*". However, WSS4J 2.0.0 will accept the older
+prefix value. No other changes are necessary for migrating Crypto properties.
+
+In WSS4J 1.6.x, it was only possible to specify a Crypto implementation for
+both Signature Creation + Verification. In WSS4J 2.0.0, there is now a
+separate Signature Verification Crypto instance, that can be configured via
+the following configuration tags:
+
+ * signatureVerificationPropFile - The path of the crypto property file to
+use for Signature verification.
+ * signatureVerificationPropRefId - The key that holds a reference to the
+object holding complete information about the signature verification Crypto
+implementation.
+
+In WSS4J, you need to define a CallbackHandler to supply a password to a
+WSPasswordCallback Object when dealing with UsernameTokens, or to unlock
+private keys for Signature creation, etc. In WSS4J 2.0.0, the functionality is
+exactly the same, except that the package of the WSPasswordCallback Object has
+changed from "org.apache.ws.security" to "org.apache.wss4j.common.ext". Any
+CallbackHandler implementation will need to be updated to use the new package.
+
+==== SAML Assertion changes
+
+A CallbackHandler implementation is required to create a SAML Assertion, by
+populating various beans. Similar to the WSPasswordCallback package change,
+there are also some package changes for SAML. The base package for the
+SAMLCallback class, and of the various "bean" classes, has changed from
+"org.apache.ws.security.saml.ext" to "org.apache.wss4j.common.saml". 
+
+Apache WSS4J 1.6.x uses the SAMLIssuer interface to configure the creation and
+signing of a SAML Assertion. In Apache WSS4J 2.0.0, the SAMLIssuer
+functionality has been moved to the SAMLCallback, so that the CallbackHandler
+used to create a SAML Assertion is responsible for all of the signing
+configuration as well. Therefore, the properties file that is used in
+WSS4J 1.6.x to sign a SAML Assertion is no longer used in WSS4J 2.0.0, and
+the "samlPropFile" and "samlPropRefId" configuration tags have been removed. 
+
+The SAMLCallback Object contains the additional properties in WSS4J 2.0.0 that
+can be set to sign the Assertion:
+
+ * boolean signAssertion - Whether to sign the assertion or not (default "false").
+ * String issuerKeyName - The keystore alias for signature
+ * String issuerKeyPassword - The keystore password for the alias
+ * Crypto issuerCrypto - The Crypto instance used for signature
+ * boolean sendKeyValue - Whether to send the keyvalue or the X509Certificate
+(default "false").
+ * String canonicalizationAlgorithm - The C14n algorithm to use for signature.
+ * String signatureAlgorithm - The Signature algorithm.
+
+==== Configuration tag changes
+
+In WSS4J 1.6.x, configuration tags were configured in the WSHandlerConstants
+class. In WSS4J 2.0.0, both the DOM and StAX-based code largely share the 
+same configuration options, and so the configuration tags are defined in
+http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants]. Note that the WSS4J 1.6.x configuration class
+(WSHandlerConstants) extends this class in WSS4J 2.0.0, so there is no need to
+change any configuration code when upgrading.
+
+The configuration tags that have been removed and added are detailed below. 
+The non-standard key derivation and UsernameToken Signature functionality that
+was optional in WSS4J 1.6.x has been removed. Some new actions are added for
+the streaming code, as well as some options surrounding caching. An important
+migration point is that there is now a separate configuration tag used for
+verifying signatures. In WSS4J 1.6.x, there was only one tag used for both
+signature creation and verification.
+
+===== Removed Configuration tags in WSS4J 2.0.0
+
+This section details the Configuration tags that are no longer present in
+WSS4J 2.0.0.
+
+ * SIGN_WITH_UT_KEY (UsernameTokenSignature) - Perform a .NET specific signature using a Username Token action. Removed
+as it was not standard compliant.
+ * PASSWORD_TYPE_STRICT (passwordTypeStrict) - Whether to enable strict Username Token password type handling. In WSS4J
+2.0.0 this functionality can be enabled by just setting the required
+PASSWORD_TYPE.
+ * USE_DERIVED_KEY (useDerivedKey) - Whether to use the standard UsernameToken Key Derivation algorithm. Removed
+as only the standard algorithm is used in WSS4J 2.0.0.
+ * ENC_KEY_NAME (embeddedKeyName) - The text of the key name to be sent in the KeyInfo for encryption. Embedded
+KeyNames are not supported in WSS4J 2.0.0.
+ * ADD_UT_ELEMENTS (addUTElements) - Additional elements to add to a Username Token, i.e. "nonce" and "created".
+See the ADD_USERNAMETOKEN_NONCE and ADD_USERNAMETOKEN_CREATED properties below.
+ * WSE_SECRET_KEY_LENGTH (wseSecretKeyLength) - The length of the secret (derived) key to use for the WSE UT_SIGN
+functionality. Removed as it is not standard compliant.
+ * ENC_CALLBACK_CLASS (embeddedKeyCallbackClass) - The CallbackHandler implementation class used to get the key associated
+with a key name. KeyName is not supported in WSS4J 2.0.0.
+ * ENC_CALLBACK_REF (embeddedKeyCallbackRef) -The CallbackHandler implementation object used to get the key associated
+with a key name. KeyName is not supported in WSS4J 2.0.0.
+
+===== New Configuration tags in WSS4J 2.0.0
+
+This section details the new Configuration tags in WSS4J 2.0.0.
+
+ * USERNAME_TOKEN_SIGNATURE (UsernameTokenSignature) - Perform a UsernameTokenSignature action.
+ * SIGNATURE_DERIVED (SignatureDerived) - Perform a Signature action with derived keys.
+ * ENCRYPT_DERIVED (EncryptDerived) - Perform a Encryption action with derived keys.
+ * SIGNATURE_WITH_KERBEROS_TOKEN (SignatureWithKerberosToken) - Perform a Signature action with a kerberos token. Only for StAX code.
+ * ENCRYPT_WITH_KERBEROS_TOKEN (EncryptWithKerberosToken) - Perform a Encryption action with a kerberos token. Only for StAX code.
+ * KERBEROS_TOKEN (KerberosToken) - Add a kerberos token.
+ * CUSTOM_TOKEN (CustomToken) - Add a "Custom" token from a CallbackHandler
+ * SIG_VER_PROP_FILE (signatureVerificationPropFile) - The path of the crypto property file to use for Signature verification.
+ * SIG_VER_PROP_REF_ID (signatureVerificationPropRefId) - The String ID that is used to store a reference to the Crypto object or
+the Crypto Properties object for Signature verification.
+ * ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM (allowRSA15KeyTransportAlgorithm) - Whether to allow the RSA v1.5 Key Transport Algorithm or not. Default is
+"false".
+ * ADD_INCLUSIVE_PREFIXES (addInclusivePrefixes) - Whether to add an InclusiveNamespaces PrefixList as a
+CanonicalizationMethod child when generating Signatures using
+WSConstants.C14N_EXCL_OMIT_COMMENTS. Default is "true".
+ * ADD_USERNAMETOKEN_NONCE (addUsernameTokenNonce) - Whether to add a Nonce Element to a UsernameToken (for plaintext). Default
+is "false"
+ * ADD_USERNAMETOKEN_CREATED (addUsernameTokenCreated) - Whether to add a Created Element to a UsernameToken (for plaintext).
+Default is "false"
+ * ALLOW_USERNAMETOKEN_NOPASSWORD (allowUsernameTokenNoPassword) - Whether a UsernameToken with no password element is allowed. Default is
+"false".
+ * VALIDATE_SAML_SUBJECT_CONFIRMATION (validateSamlSubjectConfirmation) - Whether to validate the SubjectConfirmation requirements of a received
+SAML Token (sender-vouches or holder-of-key). Default is "true".
+ * INCLUDE_SIGNATURE_TOKEN (includeSignatureToken) - Whether to include the Signature Token in the security header as well or
+not (for IssuerSerial + Thumbprint cases). Default is "false"
+ * INCLUDE_ENCRYPTION_TOKEN (includeEncryptionToken) - Whether to include the Encryption Token in the security header as well or
+not (for IssuerSerial, Thumbprint, SKI cases). Default is "false"
+ * ENABLE_NONCE_CACHE (enableNonceCache) - Whether to cache UsernameToken nonces. Default is "true"
+ * ENABLE_TIMESTAMP_CACHE (enableTimestampCache) - Whether to cache Timestamp Created Strings (these are only cached in
+conjunction with a message Signature). Default is "true"
+ * ENABLE_SAML_ONE_TIME_USE_CACHE (enableSamlOneTimeUseCache) - Whether to cache SAML2 Token Identifiers, if the token contains a
+"OneTimeUse" Condition. Default is "true".
+ * USE_2005_12_NAMESPACE (use200512Namespace) - Whether to use the 2005/12 namespace for SecureConveration + DerivedKeys,
+or the older namespace. The default is "true"
+ * OPTIONAL_SIGNATURE_PARTS (optionalSignatureParts) - Parameter to define which parts of the request shall be signed, if they
+exist in the request.
+ * OPTIONAL_ENCRYPTION_PARTS (optionalEncryptionParts) - Parameter to define which parts of the request shall be encrypted, if they
+exist in the request.
+ * ENC_MGF_ALGO (encryptionMGFAlgorithm) - Defines which encryption mgf algorithm to use with the RSA OAEP Key
+Transport algorithm for encryption. The default is mgfsha1.
+ * VALIDATOR_MAP (validatorMap) - A map of QName, Object (Validator) instances to be used to validate
+tokens identified by their QName.
+ * NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. The default
+instance that is used is the EHCacheReplayCache.
+ * TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. The default
+instance that is used is the EHCacheReplayCache.
+ * SAML_ONE_TIME_USE_CACHE_INSTANCE (samlOneTimeUseCacheInstance) - A ReplayCache instance used to cache SAML2 Token Identifier Strings (if
+the token contains a OneTimeUse Condition). The default instance that is used
+is the EHCacheReplayCache.
+ * PASSWORD_ENCRYPTOR_INSTANCE (passwordEncryptorInstance) - A PasswordEncryptor instance used to decrypt encrypted passwords in Crypto
+properties files. The default is the JasyptPasswordEncryptor.
+ * DERIVED_TOKEN_REFERENCE (derivedTokenReference) - This controls how deriving tokens are referenced.
+ * DERIVED_TOKEN_KEY_ID (derivedTokenKeyIdentifier) - This controls the key identifier of Derived Tokens.
+ * DERIVED_SIGNATURE_KEY_LENGTH (derivedSignatureKeyLength) - The length to use (in bytes) when deriving a key for Signature.
+ * DERIVED_ENCRYPTION_KEY_LENGTH (derivedEncryptionKeyLength) - The length to use (in bytes) when deriving a key for Encryption.
+
+==== Derived Key and Secure Conversation namespace change
+
+In WSS4J 1.6.x, the default namespace used for Derived Key and Secure
+Conversation was the older "http://schemas.xmlsoap.org/ws/2005/02/sc"
+namespace. In WSS4J 2.0.0, the default namespace is now
+"http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512". To switch
+back to use the older namespace, you can set the new configuration property
+"USE_2005_12_NAMESPACE" to "false".
+
+==== Caching changes
+
+WSS4J 2.0.0 uses three EhCache-based caches by default for the following
+scenarios, to prevent replay attacks:
+
+ * UsernameToken nonces
+ * Signed Timestamps
+ * SAML 2.0 OneTimeUse Assertions
+
+If you are seeing a error about "replay attacks" after upgrade, then you may
+need to disable a particular cache.
+
+==== RSA v1.5 Key Transport algorithm not allowed by default
+
+WSS4J supports two key transport algorithms, RSA v1.5 and RSA-OAEP. A number
+of attacks exist on RSA v1.5. Therefore, you should always use RSA-OAEP as the
+key transport algorithm. In WSS4J 2.0.0, the RSA v1.5 Key Transport algorithm
+is not allowed by default (as opposed to previous versions of WSS4J, where it
+is allowed). If you wish to allow it, then you must set the
+WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM property to "true".
+
+==== InclusiveNamespaces PrefixList change
+
+In WSS4J 1.6.x, when BSP Compliance was switched off on the outbound side, it
+had the effect that an InclusiveNamespaces PrefixList was not generated as a
+CanonicalizationMethod child of a Signature Element (as required by the BSP
+specification). In WSS4J 2.0.0, this is now controlled by a separate
+configuration tag "addInclusivePrefixes", which defaults to true.
+
+

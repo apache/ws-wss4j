@@ -1,0 +1,106 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+=== Apache WSS4J 1.6.0 Migration Guide
+
+This page describes the new features of WSS4J 1.6.0, and the things to be
+aware of when upgrading from WSS4J 1.5.x. Note that WSS4J 1.6.x has now been
+replaced by WSS4J 2.0.x, please see the WSS4J 2.0.0 link:wss4j20.html[migration guide] for more information.
+
+==== New features
+
+This section describes the main new features that have been implemented in
+WSS4J 1.6. For more information on the changes, please click on the links. You
+can also review the 
+https://issues.apache.org/jira/browse/WSS/fixforversion/12313718[list of JIRAs]
+that have been fixed in WSS4J 1.6.
+
+ * http://coheigea.blogspot.com/2011/03/wss4j-16-jsr-105-support.html[JSR-105 support]: 
+WSS4J 1.6 has been ported to use the JSR 105 API for XML Digital Signature.
+ * http://coheigea.blogspot.com/2011/02/support-for-saml2-assertions-in-wss4j.html[SAML2 support]: WSS4J 1.6 includes full support for creating, manipulating and parsing SAML2 
+assertions, via the Opensaml2 library.
+ * Performance work: A general code-rewrite has been done with a focus on improving performance,
+e.g. the http://coheigea.blogspot.com/2011/01/wss4j-16-actionprocessor-loading-change.html[changes] that have been made to processor loading.
+ * http://coheigea.blogspot.com/2011/03/wss4j-16-basic-security-profile-11.html[Basic Security Profile 1.1 compliance]: WSS4J 1.6 provides support for the BSP 1.1 specification. 
+ * JDK 1.5 port: The JDK 1.4 requirement of WSS4J 1.5.x has been dropped as part of this work.
+ * http://coheigea.blogspot.com/2011/01/wss4j-16-crypto-property-change.html[Support for Crypto trust-stores]: WSS4J 1.6 separates the concept of keystore and truststores for
+Crypto implementations.
+ * http://coheigea.blogspot.com/2011/04/wss4j-16-introducing-validators.html[New Validator interface]: WSS4J 1.6 moves all validation of security tokens into a new Validator
+interface, which allows for custom validation of specific tokens.
+ * Support for the Kerberos Token Profile (in WSS4J 1.6.2 and 1.6.3).
+
+==== Upgrade notes
+This section describes the changes that have been made in WSS4J 1.6 that will impact on an existing
+user of WSS4J 1.5.x. Although WSS4J 1.6 is not 100% backwards compatible with 1.5.x, a general goal for 
+the release was to restrict the API changes to those that were strictly necessary.
+
+ * All Axis1 dependencies have been removed. Any user wishing to use WSS4J with Axis1 must use the 
+WSS4J 1.5.x library. As Axis1 has been replaced by Axis2, this is unlikely to be an issue.
+ * A number of changes have been made to the Crypto interface. See 
+http://coheigea.blogspot.com/2011/01/wss4j-16-crypto-property-change.html[here],
+http://coheigea.blogspot.com/2011/02/wss4j-16-changes-to-crypto-interface.html[here]
+and http://coheigea.blogspot.com/2011/02/wss4j-16-change-to-publickey-validation.html[here]
+for an indepth explanation. In a nutshell, these changes are:
+  . The BouncyCastle crypto implementation has been removed (replaced by Merlin)
+  . A new set of Merlin "truststore" configuration tags have been added. The behaviour of the old Merlin
+configuration tags will work exactly the same way in WSS4J 1.6.
+  . The CA certs are now <b>not</b> loaded by default.
+  . PublicKeys (from KeyValues) are now not handled by a PublicKeyCallback, but by the Crypto implementation
+directly.
+ * If the WSEncryptionPart used to point to an element for signature or encryption does not either store
+the element directly, or store the wsu:Id, *all* DOM Elements that match the stored 
+localname/namespace will be processed. See the 
+http://ws.apache.org/wss4j/topics.html#Specifying_elements_to_sign_or_encrypt[Special Topics page]
+for more information.
+ * WSS4J 1.5.x used Opensaml1 to provide extremely limited support for SAML 1 assertions. WSS4J 1.6 has
+been upgraded to Opensaml2, and provides far more comprehensive support for SAML. See
+http://coheigea.blogspot.com/2011/02/support-for-saml2-assertions-in-wss4j.html[here] for
+more information on this. Some changes to be aware of are:
+  . The way of creating SAML assertions via a properties file has completely changed. For example, see
+link:../xref-test/org/apache/ws/security/saml/SamlTokenTest.html[SAML Token Test].
+  . WSS4J 1.5.x ignored (enveloped) signatures on SAML (1.1) assertions - this is no longer the case, so 
+deployments which do not set the correct keystore/truststore config for dealing with signature 
+verification will fail.
+  . The SAMLTokenProcessor no longer saves all tokens as an "WSConstants.ST_UNSIGNED" action. It saves 
+tokens that do not have an enveloped signature as this action, and token which *do* have an enveloped 
+signature are saved as a "WSConstants.ST_SIGNED" action.
+  . The object that is saved as part of the action above has changed, from an Opensaml1 specific Assertion 
+object, to an AssertionWrapper instance, which is a WSS4J specific object which encapsulates an 
+Assertion, as well as some information corresponding to signature verification, etc.
+ * The way that UsernameTokens are processed has been changed. See
+http://coheigea.blogspot.com/2011/02/usernametoken-processing-changes-in.html[here] for
+more information. Some important changes are:
+  . The plaintext password case has exactly the same behaviour as the digest case. The identifier is now 
+WSPasswordCallback.USERNAME_TOKEN and not WSPasswordCallback.USERNAME_TOKEN_UNKNOWN, and the 
+CallbackHandler does not do any authentication, but must set the password on the callback.
+  . The custom password type case defaults to the same behaviour as the plaintext case, assuming 
+wssConfig.getHandleCustomPasswordTypes() returns true.
+  . For the case of a username token with no password element, the default behaviour is simply to ignore it,
+and to store it as a new result of type WSConstants.UT_NOPASSWORD.
+ * Some changes have been made to the WSPasswordCallback identifiers, used to obtain passwords for various
+actions. For more information see
+http://coheigea.blogspot.com/2011/02/wspasswordcallback-changes-in-wss4j-16.html[here]. In
+a nutshell, these changes consist of:
+  . The WSPasswordCallback KEY_NAME, USERNAME_TOKEN_UNKNOWN and WSPasswordCallback.ENCRYPTED_KEY_TOKEN 
+identifiers have been removed.
+  . CUSTOM_TOKEN is not longer used in the processors to get a secret key.
+  . SECRET_KEY is a new identifier for finding secret keys. It replaces the occasionally incorrect use of 
+CUSTOM_TOKEN, as well as KEY_NAME and ENCRYPTED_KEY_TOKEN. 
+ * Timestamp validation and signature trust verification is not done by the WSHandler implementation
+any more, but is performed when the security header is processed.

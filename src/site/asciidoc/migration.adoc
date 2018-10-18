@@ -17,9 +17,13 @@
 // under the License.
 //
 
-= Apache WSS4J&#8482; User Guide
-:toc:
+== Apache WSS4J Migration Guides
 
-include::what.adoc[]
-include::using.adoc[]
-include::migration.adoc[]
+Information about migrating to various new versions of WSS4J is provided in this section.
+
+include::wss4j22.adoc[]
+include::wss4j21.adoc[]
+include::wss4j20.adoc[]
+include::newfeatures20.adoc[]
+include::wss4j16.adoc[]
+
