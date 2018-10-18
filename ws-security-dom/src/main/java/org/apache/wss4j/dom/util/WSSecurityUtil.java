@@ -376,7 +376,7 @@ public final class WSSecurityUtil {
                         } else {
                             header = createElementInSameNamespace(doc.getDocumentElement(), WSConstants.ELEM_HEADER);
                         }
-                        doc.importNode(header, true);
+                        header = (Element)doc.importNode(header, true);
                         header = (Element)getDomElement(header);
                         header = prependChildElement(envelope, header);
 
@@ -432,7 +432,7 @@ public final class WSSecurityUtil {
         } else if (doCreate) {
             foundSecurityHeader = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
             foundSecurityHeader.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-            doc.importNode(foundSecurityHeader, true);
+            foundSecurityHeader = (Element)doc.importNode(foundSecurityHeader, true);
             foundSecurityHeader = (Element)getDomElement(foundSecurityHeader);
 
             return prependChildElement(header, foundSecurityHeader);
