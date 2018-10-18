@@ -49,7 +49,7 @@ set the JAX-WS property SecurityConstants.ENABLE_STREAMING_SECURITY
 ("ws-security.enable.streaming") to "true".
 
 For more information on the streaming functionality available in WSS4J 2.0.0, 
-please see the link:../streaming.html[streaming documentation] page.
+please see the link:streaming.html[streaming documentation] page.
 
 ==== Crypto/CallbackHandler changes
 

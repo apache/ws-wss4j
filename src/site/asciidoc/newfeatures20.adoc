@@ -36,7 +36,7 @@ implementation.
 ==== Streaming (StAX) based WS-Security implementation
 
 WSS4J 2.0.0 introduces a new streaming (StAX) based WS-Security implementation.
-Please see the dedicated link:../streaming.html[page] for more information.
+Please see the dedicated link:streaming.html[page] for more information.
 
 ==== WS-SecurityPolicy support
 
@@ -61,7 +61,7 @@ DoS based scenarios.
 
 WSS4J 2.0.0 introduces support for signing and encrypting SOAP message
 attachments, via the the SOAP with Attachments (SWA) Profile 1.1 specification.
-Please see the dedicated link:../attachments.html[page] for more
+Please see the dedicated link:attachments.html[page] for more
 information.
 
 ==== Replay Attack detection using EhCache

@@ -73,7 +73,7 @@ been upgraded to Opensaml2, and provides far more comprehensive support for SAML
 http://coheigea.blogspot.com/2011/02/support-for-saml2-assertions-in-wss4j.html[here] for
 more information on this. Some changes to be aware of are:
   . The way of creating SAML assertions via a properties file has completely changed. For example, see
-link:../xref-test/org/apache/ws/security/saml/SamlTokenTest.html[SAML Token Test].
+link:xref-test/org/apache/ws/security/saml/SamlTokenTest.html[SAML Token Test].
   . WSS4J 1.5.x ignored (enveloped) signatures on SAML (1.1) assertions - this is no longer the case, so 
 deployments which do not set the correct keystore/truststore config for dealing with signature 
 verification will fail.
