@@ -1,32 +1,31 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
 
-      http://www.apache.org/licenses/LICENSE-2.0
+== Securing message attachments
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-<document>
-<body>
-<section name="Securing message attachments">
-<p>
 WSS4J 2.0.0 introduces support for signing and encrypting SOAP message
 attachments, via the the SOAP with Attachments (SWA) Profile 1.1 specification.
 There is no support in WSS4J 1.6.x for signing or encrypting message
 attachments. Attachments can be signed and encrypted in WSS4J via either the
 "action"-based approach or via WS-SecurityPolicy, as covered in the sections
 below.
-</p>
-<p>
+
 The message attachment streams must be supplied to WSS4J for
 signature/encryption via a CallbackHandler approach. An
 AttachmentRequestCallback Object is used to retrieve either a particular
@@ -34,25 +33,21 @@ Attachment (on the receiving side), or all attachments (on the sending side).
 The user must implement a CallbackHandler that sets a list of Attachments
 matching this request on the Callback. Correspondingly, there is also a
 AttachmentResponseCallback, which represents the secured/processed Attachment.
-</p>
-<p>
+
 The good news is that if you are using Apache CXF then all of this is taken
 care of automatically by a CallbackHandler that retrieves and sets CXF message
 attachments. Therefore if you are using CXF then you can sign/encrypt message
 attachments just by setting the configuration detailed in the next couple of
 sections.
-</p>
 
-<subsection name="Securing message attachments via the action approach">
-<p>
+=== Securing message attachments via the action approach
+
 With the "action" approach to using WSS4J, the user specifies the parts to
 sign or encrypt via the following configuration tags:
-</p>
-<ul>
-<li>ConfigurationConstants.SIGNATURE_PARTS ("signatureParts")</li>
-<li>ConfigurationConstants.ENCRYPTION_PARTS ("encryptionParts")</li>
-</ul>
-<p>
+
+ * ConfigurationConstants.SIGNATURE_PARTS ("signatureParts")
+ * ConfigurationConstants.ENCRYPTION_PARTS ("encryptionParts")
+
 The value of these tags is a String in a special format that looks something
 like "{Content}{http://example.org/paymentv2}CreditCard"
 ({modifier}{namespace}localname). In WSS4J 2.0.0, it is possible to
@@ -60,11 +55,9 @@ sign/encrypt all of the attachments by specifying the following as part of
 signatureParts/encryptionParts: "{}cid:Attachments;". Note that this signs or
 encrypts all of the attachments, it is not possible to only sign/encrypt
 individual attachments.
-</p>
-</subsection>
 
-<subsection name="Securing message attachments via WS-SecurityPolicy">
-<p>
+=== Securing message attachments via WS-SecurityPolicy
+
 An easier way to use WSS4J is in conjunction with a web services stack such as
 Apache CXF and a WS-SecurityPolicy-based policy. It is possible to sign/encrypt
 all attachments by adding a "sp:Attachments" policy as a child of either a
@@ -73,9 +66,4 @@ all attachments by adding a "sp:Attachments" policy as a child of either a
 called "sp13:ContentSignatureTransform" and
 "sp13:AttachmentCompleteSignatureTransform", which dictate whether the
 attachment headers are included or not in the Signature.
-</p>
-</subsection>
 
-</section>            
-</body>
-</document>

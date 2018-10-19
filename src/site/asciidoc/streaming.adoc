@@ -1,0 +1,77 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+== Streaming (StAX) WS-Security support in Apache WSS4J&#8482; 2.0.0
+
+=== Overview of new features
+
+WSS4J 2.0.0 introduces a streaming (StAX-based) WS-Security implementation to
+complement the existing DOM-based implementation. The DOM-based implementation
+is quite performant and flexible, but suffers from having to read the entire
+XML tree into memory. For large SOAP requests this can have a detrimental
+impact on performance. In addition, for web services stacks such as Apache CXF
+which are streaming-based, it carries an additional performance penalty of
+having to explicitly convert the request stream to a DOM Element.
+
+The new StAX-based WS-Security implementation does not read the request into
+memory, and hence uses far less memory for large requests. It is also more
+performant in certain circumstances. The StAX-based code offers largely the
+same functionality as that available as part of the DOM code, and is
+configured in mostly the same way (via configuration tags that are shared
+between both stacks). It does not offer the low-level API available in the DOM
+code to individually construct various WS-Security tokens, but instead must be
+used by specifying various actions to perform.
+
+As of the time of writing, Apache CXF is the only web services stack to 
+integrate the new WS-Security streaming functionality. To switch to use the
+streaming code for the manual "Action" based approach, simply change the
+outbound and inbound interceptors as follows:
+
+ * "org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor".
+ * "org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor".
+
+For the WS-SecurityPolicy based approach of configuring WS-Security, simply
+set the JAX-WS property SecurityConstants.ENABLE_STREAMING_SECURITY
+("ws-security.enable.streaming") to "true".
+
+=== Limitations of the streaming WS-Security implementation
+
+The new streaming implementation in WSS4J 2.0.0 meets the vast majority of the
+most common use-cases. However, it does not support everything that the DOM
+implementation supports. The limitations are:
+
+ * XPath evaluation is not supported apart from certain simple expressions.
+XPath evaluations are used with WS-SecurityPolicy RequiredElements,
+SignedElements, (Content)EncryptedElements. XPath expressions that point
+directly to the element are supported, e.g. /soap:Envelope/soap:Header/wsa:To.
+See WSS-445.
+ * WS-SecurityPolicy "Strict" Layout validation is not enforced. This includes
+enforcing whether a Timestamp is first or last. See WSS-444.
+ * A SymmetricBinding policy with a ProtectTokens assertion is not supported.
+See WSS-456.
+ * The combination of EncryptBeforeSigning + EncryptSignature policies are not
+supported. See WSS-464.
+ * Deriving keys from Username Tokens (Endorsing Username Tokens) are not
+supported.
+ * Endorsing tokens don't work with Symmetric + Asymmetric binding on the
+client side, unless the endorsing token is a SAML or IssuedToken.
+ * Derived Endorsing Tokens are not supported on the client side.
+
