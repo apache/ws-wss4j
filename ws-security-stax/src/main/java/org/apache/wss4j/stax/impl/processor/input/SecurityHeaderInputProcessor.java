@@ -53,7 +53,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     protected static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityHeaderInputProcessor.class);
 
-    private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
+    private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<>();
     private int startIndexForProcessor;
 
     public SecurityHeaderInputProcessor(WSSSecurityProperties securityProperties) {

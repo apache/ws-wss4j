@@ -171,7 +171,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                     }
 
                     Map<SecurityHeaderOrder, Deque<XMLSecEvent>> map = actionEventMap.get(securityHeaderOrder.getAction());
-                    currentDeque = new ArrayDeque<XMLSecEvent>();
+                    currentDeque = new ArrayDeque<>();
                     map.put(securityHeaderOrder, currentDeque);
 
                     securityHeaderIndex++;

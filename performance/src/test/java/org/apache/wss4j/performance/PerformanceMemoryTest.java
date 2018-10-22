@@ -429,7 +429,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         private FileWriter fileWriter;
         private long memoryDiff;
 
-        private List<Integer> memory = new LinkedList<Integer>();
+        private List<Integer> memory = new LinkedList<>();
 
         MemorySamplerThread(ThreadStopper threadStopper, FileWriter fileWriter, long memoryDiff) {
             this.threadStopper = threadStopper;

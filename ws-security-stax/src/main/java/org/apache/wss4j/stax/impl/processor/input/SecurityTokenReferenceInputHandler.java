@@ -108,7 +108,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         private QName startElementName;
         private int startElementLevel;
 
-        private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
+        private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<>();
 
         InternalSecurityTokenReferenceInputProcessor(String securityTokenReferenceId, QName attribute,
                                                      String attributeValue, WSSSecurityProperties securityProperties) {

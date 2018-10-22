@@ -105,7 +105,7 @@ public class InboundWSSecurityContextImplTest {
 
     public List<SecurityEvent> generateTransportBindingSecurityEvents() throws Exception {
 
-        final List<SecurityEvent> securityEventList = new LinkedList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new LinkedList<>();
 
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
@@ -127,7 +127,7 @@ public class InboundWSSecurityContextImplTest {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(timestampSecurityEvent);
 
-        List<QName> timestampPath = new LinkedList<QName>();
+        List<QName> timestampPath = new LinkedList<>();
         timestampPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         timestampPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
 
@@ -135,7 +135,7 @@ public class InboundWSSecurityContextImplTest {
         timestampRequiredElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(timestampRequiredElementSecurityEvent);
 
-        List<QName> usernameTokenPath = new LinkedList<QName>();
+        List<QName> usernameTokenPath = new LinkedList<>();
         usernameTokenPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         usernameTokenPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
 
@@ -156,7 +156,7 @@ public class InboundWSSecurityContextImplTest {
         SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
 
-        List<QName> scPath = new LinkedList<QName>();
+        List<QName> scPath = new LinkedList<>();
         scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         scPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
 
@@ -164,7 +164,7 @@ public class InboundWSSecurityContextImplTest {
         scRequiredElementSecurityEvent.setElementPath(scPath);
         inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
 
-        List<QName> bstPath = new LinkedList<QName>();
+        List<QName> bstPath = new LinkedList<>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
@@ -270,7 +270,7 @@ public class InboundWSSecurityContextImplTest {
     }
 
     public List<SecurityEvent> generateAsymmetricBindingSecurityEvents() throws Exception {
-        final List<SecurityEvent> securityEventList = new LinkedList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new LinkedList<>();
 
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
@@ -285,7 +285,7 @@ public class InboundWSSecurityContextImplTest {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(timestampSecurityEvent);
 
-        List<QName> timestampPath = new LinkedList<QName>();
+        List<QName> timestampPath = new LinkedList<>();
         timestampPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         timestampPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
 
@@ -296,7 +296,7 @@ public class InboundWSSecurityContextImplTest {
         SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
 
-        List<QName> scPath = new LinkedList<QName>();
+        List<QName> scPath = new LinkedList<>();
         scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         scPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
 
@@ -304,7 +304,7 @@ public class InboundWSSecurityContextImplTest {
         scRequiredElementSecurityEvent.setElementPath(scPath);
         inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
 
-        List<QName> bstPath = new LinkedList<QName>();
+        List<QName> bstPath = new LinkedList<>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
@@ -322,7 +322,7 @@ public class InboundWSSecurityContextImplTest {
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> signaturePath = new LinkedList<QName>();
+        List<QName> signaturePath = new LinkedList<>();
         signaturePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         signaturePath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -330,7 +330,7 @@ public class InboundWSSecurityContextImplTest {
         signatureEncryptedElementSecurityEvent.setElementPath(signaturePath);
         inboundWSSecurityContext.registerSecurityEvent(signatureEncryptedElementSecurityEvent);
 
-        List<QName> usernameTokenPath = new LinkedList<QName>();
+        List<QName> usernameTokenPath = new LinkedList<>();
         usernameTokenPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         usernameTokenPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
 
@@ -441,7 +441,7 @@ public class InboundWSSecurityContextImplTest {
         bstElementSecurityEvent.setXmlSecEvent(initiatorTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(bstElementSecurityEvent);
 
-        List<QName> header1Path = new LinkedList<QName>();
+        List<QName> header1Path = new LinkedList<>();
         header1Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         header1Path.add(new QName("x", "Header1", "x"));
 
@@ -449,7 +449,7 @@ public class InboundWSSecurityContextImplTest {
         header1SignedPartSecurityEvent.setElementPath(header1Path);
         inboundWSSecurityContext.registerSecurityEvent(header1SignedPartSecurityEvent);
 
-        List<QName> header2Path = new LinkedList<QName>();
+        List<QName> header2Path = new LinkedList<>();
         header2Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         header2Path.add(new QName("x", "Header1", "x"));
 
@@ -457,7 +457,7 @@ public class InboundWSSecurityContextImplTest {
         header2SignedPartSecurityEvent.setElementPath(header2Path);
         inboundWSSecurityContext.registerSecurityEvent(header2SignedPartSecurityEvent);
 
-        List<QName> bodyPath = new LinkedList<QName>();
+        List<QName> bodyPath = new LinkedList<>();
         bodyPath.addAll(WSSConstants.SOAP_11_BODY_PATH);
 
         SignedPartSecurityEvent bodySignedPartSecurityEvent = new SignedPartSecurityEvent(initiatorToken, true, protectionOrder);
@@ -539,7 +539,7 @@ public class InboundWSSecurityContextImplTest {
     }
 
     public List<SecurityEvent> generateSymmetricBindingSecurityEvents() throws Exception {
-        final List<SecurityEvent> securityEventList = new LinkedList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new LinkedList<>();
 
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
@@ -554,7 +554,7 @@ public class InboundWSSecurityContextImplTest {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(timestampSecurityEvent);
 
-        List<QName> timestampPath = new LinkedList<QName>();
+        List<QName> timestampPath = new LinkedList<>();
         timestampPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         timestampPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
 
@@ -565,7 +565,7 @@ public class InboundWSSecurityContextImplTest {
         SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
 
-        List<QName> scPath = new LinkedList<QName>();
+        List<QName> scPath = new LinkedList<>();
         scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         scPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
 
@@ -573,7 +573,7 @@ public class InboundWSSecurityContextImplTest {
         scRequiredElementSecurityEvent.setElementPath(scPath);
         inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
 
-        List<QName> samlTokenPath = new LinkedList<QName>();
+        List<QName> samlTokenPath = new LinkedList<>();
         samlTokenPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         samlTokenPath.add(WSSConstants.TAG_SAML2_ASSERTION);
 
@@ -600,7 +600,7 @@ public class InboundWSSecurityContextImplTest {
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> usernamePath = new LinkedList<QName>();
+        List<QName> usernamePath = new LinkedList<>();
         usernamePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         usernamePath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
 
@@ -611,7 +611,7 @@ public class InboundWSSecurityContextImplTest {
         usernameEncryptedElementSecurityEvent.setXmlSecEvent(usernameTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(usernameEncryptedElementSecurityEvent);
 
-        List<QName> usernameTokenPath = new LinkedList<QName>();
+        List<QName> usernameTokenPath = new LinkedList<>();
         usernameTokenPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         usernameTokenPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
 
@@ -627,7 +627,7 @@ public class InboundWSSecurityContextImplTest {
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
         inboundWSSecurityContext.registerSecurityEvent(usernameTokenSecurityEvent);
 
-        List<QName> signaturePath = new LinkedList<QName>();
+        List<QName> signaturePath = new LinkedList<>();
         signaturePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         signaturePath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -656,7 +656,7 @@ public class InboundWSSecurityContextImplTest {
         signedUsernameTokenElementSecurityEvent.setXmlSecEvent(usernameTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(signedUsernameTokenElementSecurityEvent);
 
-        List<QName> bstPath = new LinkedList<QName>();
+        List<QName> bstPath = new LinkedList<>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
@@ -672,7 +672,7 @@ public class InboundWSSecurityContextImplTest {
         samlTokenElementSecurityEvent.setXmlSecEvent(samlTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(samlTokenElementSecurityEvent);
 
-        List<QName> header1Path = new LinkedList<QName>();
+        List<QName> header1Path = new LinkedList<>();
         header1Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         header1Path.add(new QName("x", "Header1", "x"));
 
@@ -680,7 +680,7 @@ public class InboundWSSecurityContextImplTest {
         header1SignedPartSecurityEvent.setElementPath(header1Path);
         inboundWSSecurityContext.registerSecurityEvent(header1SignedPartSecurityEvent);
 
-        List<QName> header2Path = new LinkedList<QName>();
+        List<QName> header2Path = new LinkedList<>();
         header2Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         header2Path.add(new QName("x", "Header1", "x"));
 
@@ -688,7 +688,7 @@ public class InboundWSSecurityContextImplTest {
         header2SignedPartSecurityEvent.setElementPath(header2Path);
         inboundWSSecurityContext.registerSecurityEvent(header2SignedPartSecurityEvent);
 
-        List<QName> bodyPath = new LinkedList<QName>();
+        List<QName> bodyPath = new LinkedList<>();
         bodyPath.addAll(WSSConstants.SOAP_11_BODY_PATH);
 
         SignedPartSecurityEvent bodySignedPartSecurityEvent = new SignedPartSecurityEvent(samlSecurityToken, true, protectionOrder);

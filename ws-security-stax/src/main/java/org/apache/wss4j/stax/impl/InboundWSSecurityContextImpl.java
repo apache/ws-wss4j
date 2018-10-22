@@ -56,7 +56,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(InboundWSSecurityContextImpl.class);
 
-    private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
+    private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<>();
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
     private boolean allowRSA15KeyTransportAlgorithm = false;
