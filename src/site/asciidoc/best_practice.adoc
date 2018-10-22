@@ -1,66 +1,60 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
 
-      http://www.apache.org/licenses/LICENSE-2.0
+== Security Best Practices
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-<document>
-<body>
-<section name="Security Best Practices">
-<p>
-This page describes a number of steps which should be taken to ensure that security best
+This section describes a number of steps which should be taken to ensure that security best
 practices are followed and enforced.
-</p>
-<subsection name="Upgrade to WSS4J 2.0.x or 1.6.x">
-<p>
-The 1.5.x series of releases of WSS4J is deprecated. You should switch to
-either the 2.0.x or the latest 1.6.x release as a matter of priority, as these
-branches contains up to date security fixes. For example, WSS4J 1.6.x uses the
-"secure validation" mode of Apache XML Security for Java, which protects
-against a number of <a href="http://santuario.apache.org/java150releasenotes.html">attacks</a> on XML Signature.
-</p>
-</subsection>
-<subsection name="Upgrade to the latest minor release as soon as possible">
-<p>
+
+=== Upgrade to WSS4J 2.3.x or 2.2.x
+
+The 1.5.x and 1.6.x series of releases of WSS4J are deprecated. You should switch to
+either 2.3.x or the latest 2.2.x release as a matter of priority, as these
+branches contain up to date security fixes. 
+
+=== Upgrade to the latest minor release as soon as possible
+
 You should always upgrade to the latest minor release in a timely manner, in order to pick up 
 security fixes.
-</p>
-</subsection>
-<subsection name="Use WS-SecurityPolicy to enforce security requirements">
-<p>
+
+=== Use WS-SecurityPolicy to enforce security requirements
+
 WSS4J can be used with a web services stack such as Apache CXF or Apache Axis in one of two
 ways: either by specifying security actions directly, or via WS-SecurityPolicy. 
 WS-SecurityPolicy is a much richer way of specifying security constraints when processing
-messages, and gives you more "automatic" protection against various attacks then when
+messages, and gives you more *automatic* protection against various attacks then when
 configuring via security actions. See for example, this blog 
-<a href="http://coheigea.blogspot.ie/2012/10/xml-signature-wrapping-attacks-on-web.html">post</a>
+http://coheigea.blogspot.ie/2012/10/xml-signature-wrapping-attacks-on-web.html[post]
 on XML signature wrapping attacks. Therefore, you should always try to use WSS4J with a
 WS-SecurityPolicy requirement.
-</p>
-</subsection>
-<subsection name="Use RSA-OAEP for the Key Transport Algorithm">
-<p>
+
+=== Use RSA-OAEP for the Key Transport Algorithm
+
 WSS4J supports two key transport algorithms, RSA v1.5 and RSA-OAEP. A number
 of attacks exist on RSA v1.5. Therefore, you should always use RSA-OAEP as the
 key transport algorithm, and enforce this decision. For WS-SecurityPolicy,
 this means to avoid using any AlgorithmSuite that ends with "Rsa15" (e.g.
 "Basic128Rsa15").
-</p>
-<p>
+
 For the "Action" based approach, there are different ways of enforcing that
 RSA v1.5 cannot be used for key transport depending on the version of WSS4J.
-In WSS4J 2.0.0, it is not allowed by default and no action is required. If you
+From WSS4J 2.0.0, it is not allowed by default and no action is required. If you
 wish to allow it, then you must set the
 WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM property to "true". For
 WSS4J 1.6.x, the RSA v1.5 key transport algorithm is allowed by default. In
@@ -69,29 +63,26 @@ this case, you should explicitly configure WSHandlerConstants.ENC_KEY_TRANSPORT
 "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p". This latter point requires
 the web services stack to set this property on the Request (it is known that
 Apache CXF does this).
-</p>
-</subsection>
-<subsection name="Avoid using a cbc Symmetric Encryption Algorithm">
-<p>
+
+=== Avoid using a cbc Symmetric Encryption Algorithm
+
 There are some attacks that exploit the "cbc" mode of a Symmetric Encryption Algorithm. 
 WSS4J has support for "gcm" mode algorithms as well. This can be specified via
 WSHandlerConstants.ENC_SYM_ALGO ("encryptionSymAlgorithm"), for example to 
 "http://www.w3.org/2009/xmlenc11#aes128-gcm".
-</p>
-</subsection>
-<subsection name="Use Subject DN regular expressions with chain trust">
-<p>
+
+=== Use Subject DN regular expressions with chain trust
+
 WSS4J 1.6.7 introduced the ability to specify regular expressions on the Subject DN of a 
 certificate used for signature validation. It is important to add this constraint when you
 are supporting "chain trust", which is where you are establishing trust in a certificate 
 based on the fact that the Issuer of the certificate is in your trust store. Otherwise, any
 certificate of this issuer will pass trust validation. See 
-<a href="http://coheigea.blogspot.ie/2012/08/subject-dn-certificate-constraint.html">here</a>
+http://coheigea.blogspot.ie/2012/08/subject-dn-certificate-constraint.html[here]
 for more information. 
-</p>
-</subsection>
-<subsection name="Specify signature algorithm on receiving side">
-<p>
+
+=== Specify signature algorithm on receiving side
+
 When not using WS-SecurityPolicy (see point above about favouring the WS-SecurityPolicy
 approach), you should specify a signature algorithm to use on the receiving side. This
 can be done via WSHandlerConstants.SIG_ALGO ("signatureAlgorithm"). Setting this property
@@ -99,8 +90,4 @@ to (e.g.) "http://www.w3.org/2000/09/xmldsig#rsa-sha1" will ensure that the sign
 algorithm allowed is RSA-SHA1 and not (e.g.) HMAC-SHA1. This latter point requires the
 web services stack to set this property on the Request (it is known that Apache CXF does 
 this). See also the previous point about setting the key encryption transport algorithm.
-</p>
-</subsection>
-</section>            
-</body>
-</document>
+

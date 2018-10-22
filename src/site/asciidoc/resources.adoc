@@ -1,0 +1,42 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+== Further Resources
+
+This section lists some further resources that describe how to use WSS4J in more
+detail.
+
+=== WSS4J 2.0.0 articles
+
+ * http://coheigea.blogspot.ie/2014/01/apache-wss4j-200-part-i.html[WSS4J 2.0.0 overview]
+
+=== WSS4J 1.6.x articles
+
+ * http://coheigea.blogspot.ie/2011/01/wss4j-16-crypto-property-change.html[Crypto property changes in WSS4J 1.6.x]
+ * http://coheigea.blogspot.ie/2011/02/support-for-saml2-assertions-in-wss4j.html[Support for SAML 2.0 in WSS4J 1.6.x]
+ * http://coheigea.blogspot.ie/2011/02/usernametoken-processing-changes-in.html[UsernameToken processing changes in WSS4J 1.6.x]
+ * http://coheigea.blogspot.ie/2011/02/wspasswordcallback-changes-in-wss4j-16.html[WSPasswordCallback changes in WSS4J 1.6.x]
+ * http://coheigea.blogspot.ie/2011/02/wss4j-16-specifying-elements-to-sign-or.html[Specifying elements to sign or encrypt]
+ * http://coheigea.blogspot.ie/2011/03/wss4j-16-basic-security-profile-11.html[Basic Security Profile 1.1 compliance]
+ * http://coheigea.blogspot.ie/2011/03/wss4j-16-saml-property-changes.html[SAML property changes]
+ * http://coheigea.blogspot.ie/2011/04/wss4j-16-introducing-validators.html[WSS4J Validators]
+ * http://coheigea.blogspot.ie/2011/05/crl-support-in-wss4j-161.html[CRL support in WSS4J 1.6.1]
+ * http://coheigea.blogspot.ie/2011/08/saml-token-creation-in-apache-wss4j-16.html[Creating SAML Tokens]
+ * http://coheigea.blogspot.ie/2013/03/signature-and-encryption-key.html[Signature and Encryption Key Identifiers in Apache WSS4J]
+
