@@ -181,7 +181,7 @@ public class InboundWSSecurityContextImplTest {
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
         inboundWSSecurityContext.registerSecurityEvent(signatureValueSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         SignedElementSecurityEvent signedTimestampElementSecurityEvent = new SignedElementSecurityEvent(signedEndorsingEncryptedSupportingToken, true, protectionOrder);
@@ -318,7 +318,7 @@ public class InboundWSSecurityContextImplTest {
         recipientToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
         inboundWSSecurityContext.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
@@ -596,7 +596,7 @@ public class InboundWSSecurityContextImplTest {
         samlTokenSecurityEvent.setSecurityToken(samlSecurityToken);
         inboundWSSecurityContext.registerSecurityEvent(samlTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 

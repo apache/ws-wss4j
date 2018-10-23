@@ -106,7 +106,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
@@ -202,7 +202,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
             securityProperties.setActions(actions);
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
@@ -245,7 +245,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -341,7 +341,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());

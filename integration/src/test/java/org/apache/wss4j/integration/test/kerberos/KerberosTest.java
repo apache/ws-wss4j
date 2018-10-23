@@ -679,7 +679,7 @@ public class KerberosTest {
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN);
             securityProperties.setActions(actions);
             securityProperties.setCallbackHandler(new CallbackHandler() {
@@ -945,7 +945,7 @@ public class KerberosTest {
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
             securityProperties.setActions(actions);
             securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);

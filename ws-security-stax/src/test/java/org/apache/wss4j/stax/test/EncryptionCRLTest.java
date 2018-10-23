@@ -50,7 +50,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
@@ -101,7 +101,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
     public void testEncryptionWithRevocationCheck() throws Exception {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setEnableRevocation(true);
             securityProperties.setActions(actions);

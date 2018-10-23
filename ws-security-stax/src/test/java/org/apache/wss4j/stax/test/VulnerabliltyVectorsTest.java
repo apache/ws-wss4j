@@ -346,7 +346,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -388,7 +388,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -520,7 +520,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             outboundSecurityProperties.setSignatureUser("transmitter");
             outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
@@ -607,7 +607,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);

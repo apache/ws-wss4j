@@ -45,7 +45,7 @@ public class OutputChainTest extends AbstractTestBase {
     @Test
     public void testEncryptionAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.ENCRYPT);
         securityProperties.setActions(actions);
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -88,7 +88,7 @@ public class OutputChainTest extends AbstractTestBase {
     @Test
     public void testSignatureAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SIGNATURE);
         securityProperties.setActions(actions);
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -124,7 +124,7 @@ public class OutputChainTest extends AbstractTestBase {
     @Test
     public void testTimeStampAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         securityProperties.setActions(actions);
 

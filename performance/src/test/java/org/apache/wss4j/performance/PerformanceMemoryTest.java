@@ -284,7 +284,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
@@ -311,7 +311,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);

@@ -54,7 +54,7 @@ public class MultipleActionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
@@ -95,7 +95,7 @@ public class MultipleActionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setActions(actions);
@@ -114,7 +114,7 @@ public class MultipleActionTest extends AbstractTestBase {
     @Test
     public void testDuplicateActions() throws Exception {
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<XMLSecurityConstants.Action> actions = new ArrayList<XMLSecurityConstants.Action>();
+        List<XMLSecurityConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         properties.setSignatureUser("transmitter");

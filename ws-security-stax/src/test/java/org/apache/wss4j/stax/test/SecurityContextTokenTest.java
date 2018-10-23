@@ -99,7 +99,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
@@ -310,7 +310,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);

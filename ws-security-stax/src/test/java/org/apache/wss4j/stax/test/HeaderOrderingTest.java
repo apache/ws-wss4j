@@ -61,7 +61,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.USERNAMETOKEN);
             securityProperties.setActions(actions);
@@ -109,7 +109,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.USERNAMETOKEN);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
@@ -157,7 +157,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.USERNAMETOKEN);
             securityProperties.setActions(actions);
@@ -207,7 +207,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
@@ -255,7 +255,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
@@ -303,7 +303,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.USERNAMETOKEN);
             actions.add(WSSConstants.TIMESTAMP);
@@ -356,7 +356,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.USERNAMETOKEN);
@@ -409,7 +409,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.USERNAMETOKEN);
             actions.add(WSSConstants.TIMESTAMP);
@@ -464,7 +464,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.USERNAMETOKEN);
@@ -531,7 +531,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.USERNAMETOKEN);
@@ -647,7 +647,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
             actions.add(WSSConstants.USERNAMETOKEN);
@@ -708,7 +708,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.USERNAMETOKEN);

@@ -72,7 +72,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.TIMESTAMP);
@@ -109,7 +109,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
@@ -183,7 +183,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.TIMESTAMP);
@@ -285,7 +285,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.TIMESTAMP);
