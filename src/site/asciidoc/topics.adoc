@@ -1,0 +1,167 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+== WSS4J Special Topics
+
+This section discusses various topics regarding usage of WSS4J.  See the link:using.html[Using Apache WSS4J] page for web stack-specific usage notes.
+
+=== Crypto Interface
+
+WSS4J uses the Crypto interface to provide a pluggable way of retrieving and converting certificates, verifying trust on certificates etc. Three implementations are provided out of the box by WSS4J:
+
+ * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/Merlin.java?view=markup[Merlin]: The standard implementation, based around two JDK keystores for key/cert retrieval, and trust verification.
+ * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/CertificateStore.java?view=markup[CertificateStore]: Holds an array of X509 Certificates. Can only be used for encryption and signature verification.
+ * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/MerlinDevice.java?view=markup[MerlinDevice]: Based on Merlin, allows loading of keystores using a null InputStream - for example on a smart-card device.
+
+Typically, a Crypto implementation is loaded and configured via a Crypto properties file. This tells WSS4J what Crypto implementation to load, as well as implementation-specific properties such as a keystore location, password, default alias to use, etc. A typical example of the contents of a Crypto properties file for Signature creation is as http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/resources/wss40.properties?view=markup[follows]:
+
+ * org.apache.wss4j.crypto.provider=org.apache.wss4j.common.crypto.Merlin
+ * org.apache.wss4j.crypto.merlin.keystore.type=jks
+ * org.apache.wss4j.crypto.merlin.keystore.password=security
+ * org.apache.wss4j.crypto.merlin.keystore.alias=wss40
+ * org.apache.wss4j.crypto.merlin.keystore.file=keys/wss40.jks
+
+Note that in WSS4J 2.0.0 the "org.apache.ws.security.crypto" prefix used previously is now "org.apache.wss4j.crypto", however both prefixes are accepted by the code. For WSS4J 1.6.X and 1.5.X, you must use the "org.apache.ws.security.crypto" prefix.
+
+=== Verifying Public Keys
+
+In WSS4J 1.5.x, trust validation of public keys involved construction of a PublicKeyCallback instance, passing it the PublicKey object, and invoking the CallbackHandler. It then called a "isVerified" method on the Callback to check to see whether the CallbackHandler had verified the PublicKey or not. The CallbackHandler implementation needed to call the "verifyTrust" method on the PublicKeyCallback, passing in a KeyStore object. This method iterates through each Certificate in the KeyStore, and checks to see whether the PublicKeys match.
+
+In WSS4J 1.6.x, trust validation of public keys was moved from a WSS4J 1.5's PublicKeyCallback instance to the Crypto interface, where the argument is now a PublicKey object. In this way, validation is done using the same interface as for trust validation for Certificates, and the end-user has no need to consider the special-case of verifying public keys in the CallbackHandler, as it is taken care of internally by WSS4J.
+
+=== Introducing Validators
+
+WSS4J 1.6 introduces the concept of a Validator, for validating credentials that have been processed by a Processor instance.
+
+An inbound security header is processed by WSS4J by iterating through each child element of the header, and by calling the appropriate Processor implementation to deal with each element. In WSS4J 1.5.x, some processors perform validation on the received token (e.g. UsernameTokens), whereas others store the processing results for later verification by third-party WS-Handler implementations (e.g. Timestamp verification, Certificate trust verification). There are some problems with this approach:
+
+ * It is not consistent, some processors perform validation, others do not.
+ * There is a potential security hole, in that it is assumed third-party code will know to validate the credentials that the WSS4J processors do not validate.
+ * WSS4J will continue to process the rest of the security header even if the Timestamp is invalid, or the certificate non-trusted, which could lead to denial-of-service attacks.
+ * There is no separation of concerns between processing the token and validating the token. If you want to change how the token is validated, you must replace the processor instance.
+
+WSS4J 1.6 has moved Timestamp verification and certificate trust validation back into the processing of the security header, thus solving the first three points above. The fourth point is met by the new concept of Validators, as well as some changes to the way Processors and CallbackHandler implementations are used in WSS4J 1.6.
+
+In WSS4J 1.5.x, CallbackHandler implementations are used in different ways by different processors, sometimes they are expected to verify a password (as for processing UsernameTokens), and other times they are expected to supply a password (as for decryption). In WSS4J 1.6, CallbackHandler implementations are only expected to supply a password (if it exists) to the processors. The Processor implementations do not perform any validation of the security token, instead they package up the processed token, along with any (password) information extracted from the CallbackHandler, and hand it off to a Validator implementation for Validation.
+
+The Processor implementations get the specific Validator implementation to use via the RequestData parameter, which in turn asks a WSSConfig object for the Validator implementation. If the Validator is null, then no Validation is performed on the received token. The Processor then stores the received token as normal. WSS4J 1.6 comes with several default Validators, which are:
+
+ * NoOpValidator: Does no processing of the credential
+ * TimestampValidator: Validates a Timestamp
+ * UsernameTokenValidator: Validates a UsernameToken
+ * SignatureTrustValidator: Verifies trust in a signature
+ * SamlAssertionValidator: Checks some HOK requirements on a SAML Assertion, and verifies trust on the (enveloped) signature.
+
+There are some additional WSSecurityEngineResult constants that pertain to the Validator implementations:
+
+ * TAG_VALIDATED_TOKEN: Indicates that the token corresponding to this result has been validated by a Validator implementation. Some of the processors do not have a default Validator implementation.
+ * TAG_TRANSFORMED_TOKEN: A Validator implementation may transform a credential (into a SAML Assertion) as a result of Validation. This tag holds a reference to an AssertionWrapper instance, that represents a transformed version of the validated credential.
+
+To validate an inbound UsernameToken in some custom way, simply associate the NoOpValidator with the UsernameToken QName in the WSSConfig of the RequestData object used to supply context information to the processors. After WSS4J has finished processing the security header, then extract the WSSecurityEngineResult instance corresponding to the WSConstants.UT action, and perform some custom validation on the token.
+
+To validate plaintext passwords against a directory store, rather than have the CallbackHandler set the password:  Simply @Override the verifyPlaintextPassword(UsernameToken usernameToken) method in the validator. By simply plugging in a validator on the UsernameTokenProcessor (such as the NoOpValidator), it is possible to do any kind of custom validation (or none at all) on the token.
+
+An example of how to add a custom Validator implementation is the STSTokenValidator in CXF. The https://github.com/apache/cxf/blob/master/rt/ws/security/src/main/java/org/apache/cxf/ws/security/trust/STSTokenValidator.java[STSTokenValidator] tries to validate a received SAML Assertion locally, and if that fails, it dispatches it to a Security Token Service (STS) via the WS-Trust interface for validation. It also supports validating a UsernameToken and BinarySecurityToken in the same manner. The https://github.com/apache/cxf/blob/master/rt/ws/security/src/main/java/org/apache/cxf/ws/security/SecurityConstants.java[SecurityConstants] class defines some configuration tags for specifying a custom validator for inbound SAML1, SAML2, UsernameToken, BinarySecurityToken, Signature and Timestamps. The STSTokenValidator can be configured by associating it with the appropriate configuration tag.
+
+=== Specifying elements to sign or encrypt
+
+The signature and encryption creation code in WSS4J uses the WSEncryptionPart class to find DOM elements to sign and encrypt. There are a number of minor changes to how elements are located from a WSEncryptionPart in WSS4J 1.6:
+
+ . WSEncryptionPart now stores an optional DOM element, which will be used as the element to sign/encrypt if it is non-null.
+ . Failing this, it finds the SOAP body and compares the wsu:Id with the stored Id, or if there is no stored Id in WSEncryptionPart, it checks the stored localname/namespace.
+ . Failing this, if the stored Id in WSEncryptionPart is not null, it tries to find the first element in the SOAP envelope that has a matching wsu:Id.
+ . If the stored Id is null, it tries to find *all* DOM Elements that match the stored localname/namespace.
+
+WSEncryptionPart is intended to refer to a single Element for encryption/signature. However, as a localname/namespace is not necessarily unique, point 4 will return all matching Elements. An important implication of the order of the steps given above, is that client code should set the DOM element on the WSEncryptionPart if it is accessible, and if not, it should set the wsu:Id. Otherwise, a localname/namespace (which is not referring to the SOAP Body) will result in a traversal of the DOM tree.
+
+The DOM element(s) that is(are) found are stored for retrieval, so that we don't need to traverse the SOAP envelope multiple times, when e.g. doing an STR Transform, or for element location in the XML Security code.
+
+=== WSPasswordCallback identifiers
+
+The http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ext/WSPasswordCallback.java?view=markup[WSPasswordCallback class] defines a set of integers which correspond to usage instructions for the CallbackHandler.  In WSS4J 1.6, the following WSPasswordCallback identifiers are used:
+
+ * WSPasswordCallback.DECRYPT - DECRYPT usage is used when the calling code needs a password to get the private key of this identifier (alias) from a keystore. This is only used for the inbound case of decrypting a session (symmetric) key, and not for the case of getting a private key to sign the message. The CallbackHandler must set the password via the setPassword(String) method.
+ * WSPasswordCallback.USERNAME_TOKEN - USERNAME_TOKEN usage is used to obtain a password for either creating a Username Token (whether plaintext or digest), or for validating it. It is also used for the case of deriving a key from a Username Token. The CallbackHandler must set the password via the setPassword(String) method.
+ * WSPasswordCallback.SIGNATURE - SIGNATURE usage is used on the outbound side only, to get a password to get the private key of this identifier (alias) from a keystore. The CallbackHandler must set the password via the setPassword(String) method.
+ * WSPasswordCallback.SECURITY_CONTEXT_TOKEN - SECURITY_CONTEXT_TOKEN usage is for the case of when we want the CallbackHandler to supply the key associated with a SecurityContextToken. The CallbackHandler must set the key via the setKey(byte[]) method.
+ * WSPasswordCallback.CUSTOM_TOKEN - CUSTOM_TOKEN usage is used for the case that we want the CallbackHandler to supply a token as a DOM Element. For example, this is used for the case of a reference to a SAML Assertion or Security Context Token that is not in the message. The CallbackHandler must set the token via the setCustomToken(Element) method.
+ * WSPasswordCallback.SECRET_KEY - SECRET_KEY usage is used for the case that we want to obtain a secret key for encryption or signature on the outbound side, or for decryption or verification on the inbound side. The CallbackHandler must set the key via the setKey(byte[]) method.
+
+In WSS4J 2.0, the following additional WSPasswordCallback identifier is:
+
+ * WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD - PASSWORD_ENCRYPTOR_PASSWORD usage is used to return the password used with a PasswordEncryptor implementation to decrypt encrypted passwords stored in Crypto properties files
+
+=== UsernameToken handling in WSS4J 1.6
+
+The CallbackHandler interface receives and requires the following information when handling UsernameTokens:
+
+ * For both digest and plaintext cases, the CallbackHandler is given the username, password type and an identifier of WSPasswordCallback.USERNAME_TOKEN. It must set the password on the callback, and the validator does the comparison.
+ * The custom password type case defaults to the same behaviour as the plaintext case, assuming wssConfig.getHandleCustomPasswordTypes() returns true.
+ * For the case of a username token with no password element, the default behaviour is simply to ignore it, and to store it as a new result of type WSConstants.UT_NOPASSWORD.
+
+=== Support for SAML2 assertions in WSS4J 1.6
+
+Support for SAML2 assertions has finally arrived in WSS4J, via the forthcoming 1.6 release. This has been a http://issues.apache.org/jira/browse/WSS-146[long-standing] feature request. WSS4J 1.5.x only supports SAML 1.1 assertions via the deprecated https://spaces.internet2.edu/display/OpenSAML/OS1Status[Opensaml1], and it supports them in a very limited manner, namely:
+
+ * It only supports the creation of Authentication statements.
+ * Processing essentially involves saving the assertions, it did not support validating enveloped signatures, or trust on the signatures, etc.
+
+Several patches were submitted to http://issues.apache.org/jira/browse/WSS-146[WSS-146] to upgrade WSS4J to use Opensaml2. SAML2 support in WSS4J 1.6 consists of:
+
+ * Support for creating signed/unsigned SAML 1.1/2.0 assertions, containing authentication, authorization, attribute statements etc.
+ * This extensibility is achieved by letting the user implement a CallbackHandler instance.
+ * The SAMLTokenProcessor can now process any type of assertion, verify an enveloped signature on it, and verify trust on the signature. It also verifies some holder-of-key requirements, e.g. that the Subject contains a KeyInfo element, and that the assertion is signed and trusted etc.
+
+WSS4J 1.6 contains an http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/saml/[extensive set of tests] for both creating and processing different type of assertions. To illustrate the flexibility and simplicity of the CallbackHandler approach for constructing assertions, take a look at an abstract CallbackHandler http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/common/AbstractSAMLCallbackHandler.java?view=markup[here], as well as the concrete implementations (http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/common/SAML1CallbackHandler.java?view=markup[SAML 1.1] and http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/common/SAML2CallbackHandler.java?view=markup[SAML 2]). As you can see, a fairly small amount of code can create a large variety of assertions.
+
+Opensaml2 has a very large set of dependencies, but through some judicious pom exclusions, as well replacing the Opensaml DefaultBootstrap code to avoid loading velocity, the following dependencies are introduced in WSS4J via Opensaml (snippet from mvn dependency):
+
+[source]
+----
++- org.opensaml:opensaml:jar:2.4.1:compile
+ |  \- org.opensaml:openws:jar:1.4.1:compile
+ |     \- org.opensaml:xmltooling:jar:1.3.1:compile
+ |        +- org.slf4j:slf4j-api:jar:1.6.1:compile
+ |        \- joda-time:joda-time:jar:1.6.2:compile
+----
+
+The Opensaml2 port has a large impact on existing code for *creating* assertions, however it is thought that very few people used that code. It has a minimal impact on existing code for processing assertions, with several caveats:
+
+ * WSS4J 1.5.x ignored (enveloped) signatures on SAML (1.1) assertions - this is no longer the case, so deployments which do not set the correct keystore/truststore config for dealing with signature verification will fail
+ * The SAMLTokenProcessor no longer saves all tokens as an "WSConstants.ST_UNSIGNED" action. It saves tokens that do not have an enveloped signature as this action, and token which *do* have an enveloped signature are saved as a "WSConstants.ST_SIGNED" action.
+ * The object that is saved as part of the action above has changed, from an Opensaml1 specific Assertion object, to an AssertionWrapper instance, which is a WSS4J specific object which encapsulates an Assertion, as well as some information corresponding to signature verification, etc.
+
+=== JSR-105 support
+
+WSS4J 1.6 has been ported to use the http://jcp.org/en/jsr/detail?id=105[JSR 105]  API for XML Digital Signature. Previously, WSS4J 1.5.x used the custom API of the Apache http://santuario.apache.org/[Santuario] XML Security for Java library to create and process XML Digital Signatures.
+
+WSS4J 1.6 has a minimum requirement of JDK 1.5 (note that WSS4J 1.5.x supports JDK 1.4). As JDK 1.5 does not contain an implementation of JSR 105, this means that XML Digital Signature is done via the JSR 105 implementation of Apache Santuario. However, when JDK 1.6+ is used, WSS4J 1.6 uses the JDK implementation of JSR 105 for signature creation and verification. You can override this by endorsing the Santuario jar.
+
+The Apache Santuario XML Security jar is still required for the JDK 1.6 case, as there are compile-time dependencies in WSS4J for encryption/decryption, as well as for some algorithm parsing, and resource resolver stuff. One downside to the Santuario jar, is its dependence on Xalan for a small subset of operations. This dependency is https://issues.apache.org/jira/browse/SANTUARIO-252[removed] for the 1.5 release of that library.
+
+It is worth noting some changes to the main http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/main/java/org/apache/wss4j/dom/message/WSSecSignature.java?view=markup[class] used in WSS4J for signature creation as a result of the JSR-105 port. In WSS4J 1.5.x, after the signature certs and list of references to sign had been configured, the "computeSignature" method was called to compute the signature. The DOM element corresponding to the signature was independent of the pre-existing security header, and could be extracted later and inserted into the security header.
+
+In WSS4J 1.6, you must tell "computeSignature" where to insert the signature element. A boolean "prepend" argument allows you to configure whether to prepend the generated Signature element to the security header, or whether to append it. If prepend is true, then an optional siblingElement argument can be used to prepend the signature element before this sibling element. Once computeSignature has been called, you have no control over where the signature element is inserted into the security header.
+
+=== Basic Security Profile 1.1 compliance
+
+The Basic Security Profile (BSP) 1.1 http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html[specification] provides an industry-standard way of making sure that different WS-Security stacks can communicate with each other, by clarifying and narrowing the scope of the various WS-Security standards. WSS4J 1.5.x does not implement the BSP in any meaningful way. The http://svn.apache.org/viewvc/webservices/wss4j/branches/1_5_x-fixes/src/org/apache/ws/security/WSSConfig.java?view=markup[WSSConfig] class supports a "isWsiBSPCompliant" method (default is false), which will enable the generation of an InclusivePrefix list for signature generation, something that is mandated by the BSP spec.
+
+WSS4J 1.6 provides https://issues.apache.org/jira/browse/WSS-256[support] for the BSP 1.1 specification, in so far as it pertains to the core WS-Security specifications that WSS4J supports. The enforcing of BSP compliance for inbound messages is controlled by the WSSConfig class, as per WSS4J 1.5.x. An important change is that BSP compliance is now turned *on* by default. In addition, a new http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/main/java/org/apache/wss4j/dom/handler/WSHandlerConstants.java?view=markup[WSHandlerConstants] configuration parameter has been added so that BSP compliance can be controlled via a WSHandler implementation.
+
