@@ -23,6 +23,7 @@
 include::what.adoc[]
 include::using.adoc[]
 include::migration.adoc[]
+include::config.adoc[]
 include::streaming.adoc[]
 include::attachments.adoc[]
 include::topics.adoc[]
