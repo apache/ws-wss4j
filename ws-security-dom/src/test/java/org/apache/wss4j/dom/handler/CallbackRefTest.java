@@ -68,7 +68,7 @@ public class CallbackRefTest extends org.junit.Assert {
         );
         reqData.setMsgContext(messageContext);
 
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<>();
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
@@ -104,7 +104,7 @@ public class CallbackRefTest extends org.junit.Assert {
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
 
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        final java.util.List<Integer> actions = new java.util.ArrayList<>();
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
