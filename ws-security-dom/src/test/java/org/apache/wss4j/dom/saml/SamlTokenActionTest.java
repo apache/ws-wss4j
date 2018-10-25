@@ -80,7 +80,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
@@ -116,7 +116,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
@@ -155,7 +155,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         samlCallbackHandler.setIssuerName("wss40");
         samlCallbackHandler.setIssuerPassword("security");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
         reqData.setMsgContext(config);
@@ -190,7 +190,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);

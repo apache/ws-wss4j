@@ -274,7 +274,7 @@ public class SignatureCertTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        java.util.Map<String, String> config = new java.util.TreeMap<String, String>();
+        java.util.Map<String, String> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");

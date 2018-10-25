@@ -164,7 +164,7 @@ public class UTSignatureTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
@@ -206,7 +206,7 @@ public class UTSignatureTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
         reqData.setMsgContext(messageContext);

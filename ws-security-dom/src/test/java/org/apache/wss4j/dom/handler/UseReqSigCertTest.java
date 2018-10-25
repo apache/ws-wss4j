@@ -60,7 +60,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
@@ -105,7 +105,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "IssuerSerial");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
@@ -150,7 +150,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "SKIKeyIdentifier");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
@@ -193,7 +193,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_VER_PROP_FILE, "wss40.properties");
         reqData.setMsgContext(config);
 
@@ -210,7 +210,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
     private void sendResponse(List<WSHandlerResult> handlerResults) throws Exception {
         final RequestData reqData = new RequestData();
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.ENCRYPTION_USER, "useReqSigCert");
         config.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
         reqData.setMsgContext(config);

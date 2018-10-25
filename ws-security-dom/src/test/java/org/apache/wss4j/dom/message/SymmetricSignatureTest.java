@@ -215,7 +215,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "EncryptedKeySHA1");
         messageContext.put(WSHandlerConstants.SIG_ALGO, SignatureMethod.HMAC_SHA1);
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
@@ -240,7 +240,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
 
         reqData = new RequestData();
         reqData.setWssConfig(WSSConfig.getNewInstance());
-        messageContext = new java.util.TreeMap<String, Object>();
+        messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");

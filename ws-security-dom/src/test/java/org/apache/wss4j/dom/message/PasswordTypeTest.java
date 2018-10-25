@@ -166,7 +166,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");

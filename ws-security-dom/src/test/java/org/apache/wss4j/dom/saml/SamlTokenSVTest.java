@@ -345,7 +345,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> msgContext = new java.util.HashMap<String, Object>();
+        java.util.Map<String, Object> msgContext = new java.util.HashMap<>();
         msgContext.put(WSHandlerConstants.SIG_VER_PROP_FILE, "crypto.properties");
         reqData.setMsgContext(msgContext);
 

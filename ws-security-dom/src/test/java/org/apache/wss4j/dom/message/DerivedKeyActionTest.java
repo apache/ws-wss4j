@@ -73,7 +73,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
@@ -105,7 +105,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
@@ -138,7 +138,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SIG_DIGEST_ALGO, WSConstants.SHA256);
@@ -170,7 +170,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
@@ -203,7 +203,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "SKIKeyIdentifier");
@@ -234,7 +234,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
@@ -266,7 +266,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
@@ -305,7 +305,7 @@ public class DerivedKeyActionTest extends Assert {
         byte[] keyData = key.getEncoded();
         secretKeyCallbackHandler.setOutboundSecret(keyData);
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
         reqData.setMsgContext(config);
@@ -335,7 +335,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.ENC_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
@@ -376,7 +376,7 @@ public class DerivedKeyActionTest extends Assert {
         byte[] keyData = key.getEncoded();
         secretKeyCallbackHandler.setOutboundSecret(keyData);
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
@@ -408,7 +408,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
@@ -444,7 +444,7 @@ public class DerivedKeyActionTest extends Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
@@ -488,7 +488,7 @@ public class DerivedKeyActionTest extends Assert {
         byte[] keyData = key.getEncoded();
         secretKeyCallbackHandler.setOutboundSecret(keyData);
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
@@ -530,7 +530,7 @@ public class DerivedKeyActionTest extends Assert {
         byte[] keyData = key.getEncoded();
         secretKeyCallbackHandler.setOutboundSecret(keyData);
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
         config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");

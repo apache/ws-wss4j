@@ -41,7 +41,7 @@ public final class EHCacheManagerHolder {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EHCacheManagerHolder.class);
     private static final ConcurrentHashMap<String, AtomicInteger> COUNTS
-        = new ConcurrentHashMap<String, AtomicInteger>(8, 0.75f, 2);
+        = new ConcurrentHashMap<>(8, 0.75f, 2);
 
     private static Method cacheManagerCreateMethodNoArg;
     private static Method createMethodURLArg;

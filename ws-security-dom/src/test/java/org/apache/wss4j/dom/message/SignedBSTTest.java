@@ -129,7 +129,7 @@ public class SignedBSTTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");

@@ -550,7 +550,7 @@ public class SignatureTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(
@@ -764,7 +764,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(
@@ -806,7 +806,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put("password", "security");
@@ -843,7 +843,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put("password", "security");
@@ -879,7 +879,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_C14N_ALGO, WSConstants.C14N_WITH_COMMENTS);
         config.put("password", "security");
@@ -925,7 +925,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {

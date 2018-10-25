@@ -372,7 +372,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         messageContext.put(WSHandlerConstants.ENC_PROP_REF_ID, "" + crypto.hashCode());
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + crypto.hashCode());
@@ -417,7 +417,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         messageContext.put(WSHandlerConstants.ENC_PROP_REF_ID, "" + crypto.hashCode());
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + crypto.hashCode());

@@ -64,7 +64,7 @@ import org.w3c.dom.Document;
 public abstract class WSHandler {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSHandler.class);
-    protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
+    protected Map<String, Crypto> cryptos = new ConcurrentHashMap<>();
 
     /**
      * Performs all defined security actions to set-up the SOAP request.

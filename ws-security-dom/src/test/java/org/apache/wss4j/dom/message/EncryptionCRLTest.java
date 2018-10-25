@@ -92,7 +92,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
         actionToken.setSymmetricAlgorithm(WSConstants.TRIPLE_DES);
         actionToken.setCrypto(crypto);
         reqData.setEncryptionToken(actionToken);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
@@ -134,7 +134,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
         actionToken.setSymmetricAlgorithm(WSConstants.TRIPLE_DES);
         actionToken.setCrypto(crypto);
         reqData.setEncryptionToken(actionToken);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");

@@ -59,7 +59,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put("password", "securityPassword");
         reqData.setMsgContext(messageContext);
 
@@ -86,7 +86,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put("password", "securityPassword");
         reqData.setMsgContext(messageContext);
 
@@ -124,7 +124,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF,
             callbackHandler

@@ -93,7 +93,7 @@ public class BinarySecurityTokenType {
     @XmlSchemaType(name = "ID")
     protected String id;
     @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+    private Map<QName, String> otherAttributes = new HashMap<>();
 
     /**
      * A security token that is encoded in binary Gets the value of the content property.

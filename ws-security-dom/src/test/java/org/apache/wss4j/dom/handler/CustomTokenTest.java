@@ -72,7 +72,7 @@ public class CustomTokenTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(
             WSHandlerConstants.PW_CALLBACK_REF, new CustomCallbackHandler(timestampElement)
         );

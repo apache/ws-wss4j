@@ -264,7 +264,7 @@ public class SamlTokenTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
         reqData.setMsgContext(config);
 

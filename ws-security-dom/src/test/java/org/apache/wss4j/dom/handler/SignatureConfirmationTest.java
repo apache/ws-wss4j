@@ -72,7 +72,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     public void
     testRequestSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
@@ -113,7 +113,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     public void
     testRequestNotSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
@@ -152,7 +152,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     public void
     testSignatureConfirmationResponse() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");
@@ -216,7 +216,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     public void
     testSignatureConfirmationProcessing() throws Exception {
         final RequestData reqData = new RequestData();
-        java.util.Map<String, Object> msgContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         msgContext.put("password", "security");

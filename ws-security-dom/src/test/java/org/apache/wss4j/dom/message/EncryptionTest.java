@@ -460,7 +460,7 @@ public class EncryptionTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
         messageContext.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
         secretKeyCallbackHandler.setOutboundSecret(keyData);

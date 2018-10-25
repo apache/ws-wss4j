@@ -812,7 +812,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");
@@ -843,7 +843,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
@@ -873,7 +873,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
 
@@ -902,7 +902,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setUsername("emptyuser");
@@ -1107,7 +1107,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         RequestData reqData = new RequestData();
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, "true");

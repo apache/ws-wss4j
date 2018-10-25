@@ -619,7 +619,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(

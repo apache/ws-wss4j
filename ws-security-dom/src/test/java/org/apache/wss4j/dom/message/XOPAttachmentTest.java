@@ -519,7 +519,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         reqData.setAttachmentCallbackHandler(outboundAttachmentCallback);
 
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
@@ -569,7 +569,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         reqData.setAttachmentCallbackHandler(outboundAttachmentCallback);
 
 
-        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
