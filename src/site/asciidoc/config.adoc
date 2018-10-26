@@ -248,236 +248,76 @@ bytes are signed, and not just the reference.
 The configuration tags for properties that are configured via a non-boolean
 parameter are as follows:
 
-<tr>
-<th>Tag name</th>
-<th>Tag value</th>
-<th>Tag meaning</th>
-</tr>
-<tr>
- * PASSWORD_TYPE
- * passwordType
- * The encoding of the password for a Username Token. The default is
+ * PASSWORD_TYPE (passwordType) - The encoding of the password for a Username Token. The default is
 WSConstants.PW_DIGEST.
-</tr>
-<tr>
- * <b>WSS4J 1.6.x only</b> ENC_KEY_NAME
- * embeddedKeyName
- * The text of the key name to be sent in the KeyInfo for encryption
-</tr>
-<tr>
- * <b>WSS4J 1.6.x only</b> ADD_UT_ELEMENTS
- * addUTElements
- * Additional elements to add to a Username Token, i.e. "nonce" and "created".
-
-</tr>
-<tr>
- * SIG_KEY_ID
- * signatureKeyIdentifier
- * The key identifier type to use for signature. The default is "IssuerSerial".
-</tr>
-<tr>
- * SIG_ALGO
- * signatureAlgorithm
- * The signature algorithm to use. The default is set by the data in the
+ * *WSS4J 1.6.x only* ENC_KEY_NAME (embeddedKeyName) - The text of the key name to be sent in the KeyInfo for encryption
+ * *WSS4J 1.6.x only* ADD_UT_ELEMENTS (addUTElements) - Additional elements to add to a Username Token, i.e. "nonce" and "created".
+ * SIG_KEY_ID (signatureKeyIdentifier) - The key identifier type to use for signature. The default is "IssuerSerial".
+ * SIG_ALGO (signatureAlgorithm) - The signature algorithm to use. The default is set by the data in the
 certificate.
-
-</tr>
-<tr>
- * SIG_DIGEST_ALGO
- * signatureDigestAlgorithm
- * The signature digest algorithm to use. The default is SHA-1.
-</tr>
-<tr>
- * SIG_C14N_ALGO
- * signatureC14nAlgorithm
- * Defines which signature c14n (canonicalization) algorithm to use. The
+ * SIG_DIGEST_ALGO (signatureDigestAlgorithm) - The signature digest algorithm to use. The default is SHA-1.
+ * SIG_C14N_ALGO (signatureC14nAlgorithm) - Defines which signature c14n (canonicalization) algorithm to use. The
 default is: "http://www.w3.org/2001/10/xml-exc-c14n#".
-</tr>
-<tr>
- * <b>WSS4J 1.6.x only</b> WSE_SECRET_KEY_LENGTH
- * wseSecretKeyLength
- * The length of the secret (derived) key to use for the WSE UT_SIGN
+ * *WSS4J 1.6.x only* WSE_SECRET_KEY_LENGTH (wseSecretKeyLength) - The length of the secret (derived) key to use for the WSE UT_SIGN
 functionality.
-</tr>
-<tr>
- * SIGNATURE_PARTS
- * signatureParts
- * Parameter to define which parts of the request shall be signed. The SOAP
+ * SIGNATURE_PARTS (signatureParts) - Parameter to define which parts of the request shall be signed. The SOAP
 body is signed by default.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> OPTIONAL_SIGNATURE_PARTS
- * optionalSignatureParts
- * Parameter to define which parts of the request shall be signed, if they
+ * *WSS4J 2.0.0* OPTIONAL_SIGNATURE_PARTS (optionalSignatureParts) - Parameter to define which parts of the request shall be signed, if they
 exist in the request.
-</tr>
-<tr>
- * DERIVED_KEY_ITERATIONS
- * derivedKeyIterations
- * The number of iterations to use when deriving a key from a Username Token.
+ * DERIVED_KEY_ITERATIONS (derivedKeyIterations) - The number of iterations to use when deriving a key from a Username Token.
 The default is 1000.
-</tr>
-<tr>
- * ENC_KEY_ID
- * encryptionKeyIdentifier
- * The key identifier type to use for encryption. The default is
+ * ENC_KEY_ID (encryptionKeyIdentifier) - The key identifier type to use for encryption. The default is
 "IssuerSerial".
-</tr>
-<tr>
- * ENC_SYM_ALGO
- * encryptionSymAlgorithm
- * The symmetric encryption algorithm to use. The default is AES-128.
-</tr>
-<tr>
- * ENC_KEY_TRANSPORT
- * encryptionKeyTransportAlgorithm
- * The algorithm to use to encrypt the generated symmetric key. The default is RSA-OAEP.
-</tr>
-<tr>
- * ENC_DIGEST_ALGO
- * encryptionDigestAlgorithm
- * The encryption digest algorithm to use with the RSA-OAEP key transport
+ * ENC_SYM_ALGO (encryptionSymAlgorithm) - The symmetric encryption algorithm to use. The default is AES-128.
+ * ENC_KEY_TRANSPORT (encryptionKeyTransportAlgorithm) - The algorithm to use to encrypt the generated symmetric key. The default is RSA-OAEP.
+ * ENC_DIGEST_ALGO (encryptionDigestAlgorithm) - The encryption digest algorithm to use with the RSA-OAEP key transport
 algorithm. The default is SHA-1.
-</tr>
-<tr>
- * ENCRYPTION_PARTS
- * encryptionParts
- * Parameter to define which parts of the request shall be encrypted. The
+ * ENCRYPTION_PARTS (encryptionParts) - Parameter to define which parts of the request shall be encrypted. The
 SOAP body is encrypted in "Content" mode by default.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> OPTIONAL_ENCRYPTION_PARTS
- * optionalEncryptionParts
- * Parameter to define which parts of the request shall be encrypted, if they
+ * *WSS4J 2.0.0* OPTIONAL_ENCRYPTION_PARTS (optionalEncryptionParts) - Parameter to define which parts of the request shall be encrypted, if they
 exist in the request.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> ENC_MGF_ALGO
- * encryptionMGFAlgorithm
- * Defines which encryption mgf algorithm to use with the RSA OAEP Key
+ * *WSS4J 2.0.0* ENC_MGF_ALGO (encryptionMGFAlgorithm) - Defines which encryption mgf algorithm to use with the RSA OAEP Key
 Transport algorithm for encryption. The default is mgfsha1.
-</tr>
-<tr>
- * TTL_TIMESTAMP
- * timeToLive
- * The time difference between creation and expiry time in seconds in the WSS
+ * TTL_TIMESTAMP (timeToLive) - The time difference between creation and expiry time in seconds in the WSS
 Timestamp. The default is "300".
-</tr>
-<tr>
- * TTL_FUTURE_TIMESTAMP
- * futureTimeToLive
- * The time in seconds in the future within which the Created time of an
+ * TTL_FUTURE_TIMESTAMP (futureTimeToLive) - The time in seconds in the future within which the Created time of an
 incoming Timestamp is valid. The default is "60".
-</tr>
-<tr>
- * TTL_USERNAMETOKEN
- * utTimeToLive
- * The time difference between creation and expiry time in seconds in the WSS
+ * TTL_USERNAMETOKEN (utTimeToLive) - The time difference between creation and expiry time in seconds in the WSS
 UsernameToken created element. The default is "300".
-</tr>
-<tr>
- * TTL_FUTURE_USERNAMETOKEN
- * utFutureTimeToLive
- * The time in seconds in the future within which the Created time of an
+ * TTL_FUTURE_USERNAMETOKEN (utFutureTimeToLive) - The time in seconds in the future within which the Created time of an
 incoming UsernameToken is valid. The default is "60".
-</tr>
-<tr>
- * SIG_SUBJECT_CERT_CONSTRAINTS
- * sigSubjectCertConstraints
- * A comma separated String of regular expressions which will be applied to
+ * SIG_SUBJECT_CERT_CONSTRAINTS (sigSubjectCertConstraints) - A comma separated String of regular expressions which will be applied to
 the subject DN of the certificate used for signature validation, after trust
 verification of the certificate chain associated with the certificate. 
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> VALIDATOR_MAP
- * validatorMap
- * A map of QName, Object (Validator) instances to be used to validate
+ * *WSS4J 2.0.0* VALIDATOR_MAP (validatorMap) - A map of QName, Object (Validator) instances to be used to validate
 tokens identified by their QName.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> NONCE_CACHE_INSTANCE
- * nonceCacheInstance
- * A ReplayCache instance used to cache UsernameToken nonces. The default
+ * *WSS4J 2.0.0* NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. The default
 instance that is used is the EHCacheReplayCache.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> TIMESTAMP_CACHE_INSTANCE
- * timestampCacheInstance
- * A ReplayCache instance used to cache Timestamp Created Strings. The default
+ * *WSS4J 2.0.0* TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. The default
 instance that is used is the EHCacheReplayCache.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> SAML_ONE_TIME_USE_CACHE_INSTANCE
- * samlOneTimeUseCacheInstance
- * A ReplayCache instance used to cache SAML2 Token Identifier Strings (if
+ * *WSS4J 2.0.0* SAML_ONE_TIME_USE_CACHE_INSTANCE (samlOneTimeUseCacheInstance) - A ReplayCache instance used to cache SAML2 Token Identifier Strings (if
 the token contains a OneTimeUse Condition). The default instance that is used
 is the EHCacheReplayCache.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> PASSWORD_ENCRYPTOR_INSTANCE
- * passwordEncryptorInstance
- * A PasswordEncryptor instance used to decrypt encrypted passwords in Crypto
+ * *WSS4J 2.0.0* PASSWORD_ENCRYPTOR_INSTANCE (passwordEncryptorInstance) - A PasswordEncryptor instance used to decrypt encrypted passwords in Crypto
 properties files. The default is the JasyptPasswordEncryptor.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> DERIVED_TOKEN_REFERENCE
- * derivedTokenReference
- * This controls how deriving tokens are referenced.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> DERIVED_TOKEN_KEY_ID
- * derivedTokenKeyIdentifier
- * This controls the key identifier of Derived Tokens.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> DERIVED_SIGNATURE_KEY_LENGTH
- * derivedSignatureKeyLength
- * The length to use (in bytes) when deriving a key for Signature.
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> DERIVED_ENCRYPTION_KEY_LENGTH
- * derivedEncryptionKeyLength
- * The length to use (in bytes) when deriving a key for Encryption.
-</tr>
-</table>
-<p>
+ * *WSS4J 2.0.0* DERIVED_TOKEN_REFERENCE (derivedTokenReference) - This controls how deriving tokens are referenced.
+ * *WSS4J 2.0.0* DERIVED_TOKEN_KEY_ID (derivedTokenKeyIdentifier) - This controls the key identifier of Derived Tokens.
+ * *WSS4J 2.0.0* DERIVED_SIGNATURE_KEY_LENGTH (derivedSignatureKeyLength) - The length to use (in bytes) when deriving a key for Signature.
+ * *WSS4J 2.0.0* DERIVED_ENCRYPTION_KEY_LENGTH (derivedEncryptionKeyLength) - The length to use (in bytes) when deriving a key for Encryption.
+
+==== KeyIdentifier values
+
 The configuration values for setting the KeyIdentifiers for signature or
 encryption are shown below. For an in depth explanation 
-with examples, see this blog <a href="http://coheigea.blogspot.com/2013/03/signature-and-encryption-key.html">entry</a>.
-</p>
-<table name="KeyIdentifier values">
-<tr>
-<th>Value</th>
-</tr>
-<tr>
+with examples, see this blog http://coheigea.blogspot.com/2013/03/signature-and-encryption-key.html[entry].
+
  * DirectReference
-</tr>
-<tr>
  * IssuerSerial
-</tr>
-<tr>
  * X509KeyIdentifier
-</tr>
-<tr>
  * SKIKeyIdentifier
-</tr>
-<tr>
  * EmbeddedKeyName
-</tr>
-<tr>
  * Thumbprint
-</tr>
-<tr>
  * EncryptedKeySHA1
-</tr>
-<tr>
  * KeyValue
-</tr>
-<tr>
- * <b>WSS4J 2.0.0</b> KerberosSHA1
-</tr>
-</table>
-</subsection>
-</section>            
-</body>
-</document>
+ * *WSS4J 2.0.0* KerberosSHA1
+
