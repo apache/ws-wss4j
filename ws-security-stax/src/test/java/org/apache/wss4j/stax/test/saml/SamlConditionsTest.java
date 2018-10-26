@@ -650,7 +650,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             conditions.setTokenPeriodMinutes(5);
 
             List<AudienceRestrictionBean> audiencesRestrictions =
-                new ArrayList<AudienceRestrictionBean>();
+                new ArrayList<>();
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
             audiencesRestrictions.add(audienceRestrictionBean);
@@ -698,7 +698,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             conditions.setTokenPeriodMinutes(5);
 
             List<AudienceRestrictionBean> audiencesRestrictions =
-                new ArrayList<AudienceRestrictionBean>();
+                new ArrayList<>();
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
             audiencesRestrictions.add(audienceRestrictionBean);

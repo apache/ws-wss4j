@@ -106,7 +106,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
         );
@@ -138,7 +138,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
         );
@@ -169,7 +169,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
         );
@@ -197,7 +197,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
         );
@@ -227,7 +227,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
 
         java.util.List<Integer> actions = new java.util.ArrayList<>();
         actions.add(WSConstants.TS);
@@ -244,7 +244,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
         );
@@ -263,7 +263,7 @@ public class ResultsOrderTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
 
         java.util.List<WSSecurityEngineResult> results =
-            new java.util.ArrayList<WSSecurityEngineResult>();
+            new java.util.ArrayList<>();
         results.add(
             new WSSecurityEngineResult(WSConstants.ENCR)
         );

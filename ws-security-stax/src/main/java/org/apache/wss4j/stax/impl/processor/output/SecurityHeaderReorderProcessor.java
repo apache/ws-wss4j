@@ -54,7 +54,7 @@ import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
 public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
 
     private final Map<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> actionEventMap =
-            new LinkedHashMap<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>();
+            new LinkedHashMap<>();
 
     private int securityHeaderIndex;
     private Deque<XMLSecEvent> currentDeque;
