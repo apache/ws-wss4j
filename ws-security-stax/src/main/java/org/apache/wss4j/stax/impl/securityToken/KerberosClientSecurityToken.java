@@ -95,7 +95,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
                                                   contextAndServiceNameCallback.isRequestCredDeleg());
             KerberosContext krbCtx = null;
             try {
-                krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
+                krbCtx = Subject.doAs(clientSubject, action);
 
                 // Get the secret key from KerberosContext if available, otherwise use Kerberos ticket's session key
                 Key sessionKey = krbCtx.getSecretKey();
