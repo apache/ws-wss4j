@@ -34,7 +34,7 @@
     <properties>
         <bcprov.version>1.60</bcprov.version>
         <commons.compress.version>1.18</commons.compress.version>
-        <ehcache.version>2.10.5</ehcache.version>
+        <ehcache.version>2.10.6</ehcache.version>
         <geronimo.javamail.version>1.8.4</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
