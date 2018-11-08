@@ -35,12 +35,7 @@ import javax.xml.stream.util.XMLEventConsumer;
  */
 public class XMLSecEventAllocator implements XMLEventAllocator {
 
-    private XMLEventAllocator xmlEventAllocator;
     private XMLSecStartElement parentXmlSecStartElement;
-
-    public XMLSecEventAllocator() throws Exception {
-        xmlEventAllocator = com.ctc.wstx.evt.DefaultEventAllocator.getDefaultInstance();
-    }
 
     @Override
     public XMLEventAllocator newInstance() {
@@ -69,6 +64,6 @@ public class XMLSecEventAllocator implements XMLEventAllocator {
 
     @Override
     public void allocate(XMLStreamReader reader, XMLEventConsumer consumer) throws XMLStreamException {
-        xmlEventAllocator.allocate(reader, consumer);
+        //xmlEventAllocator.allocate(reader, consumer);
     }
 }
