@@ -249,7 +249,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
             );
 
-        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -299,7 +299,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvsa1qne1m6TM8XA==", createdString, "default"
             );
 
-        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -343,7 +343,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvSa1qne1m6TM8XA==", createdString, "default"
             );
 
-        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -380,7 +380,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvsa1Qne1m6TM8XA==", createdString, "default"
             );
 
-        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
