@@ -20,16 +20,26 @@
 package org.apache.wss4j.dom.message;
 
 import java.io.File;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -989,6 +999,53 @@ public class SignatureTest extends org.junit.Assert {
         verify(signedDoc);
     }
 
+    @Test
+    public void testCustomKeyInfoElementCreation() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        // Create the KeyInfo
+        DocumentBuilderFactory docBuilderFactory =
+            DocumentBuilderFactory.newInstance();
+        docBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        Document keyInfoDoc = docBuilder.newDocument();
+
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("16c73ab6-b892-458f-abf5-2f875f74882e");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+
+        KeyInfoFactory keyInfoFactory =
+            XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig").getKeyInfoFactory();
+
+        // X.509
+        X509Data x509Data = keyInfoFactory.newX509Data(Collections.singletonList(certs[0]));
+        KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data), null);
+
+        // Marshal the KeyInfo to DOM
+        Element parent = keyInfoDoc.createElement("temp");
+        DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
+        cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
+        keyInfo.marshal(new DOMStructure(parent), cryptoContext);
+
+        Element keyInfoElement = (Element)parent.getFirstChild();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setCustomKeyInfoElement(keyInfoElement);
+        LOG.info("Before Signing IS....");
+
+        Document signedDoc = builder.build(crypto);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString =
+                XMLUtils.prettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+
+        assertNotNull(signedDoc);
+    }
 
     /**
      * Verifies the soap envelope.
