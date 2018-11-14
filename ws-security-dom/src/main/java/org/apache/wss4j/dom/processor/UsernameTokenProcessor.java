@@ -136,6 +136,11 @@ public class UsernameTokenProcessor implements Processor {
         UsernameToken ut =
             new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, data.getBSPEnforcer());
 
+        // Validate whether the security semantics have expired
+        if (!ut.verifyCreated(utTTL, futureTimeToLive)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
+
         // Test for replay attacks
         ReplayCache replayCache = data.getNonceReplayCache();
         if (replayCache != null && ut.getNonce() != null) {
@@ -156,11 +161,6 @@ public class UsernameTokenProcessor implements Processor {
             } else {
                 replayCache.add(ut.getNonce(), utTTL + 1L);
             }
-        }
-
-        // Validate whether the security semantics have expired
-        if (!ut.verifyCreated(utTTL, futureTimeToLive)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
 
         Credential credential = new Credential();
