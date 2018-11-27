@@ -221,11 +221,11 @@ public class ValidatorTest extends org.junit.Assert {
 
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        assertNotNull(token);
 
         SamlAssertionWrapper samlAssertion =
             (SamlAssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
-        assertTrue(samlAssertion != null);
+        assertNotNull(samlAssertion);
     }
 
     /**
@@ -272,7 +272,7 @@ public class ValidatorTest extends org.junit.Assert {
 
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        assertNotNull(token);
     }
 
 

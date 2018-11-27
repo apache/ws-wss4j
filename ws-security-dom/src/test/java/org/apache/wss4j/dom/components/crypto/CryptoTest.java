@@ -53,14 +53,14 @@ public class CryptoTest extends org.junit.Assert {
     @Test
     public void testCrypto() throws Exception {
         Crypto crypto = CryptoFactory.getInstance();
-        assertTrue(crypto != null);
+        assertNotNull(crypto);
     }
 
     @Test
     public void testMerlinWithNullProperties()
         throws Exception {
         Crypto crypto = new NullPropertiesCrypto();
-        assertTrue(crypto != null);
+        assertNotNull(crypto);
     }
 
     /**

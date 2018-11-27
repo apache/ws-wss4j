@@ -138,11 +138,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -202,11 +202,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -267,12 +267,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -332,12 +332,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -465,12 +465,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
         actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -541,12 +541,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
         actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -600,11 +600,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -663,11 +663,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -728,12 +728,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -794,12 +794,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -869,12 +869,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
         actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -945,12 +945,12 @@ public class SamlReferenceTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed an encrypted element
         actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);

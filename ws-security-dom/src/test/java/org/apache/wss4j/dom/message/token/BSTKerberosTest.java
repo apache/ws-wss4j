@@ -99,7 +99,7 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         assertTrue(AP_REQ.equals(bst.getValueType()));
         assertTrue(BASE64_NS.equals(bst.getEncodingType()));
-        assertTrue(bst.getToken() != null);
+        assertNotNull(bst.getToken());
     }
 
 
@@ -205,11 +205,11 @@ public class BSTKerberosTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        assertNotNull(token);
 
         assertTrue(AP_REQ.equals(token.getValueType()));
         assertTrue(BASE64_NS.equals(token.getEncodingType()));
-        assertTrue(token.getToken() != null);
+        assertNotNull(token.getToken());
     }
 
     /**

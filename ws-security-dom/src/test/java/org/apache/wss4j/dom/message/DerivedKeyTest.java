@@ -171,9 +171,9 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
-        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_SECRET));
     }
 
 
@@ -213,9 +213,9 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
-        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_SECRET));
     }
 
 
@@ -254,9 +254,9 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
-        assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_SECRET));
     }
 
     @Test

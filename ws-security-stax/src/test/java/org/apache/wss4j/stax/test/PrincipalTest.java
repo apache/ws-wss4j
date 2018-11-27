@@ -100,9 +100,9 @@ public class PrincipalTest extends AbstractTestBase {
             Assert.assertTrue(principal instanceof UsernameTokenPrincipal);
             UsernameTokenPrincipal usernameTokenPrincipal = (UsernameTokenPrincipal)principal;
             Assert.assertTrue("transmitter".equals(usernameTokenPrincipal.getName()));
-            Assert.assertTrue(usernameTokenPrincipal.getCreatedTime() != null);
-            Assert.assertTrue(usernameTokenPrincipal.getNonce() != null);
-            Assert.assertTrue(usernameTokenPrincipal.getPassword() != null);
+            Assert.assertNotNull(usernameTokenPrincipal.getCreatedTime());
+            Assert.assertNotNull(usernameTokenPrincipal.getNonce());
+            Assert.assertNotNull(usernameTokenPrincipal.getPassword());
             Assert.assertTrue(usernameTokenPrincipal.isPasswordDigest());
             Assert.assertTrue(WSSConstants.NS_PASSWORD_DIGEST.equals(usernameTokenPrincipal.getPasswordType()));
         }
@@ -158,7 +158,7 @@ public class PrincipalTest extends AbstractTestBase {
             Principal principal = token.getPrincipal();
             Assert.assertTrue(principal instanceof SAMLTokenPrincipal);
             Assert.assertTrue(principal.getName().contains("uid=joe"));
-            Assert.assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+            Assert.assertNotNull(((SAMLTokenPrincipal)principal).getToken());
         }
     }
 

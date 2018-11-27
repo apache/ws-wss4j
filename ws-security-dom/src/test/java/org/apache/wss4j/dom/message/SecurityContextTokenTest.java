@@ -130,7 +130,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 results.getActionResults().get(WSConstants.SCT).get(0);
             SecurityContextToken receivedToken =
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-            assertTrue(receivedToken != null);
+            assertNotNull(receivedToken);
             assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
 
             SecurityContextToken clone = new SecurityContextToken(receivedToken.getElement());
@@ -180,7 +180,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 results.getActionResults().get(WSConstants.SCT).get(0);
             SecurityContextToken receivedToken =
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-            assertTrue(receivedToken != null);
+            assertNotNull(receivedToken);
             assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
 
         } catch (Exception e) {

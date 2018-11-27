@@ -100,7 +100,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecurityEngineResult result = signatureResults.get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue(cert != null);
+        assertNotNull(cert);
     }
 
     /**
@@ -138,7 +138,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecurityEngineResult result = signatureResults.get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue(cert != null);
+        assertNotNull(cert);
     }
 
     /**
@@ -172,7 +172,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecurityEngineResult result = signatureResults.get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue(cert != null);
+        assertNotNull(cert);
     }
 
     /**
@@ -206,7 +206,7 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue(cert != null);
+        assertNotNull(cert);
     }
 
     /**
@@ -240,7 +240,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecurityEngineResult result = signatureResults.get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue(cert != null);
+        assertNotNull(cert);
     }
 
     /**

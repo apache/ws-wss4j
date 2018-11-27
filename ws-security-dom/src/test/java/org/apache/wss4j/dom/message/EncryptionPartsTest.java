@@ -121,7 +121,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -284,7 +284,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -332,7 +332,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -448,7 +448,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
 
         @SuppressWarnings("unchecked")
@@ -511,7 +511,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =

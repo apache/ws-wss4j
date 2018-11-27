@@ -86,11 +86,11 @@ public class TimestampTest extends org.junit.Assert {
         WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-        assertTrue(receivedTimestamp != null);
+        assertNotNull(receivedTimestamp);
 
         Timestamp clone = new Timestamp(receivedTimestamp.getElement(), new BSPEnforcer(true));
         assertTrue(clone.equals(receivedTimestamp));
@@ -124,11 +124,11 @@ public class TimestampTest extends org.junit.Assert {
         WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-        assertTrue(receivedTimestamp != null);
+        assertNotNull(receivedTimestamp);
     }
 
     @Test
@@ -167,11 +167,11 @@ public class TimestampTest extends org.junit.Assert {
         WSHandlerResult wsResult = secEngine.processSecurityHeader(doc, requestData);
         WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-        assertTrue(receivedTimestamp != null);
+        assertNotNull(receivedTimestamp);
     }
 
 
@@ -832,7 +832,7 @@ public class TimestampTest extends org.junit.Assert {
         WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
     }
 
     @Test
@@ -856,7 +856,7 @@ public class TimestampTest extends org.junit.Assert {
             WSHandlerResult wsResult = verify(createdDoc);
             WSSecurityEngineResult actionResult =
                 wsResult.getActionResults().get(WSConstants.TS).get(0);
-            assertTrue(actionResult != null);
+            assertNotNull(actionResult);
         } finally {
             Locale.setDefault(defaultLocale);
         }

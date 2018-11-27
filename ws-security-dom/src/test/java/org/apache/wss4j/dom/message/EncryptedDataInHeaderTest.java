@@ -104,7 +104,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
     }
 

@@ -100,11 +100,11 @@ public class CustomTokenTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, null);
         WSSecurityEngineResult actionResult =
             wsResults.getActionResults().get(WSConstants.TS).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-        assertTrue(receivedTimestamp != null);
+        assertNotNull(receivedTimestamp);
     }
 
     private static class CustomCallbackHandler implements CallbackHandler {

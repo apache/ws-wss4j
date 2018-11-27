@@ -86,7 +86,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
                             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
         Assert.assertFalse(properties.isAddExcC14NInclusivePrefixes());
         Assert.assertNotNull(properties.getSignatureCrypto());
-        Assert.assertTrue(properties.getSignatureSecureParts() != null);
+        Assert.assertNotNull(properties.getSignatureSecureParts());
         Assert.assertEquals(properties.getSignatureSecureParts().size(), 1);
         Assert.assertEquals(properties.getSignatureSecureParts().get(0).getName().getLocalPart(),
                             "Body");
@@ -141,7 +141,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         Assert.assertEquals(properties.getEncryptionKeyIdentifier(),
                             WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER);
         Assert.assertNotNull(properties.getEncryptionCrypto());
-        Assert.assertTrue(properties.getEncryptionSecureParts() != null);
+        Assert.assertNotNull(properties.getEncryptionSecureParts());
         Assert.assertEquals(properties.getEncryptionSecureParts().size(), 1);
         Assert.assertEquals(properties.getEncryptionSecureParts().get(0).getName().getLocalPart(),
                             "Body");

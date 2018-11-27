@@ -36,17 +36,17 @@ public class WSSConfigTest extends org.junit.Assert {
         WSSConfig.init();
 
         // Check providers
-        assertTrue(Security.getProvider("STRTransform") != null);
-        assertTrue(Security.getProvider("AttachmentContentSignatureTransform") != null);
-        assertTrue(Security.getProvider("AttachmentCompleteSignatureTransform") != null);
-        assertTrue(Security.getProvider("ApacheXMLDSig") != null);
+        assertNotNull(Security.getProvider("STRTransform"));
+        assertNotNull(Security.getProvider("AttachmentContentSignatureTransform"));
+        assertNotNull(Security.getProvider("AttachmentCompleteSignatureTransform"));
+        assertNotNull(Security.getProvider("ApacheXMLDSig"));
 
         WSSConfig.cleanUp();
 
-        assertTrue(Security.getProvider("STRTransform") == null);
-        assertTrue(Security.getProvider("AttachmentContentSignatureTransform") == null);
-        assertTrue(Security.getProvider("AttachmentCompleteSignatureTransform") == null);
-        assertTrue(Security.getProvider("ApacheXMLDSig") == null);
+        assertNull(Security.getProvider("STRTransform"));
+        assertNull(Security.getProvider("AttachmentContentSignatureTransform"));
+        assertNull(Security.getProvider("AttachmentCompleteSignatureTransform"));
+        assertNull(Security.getProvider("ApacheXMLDSig"));
 
     }
 
@@ -56,22 +56,22 @@ public class WSSConfigTest extends org.junit.Assert {
         WSProviderConfig.init();
 
         // Check providers
-        assertTrue(Security.getProvider("ApacheXMLDSig") != null);
+        assertNotNull(Security.getProvider("ApacheXMLDSig"));
 
         WSProviderConfig.cleanUp();
 
-        assertTrue(Security.getProvider("ApacheXMLDSig") == null);
+        assertNull(Security.getProvider("ApacheXMLDSig"));
 
         WSProviderConfig.init(true, true, true);
-        assertTrue(Security.getProvider("ApacheXMLDSig") != null);
-        assertTrue(Security.getProvider("BC") != null);
-        assertTrue(Security.getProvider("TLSP") != null);
+        assertNotNull(Security.getProvider("ApacheXMLDSig"));
+        assertNotNull(Security.getProvider("BC"));
+        assertNotNull(Security.getProvider("TLSP"));
 
         WSProviderConfig.cleanUp();
 
-        assertTrue(Security.getProvider("ApacheXMLDSig") == null);
-        assertTrue(Security.getProvider("BC") == null);
-        assertTrue(Security.getProvider("TLSP") == null);
+        assertNull(Security.getProvider("ApacheXMLDSig"));
+        assertNull(Security.getProvider("BC"));
+        assertNull(Security.getProvider("TLSP"));
 
     }
 

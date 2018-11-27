@@ -52,7 +52,7 @@ public class SamlTokenTest extends AbstractTestBase {
             assertEquals(SP12Constants.SAML_TOKEN, samlToken.getName());
             assertEquals(SamlToken.SamlTokenType.WssSamlV20Token11, samlToken.getSamlTokenType());
             assertTrue(samlToken.isRequireKeyIdentifierReference());
-            assertTrue(samlToken.getClaims() != null);
+            assertNotNull(samlToken.getClaims());
             count++;
         }
         assertEquals(1, count);
@@ -87,6 +87,6 @@ public class SamlTokenTest extends AbstractTestBase {
         assertEquals(SP12Constants.SAML_TOKEN, samlToken.getName());
         assertEquals(SamlToken.SamlTokenType.WssSamlV20Token11, samlToken.getSamlTokenType());
         assertTrue(samlToken.isRequireKeyIdentifierReference());
-        assertTrue(samlToken.getClaims() != null);
+        assertNotNull(samlToken.getClaims());
     }
 }

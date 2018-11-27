@@ -88,7 +88,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         java.security.Principal principal =
             (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -167,7 +167,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
 
         java.security.Principal principal =
             (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);

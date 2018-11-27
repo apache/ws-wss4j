@@ -105,7 +105,7 @@ public class NameConstraintsTest extends org.junit.Assert {
             // We're loading a single cert chain; there will be one alias
             Enumeration<String> aliases = keystore.aliases();
             Certificate[] certificates = keystore.getCertificateChain(aliases.nextElement());
-            assertTrue(certificates != null);
+            assertNotNull(certificates);
 
             X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
             System.arraycopy(certificates, 0, x509Certificates, 0, certificates.length);

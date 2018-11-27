@@ -102,7 +102,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
         assertNotNull(receivedSamlAssertion.assertionToString());
     }
@@ -154,7 +154,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
     }
 
@@ -194,7 +194,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
     }
 
@@ -245,7 +245,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
     }
 
     /**

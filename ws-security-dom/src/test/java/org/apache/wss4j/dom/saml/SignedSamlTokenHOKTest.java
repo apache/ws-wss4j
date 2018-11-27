@@ -156,9 +156,9 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
-        assertTrue(receivedSamlAssertion.getSignatureValue() != null);
+        assertNotNull(receivedSamlAssertion.getSignatureValue());
 
         // Test we have a WSDataRef for the signed SAML token as well
         List<WSDataRef> refs =
@@ -171,7 +171,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         refs = (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
@@ -227,12 +227,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        assertNotNull(receivedAssertion);
         assertTrue(receivedAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
@@ -290,12 +290,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -352,12 +352,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        assertNotNull(receivedAssertion);
         assertTrue(receivedAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
@@ -414,12 +414,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -475,12 +475,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assert receivedSamlAssertion.isSigned();
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -536,12 +536,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -603,12 +603,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -681,12 +681,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        assertNotNull(receivedAssertion);
         assertTrue(receivedAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
@@ -782,12 +782,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -843,12 +843,12 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         // Test we processed a signature (SOAP body)
         actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);

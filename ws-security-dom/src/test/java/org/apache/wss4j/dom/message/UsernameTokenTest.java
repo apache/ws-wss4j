@@ -148,7 +148,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             results.getActionResults().get(WSConstants.UT).get(0);
         UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-        assertTrue(receivedToken != null);
+        assertNotNull(receivedToken);
 
         UsernameToken clone =
             new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
@@ -443,7 +443,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             results.getActionResults().get(WSConstants.UT).get(0);
         UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-        assertTrue(receivedToken != null);
+        assertNotNull(receivedToken);
 
         UsernameToken clone =
             new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
@@ -587,7 +587,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             results.getActionResults().get(WSConstants.UT_NOPASSWORD).get(0);
         UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-        assertTrue(receivedToken != null);
+        assertNotNull(receivedToken);
     }
 
     /**

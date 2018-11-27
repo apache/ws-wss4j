@@ -204,7 +204,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -357,7 +357,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -435,7 +435,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -508,7 +508,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -584,7 +584,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -659,7 +659,7 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertTrue(token != null);
+        Assert.assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -741,7 +741,7 @@ public class KerberosTest {
                     results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            Assert.assertTrue(token != null);
+            Assert.assertNotNull(token);
 
             Principal principal = (Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             Assert.assertTrue(principal instanceof KerberosPrincipal);
@@ -1007,7 +1007,7 @@ public class KerberosTest {
                     results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            Assert.assertTrue(token != null);
+            Assert.assertNotNull(token);
 
             Principal principal = (Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             Assert.assertTrue(principal instanceof KerberosPrincipal);

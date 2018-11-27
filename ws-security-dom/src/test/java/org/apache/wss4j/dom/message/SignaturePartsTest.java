@@ -131,7 +131,7 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -333,12 +333,12 @@ public class SignaturePartsTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
         assertTrue(receivedSamlAssertion.isSigned());
 
         WSSecurityEngineResult signActionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(signActionResult != null);
+        assertNotNull(signActionResult);
         assertFalse(signActionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -449,7 +449,7 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
 
         @SuppressWarnings("unchecked")
@@ -513,7 +513,7 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
@@ -584,7 +584,7 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);

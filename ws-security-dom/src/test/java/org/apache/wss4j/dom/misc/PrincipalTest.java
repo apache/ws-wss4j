@@ -97,9 +97,9 @@ public class PrincipalTest extends org.junit.Assert {
         assertTrue(principal instanceof UsernameTokenPrincipal);
         assertTrue("wernerd".equals(principal.getName()));
         UsernameTokenPrincipal userPrincipal = (UsernameTokenPrincipal)principal;
-        assertTrue(userPrincipal.getCreatedTime() != null);
-        assertTrue(userPrincipal.getNonce() != null);
-        assertTrue(userPrincipal.getPassword() != null);
+        assertNotNull(userPrincipal.getCreatedTime());
+        assertNotNull(userPrincipal.getNonce());
+        assertNotNull(userPrincipal.getPassword());
         assertTrue(userPrincipal.isPasswordDigest());
         assertTrue(WSConstants.PASSWORD_DIGEST.equals(userPrincipal.getPasswordType()));
     }
@@ -130,7 +130,7 @@ public class PrincipalTest extends org.junit.Assert {
             (Principal)results.getResults().get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
-        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
     }
 
     /**
@@ -168,12 +168,12 @@ public class PrincipalTest extends org.junit.Assert {
 
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
-        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
     }
 
     /**
@@ -211,12 +211,12 @@ public class PrincipalTest extends org.junit.Assert {
 
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
-        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
     }
 
     /**
@@ -256,12 +256,12 @@ public class PrincipalTest extends org.junit.Assert {
 
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
+        assertNotNull(receivedSamlAssertion);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
-        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
     }
 
     /**
@@ -304,7 +304,7 @@ public class PrincipalTest extends org.junit.Assert {
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
-        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
+        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
     }
 
     /**

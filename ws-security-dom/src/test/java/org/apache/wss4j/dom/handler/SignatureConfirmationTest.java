@@ -139,7 +139,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         Set<Integer> savedSignatures =
             (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
-        assertTrue(savedSignatures == null);
+        assertNull(savedSignatures);
     }
 
 
@@ -267,8 +267,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         results = verify(doc);
         WSSecurityEngineResult scResult =
             results.getActionResults().get(WSConstants.SC).get(0);
-        assertTrue(scResult != null);
-        assertTrue(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION) != null);
+        assertNotNull(scResult);
+        assertNotNull(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION));
         handler.signatureConfirmation(reqData, results);
     }
 
