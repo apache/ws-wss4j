@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.validate;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -262,9 +261,8 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
 
             DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
             if (expires != null) {
-                Instant currentTime = Instant.now();
                 Instant zonedExpires = Instant.ofEpochMilli(expires.getMillis());
-                replayCache.add(identifier, 1L + Duration.between(currentTime, zonedExpires).getSeconds());
+                replayCache.add(identifier, zonedExpires);
             } else {
                 replayCache.add(identifier);
             }

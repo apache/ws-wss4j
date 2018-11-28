@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.cache;
 
 import java.net.URL;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.ehcache.Cache;
@@ -100,24 +101,24 @@ public class EHCacheReplayCache implements ReplayCache {
      * @param identifier The identifier to be added
      */
     public void add(String identifier) {
-        add(identifier, ttl);
+        add(identifier, Instant.now().plusSeconds(DEFAULT_TTL));
     }
 
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
-     * @param timeToLive The length of time to cache the Identifier in seconds
+     * @param expiry A custom expiry time for the identifier
      */
-    public void add(String identifier, long timeToLive) {
+    public void add(String identifier, Instant expiry) {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
 
-        int parsedTTL = (int)timeToLive;
-        if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+        int parsedTTL = (int)(expiry.getEpochSecond() - Instant.now().getEpochSecond());
+        if (parsedTTL < 0 || parsedTTL > MAX_TTL) {
             // Default to configured value
             parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
+            if (ttl != parsedTTL) {
                 // Fall back to 60 minutes if the default TTL is set incorrectly
                 parsedTTL = 3600;
             }

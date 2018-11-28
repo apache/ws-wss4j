@@ -103,7 +103,7 @@ public class UsernameTokenValidator implements Validator {
      * Verify a UsernameToken containing a password of some unknown (but specified) password
      * type. It does this by querying a CallbackHandler instance to obtain a password for the
      * given username, and then comparing it against the received password.
-     * This method currently uses the same LOG.c as the verifyPlaintextPassword case, but it in
+     * This method currently uses the same logic as the verifyPlaintextPassword case, but it in
      * a separate protected method to allow users to override the validation of the custom
      * password type specific case.
      * @param usernameToken The UsernameToken instance to verify
@@ -118,7 +118,7 @@ public class UsernameTokenValidator implements Validator {
      * Verify a UsernameToken containing a plaintext password. It does this by querying a
      * CallbackHandler instance to obtain a password for the given username, and then comparing
      * it against the received password.
-     * This method currently uses the same LOG.c as the verifyDigestPassword case, but it in
+     * This method currently uses the same logic as the verifyDigestPassword case, but it in
      * a separate protected method to allow users to override the validation of the plaintext
      * password specific case.
      * @param usernameToken The UsernameToken instance to verify

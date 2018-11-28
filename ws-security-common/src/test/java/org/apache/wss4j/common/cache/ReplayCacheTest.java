@@ -21,6 +21,7 @@ package org.apache.wss4j.common.cache;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.junit.Assert;
@@ -58,12 +59,12 @@ public class ReplayCacheTest extends Assert {
 
         // Test specifying TTL caches OK
         id = UUID.randomUUID().toString();
-        replayCache.add(id, 100L);
+        replayCache.add(id, Instant.now().plusSeconds(100L));
         assertTrue(replayCache.contains(id));
 
         // Test expiration
         id = UUID.randomUUID().toString();
-        replayCache.add(id, 1L);
+        replayCache.add(id, Instant.now().plusSeconds(1L));
         Thread.sleep(1250L);
         assertFalse(replayCache.contains(id));
 

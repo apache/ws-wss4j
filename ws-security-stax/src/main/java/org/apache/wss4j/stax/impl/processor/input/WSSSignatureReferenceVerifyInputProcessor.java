@@ -22,7 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.Arrays;
@@ -323,8 +322,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             // Store the Timestamp/SignatureValue combination in the cache
             Instant expires = timestampSecurityEvent.getExpires();
             if (expires != null) {
-                Instant currentTime = Instant.now();
-                replayCache.add(cacheKey, 1L + Duration.between(currentTime, expires).getSeconds());
+                replayCache.add(cacheKey, expires);
             } else {
                 replayCache.add(cacheKey);
             }

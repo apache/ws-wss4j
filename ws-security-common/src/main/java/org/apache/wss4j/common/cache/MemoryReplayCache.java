@@ -47,31 +47,30 @@ public class MemoryReplayCache implements ReplayCache {
      * @param identifier The identifier to be added
      */
     public void add(String identifier) {
-        add(identifier, DEFAULT_TTL);
+        add(identifier, Instant.now().plusSeconds(DEFAULT_TTL));
     }
 
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
-     * @param timeToLive The length of time to cache the Identifier in seconds
+     * @param expiry A custom expiry time for the identifier
      */
-    public void add(String identifier, long timeToLive) {
+    public void add(String identifier, Instant expiry) {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
 
-        long ttl = timeToLive;
-        if (ttl < 0 || ttl > MAX_TTL) {
-            ttl = DEFAULT_TTL;
+        Instant now = Instant.now();
+        Instant maxTTL = now.plusSeconds(MAX_TTL);
+        if (expiry == null || expiry.isBefore(now) || expiry.isAfter(maxTTL)) {
+            expiry = now.plusSeconds(DEFAULT_TTL);
         }
 
-        Instant expires = Instant.now().plusSeconds(ttl);
-
         synchronized (cache) {
-            List<String> list = cache.get(expires);
+            List<String> list = cache.get(expiry);
             if (list == null) {
                 list = new ArrayList<>(1);
-                cache.put(expires, list);
+                cache.put(expiry, list);
             }
             list.add(identifier);
         }

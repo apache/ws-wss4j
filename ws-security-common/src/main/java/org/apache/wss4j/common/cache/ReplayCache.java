@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.cache;
 
 import java.io.Closeable;
+import java.time.Instant;
 
 /**
  * A cache to store (String) identifiers to avoid replay attacks. An example of such an identifier
@@ -36,9 +37,9 @@ public interface ReplayCache extends Closeable {
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
-     * @param timeToLive The length of time to cache the Identifier in seconds
+     * @param expiry A custom expiry time for the identifier
      */
-    void add(String identifier, long timeToLive);
+    void add(String identifier, Instant expiry);
 
     /**
      * Return true if the given identifier is contained in the cache

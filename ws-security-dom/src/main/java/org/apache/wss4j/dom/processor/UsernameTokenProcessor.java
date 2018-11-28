@@ -159,7 +159,7 @@ public class UsernameTokenProcessor implements Processor {
             if (created == null || utTTL <= 0) {
                 replayCache.add(ut.getNonce());
             } else {
-                replayCache.add(ut.getNonce(), utTTL + 1L);
+                replayCache.add(ut.getNonce(), Instant.now().plusSeconds(utTTL));
             }
         }
 

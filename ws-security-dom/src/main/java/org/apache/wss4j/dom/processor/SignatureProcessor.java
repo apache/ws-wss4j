@@ -26,8 +26,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -566,7 +564,7 @@ public class SignatureProcessor implements Processor {
 
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
-                List<Transform> transforms = (List<Transform>)siRef.getTransforms();
+                List<Transform> transforms = siRef.getTransforms();
                 List<String> transformAlgorithms = new ArrayList<>(transforms.size());
                 for (Transform transform : transforms) {
                     transformAlgorithms.add(transform.getAlgorithm());
@@ -683,11 +681,10 @@ public class SignatureProcessor implements Processor {
 
         // Store the Timestamp/SignatureValue/Key combination in the cache
         if (timeStamp.getExpires() != null) {
-            replayCache.add(identifier, 1L + Duration.between(Instant.now(), timeStamp.getExpires()).getSeconds());
+            replayCache.add(identifier, timeStamp.getExpires());
         } else {
             replayCache.add(identifier);
         }
-
     }
 
     /**

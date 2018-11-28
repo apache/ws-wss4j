@@ -93,7 +93,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             if (created == null || utTTL <= 0) {
                 replayCache.add(nonce);
             } else {
-                replayCache.add(nonce, utTTL + 1L);
+                replayCache.add(nonce, Instant.now().plusSeconds(utTTL));
             }
         }
 

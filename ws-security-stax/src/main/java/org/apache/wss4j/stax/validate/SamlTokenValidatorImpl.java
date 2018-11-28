@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -260,8 +259,8 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
 
             DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
             if (expires != null) {
-                Instant currentTime = Instant.now();
-                replayCache.add(identifier, 1L + Duration.between(currentTime, expires.toDate().toInstant()).getSeconds());
+                Instant zonedExpires = Instant.ofEpochMilli(expires.getMillis());
+                replayCache.add(identifier, zonedExpires);
             } else {
                 replayCache.add(identifier);
             }
