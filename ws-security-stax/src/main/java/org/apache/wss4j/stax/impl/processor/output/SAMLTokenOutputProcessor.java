@@ -20,7 +20,6 @@ package org.apache.wss4j.stax.impl.processor.output;
 
 import java.security.Key;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
@@ -142,7 +140,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 securityToken.setProcessor(finalSAMLTokenOutputProcessor);
 
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && hok) {
-                final SAMLKeyInfo samlKeyInfo = getSamlKeyInfo(samlCallback);
 
                 final Element ref;
                 if (securityToken != null) {
@@ -155,8 +152,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         securityTokenReferenceId, senderVouches, includeSTR);
 
                 final SAMLSecurityTokenProvider securityTokenProvider =
-                    new SAMLSecurityTokenProvider(samlKeyInfo, samlCallback, tokenId, ref,
-                                                  finalSAMLTokenOutputProcessor);
+                    new SAMLSecurityTokenProvider(samlCallback, (WSSSecurityProperties)getSecurityProperties(),
+                                                  tokenId, ref, finalSAMLTokenOutputProcessor);
 
                 //fire a tokenSecurityEvent
                 TokenSecurityEvent<OutboundSecurityToken> tokenSecurityEvent =
@@ -278,62 +275,20 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         return bstSecurityToken;
     }
 
-    private SAMLKeyInfo getSamlKeyInfo(SAMLCallback samlCallback)
-        throws WSSConfigurationException, WSSecurityException {
-
-        final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo();
-
-        SubjectBean subjectBean = samlCallback.getSubject();
-        if (subjectBean != null) {
-            KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
-            if (keyInfoBean != null) {
-                X509Certificate x509Certificate = keyInfoBean.getCertificate();
-                if (x509Certificate != null) {
-                    String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().
-                            getX509Identifier(x509Certificate);
-                    if (alias == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
-                    }
-                    WSPasswordCallback wsPasswordCallback =
-                        new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
-                    WSSUtils.doPasswordCallback(
-                            ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
-                            wsPasswordCallback);
-                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(alias);
-                    samlKeyInfo.setCerts(((WSSSecurityProperties) getSecurityProperties()).
-                            getSignatureCrypto().getX509Certificates(cryptoType));
-                    samlKeyInfo.setPrivateKey(((WSSSecurityProperties) getSecurityProperties()).
-                            getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword()));
-                } else if (keyInfoBean.getPublicKey() != null) {
-                    PublicKey publicKey = keyInfoBean.getPublicKey();
-                    samlKeyInfo.setPublicKey(publicKey);
-                    samlKeyInfo.setPrivateKey(((WSSSecurityProperties) getSecurityProperties()).
-                            getSignatureCrypto().getPrivateKey(
-                                    samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword()));
-                } else {
-                    samlKeyInfo.setSecret(keyInfoBean.getEphemeralKey());
-                }
-            }
-        }
-
-        return samlKeyInfo;
-    }
-
     private static class SAMLSecurityTokenProvider
         implements SecurityTokenProvider<OutboundSecurityToken> {
 
         private GenericOutboundSecurityToken samlSecurityToken;
-        private SAMLKeyInfo samlKeyInfo;
         private SAMLCallback samlCallback;
         private String tokenId;
         private Element ref;
         private FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
+        private WSSSecurityProperties securityProperties;
 
-        SAMLSecurityTokenProvider(SAMLKeyInfo samlKeyInfo, SAMLCallback samlCallback, String tokenId,
+        SAMLSecurityTokenProvider(SAMLCallback samlCallback, WSSSecurityProperties securityProperties, String tokenId,
                                          Element ref, FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor) {
-            this.samlKeyInfo = samlKeyInfo;
             this.samlCallback = samlCallback;
+            this.securityProperties = securityProperties;
             this.tokenId = tokenId;
             this.ref = ref;
             this.finalSAMLTokenOutputProcessor = finalSAMLTokenOutputProcessor;
@@ -354,9 +309,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 tokenType = WSSecurityTokenConstants.SAML_20_TOKEN;
             }
-            if (samlKeyInfo.getPrivateKey() != null) {
+
+            PrivateKey privateKey = getPrivateKeyUsingCallback();
+            if (privateKey != null) {
                 this.samlSecurityToken = new GenericOutboundSecurityToken(
-                        tokenId, tokenType, samlKeyInfo.getPrivateKey(), samlKeyInfo.getCerts());
+                        tokenId, tokenType, privateKey, getCertificatesUsingCallback());
             } else {
                 this.samlSecurityToken = new GenericOutboundSecurityToken(
                         tokenId, tokenType) {
@@ -373,9 +330,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         if (key != null) {
                             return key;
                         }
-                        if (samlKeyInfo.getSecret() != null) {
+                        byte[] secretKey = getSecretKeyUsingCallback();
+                        if (secretKey != null) {
                             String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                            key = new SecretKeySpec(samlKeyInfo.getSecret(), algoFamily);
+                            key = new SecretKeySpec(secretKey, algoFamily);
                             setSecretKey(algorithmURI, key);
                         }
                         return key;
@@ -385,6 +343,73 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
             this.samlSecurityToken.setCustomTokenReference(ref);
             return this.samlSecurityToken;
+        }
+
+        private PrivateKey getPrivateKeyUsingCallback()
+            throws WSSConfigurationException, WSSecurityException {
+
+            SubjectBean subjectBean = samlCallback.getSubject();
+            if (subjectBean != null) {
+                KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
+                if (keyInfoBean != null) {
+                    X509Certificate x509Certificate = keyInfoBean.getCertificate();
+                    if (x509Certificate != null) {
+                        String alias = securityProperties.getSignatureCrypto().getX509Identifier(x509Certificate);
+                        if (alias == null) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
+                        }
+                        WSPasswordCallback wsPasswordCallback =
+                            new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
+                        WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), wsPasswordCallback);
+                        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                        cryptoType.setAlias(alias);
+                        return securityProperties.getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
+                    } else if (keyInfoBean.getPublicKey() != null) {
+                        return securityProperties.getSignatureCrypto().getPrivateKey(
+                                        samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private X509Certificate[] getCertificatesUsingCallback()
+            throws WSSConfigurationException, WSSecurityException {
+
+            SubjectBean subjectBean = samlCallback.getSubject();
+            if (subjectBean != null) {
+                KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
+                if (keyInfoBean != null) {
+                    X509Certificate x509Certificate = keyInfoBean.getCertificate();
+                    if (x509Certificate != null) {
+                        String alias = securityProperties.getSignatureCrypto().getX509Identifier(x509Certificate);
+                        if (alias == null) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
+                        }
+                        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                        cryptoType.setAlias(alias);
+                        return securityProperties.getSignatureCrypto().getX509Certificates(cryptoType);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        private byte[] getSecretKeyUsingCallback()
+            throws WSSConfigurationException, WSSecurityException {
+
+            SubjectBean subjectBean = samlCallback.getSubject();
+            if (subjectBean != null) {
+                KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
+                if (keyInfoBean != null && keyInfoBean.getCertificate() == null && keyInfoBean.getPublicKey() == null) {
+                   return keyInfoBean.getEphemeralKey();
+                }
+            }
+
+            return null;
         }
 
         @Override

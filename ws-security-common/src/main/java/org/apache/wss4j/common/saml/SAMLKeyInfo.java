@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.common.saml;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
@@ -42,11 +41,6 @@ public class SAMLKeyInfo {
      * The public key {e.g.: held in a ds:KeyInfo).
      */
     private PublicKey publicKey;
-
-    /**
-     * The private key
-     */
-    private PrivateKey privateKey;
 
     public SAMLKeyInfo() {
     }
@@ -87,11 +81,4 @@ public class SAMLKeyInfo {
         this.publicKey = publicKey;
     }
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
 }
