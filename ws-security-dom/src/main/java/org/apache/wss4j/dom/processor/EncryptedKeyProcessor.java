@@ -227,6 +227,13 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes = getAsymmetricDecryptedBytes(data, data.getWsDocInfo(), encryptedKeyTransportMethod,
                                                          encryptedEphemeralKey, refList,
                                                          elem, privateKey);
+
+            // Clean the private key from memory
+            try {
+                privateKey.destroy();
+            } catch (javax.security.auth.DestroyFailedException ex) {
+                LOG.debug("Error destroying private key: {}", ex.getMessage());
+            }
         }
 
         List<WSDataRef> dataRefs = decryptDataRefs(refList, data.getWsDocInfo(), decryptedBytes, data);

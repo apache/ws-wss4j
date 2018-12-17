@@ -593,6 +593,13 @@ public class SamlAssertionWrapper {
 
         // add the signature to the assertion
         setSignature(signature, signatureDigestAlgorithm);
+
+        // Clean the private key from memory
+        try {
+            privateKey.destroy();
+        } catch (javax.security.auth.DestroyFailedException ex) {
+            LOG.debug("Error destroying private key: {}", ex.getMessage());
+        }
     }
 
     /**

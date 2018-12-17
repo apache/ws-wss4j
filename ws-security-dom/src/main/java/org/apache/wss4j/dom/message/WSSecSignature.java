@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.auth.Destroyable;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMCryptoContext;
@@ -608,6 +609,15 @@ public class WSSecSignature extends WSSecSignatureBase {
             sig.sign(signContext);
 
             signatureValue = sig.getSignatureValue().getValue();
+
+            // Clean the private key from memory
+            if (key instanceof Destroyable) {
+                try {
+                    ((Destroyable)key).destroy();
+                } catch (javax.security.auth.DestroyFailedException ex) {
+                    LOG.debug("Error destroying private key: {}", ex.getMessage());
+                }
+            }
 
             cleanup();
         } catch (Exception ex) {
