@@ -125,7 +125,7 @@ The configuration tags for Actions are as follows:
  * *WSS4J 2.0.0* ENCRYPT_DERIVED (EncryptDerived) - Perform a Encryption action with derived keys.
  * *WSS4J 2.0.0* SIGNATURE_WITH_KERBEROS_TOKEN (SignatureWithKerberosToken) - Perform a Signature action with a kerberos token. Only for StAX code.
  * *WSS4J 2.0.0* ENCRYPT_WITH_KERBEROS_TOKEN (EncryptWithKerberosToken) - Perform a Encryption action with a kerberos token. Only for StAX code.
- * *WSS4J 2.0.0* KERBEROS_TOKEN (KerberosToken) - Add a kerberos token.
+ * *WSS4J 2.0.0* KERBEROS_TOKEN (KerberosToken) - Add a kerberos token. Only for StAX code.
  * *WSS4J 2.0.0* CUSTOM_TOKEN (CustomToken) - Add a "Custom" token from a CallbackHandler
  * *WSS4J 1.6.x only* SIGN_WITH_UT_KEY (UsernameTokenSignature) - Perform a .NET specific signature using a Username Token action.
 
