@@ -41,6 +41,7 @@ package org.apache.wss4j.common.derivedKey;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
@@ -48,6 +49,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class P_SHA1 implements DerivationAlgorithm {
+
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(P_SHA1.class);
 
     @Override
     public byte[] createKey(byte[] secret, byte[] seed, int offset, long length)
@@ -100,6 +104,12 @@ public class P_SHA1 implements DerivationAlgorithm {
             System.arraycopy(tmp, 0, out, offset, tocpy);
             offset += tocpy;
             bytesRequired -= tocpy;
+        }
+
+        try {
+            key.destroy();
+        } catch (DestroyFailedException e) {
+            LOG.debug("Error destroying key: {}", e.getMessage());
         }
         return out;
     }
