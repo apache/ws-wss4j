@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -242,6 +243,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         encryptor.setWsDocInfo(getWsDocInfo());
         List<String> encDataRefs =
             encryptor.doEncryption(keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, attachmentEncryptedDataElements);
+
+        // Clean the secret key from memory now that we're done with it
+        try {
+            secretKeySpec.destroy();
+        } catch (DestroyFailedException e) {
+            LOG.debug("Error destroying key: {}", e.getMessage());
+        }
+
         if (encDataRefs.isEmpty()) {
             return null;
         }
