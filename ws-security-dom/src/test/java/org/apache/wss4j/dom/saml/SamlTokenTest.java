@@ -89,10 +89,17 @@ import org.opensaml.saml.saml2.core.Conditions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test-case for sending and processing an unsigned (sender vouches) SAML Assertion.
  */
-public class SamlTokenTest extends org.junit.Assert {
+public class SamlTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

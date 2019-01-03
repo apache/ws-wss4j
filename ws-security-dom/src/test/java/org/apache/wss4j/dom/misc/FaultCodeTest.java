@@ -46,11 +46,15 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * WS-Security Test Case for fault codes. The SOAP Message Security specification 1.1 defines
  * standard fault codes and fault strings for error propagation.
  */
-public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
+public class FaultCodeTest implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
 

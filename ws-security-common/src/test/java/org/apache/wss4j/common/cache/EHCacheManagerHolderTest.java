@@ -25,13 +25,15 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class EHCacheManagerHolderTest extends Assert {
+public class EHCacheManagerHolderTest {
 
     @Test
     public void testCreateCacheManager() {

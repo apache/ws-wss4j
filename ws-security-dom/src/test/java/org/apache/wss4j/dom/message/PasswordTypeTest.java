@@ -37,11 +37,14 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for processing a Username Token to enforce either a plaintext or digest
  * password type. See WSS-255.
  */
-public class PasswordTypeTest extends org.junit.Assert {
+public class PasswordTypeTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PasswordTypeTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();

@@ -51,11 +51,14 @@ import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SAMLTokenSVTest extends AbstractTestBase {
 
@@ -87,16 +90,16 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //done signature; now test sig-verification:
@@ -126,7 +129,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -143,7 +146,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
     }
 
@@ -174,22 +177,22 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
+            assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 3);
+            assertEquals(nodeList.getLength(), 3);
             String referenceId = ((Element) nodeList.item(1)).getAttributeNode(WSSConstants.ATT_NULL_URI.getLocalPart()).getValue();
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE.getNamespaceURI(), WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
             String tokenId = ((Element) nodeList.item(0)).getAttributeNodeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart()).getValue();
-            Assert.assertEquals(tokenId, WSSUtils.dropReferenceMarker(referenceId));
+            assertEquals(tokenId, WSSUtils.dropReferenceMarker(referenceId));
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //done signature; now test sig-verification:
@@ -219,7 +222,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -236,7 +239,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
         }
     }
 
@@ -268,16 +271,16 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //done signature; now test sig-verification:
@@ -307,7 +310,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -324,7 +327,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
     }
 
@@ -347,7 +350,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -379,7 +382,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -412,16 +415,16 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //done signature; now test sig-verification:
@@ -452,7 +455,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -469,7 +472,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
     }
 
@@ -502,16 +505,16 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //done signature; now test sig-verification:
@@ -542,7 +545,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -559,7 +562,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
     }
 }

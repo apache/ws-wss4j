@@ -62,7 +62,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -70,6 +69,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class InteroperabilityTest extends AbstractTestBase {
 
@@ -160,11 +165,11 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-        Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        assertEquals(4, encryptedPartSecurityEvents.size());
+        assertEquals(3, signedElementSecurityEvents1.size());
+        assertEquals(3, signedElementSecurityEvents2.size());
+        assertEquals(4, signatureValueSecurityEvents.size());
+        assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         signedElementSecurityEvents1.size() +
@@ -325,12 +330,12 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        Assert.assertEquals(3, encryptedPartSecurityEvents.size());
-        Assert.assertEquals(3, encryptedElementSecurityEvents.size());
-        Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        assertEquals(3, encryptedPartSecurityEvents.size());
+        assertEquals(3, encryptedElementSecurityEvents.size());
+        assertEquals(3, signedElementSecurityEvents1.size());
+        assertEquals(3, signedElementSecurityEvents2.size());
+        assertEquals(4, signatureValueSecurityEvents.size());
+        assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         encryptedElementSecurityEvents.size() +
@@ -456,10 +461,10 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-        Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        assertEquals(4, encryptedPartSecurityEvents.size());
+        assertEquals(3, signedElementSecurityEvents1.size());
+        assertEquals(4, signatureValueSecurityEvents.size());
+        assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         signedElementSecurityEvents1.size() +
@@ -636,12 +641,12 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        Assert.assertEquals(3, encryptedPartSecurityEvents.size());
-        Assert.assertEquals(3, encryptedElementSecurityEvents.size());
-        Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        assertEquals(3, encryptedPartSecurityEvents.size());
+        assertEquals(3, encryptedElementSecurityEvents.size());
+        assertEquals(3, signedElementSecurityEvents1.size());
+        assertEquals(3, signedElementSecurityEvents2.size());
+        assertEquals(4, signatureValueSecurityEvents.size());
+        assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         encryptedElementSecurityEvents.size() +
@@ -666,7 +671,7 @@ public class InteroperabilityTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -694,8 +699,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //so we have a request generated, now do the response:
@@ -720,16 +725,16 @@ public class InteroperabilityTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
         }
 
         //verify SigConf response:
@@ -766,13 +771,13 @@ public class InteroperabilityTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 25);
+            assertEquals(nodeList.getLength(), 25);
 
             nodeList = document.getElementsByTagNameNS("http://www.w3.org/1999/XMLSchema", "complexType");
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
 
         //done signature; now test sig-verification:
@@ -820,7 +825,7 @@ public class InteroperabilityTest extends AbstractTestBase {
 
                 securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
             }
 
             {
@@ -934,8 +939,8 @@ public class InteroperabilityTest extends AbstractTestBase {
 
                 //header element must still be there
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
                 securityEventListener.compare();
             }
@@ -1186,9 +1191,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.ACTOR, "anotherTest");
         try {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
-            Assert.fail("Expected WSSecurityException");
+            fail("Expected WSSecurityException");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "WSS4JHandler: Request does not contain required Security header");
+            assertEquals(e.getMessage(), "WSS4JHandler: Request does not contain required Security header");
         }
     }
 
@@ -1307,7 +1312,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
-                    Assert.assertFalse(stringWriter.toString(), t instanceof NullPointerException);
+                    assertFalse(stringWriter.toString(), t instanceof NullPointerException);
                     t = t.getCause();
                 }
             }

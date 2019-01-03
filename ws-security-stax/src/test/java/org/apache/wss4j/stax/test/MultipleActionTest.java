@@ -35,11 +35,15 @@ import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A test for 2x Signatures + 2x Encryption. This is not supported for now, but these tests are mainly to
@@ -70,21 +74,21 @@ public class MultipleActionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
-            Assert.assertNotNull(idAttrValue);
-            Assert.assertTrue(idAttrValue.length() > 0);
+            assertNotNull(idAttrValue);
+            assertTrue(idAttrValue.length() > 0);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_c14nExcl_InclusiveNamespaces.getNamespaceURI(), WSSConstants.TAG_c14nExcl_InclusiveNamespaces.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "env");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "");
+            assertEquals(nodeList.getLength(), 2);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "env");
+            assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "");
         }
     }
 
@@ -130,9 +134,9 @@ public class MultipleActionTest extends AbstractTestBase {
 
         try {
             WSSec.getOutboundWSSec(properties);
-            Assert.fail();
+            fail();
         } catch (WSSecurityException ex) {
-            Assert.assertTrue(ex.getMessage().contains("Duplicate Actions are not allowed"));
+            assertTrue(ex.getMessage().contains("Duplicate Actions are not allowed"));
         }
     }
 }

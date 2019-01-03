@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
  * This is a test for WSS-60 - "Problems when SOAP envelope namespace prefix is null"
  * http://issues.apache.org/jira/browse/WSS-60
  */
-public class NoSoapPrefixSignatureTest extends org.junit.Assert {
+public class NoSoapPrefixSignatureTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(NoSoapPrefixSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

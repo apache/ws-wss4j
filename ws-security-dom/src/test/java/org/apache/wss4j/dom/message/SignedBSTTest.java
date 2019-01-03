@@ -43,11 +43,14 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is a test for signing the SOAP Body as well as the BinarySecurityToken that contains the certificate
  * used to verify the signature.
  */
-public class SignedBSTTest extends org.junit.Assert {
+public class SignedBSTTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignedBSTTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

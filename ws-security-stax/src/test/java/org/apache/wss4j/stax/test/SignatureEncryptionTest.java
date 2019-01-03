@@ -58,11 +58,12 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
 
 public class SignatureEncryptionTest extends AbstractTestBase {
 
@@ -262,14 +263,14 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 4);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "ReferenceList");
-            Assert.assertEquals(childs.item(3).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 4);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "ReferenceList");
+            assertEquals(childs.item(3).getLocalName(), "Signature");
         }
 
         //done encryption; now test decryption:
@@ -364,14 +365,14 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 4);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
-            Assert.assertEquals(childs.item(3).getLocalName(), "ReferenceList");
+            assertEquals(childs.getLength(), 4);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "Signature");
+            assertEquals(childs.item(3).getLocalName(), "ReferenceList");
         }
 
         //done encryption; now test decryption:
@@ -428,7 +429,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             //no encrypted content
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 }

@@ -34,11 +34,13 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * WS-Security Test Case for the getPassword method in WSHandler.
  * <p/>
  */
-public class WSHandlerGetPasswordTest extends org.junit.Assert {
+public class WSHandlerGetPasswordTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();

@@ -54,7 +54,7 @@ import org.w3c.dom.Document;
 /**
  * This is a set of tests for using SecurityActionTokens to configure various Actions.
  */
-public class SecurityActionTokenTest extends org.junit.Assert {
+public class SecurityActionTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityActionTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

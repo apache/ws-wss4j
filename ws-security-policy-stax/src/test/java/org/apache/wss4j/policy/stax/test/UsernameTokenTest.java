@@ -32,7 +32,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;
@@ -41,6 +40,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class UsernameTokenTest extends AbstractPolicyTestBase {
 
@@ -202,12 +205,12 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "UsernameToken does not contain a hashed password");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

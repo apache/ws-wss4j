@@ -47,11 +47,14 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of test-cases for signing and verifying SOAP requests when specifying an
  * AlgorithmSuite policy.
  */
-public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
+public class SignatureAlgorithmSuiteTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureAlgorithmSuiteTest.class);
 

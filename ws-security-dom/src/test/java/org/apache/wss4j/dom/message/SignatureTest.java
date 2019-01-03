@@ -63,11 +63,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * A set of test-cases for signing and verifying SOAP requests.
  */
-public class SignatureTest extends org.junit.Assert {
+public class SignatureTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureTest.class);
 

@@ -42,6 +42,10 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.util.Collections;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the
  * UsernameTokenProfile 1.1 specification. The derived keys are used for signature.
@@ -50,7 +54,7 @@ import java.util.Collections;
  * different to UTWseSignatureTest, which derives a key for signature using a
  * non-standard implementation.
  */
-public class UTSignatureTest extends org.junit.Assert {
+public class UTSignatureTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UTSignatureTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();

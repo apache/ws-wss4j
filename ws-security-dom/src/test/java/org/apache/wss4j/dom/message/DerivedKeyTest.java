@@ -39,10 +39,14 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of tests for using a derived key for encryption/signature.
  */
-public class DerivedKeyTest extends org.junit.Assert {
+public class DerivedKeyTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

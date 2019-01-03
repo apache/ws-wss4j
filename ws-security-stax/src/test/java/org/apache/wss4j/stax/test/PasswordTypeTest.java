@@ -36,11 +36,15 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for processing a Username Token to enforce either a plaintext or digest
@@ -59,11 +63,11 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_PASSWORD.getNamespaceURI(), WSSConstants.TAG_WSSE_PASSWORD.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -104,12 +108,12 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Expected XMLStreamException");
+                fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "The security token could not be authenticated or authorized");
-                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
+                assertNotNull(e.getCause());
+                assertTrue(e.getCause() instanceof WSSecurityException);
+                assertEquals(e.getCause().getMessage(), "The security token could not be authenticated or authorized");
+                assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
             }
         }
     }
@@ -126,11 +130,11 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_PASSWORD.getNamespaceURI(), WSSConstants.TAG_WSSE_PASSWORD.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -171,12 +175,12 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Expected XMLStreamException");
+                fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "The security token could not be authenticated or authorized");
-                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
+                assertNotNull(e.getCause());
+                assertTrue(e.getCause() instanceof WSSecurityException);
+                assertEquals(e.getCause().getMessage(), "The security token could not be authenticated or authorized");
+                assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
             }
         }
     }

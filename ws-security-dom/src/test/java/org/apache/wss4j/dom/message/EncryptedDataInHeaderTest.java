@@ -38,13 +38,16 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * This test encrypts a Timestamp and the SOAP Body, and appends the ReferenceList Element after the
  * EncryptedData Element that is the Timestamp. When processing, the EncryptedData Element gets decrypted,
  * and then the ReferenceListProcessor must check to see whether the Data Reference pointing to the
  * encrypted Timestamp needs to be decrypted or not.
  */
-public class EncryptedDataInHeaderTest extends org.junit.Assert {
+public class EncryptedDataInHeaderTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedDataInHeaderTest.class);
 

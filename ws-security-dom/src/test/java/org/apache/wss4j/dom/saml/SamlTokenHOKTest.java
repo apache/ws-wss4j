@@ -43,12 +43,15 @@ import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test-case for sending and processing a signed (holder-of-key) SAML Assertion. These tests
  * just cover the case of creating and signing the Assertion, and not using the credential
  * information in the SAML Subject to sign the SOAP body.
  */
-public class SamlTokenHOKTest extends org.junit.Assert {
+public class SamlTokenHOKTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

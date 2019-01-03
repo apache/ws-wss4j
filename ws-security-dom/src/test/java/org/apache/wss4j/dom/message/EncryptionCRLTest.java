@@ -42,13 +42,16 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * This is a test for Certificate Revocation List checking before encryption.
  *
  * This test reuses the revoked certificate from SignatureCRLTest
  */
-public class EncryptionCRLTest extends org.junit.Assert {
+public class EncryptionCRLTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionCRLTest.class);
 

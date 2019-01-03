@@ -31,8 +31,11 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EncryptedElementsTest extends AbstractPolicyTestBase {
 
@@ -90,12 +93,12 @@ public class EncryptedElementsTest extends AbstractPolicyTestBase {
         encryptedElementSecurityEvent.setElementPath(headerPath);
         try {
             policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://example.org}a must be encrypted");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

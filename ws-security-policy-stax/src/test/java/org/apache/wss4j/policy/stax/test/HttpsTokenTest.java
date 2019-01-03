@@ -27,8 +27,11 @@ import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class HttpsTokenTest extends AbstractPolicyTestBase {
 
@@ -107,12 +110,12 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Policy enforces HttpClientCertificateAuthentication but we got HttpBasicAuthentication");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

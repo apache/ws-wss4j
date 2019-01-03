@@ -31,8 +31,11 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SignedPartsTest extends AbstractPolicyTestBase {
 
@@ -103,12 +106,12 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         signedPartSecurityEvent.setElementPath(headerPath);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://example.org}a must be signed");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -158,10 +161,10 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -232,12 +235,12 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         signedPartSecurityEvent.setElementPath(headerPath);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://example.org}a must be signed");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

@@ -31,11 +31,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for Certificate Revocation List checking before encryption.
@@ -62,32 +66,32 @@ public class EncryptionCRLTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
-            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
             NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -114,10 +118,10 @@ public class EncryptionCRLTest extends AbstractTestBase {
 
             try {
                 doOutboundSecurity(securityProperties, sourceDocument);
-                Assert.fail("Expected failure on a revocation check");
+                fail("Expected failure on a revocation check");
             } catch (Exception ex) {
-                Assert.assertNotNull(ex.getCause());
-                Assert.assertTrue(ex.getCause() instanceof WSSecurityException);
+                assertNotNull(ex.getCause());
+                assertTrue(ex.getCause() instanceof WSSecurityException);
             }
         }
     }

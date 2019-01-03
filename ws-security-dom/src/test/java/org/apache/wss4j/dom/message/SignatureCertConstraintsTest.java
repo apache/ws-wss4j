@@ -38,12 +38,15 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * A set of test-cases for signing and verifying SOAP requests, where the certificate used to
  * verify the signature is validated against a set of cert constraints.
  */
-public class SignatureCertConstraintsTest extends org.junit.Assert {
+public class SignatureCertConstraintsTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureCertConstraintsTest.class);
     private Crypto crypto;

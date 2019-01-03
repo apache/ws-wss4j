@@ -74,11 +74,15 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class KerberosTest {
 
@@ -204,11 +208,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
     }
 
     /**
@@ -241,11 +245,11 @@ public class KerberosTest {
         spnegoToken.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
 
         byte[] token = spnegoToken.getToken();
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         spnegoToken = new SpnegoTokenContext();
         spnegoToken.validateServiceTicket("bob", callbackHandler, "bob@service.ws.apache.org", token);
-        Assert.assertTrue(spnegoToken.isEstablished());
+        assertTrue(spnegoToken.isEstablished());
     }
 
     /**
@@ -275,18 +279,18 @@ public class KerberosTest {
         try {
             KerberosSecurity bst = new KerberosSecurity(doc);
             bst.retrieveServiceTicket("alice2", callbackHandler, "bob@service");
-            Assert.fail("Failure expected on an unknown user");
+            fail("Failure expected on an unknown user");
         } catch (WSSecurityException ex) {
-            Assert.assertTrue(ex.getMessage().startsWith("An error occurred in trying to obtain a TGT:"));
+            assertTrue(ex.getMessage().startsWith("An error occurred in trying to obtain a TGT:"));
         }
 
 
         try {
             KerberosSecurity bst = new KerberosSecurity(doc);
             bst.retrieveServiceTicket("alice", callbackHandler, "bob2@service");
-            Assert.fail("Failure expected on an unknown user");
+            fail("Failure expected on an unknown user");
         } catch (WSSecurityException ex) {
-            Assert.assertEquals(ex.getMessage(), "An error occurred in trying to obtain a service ticket");
+            assertEquals(ex.getMessage(), "An error occurred in trying to obtain a service ticket");
         }
 
     }
@@ -357,11 +361,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
     }
 
 
@@ -435,11 +439,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
     }
 
     /**
@@ -508,11 +512,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -584,11 +588,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
     }
 
     /**
@@ -659,11 +663,11 @@ public class KerberosTest {
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        Assert.assertNotNull(token);
+        assertNotNull(token);
 
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        Assert.assertTrue(principal instanceof KerberosPrincipal);
-        Assert.assertTrue(principal.getName().contains("alice"));
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
     }
 
     //
@@ -709,7 +713,7 @@ public class KerberosTest {
 
             document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done signature; now test sig-verification:
@@ -741,11 +745,11 @@ public class KerberosTest {
                     results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            Assert.assertNotNull(token);
+            assertNotNull(token);
 
             Principal principal = (Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            Assert.assertTrue(principal instanceof KerberosPrincipal);
-            Assert.assertTrue(principal.getName().contains("alice"));
+            assertTrue(principal instanceof KerberosPrincipal);
+            assertTrue(principal.getName().contains("alice"));
         }
     }
 
@@ -831,14 +835,14 @@ public class KerberosTest {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
+            assertEquals(kerberosTokenSecurityEvents.size(), 1);
             final KerberosTokenSecurityEvent kerberosTokenSecurityEvent = kerberosTokenSecurityEvents.get(0);
-            Assert.assertNotNull(kerberosTokenSecurityEvent.getSecurityToken().getSubject());
-            Assert.assertTrue(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal() instanceof KerberosPrincipal);
-            Assert.assertEquals(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal().getName(), "alice@service.ws.apache.org");
+            assertNotNull(kerberosTokenSecurityEvent.getSecurityToken().getSubject());
+            assertTrue(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal() instanceof KerberosPrincipal);
+            assertEquals(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal().getName(), "alice@service.ws.apache.org");
         }
     }
 
@@ -928,10 +932,10 @@ public class KerberosTest {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
+            assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 
@@ -976,7 +980,7 @@ public class KerberosTest {
 
             document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
-            Assert.assertEquals(1, nodeList.getLength());
+            assertEquals(1, nodeList.getLength());
         }
 
         {
@@ -1007,11 +1011,11 @@ public class KerberosTest {
                     results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            Assert.assertNotNull(token);
+            assertNotNull(token);
 
             Principal principal = (Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            Assert.assertTrue(principal instanceof KerberosPrincipal);
-            Assert.assertTrue(principal.getName().contains("alice"));
+            assertTrue(principal instanceof KerberosPrincipal);
+            assertTrue(principal.getName().contains("alice"));
         }
     }
 
@@ -1095,14 +1099,14 @@ public class KerberosTest {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
+            assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 
@@ -1191,14 +1195,14 @@ public class KerberosTest {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
+            assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 

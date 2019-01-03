@@ -45,10 +45,12 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test-case for sending SAML Assertions using the "action" approach.
  */
-public class SamlTokenActionTest extends org.junit.Assert {
+public class SamlTokenActionTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenActionTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

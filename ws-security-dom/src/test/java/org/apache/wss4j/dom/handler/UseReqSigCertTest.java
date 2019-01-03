@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
  * Some tests for WSHandlerConstants.USE_REQ_SIG_CERT - the user signature cert is used to
  * encrypt the response.
  */
-public class UseReqSigCertTest extends org.junit.Assert {
+public class UseReqSigCertTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UseReqSigCertTest.class);
 

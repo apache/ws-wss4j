@@ -46,8 +46,11 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.saml.SAML1CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A test for various Principals...
@@ -65,11 +68,11 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_PASSWORD.getNamespaceURI(), WSSConstants.TAG_WSSE_PASSWORD.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -94,17 +97,17 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             UsernameTokenSecurityEvent event =
                 (UsernameTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.USERNAME_TOKEN);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             UsernameSecurityToken usernameSecurityToken = event.getSecurityToken();
             Principal principal = usernameSecurityToken.getPrincipal();
-            Assert.assertTrue(principal instanceof UsernameTokenPrincipal);
+            assertTrue(principal instanceof UsernameTokenPrincipal);
             UsernameTokenPrincipal usernameTokenPrincipal = (UsernameTokenPrincipal)principal;
-            Assert.assertTrue("transmitter".equals(usernameTokenPrincipal.getName()));
-            Assert.assertNotNull(usernameTokenPrincipal.getCreatedTime());
-            Assert.assertNotNull(usernameTokenPrincipal.getNonce());
-            Assert.assertNotNull(usernameTokenPrincipal.getPassword());
-            Assert.assertTrue(usernameTokenPrincipal.isPasswordDigest());
-            Assert.assertTrue(WSSConstants.NS_PASSWORD_DIGEST.equals(usernameTokenPrincipal.getPasswordType()));
+            assertTrue("transmitter".equals(usernameTokenPrincipal.getName()));
+            assertNotNull(usernameTokenPrincipal.getCreatedTime());
+            assertNotNull(usernameTokenPrincipal.getNonce());
+            assertNotNull(usernameTokenPrincipal.getPassword());
+            assertTrue(usernameTokenPrincipal.isPasswordDigest());
+            assertTrue(WSSConstants.NS_PASSWORD_DIGEST.equals(usernameTokenPrincipal.getPasswordType()));
         }
     }
 
@@ -127,7 +130,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -152,13 +155,13 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             SamlTokenSecurityEvent event =
                 (SamlTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.SAML_TOKEN);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             SamlSecurityToken token = event.getSecurityToken();
 
             Principal principal = token.getPrincipal();
-            Assert.assertTrue(principal instanceof SAMLTokenPrincipal);
-            Assert.assertTrue(principal.getName().contains("uid=joe"));
-            Assert.assertNotNull(((SAMLTokenPrincipal)principal).getToken());
+            assertTrue(principal instanceof SAMLTokenPrincipal);
+            assertTrue(principal.getName().contains("uid=joe"));
+            assertNotNull(((SAMLTokenPrincipal)principal).getToken());
         }
     }
 
@@ -173,7 +176,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -197,11 +200,11 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             X509TokenSecurityEvent event =
                 (X509TokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.X509Token);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             X509SecurityToken token = event.getSecurityToken();
 
             Principal principal = token.getPrincipal();
-            Assert.assertTrue(principal instanceof X500Principal);
+            assertTrue(principal instanceof X500Principal);
         }
     }
 
@@ -218,7 +221,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -243,11 +246,11 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             KeyValueTokenSecurityEvent event =
                     (KeyValueTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.KeyValueToken);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             KeyValueSecurityToken token = event.getSecurityToken();
 
             Principal principal = token.getPrincipal();
-            Assert.assertTrue(principal instanceof PublicKeyPrincipal);
+            assertTrue(principal instanceof PublicKeyPrincipal);
         }
     }
 
@@ -265,7 +268,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -291,11 +294,11 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             KeyValueTokenSecurityEvent event =
                     (KeyValueTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.KeyValueToken);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             KeyValueSecurityToken token = event.getSecurityToken();
 
             Principal principal = token.getPrincipal();
-            Assert.assertTrue(principal instanceof PublicKeyPrincipal);
+            assertTrue(principal instanceof PublicKeyPrincipal);
         }
     }
 
@@ -324,7 +327,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -350,11 +353,11 @@ public class PrincipalTest extends AbstractTestBase {
             // Check principal
             KeyValueTokenSecurityEvent event =
                     (KeyValueTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.KeyValueToken);
-            Assert.assertNotNull(event);
+            assertNotNull(event);
             KeyValueSecurityToken token = event.getSecurityToken();
 
             Principal principal = token.getPrincipal();
-            Assert.assertTrue(principal instanceof PublicKeyPrincipal);
+            assertTrue(principal instanceof PublicKeyPrincipal);
         }
     }
 }

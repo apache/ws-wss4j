@@ -74,7 +74,9 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 
-public abstract class AbstractTestBase extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+
+public abstract class AbstractTestBase {
     protected XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
     protected String serializePolicy(Policy policy) throws Exception {

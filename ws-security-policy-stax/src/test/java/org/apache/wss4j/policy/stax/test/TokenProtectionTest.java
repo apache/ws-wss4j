@@ -41,8 +41,11 @@ import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TokenProtectionTest extends AbstractPolicyTestBase {
 
@@ -214,10 +217,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}BinarySecurityToken must not be signed by its signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -258,12 +261,12 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}BinarySecurityToken must be signed by its signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -304,12 +307,12 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}BinarySecurityToken must be signed by its signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -351,12 +354,12 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}BinarySecurityToken must be signed by its signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -429,10 +432,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}BinarySecurityToken must sign the main signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -491,10 +494,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Main signature must sign the Signed*Supporting-Tokens.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -631,10 +634,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://www.w3.org/2001/04/xmlenc#}EncryptedKey must be signed by its signature.");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 

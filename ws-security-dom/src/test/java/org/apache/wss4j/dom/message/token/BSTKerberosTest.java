@@ -52,10 +52,14 @@ import javax.xml.crypto.dsig.SignatureMethod;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for the Kerberos Token Profile 1.1
  */
-public class BSTKerberosTest extends org.junit.Assert {
+public class BSTKerberosTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BSTKerberosTest.class);
     private static final String AP_REQ = WSConstants.WSS_GSS_KRB_V5_AP_REQ;

@@ -58,10 +58,13 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test various principal objects after processing a security token.
  */
-public class PrincipalTest extends org.junit.Assert {
+public class PrincipalTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PrincipalTest.class);
 

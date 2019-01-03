@@ -80,12 +80,16 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.utils.XMLUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EncDecryptionTest extends AbstractTestBase {
 
@@ -106,32 +110,32 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
-            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
             NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -156,7 +160,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -180,12 +184,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -194,16 +198,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -225,8 +229,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -250,32 +254,32 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
-            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
             NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -300,7 +304,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -326,12 +330,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -340,16 +344,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -371,8 +375,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -395,26 +399,26 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 25);
+            assertEquals(nodeList.getLength(), 25);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 25);
+            assertEquals(nodeList.getLength(), 25);
 
             for (int i = 0; i < nodeList.getLength(); i++) {
-                Assert.assertEquals(nodeList.item(i).getParentNode().getLocalName(), "complexType");
-                Assert.assertEquals(nodeList.item(i).getParentNode().getNamespaceURI(), "http://www.w3.org/1999/XMLSchema");
+                assertEquals(nodeList.item(i).getParentNode().getLocalName(), "complexType");
+                assertEquals(nodeList.item(i).getParentNode().getNamespaceURI(), "http://www.w3.org/1999/XMLSchema");
                 NodeList childNodes = nodeList.item(i).getParentNode().getChildNodes();
                 for (int j = 0; j < childNodes.getLength(); j++) {
                     Node child = childNodes.item(j);
                     if (child.getNodeType() == Node.TEXT_NODE) {
-                        Assert.assertEquals(child.getTextContent().trim(), "");
+                        assertEquals(child.getTextContent().trim(), "");
                     } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Assert.assertEquals(child, nodeList.item(i));
+                        assertEquals(child, nodeList.item(i));
                     } else {
-                        Assert.fail("Unexpected Node encountered");
+                        fail("Unexpected Node encountered");
                     }
                 }
             }
@@ -441,7 +445,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -514,12 +518,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -528,16 +532,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ContentEncrypted) {
                     ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
-                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getElementPath());
+                    assertNotNull(contentEncryptedElementSecurityEvent.getXmlSecEvent());
+                    assertNotNull(contentEncryptedElementSecurityEvent.getSecurityToken());
+                    assertNotNull(contentEncryptedElementSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
-                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().size(), 6);
-                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().get(contentEncryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(contentEncryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(contentEncryptedElementSecurityEvent.getElementPath().size(), 6);
+                    assertEquals(contentEncryptedElementSecurityEvent.getElementPath().get(contentEncryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -623,24 +627,24 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents1.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents2.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents3.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents4.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents5.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents6.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents7.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents8.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents9.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents10.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents11.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents12.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents13.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents14.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents15.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents16.size());
-            Assert.assertEquals(3, encryptedPartSecurityEvents17.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents1.size());
+            assertEquals(3, encryptedPartSecurityEvents2.size());
+            assertEquals(3, encryptedPartSecurityEvents3.size());
+            assertEquals(3, encryptedPartSecurityEvents4.size());
+            assertEquals(3, encryptedPartSecurityEvents5.size());
+            assertEquals(3, encryptedPartSecurityEvents6.size());
+            assertEquals(3, encryptedPartSecurityEvents7.size());
+            assertEquals(3, encryptedPartSecurityEvents8.size());
+            assertEquals(3, encryptedPartSecurityEvents9.size());
+            assertEquals(3, encryptedPartSecurityEvents10.size());
+            assertEquals(3, encryptedPartSecurityEvents11.size());
+            assertEquals(3, encryptedPartSecurityEvents12.size());
+            assertEquals(3, encryptedPartSecurityEvents13.size());
+            assertEquals(3, encryptedPartSecurityEvents14.size());
+            assertEquals(3, encryptedPartSecurityEvents15.size());
+            assertEquals(3, encryptedPartSecurityEvents16.size());
+            assertEquals(3, encryptedPartSecurityEvents17.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                     encryptedPartSecurityEvents1.size() +
                     encryptedPartSecurityEvents2.size() +
@@ -683,16 +687,16 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 25);
+            assertEquals(nodeList.getLength(), 25);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 25);
+            assertEquals(nodeList.getLength(), 25);
 
             nodeList = document.getElementsByTagNameNS("http://www.w3.org/1999/XMLSchema", "complexType");
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
 
         //done encryption; now test decryption:
@@ -722,16 +726,16 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 27);
+            assertEquals(nodeList.getLength(), 27);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 26);
+            assertEquals(nodeList.getLength(), 26);
 
             nodeList = document.getElementsByTagNameNS("http://www.w3.org/1999/XMLSchema", "complexType");
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
 
         //done encryption; now test decryption:
@@ -755,7 +759,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -829,12 +833,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -843,16 +847,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedElement) {
                     EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedElementSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedElementSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedElementSecurityEvent.getElementPath());
+                    assertNotNull(encryptedElementSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedElementSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedElementSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
-                    Assert.assertEquals(encryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().size(), 6);
-                    Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().get(encryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedElementSecurityEvent.getElementPath().size(), 6);
+                    assertEquals(encryptedElementSecurityEvent.getElementPath().get(encryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
         }
@@ -872,7 +876,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -897,12 +901,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse11_EncryptedHeader.getNamespaceURI(), WSSConstants.TAG_wsse11_EncryptedHeader.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             securityEventListener.compare();
 
@@ -911,16 +915,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.example.com", "testEncryptedHeader");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 3);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 3);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -942,8 +946,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -963,10 +967,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             try {
                 doOutboundSecurity(securityProperties, sourceDocument);
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                Assert.assertEquals("Part to encrypt not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertEquals("Part to encrypt not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
             }
         }
     }
@@ -991,24 +995,24 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), "Body");
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), "Body");
             NodeList childNodes = nodeList.item(0).getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -1022,12 +1026,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1050,17 +1054,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1084,7 +1088,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1099,12 +1103,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1127,17 +1131,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/wsse:BinarySecurityToken");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1161,7 +1165,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/wsse:BinarySecurityToken");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1176,12 +1180,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1201,7 +1205,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      * //some test that we can really sure we get what we want from WSS4J
      * XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/wsse:BinarySecurityToken");
      * Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-     * Assert.assertNotNull(node);
+     * assertNotNull(node);
      * Element parentElement = (Element) node.getParentNode();
      * parentElement.removeChild(node);
      * parentElement.appendChild(node);
@@ -1219,12 +1223,12 @@ public class EncDecryptionTest extends AbstractTestBase {
      * <p/>
      * //header element must still be there
      * NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-     * Assert.assertEquals(nodeList.getLength(), 1);
-     * Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+     * assertEquals(nodeList.getLength(), 1);
+     * assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
      * <p/>
      * //no encrypted content
      * nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-     * Assert.assertEquals(nodeList.getLength(), 0);
+     * assertEquals(nodeList.getLength(), 0);
      * }
      * }
      */
@@ -1247,17 +1251,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:Reference/wsse:BinarySecurityToken");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1269,12 +1273,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }*/
 
@@ -1296,17 +1300,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1331,7 +1335,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1346,12 +1350,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1374,17 +1378,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1408,7 +1412,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1423,12 +1427,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1451,17 +1455,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1485,7 +1489,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1500,12 +1504,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1528,21 +1532,21 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKeySHA1']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
         }
 
         //done encryption; now test decryption:
@@ -1576,7 +1580,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKeySHA1']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1591,7 +1595,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //no encrypted content
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1614,17 +1618,17 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             //move ReferenceList...
             TransformerFactory transFact = TransformerFactory.newInstance();
@@ -1643,12 +1647,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1670,7 +1674,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             NodeList nodeList = (NodeList) xPathExpression.evaluate(securedDocument, XPathConstants.NODESET);
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             transformer = TRANSFORMER_FACTORY.newTransformer();
             baos.reset();
@@ -1685,12 +1689,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1723,32 +1727,32 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
-            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
             NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -1772,12 +1776,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -1786,16 +1790,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -1817,8 +1821,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -1846,32 +1850,32 @@ public class EncDecryptionTest extends AbstractTestBase {
 
                 Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
                 XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
                 Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes128-gcm']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
-                Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+                assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
                 NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); i++) {
                     Node child = childNodes.item(i);
                     if (child.getNodeType() == Node.TEXT_NODE) {
-                        Assert.assertEquals(child.getTextContent().trim(), "");
+                        assertEquals(child.getTextContent().trim(), "");
                     } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Assert.assertEquals(child, nodeList.item(0));
+                        assertEquals(child, nodeList.item(0));
                     } else {
-                        Assert.fail("Unexpected Node encountered");
+                        fail("Unexpected Node encountered");
                     }
                 }
             }
@@ -1901,11 +1905,11 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes128-gcm']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -1920,12 +1924,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -1953,36 +1957,36 @@ public class EncDecryptionTest extends AbstractTestBase {
 
                 Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
                 XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
                 Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#sha256']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
-                Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+                assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
                 NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); i++) {
                     Node child = childNodes.item(i);
                     if (child.getNodeType() == Node.TEXT_NODE) {
-                        Assert.assertEquals(child.getTextContent().trim(), "");
+                        assertEquals(child.getTextContent().trim(), "");
                     } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Assert.assertEquals(child, nodeList.item(0));
+                        assertEquals(child, nodeList.item(0));
                     } else {
-                        Assert.fail("Unexpected Node encountered");
+                        fail("Unexpected Node encountered");
                     }
                 }
             }
@@ -2011,15 +2015,15 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#sha256']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -2035,12 +2039,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -2070,40 +2074,40 @@ public class EncDecryptionTest extends AbstractTestBase {
 
                 Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
                 XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
                 Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc11:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
-                Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+                assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
                 NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); i++) {
                     Node child = childNodes.item(i);
                     if (child.getNodeType() == Node.TEXT_NODE) {
-                        Assert.assertEquals(child.getTextContent().trim(), "");
+                        assertEquals(child.getTextContent().trim(), "");
                     } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Assert.assertEquals(child, nodeList.item(0));
+                        assertEquals(child, nodeList.item(0));
                     } else {
-                        Assert.fail("Unexpected Node encountered");
+                        fail("Unexpected Node encountered");
                     }
                 }
             }
@@ -2135,15 +2139,15 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -2160,12 +2164,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -2196,44 +2200,44 @@ public class EncDecryptionTest extends AbstractTestBase {
 
                 Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+                assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
                 XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
                 Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc11:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-                Assert.assertEquals(nodeList.getLength(), 1);
+                assertEquals(nodeList.getLength(), 1);
 
                 xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
                 node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-                Assert.assertNotNull(node);
+                assertNotNull(node);
 
-                Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+                assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
                 NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); i++) {
                     Node child = childNodes.item(i);
                     if (child.getNodeType() == Node.TEXT_NODE) {
-                        Assert.assertEquals(child.getTextContent().trim(), "");
+                        assertEquals(child.getTextContent().trim(), "");
                     } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        Assert.assertEquals(child, nodeList.item(0));
+                        assertEquals(child, nodeList.item(0));
                     } else {
-                        Assert.fail("Unexpected Node encountered");
+                        fail("Unexpected Node encountered");
                     }
                 }
             }
@@ -2267,23 +2271,23 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -2300,12 +2304,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -2322,7 +2326,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -2346,9 +2350,9 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             try {
                 doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null);
-                Assert.fail("Failure expected on the wrong key transport algorithm");
+                fail("Failure expected on the wrong key transport algorithm");
             }  catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+                assertTrue(e.getCause() instanceof WSSecurityException);
             }
         }
         // This should fail as we are requiring another symmetric encryption algorithm
@@ -2360,9 +2364,9 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             try {
                 doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null);
-                Assert.fail("Failure expected on the wrong key transport algorithm");
+                fail("Failure expected on the wrong key transport algorithm");
             }  catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+                assertTrue(e.getCause() instanceof WSSecurityException);
             }
         }
     }
@@ -2382,32 +2386,32 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.getLength(), 1);
 
             xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
             node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
-            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
             NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
                 if (child.getNodeType() == Node.TEXT_NODE) {
-                    Assert.assertEquals(child.getTextContent().trim(), "");
+                    assertEquals(child.getTextContent().trim(), "");
                 } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    Assert.assertEquals(child, nodeList.item(0));
+                    assertEquals(child, nodeList.item(0));
                 } else {
-                    Assert.fail("Unexpected Node encountered");
+                    fail("Unexpected Node encountered");
                 }
             }
         }
@@ -2432,7 +2436,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
-            Assert.assertNotNull(node);
+            assertNotNull(node);
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -2464,12 +2468,12 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
 
@@ -2478,16 +2482,16 @@ public class EncDecryptionTest extends AbstractTestBase {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                    assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
-                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
 
@@ -2509,8 +2513,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            assertEquals(4, encryptedPartSecurityEvents.size());
+            assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -2542,10 +2546,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             try {
                 XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
                 xmlStreamWriter.close();
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                Assert.assertEquals("Part to encrypt not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertEquals("Part to encrypt not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
             }
         }
     }
@@ -2590,7 +2594,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //no encrypted content
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -2633,7 +2637,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //no encrypted content
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 
@@ -2677,7 +2681,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //no encrypted content
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
         }
     }
 }

@@ -71,12 +71,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test-case for sending and processing a signed (holder-of-key) SAML Assertion. These tests
  * also cover the case of using the credential information in the SAML Subject to sign the
  * SOAP body.
  */
-public class SignedSamlTokenHOKTest extends org.junit.Assert {
+public class SignedSamlTokenHOKTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignedSamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

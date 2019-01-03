@@ -29,8 +29,12 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.setup.ConfigurationConverter;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some tests for the ConfigurationConverter utility
@@ -48,14 +52,14 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         config.put(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, "false");
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
-        Assert.assertEquals(properties.getTokenUser(), "testuser");
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.USERNAMETOKEN);
-        Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
-        Assert.assertEquals(properties.getUsernameTokenPasswordType(),
+        assertEquals(properties.getTokenUser(), "testuser");
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.USERNAMETOKEN);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertEquals(properties.getUsernameTokenPasswordType(),
                             UsernameTokenPasswordType.PASSWORD_TEXT);
-        Assert.assertTrue(properties.isAddUsernameTokenNonce());
-        Assert.assertFalse(properties.isAddUsernameTokenCreated());
+        assertTrue(properties.isAddUsernameTokenNonce());
+        assertFalse(properties.isAddUsernameTokenCreated());
 
         WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
     }
@@ -76,21 +80,21 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
 
-        Assert.assertEquals(properties.getSignatureUser(), "transmitter");
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.SIGNATURE);
-        Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
-        Assert.assertEquals(properties.getSignatureAlgorithm(), sigAlgo);
-        Assert.assertEquals(properties.getSignatureKeyIdentifiers().size(), 1);
-        Assert.assertEquals(properties.getSignatureKeyIdentifiers().get(0),
+        assertEquals(properties.getSignatureUser(), "transmitter");
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.SIGNATURE);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertEquals(properties.getSignatureAlgorithm(), sigAlgo);
+        assertEquals(properties.getSignatureKeyIdentifiers().size(), 1);
+        assertEquals(properties.getSignatureKeyIdentifiers().get(0),
                             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
-        Assert.assertFalse(properties.isAddExcC14NInclusivePrefixes());
-        Assert.assertNotNull(properties.getSignatureCrypto());
-        Assert.assertNotNull(properties.getSignatureSecureParts());
-        Assert.assertEquals(properties.getSignatureSecureParts().size(), 1);
-        Assert.assertEquals(properties.getSignatureSecureParts().get(0).getName().getLocalPart(),
+        assertFalse(properties.isAddExcC14NInclusivePrefixes());
+        assertNotNull(properties.getSignatureCrypto());
+        assertNotNull(properties.getSignatureSecureParts());
+        assertEquals(properties.getSignatureSecureParts().size(), 1);
+        assertEquals(properties.getSignatureSecureParts().get(0).getName().getLocalPart(),
                             "Body");
-        Assert.assertEquals(properties.getSignatureSecureParts().get(0).getName().getNamespaceURI(),
+        assertEquals(properties.getSignatureSecureParts().get(0).getName().getNamespaceURI(),
                             "http://schemas.xmlsoap.org/soap/envelope/");
 
         WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
@@ -108,12 +112,12 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
 
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.SIGNATURE);
-        Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
-        Assert.assertTrue(properties.isDisableBSPEnforcement());
-        Assert.assertTrue(properties.isEnableRevocation());
-        Assert.assertNotNull(properties.getSignatureVerificationCrypto());
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.SIGNATURE);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertTrue(properties.isDisableBSPEnforcement());
+        assertTrue(properties.isEnableRevocation());
+        assertNotNull(properties.getSignatureVerificationCrypto());
 
         WSSec.validateAndApplyDefaultsToInboundSecurityProperties(properties);
     }
@@ -132,20 +136,20 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
 
-        Assert.assertEquals(properties.getEncryptionUser(), "transmitter");
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
-        Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
-        Assert.assertEquals(properties.getEncryptionKeyTransportAlgorithm(),
+        assertEquals(properties.getEncryptionUser(), "transmitter");
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertEquals(properties.getEncryptionKeyTransportAlgorithm(),
                             WSSConstants.NS_XENC_RSA15);
-        Assert.assertEquals(properties.getEncryptionKeyIdentifier(),
+        assertEquals(properties.getEncryptionKeyIdentifier(),
                             WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        Assert.assertNotNull(properties.getEncryptionCrypto());
-        Assert.assertNotNull(properties.getEncryptionSecureParts());
-        Assert.assertEquals(properties.getEncryptionSecureParts().size(), 1);
-        Assert.assertEquals(properties.getEncryptionSecureParts().get(0).getName().getLocalPart(),
+        assertNotNull(properties.getEncryptionCrypto());
+        assertNotNull(properties.getEncryptionSecureParts());
+        assertEquals(properties.getEncryptionSecureParts().size(), 1);
+        assertEquals(properties.getEncryptionSecureParts().get(0).getName().getLocalPart(),
                             "Body");
-        Assert.assertEquals(properties.getEncryptionSecureParts().get(0).getName().getNamespaceURI(),
+        assertEquals(properties.getEncryptionSecureParts().get(0).getName().getNamespaceURI(),
                             "http://schemas.xmlsoap.org/soap/envelope/");
 
         WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
@@ -161,10 +165,10 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
 
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
-        Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
-        Assert.assertNotNull(properties.getDecryptionCrypto());
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertNotNull(properties.getDecryptionCrypto());
 
         WSSec.validateAndApplyDefaultsToInboundSecurityProperties(properties);
     }
@@ -176,9 +180,9 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         config.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAMLCallbackHandlerImpl());
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.SAML_TOKEN_UNSIGNED);
-        Assert.assertTrue(properties.getSamlCallbackHandler() instanceof SAMLCallbackHandlerImpl);
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.SAML_TOKEN_UNSIGNED);
+        assertTrue(properties.getSamlCallbackHandler() instanceof SAMLCallbackHandlerImpl);
 
         WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
     }
@@ -191,9 +195,9 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         config.put(ConfigurationConstants.TTL_TIMESTAMP, "180");
 
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
-        Assert.assertEquals(properties.getActions().size(), 1);
-        Assert.assertEquals(properties.getActions().get(0), WSSConstants.TIMESTAMP);
-        Assert.assertEquals(properties.getTimestampTTL(), Integer.valueOf(180));
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.TIMESTAMP);
+        assertEquals(properties.getTimestampTTL(), Integer.valueOf(180));
 
         WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
 
@@ -202,8 +206,8 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         config.put(ConfigurationConstants.TIMESTAMP_STRICT, "false");
 
         properties = ConfigurationConverter.convert(config);
-        Assert.assertEquals(properties.getTimeStampFutureTTL(), Integer.valueOf(120));
-        Assert.assertFalse(properties.isStrictTimestampCheck());
+        assertEquals(properties.getTimeStampFutureTTL(), Integer.valueOf(120));
+        assertFalse(properties.isStrictTimestampCheck());
 
         WSSec.validateAndApplyDefaultsToInboundSecurityProperties(properties);
     }

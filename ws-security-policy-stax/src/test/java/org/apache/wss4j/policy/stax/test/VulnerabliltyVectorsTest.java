@@ -41,10 +41,14 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
@@ -87,15 +91,15 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         try {
             doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(),
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof WSSecurityException);
+            assertEquals(throwable.getMessage(),
                     "SOAPAction (emptyPolicyOperation) does not match with the current Operation: " +
                             "{http://schemas.xmlsoap.org/wsdl/}definitions");
-            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -139,14 +143,14 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         try {
             doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), policyEnforcer);
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(),
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof WSSecurityException);
+            assertEquals(throwable.getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
-            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

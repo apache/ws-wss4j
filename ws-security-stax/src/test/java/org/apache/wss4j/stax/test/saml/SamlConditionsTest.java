@@ -49,12 +49,15 @@ import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Test;
 import org.opensaml.saml.config.SAMLConfigurationSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SamlConditionsTest extends AbstractTestBase {
 
@@ -95,14 +98,14 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
+            assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
         }
 
         //done signature; now test sig-verification:
@@ -142,14 +145,14 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
+            assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -163,7 +166,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -205,9 +208,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }
@@ -246,9 +249,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }
@@ -287,9 +290,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }
@@ -332,9 +335,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }
@@ -375,7 +378,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -415,7 +418,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -461,7 +464,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -506,7 +509,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -552,9 +555,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
 
@@ -568,7 +571,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -614,9 +617,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
 
@@ -630,7 +633,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -681,7 +684,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 
@@ -733,9 +736,9 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
 
@@ -749,7 +752,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         }
     }
 }

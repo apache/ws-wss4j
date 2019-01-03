@@ -45,8 +45,11 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class IssuedTokenTest extends AbstractPolicyTestBase {
 
@@ -221,10 +224,10 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "IssuerName in Policy (http://recipientTokenIssuer.com) didn't match with the one in the IssuedToken (http://initiatorTokenIssuer.com)");
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(), "IssuerName in Policy (http://recipientTokenIssuer.com) didn't match with the one in the IssuedToken (http://initiatorTokenIssuer.com)");
         }
     }
 
@@ -293,10 +296,10 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "Policy enforces SAML V2.0 token but got 1.1");
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(), "Policy enforces SAML V2.0 token but got 1.1");
         }
     }
 
@@ -365,10 +368,10 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "Policy enforces SAML token with a symmetric key");
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(), "Policy enforces SAML token with a symmetric key");
         }
     }
 
@@ -434,10 +437,10 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "Attribute http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname not found in the SAMLAssertion");
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(), "Attribute http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname not found in the SAMLAssertion");
         }
     }
 
@@ -567,10 +570,10 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Policy enforces Kerberos token of type http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#Kerberosv5APREQSHA1 but got http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#GSS_Kerberosv5_AP_REQ");
         }
     }

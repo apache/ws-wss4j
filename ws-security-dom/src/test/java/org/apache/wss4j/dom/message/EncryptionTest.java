@@ -58,10 +58,16 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests.
  */
-public class EncryptionTest extends org.junit.Assert {
+public class EncryptionTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =

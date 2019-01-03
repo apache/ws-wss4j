@@ -44,12 +44,14 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * This is a test for signing and encrypting using a Crypto properties file with an encrypted
  * password
  */
-public class PasswordEncryptorTest extends org.junit.Assert {
+public class PasswordEncryptorTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PasswordEncryptorTest.class);
 

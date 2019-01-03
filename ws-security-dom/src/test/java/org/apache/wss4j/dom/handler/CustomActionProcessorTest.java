@@ -41,11 +41,15 @@ import org.w3c.dom.Document;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * A test for adding custom actions/processors etc.
  */
-public class CustomActionProcessorTest extends org.junit.Assert {
+public class CustomActionProcessorTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CustomActionProcessorTest.class);
     private Crypto crypto;

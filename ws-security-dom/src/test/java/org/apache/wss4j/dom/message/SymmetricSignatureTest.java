@@ -55,7 +55,7 @@ import org.w3c.dom.Document;
  * Demonstrates that Signature Crypto object can have null values when
  * calling processSecurityHeader method of WSSecurityEngine.
  */
-public class SymmetricSignatureTest extends org.junit.Assert implements CallbackHandler {
+public class SymmetricSignatureTest implements CallbackHandler {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SymmetricSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

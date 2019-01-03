@@ -44,7 +44,7 @@ import org.w3c.dom.Document;
  * This is a test for WSS-194 - "Support overriding KeyStore alias for signature so that it can
  * be different than user name used for UsernameToken".
  */
-public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHandler {
+public class SignatureUTAliasTest implements CallbackHandler {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureUTAliasTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

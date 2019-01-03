@@ -48,10 +48,11 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
 
 public class HeaderOrderingTest extends AbstractTestBase {
 
@@ -85,15 +86,15 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 2);
-            Assert.assertEquals(childs.item(0).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(1).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 2);
+            assertEquals(childs.item(0).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(1).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -133,15 +134,15 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 2);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Signature");
-            Assert.assertEquals(childs.item(1).getLocalName(), "UsernameToken");
+            assertEquals(childs.getLength(), 2);
+            assertEquals(childs.item(0).getLocalName(), "Signature");
+            assertEquals(childs.item(1).getLocalName(), "UsernameToken");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -182,16 +183,16 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 3);
-            Assert.assertEquals(childs.item(0).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(1).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 3);
+            assertEquals(childs.item(0).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(1).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(2).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -231,15 +232,15 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 2);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 2);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -279,15 +280,15 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 2);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Signature");
-            Assert.assertEquals(childs.item(1).getLocalName(), "Timestamp");
+            assertEquals(childs.getLength(), 2);
+            assertEquals(childs.item(0).getLocalName(), "Signature");
+            assertEquals(childs.item(1).getLocalName(), "Timestamp");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -331,16 +332,16 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 3);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 3);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(2).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -384,16 +385,16 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 3);
-            Assert.assertEquals(childs.item(0).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(1).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 3);
+            assertEquals(childs.item(0).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(1).getLocalName(), "Timestamp");
+            assertEquals(childs.item(2).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -438,17 +439,17 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 4);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(2).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(3).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 4);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(2).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(3).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -505,17 +506,17 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 4);
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(3).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 4);
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(3).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -574,19 +575,19 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 6);
-            Assert.assertEquals(childs.item(0).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(3).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(4).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(5).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 6);
+            assertEquals(childs.item(0).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(3).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(4).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(5).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
         //done UsernameToken; now verification:
@@ -613,7 +614,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -639,8 +640,8 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //so we have a request generated, now do the response:
@@ -679,18 +680,18 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 5);
-            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
-            Assert.assertEquals(childs.item(1).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(2).getLocalName(), "SignatureConfirmation");
-            Assert.assertEquals(childs.item(3).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(4).getLocalName(), "Signature");
+            assertEquals(childs.getLength(), 5);
+            assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            assertEquals(childs.item(1).getLocalName(), "UsernameToken");
+            assertEquals(childs.item(2).getLocalName(), "SignatureConfirmation");
+            assertEquals(childs.item(3).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(4).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(4, sigReferences.getLength());
+            assertEquals(4, sigReferences.getLength());
         }
 
         //verify SigConf response:
@@ -754,19 +755,19 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
 
-            Assert.assertEquals(childs.getLength(), 6);
-            Assert.assertEquals(childs.item(0).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(3).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(4).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(5).getLocalName(), "EncryptedData");
+            assertEquals(childs.getLength(), 6);
+            assertEquals(childs.item(0).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(3).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(4).getLocalName(), "BinarySecurityToken");
+            assertEquals(childs.item(5).getLocalName(), "EncryptedData");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(0, sigReferences.getLength()); //0 because the signature is encrypted
+            assertEquals(0, sigReferences.getLength()); //0 because the signature is encrypted
         }
 
         //done UsernameToken; now verification:

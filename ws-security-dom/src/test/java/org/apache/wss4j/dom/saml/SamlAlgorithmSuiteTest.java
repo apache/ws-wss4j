@@ -43,11 +43,14 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of test-cases for signing and verifying SOAP requests containing a signed
  * SAML (HOK) assertion when specifying an AlgorithmSuite policy.
  */
-public class SamlAlgorithmSuiteTest extends org.junit.Assert {
+public class SamlAlgorithmSuiteTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAlgorithmSuiteTest.class);
     private Crypto crypto;

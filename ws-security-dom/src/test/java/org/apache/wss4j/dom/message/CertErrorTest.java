@@ -27,12 +27,15 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * This class tests for error messages that apply to certificates, e.g. when a bad
  * "username" is used for encryption or signature. See WSS-137.
  */
-public class CertErrorTest extends org.junit.Assert {
+public class CertErrorTest {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

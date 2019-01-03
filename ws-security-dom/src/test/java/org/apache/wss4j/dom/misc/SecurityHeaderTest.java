@@ -26,10 +26,13 @@ import org.junit.Test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This tests how security headers are parsed and processed.
  */
-public class SecurityHeaderTest extends org.junit.Assert {
+public class SecurityHeaderTest {
     private static final String DUPLICATE_NULL_ACTOR_MSG =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "

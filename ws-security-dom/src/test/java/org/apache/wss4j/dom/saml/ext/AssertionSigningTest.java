@@ -37,19 +37,21 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.Assert;
 import org.junit.Test;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A list of test-cases to test the functionality of signing with
  * SamlAssertionWrapper class implementation.
  */
 
-public class AssertionSigningTest extends Assert {
+public class AssertionSigningTest {
 
     private Crypto issuerCrypto;
     // Default Canonicalization algorithm used by SamlAssertionWrapper class.
@@ -107,11 +109,11 @@ public class AssertionSigningTest extends Assert {
         samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false);
         Signature signature = samlAssertion.getSaml2().getSignature();
-        Assert.assertTrue(signature.getSignatureAlgorithm().equalsIgnoreCase(
+        assertTrue(signature.getSignatureAlgorithm().equalsIgnoreCase(
                 defaultRSASignatureAlgorithm)
                 || signature.getSignatureAlgorithm().equalsIgnoreCase(
                         defaultDSASignatureAlgorithm));
-        Assert.assertEquals(defaultCanonicalizationAlgorithm,
+        assertEquals(defaultCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
 
         // Verify Signature
@@ -149,9 +151,9 @@ public class AssertionSigningTest extends Assert {
                 false, customCanonicalizationAlgorithm,
                 customSignatureAlgorithm, customSignatureDigestAlgorithm);
         Signature signature = samlAssertion.getSaml2().getSignature();
-        Assert.assertEquals(customSignatureAlgorithm,
+        assertEquals(customSignatureAlgorithm,
                 signature.getSignatureAlgorithm());
-        Assert.assertEquals(customCanonicalizationAlgorithm,
+        assertEquals(customCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
 
         Document doc = dbf.newDocumentBuilder().newDocument();
@@ -159,7 +161,7 @@ public class AssertionSigningTest extends Assert {
         Element assertionElement = samlAssertion.toDOM(doc);
         doc.appendChild(assertionElement);
         String assertionString = DOM2Writer.nodeToString(assertionElement);
-        Assert.assertTrue(assertionString.contains(customSignatureDigestAlgorithm));
+        assertTrue(assertionString.contains(customSignatureDigestAlgorithm));
 
         // Verify Signature
         SAMLKeyInfo keyInfo = new SAMLKeyInfo();

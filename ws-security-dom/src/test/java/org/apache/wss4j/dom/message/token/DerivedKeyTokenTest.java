@@ -23,11 +23,15 @@ import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests for DerivedKeyToken type.
  */
 
-public class DerivedKeyTokenTest extends org.junit.Assert {
+public class DerivedKeyTokenTest {
 
     private static final String TEST_TOKEN_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             + "<wsc:DerivedKeyToken "

@@ -18,144 +18,146 @@
  */
 package org.apache.wss4j.common.attachment;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.apache.wss4j.common.util.AttachmentUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AttachmentTest {
 
     @Test
     public void testMatch() {
-        Assert.assertTrue("text/xml".matches("(?i)(text/xml).*"));
-        Assert.assertTrue("TEXT/XML".matches("(?i)(text/xml).*"));
-        Assert.assertTrue("application/xml".matches("(?i)(application/xml).*"));
-        Assert.assertTrue("APPLICATION/XML".matches("(?i)(application/xml).*"));
-        Assert.assertTrue("text/plain".matches("(?i)(text/).*"));
-        Assert.assertTrue("TEXT/PLAIN".matches("(?i)(text/).*"));
+        assertTrue("text/xml".matches("(?i)(text/xml).*"));
+        assertTrue("TEXT/XML".matches("(?i)(text/xml).*"));
+        assertTrue("application/xml".matches("(?i)(application/xml).*"));
+        assertTrue("APPLICATION/XML".matches("(?i)(application/xml).*"));
+        assertTrue("text/plain".matches("(?i)(text/).*"));
+        assertTrue("TEXT/PLAIN".matches("(?i)(text/).*"));
     }
 
     @Test
     public void testMimeHeaderUncomment_1() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\"a\" \"(b)\" c  test",
                 AttachmentUtils.uncomment("\"a\" \"(b)\" c ((\"d\")) test"));
     }
 
     @Test
     public void testMimeHeaderUncomment_2() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "",
                 AttachmentUtils.uncomment("(\"a\" \"(b)\" c ((\"d\")) test)"));
     }
 
     @Test
     public void testMimeHeaderUncomment_3() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\"a\" \"(\"b\")\" test",
                 AttachmentUtils.uncomment("\"a\" \"(\"b\")\" (c(\"d\"))test"));
     }
 
     @Test
     public void testMimeHeaderUnfold_1() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\r\n",
                 AttachmentUtils.unfold("\r\n"));
     }
 
     @Test
     public void testMimeHeaderUnfold_2() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\r\na",
                 AttachmentUtils.unfold("\r\na"));
     }
 
     @Test
     public void testMimeHeaderUnfold_3() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "",
                 AttachmentUtils.unfold("\r\n "));
     }
 
     @Test
     public void testMimeHeaderUnfold_4() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "",
                 AttachmentUtils.unfold("\r\n\t"));
     }
 
     @Test
     public void testMimeHeaderUnfold_5() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "aa",
                 AttachmentUtils.unfold("a\r\n\ta"));
     }
 
     @Test
     public void testMimeHeaderUnfold_6() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "aaa",
                 AttachmentUtils.unfold("a\r\n\taa"));
     }
 
     @Test
     public void testMimeHeaderUnfold_7() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "aaaa",
                 AttachmentUtils.unfold("\r\n\taaaa"));
     }
 
     @Test
     public void testMimeHeaderUnfold_8() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "a",
                 AttachmentUtils.unfold("\r\n\ta\r\n "));
     }
 
     @Test
     public void testMimeHeaderUnfold_9() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\r\n\ra",
                 AttachmentUtils.unfold("\r\n\ra\r\n "));
     }
 
     @Test
     public void testMimeHeaderUnfold_10() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\r\n",
                 AttachmentUtils.unfold("\r\n \r\n \r\n"));
     }
 
     @Test
     public void testMimeHeaderUnfoldWS_1() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "a ",
                 AttachmentUtils.unfoldWhitespace(" a "));
     }
 
     @Test
     public void testMimeHeaderUnfoldWS_2() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "",
                 AttachmentUtils.unfoldWhitespace(""));
     }
 
     @Test
     public void testMimeHeaderUnfoldWS_3() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "",
                 AttachmentUtils.unfoldWhitespace(" \t \t\t  "));
     }
 
     @Test
     public void testMimeHeaderUnfoldWS_4() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "a\ta\t  a",
                 AttachmentUtils.unfoldWhitespace(" \t a\ta\t  a"));
     }
 
     @Test
     public void testMimeHeaderDecodeRfc2184_1() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "message/external-body;access-type=\"URL\";" +
                         "test=\"true\";" +
                         "url=\"ftp://cs.utk.edu/pub/moore/bulk-mailer/bulk-mailer.tar\""
@@ -169,7 +171,7 @@ public class AttachmentTest {
 
     @Test
     public void testMimeHeaderDecodeRfc2184_2() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "message/external-body;access-type=\"URL\";" +
                         "url=\"ftp://cs.utk.edu/pub/moore/bulk-mailer/bulk-mailer.tar\"",
                 AttachmentUtils.decodeRfc2184(
@@ -182,7 +184,7 @@ public class AttachmentTest {
 
     @Test
     public void testMimeHeaderDecodeRfc2184_3() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "application/x-stuff;" +
                         "title=\"This is ***fun***\"",
                 AttachmentUtils.decodeRfc2184(
@@ -194,7 +196,7 @@ public class AttachmentTest {
 
     @Test
     public void testMimeHeaderDecodeRfc2184_4() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "application/x-stuff;" +
                         "title=\"This is even more ***fun*** isn't it!\"",
                 AttachmentUtils.decodeRfc2184(
@@ -208,7 +210,7 @@ public class AttachmentTest {
 
     @Test
     public void testMimeHeaderUnquoteInnerText_1() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\"\\\"\\\"\\\\A\"",
                 AttachmentUtils.unquoteInnerText(
                         "\\\"\"\"\\\\\\A\\\""
@@ -218,7 +220,7 @@ public class AttachmentTest {
 
     @Test
     public void testMimeHeaderUnquoteInnerText_2() throws Exception {
-        Assert.assertEquals(
+        assertEquals(
                 "\"a\"",
                 AttachmentUtils.unquoteInnerText(
                         "\\\"a\\\""

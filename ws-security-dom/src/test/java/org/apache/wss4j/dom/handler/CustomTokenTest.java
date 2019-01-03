@@ -43,11 +43,13 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * A test to add a Custom Token to an outbound message
  */
-public class CustomTokenTest extends org.junit.Assert {
+public class CustomTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CustomTokenTest.class);
 

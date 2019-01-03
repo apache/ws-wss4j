@@ -44,6 +44,9 @@ import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for WSS-86 - "CryptoBase.splitAndTrim does not take into account the format of a
  * DN constructed by different providers":
@@ -57,7 +60,7 @@ import java.security.cert.X509Certificate;
  * -dname "1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d,CN=Werner,
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
-public class CryptoProviderTest extends org.junit.Assert {
+public class CryptoProviderTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CryptoProviderTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

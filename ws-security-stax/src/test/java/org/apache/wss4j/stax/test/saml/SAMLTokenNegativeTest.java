@@ -38,11 +38,14 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SAMLTokenNegativeTest extends AbstractTestBase {
 
@@ -65,7 +68,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             NodeList list = securedDocument.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
             Element assertionElement = (Element) list.item(0);
@@ -84,10 +87,10 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
-                Assert.assertNotNull(e.getCause().getCause());
+                assertNotNull(e.getCause());
+                assertNotNull(e.getCause().getCause());
             }
         }
     }
@@ -111,7 +114,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             Element envelope = securedDocument.getDocumentElement();
             NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
@@ -135,10 +138,10 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
-                Assert.assertNotNull(e.getCause().getCause());
+                assertNotNull(e.getCause());
+                assertNotNull(e.getCause().getCause());
             }
         }
     }
@@ -161,7 +164,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             NodeList list = securedDocument.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
             Element assertionElement = (Element) list.item(0);
@@ -180,10 +183,10 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
-                Assert.assertNotNull(e.getCause().getCause());
+                assertNotNull(e.getCause());
+                assertNotNull(e.getCause().getCause());
             }
         }
     }
@@ -208,7 +211,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 0);
+            assertEquals(nodeList.getLength(), 0);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -223,9 +226,9 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }
@@ -249,7 +252,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            assertEquals(nodeList.getLength(), 2);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -264,9 +267,9 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("XMLStreamException expected");
+                fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getCause());
+                assertNotNull(e.getCause());
             }
         }
     }

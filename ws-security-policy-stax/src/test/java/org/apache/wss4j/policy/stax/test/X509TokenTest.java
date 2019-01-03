@@ -29,13 +29,15 @@ import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class X509TokenTest extends AbstractPolicyTestBase {
 
@@ -177,11 +179,11 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(),
+            assertEquals(e.getMessage(),
                     "X509Certificate Version 3 mismatch; Policy enforces WssX509V3Token11");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

@@ -28,8 +28,10 @@ import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.RequiredPartSecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RequiredPartsTest extends AbstractPolicyTestBase {
 
@@ -83,9 +85,9 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "Element {http://example.org}a must be present");
+            assertEquals(e.getMessage(), "Element {http://example.org}a must be present");
         }
     }
 }

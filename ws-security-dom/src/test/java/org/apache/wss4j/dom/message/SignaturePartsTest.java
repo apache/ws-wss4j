@@ -58,11 +58,17 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
  * has a custom header added.
  */
-public class SignaturePartsTest extends org.junit.Assert {
+public class SignaturePartsTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignaturePartsTest.class);
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

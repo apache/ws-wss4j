@@ -50,10 +50,15 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion.
  */
-public class SamlTokenSVTest extends org.junit.Assert {
+public class SamlTokenSVTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenSVTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

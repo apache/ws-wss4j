@@ -38,11 +38,13 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * A set of test-cases for signing and verifying SOAP requests using the Merlin AKI Crypto implementation.
  */
-public class SignatureAKITest extends org.junit.Assert {
+public class SignatureAKITest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureAKITest.class);
 

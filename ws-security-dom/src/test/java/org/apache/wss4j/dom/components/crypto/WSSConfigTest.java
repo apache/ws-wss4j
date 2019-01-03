@@ -25,10 +25,13 @@ import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Test loading and removing security providers via WSSConfig
  */
-public class WSSConfigTest extends org.junit.Assert {
+public class WSSConfigTest {
 
     @Test
     public void testWSSConfig() {

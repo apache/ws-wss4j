@@ -49,12 +49,16 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for processing an xop:Include inside a CipherValue Element
@@ -102,14 +106,14 @@ public class XOPAttachmentTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     private List<Attachment> createEncryptedBodyInAttachment(Document doc) throws Exception {

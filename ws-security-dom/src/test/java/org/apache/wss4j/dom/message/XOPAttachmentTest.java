@@ -52,10 +52,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test for creating / processing an xop:Include inside a CipherValue Element
  */
-public class XOPAttachmentTest extends org.junit.Assert {
+public class XOPAttachmentTest {
 
     private static final String SOAP_BODY =
         "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"

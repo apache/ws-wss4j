@@ -42,10 +42,14 @@ import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for constructing and processing BinarySecurityTokens.
  */
-public class BinarySecurityTokenTest extends org.junit.Assert {
+public class BinarySecurityTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenTest.class);
     private Crypto crypto;

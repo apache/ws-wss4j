@@ -42,6 +42,10 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Properties;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for WSS-40. Essentially it just tests that a message is signed using a
  * keyEntry from one keystore, and verified at the other end with a keystore with just the
@@ -70,7 +74,7 @@ import java.util.Properties;
  * keytool -import -file wss40.crt -alias wss40 -keystore wss40.jks
  *
  */
-public class SignatureCertTest extends org.junit.Assert {
+public class SignatureCertTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

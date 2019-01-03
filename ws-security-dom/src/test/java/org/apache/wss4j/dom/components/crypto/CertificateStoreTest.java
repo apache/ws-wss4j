@@ -46,11 +46,15 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for the CertificateStore Crypto instance. This class does not know anything
  * about Java KeyStores, but just wraps a list of trusted certificates.
  */
-public class CertificateStoreTest extends org.junit.Assert {
+public class CertificateStoreTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CertificateStoreTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

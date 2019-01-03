@@ -25,10 +25,15 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * unit test for the Reference type
  */
-public class ReferenceTest extends org.junit.Assert {
+public class ReferenceTest {
 
     private static final String
     TEST_REFERENCE_TEMPLATE =

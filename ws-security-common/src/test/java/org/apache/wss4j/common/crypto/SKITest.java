@@ -28,6 +28,9 @@ import org.apache.wss4j.common.util.Loader;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is a test for WSS-300 - "SubjectKeyIdentifier (SKI) incorrectly calculated for 2048-bit RSA key".
  * The SKI value WSS4J generates for various key sizes is tested against the output from openssl, e.g.:
@@ -35,7 +38,7 @@ import org.junit.Test;
  * openssl x509 -inform der -ocspid -in wss40_server.crt | grep 'Public key OCSP hash'
  * | perl -ne 'split; print pack("H*",$_[4])' | base64
  */
-public class SKITest extends org.junit.Assert {
+public class SKITest {
 
     @Test
     public void testRSA1024() throws Exception {

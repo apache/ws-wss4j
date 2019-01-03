@@ -45,10 +45,15 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of test-cases for SignatureConfirmation.
  */
-public class SignatureConfirmationTest extends org.junit.Assert {
+public class SignatureConfirmationTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

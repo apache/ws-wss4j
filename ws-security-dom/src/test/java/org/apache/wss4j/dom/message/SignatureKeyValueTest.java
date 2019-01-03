@@ -38,12 +38,16 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This class tests signing where the the public key is transmitted in the message via
  * a ds:KeyInfo/ds:KeyValue element. Although this isn't strictly recommended for use in
  * WS-Security, it's necessary to support it for WCF interop.
  */
-public class SignatureKeyValueTest extends org.junit.Assert {
+public class SignatureKeyValueTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureKeyValueTest.class);
     private Crypto crypto;

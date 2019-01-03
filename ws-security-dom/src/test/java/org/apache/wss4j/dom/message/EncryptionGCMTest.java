@@ -43,11 +43,16 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests using GCM. See:
  * https://issues.apache.org/jira/browse/WSS-325
  */
-public class EncryptionGCMTest extends org.junit.Assert {
+public class EncryptionGCMTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionGCMTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =

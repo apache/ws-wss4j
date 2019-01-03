@@ -33,12 +33,14 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test case for WSS-245 - "WSHandlerConstants.PW_CALLBACK_REF isn't correctly searched for"
  *
  * https://issues.apache.org/jira/browse/WSS-245
  */
-public class CallbackRefTest extends org.junit.Assert {
+public class CallbackRefTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();

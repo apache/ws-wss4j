@@ -28,11 +28,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for extracting AuthorityKeyIdentifier/SubjectKeyIdentifier information from
  * the certs using BouncyCastle.
  */
-public class AuthorityKeyIdentifierTest extends org.junit.Assert {
+public class AuthorityKeyIdentifierTest {
 
     public AuthorityKeyIdentifierTest() {
         WSProviderConfig.init();

@@ -25,12 +25,15 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * This is a test for WSS-147. A "checkReceiverResultsAnyOrder" method is added to WSHandler
  * which applications can use if they want.
  */
-public class ResultsOrderTest extends org.junit.Assert {
+public class ResultsOrderTest {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

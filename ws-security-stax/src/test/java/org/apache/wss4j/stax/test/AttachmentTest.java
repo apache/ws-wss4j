@@ -63,11 +63,16 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AttachmentTest extends AbstractTestBase {
 
@@ -141,14 +146,14 @@ public class AttachmentTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @Test
@@ -211,10 +216,10 @@ public class AttachmentTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                Assert.assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
             }
         }
     }
@@ -265,15 +270,15 @@ public class AttachmentTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(2, sigReferences.getLength());
+            assertEquals(2, sigReferences.getLength());
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @Test
@@ -336,10 +341,10 @@ public class AttachmentTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                Assert.assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
             }
         }
     }
@@ -398,15 +403,15 @@ public class AttachmentTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
-            Assert.assertEquals(3, sigReferences.getLength());
+            assertEquals(3, sigReferences.getLength());
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @Test
@@ -443,18 +448,18 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-            Assert.assertEquals(2, references.getLength());
+            assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-            Assert.assertEquals(1, cipherReferences.getLength());
+            assertEquals(1, cipherReferences.getLength());
             NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-            Assert.assertEquals(2, encDatas.getLength());
+            assertEquals(2, encDatas.getLength());
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(2, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(2, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
         }
 
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
@@ -469,15 +474,15 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -515,18 +520,18 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-            Assert.assertEquals(2, references.getLength());
+            assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-            Assert.assertEquals(1, cipherReferences.getLength());
+            assertEquals(1, cipherReferences.getLength());
             NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-            Assert.assertEquals(2, encDatas.getLength());
+            assertEquals(2, encDatas.getLength());
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(2, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(2, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
         }
 
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
@@ -541,15 +546,15 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -585,18 +590,18 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-            Assert.assertEquals(2, references.getLength());
+            assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-            Assert.assertEquals(1, cipherReferences.getLength());
+            assertEquals(1, cipherReferences.getLength());
             NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-            Assert.assertEquals(2, encDatas.getLength());
+            assertEquals(2, encDatas.getLength());
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(2, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(2, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
         }
 
         final PushbackInputStream pis = new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
@@ -614,17 +619,17 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         // Different behaviour here for different JDKs...
         try {
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-            Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+            assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+            assertEquals("text/xml", responseAttachment.getMimeType());
 
             Map<String, String> attHeaders = responseAttachment.getHeaders();
-            Assert.assertEquals(6, attHeaders.size());
+            assertEquals(6, attHeaders.size());
         } catch (IOException ex) { //NOPMD
             // expected
         }
@@ -663,19 +668,19 @@ public class AttachmentTest extends AbstractTestBase {
         encrypt.prependToHeader();
 
         NodeList references = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-        Assert.assertEquals(2, references.getLength());
+        assertEquals(2, references.getLength());
         NodeList cipherReferences = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-        Assert.assertEquals(1, cipherReferences.getLength());
+        assertEquals(1, cipherReferences.getLength());
         NodeList encDatas = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-        Assert.assertEquals(2, encDatas.getLength());
+        assertEquals(2, encDatas.getLength());
 
         NodeList securityHeaderElement = doc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-        Assert.assertEquals(1, securityHeaderElement.getLength());
+        assertEquals(1, securityHeaderElement.getLength());
         NodeList childs = securityHeaderElement.item(0).getChildNodes();
-        Assert.assertEquals(3, childs.getLength());
-        Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-        Assert.assertEquals(childs.item(1).getLocalName(), "ReferenceList");
-        Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+        assertEquals(3, childs.getLength());
+        assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+        assertEquals(childs.item(1).getLocalName(), "ReferenceList");
+        assertEquals(childs.item(2).getLocalName(), "EncryptedData");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -693,14 +698,14 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -738,20 +743,20 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-            Assert.assertEquals(2, references.getLength());
+            assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-            Assert.assertEquals(1, cipherReferences.getLength());
+            assertEquals(1, cipherReferences.getLength());
             NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-            Assert.assertEquals(2, encDatas.getLength());
+            assertEquals(2, encDatas.getLength());
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(2, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(2, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
 
-            Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
+            assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
         }
 
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
@@ -766,14 +771,14 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -811,20 +816,20 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
-            Assert.assertEquals(2, references.getLength());
+            assertEquals(2, references.getLength());
             NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
-            Assert.assertEquals(1, cipherReferences.getLength());
+            assertEquals(1, cipherReferences.getLength());
             NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
-            Assert.assertEquals(2, encDatas.getLength());
+            assertEquals(2, encDatas.getLength());
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(2, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(2, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
 
-            Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
+            assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
         }
 
         final PushbackInputStream pis = new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
@@ -842,16 +847,16 @@ public class AttachmentTest extends AbstractTestBase {
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                // Assert.assertEquals(e.getCause().getMessage(), "The signature or decryption was invalid");
+                assertTrue(e.getCause() instanceof WSSecurityException);
+                // assertEquals(e.getCause().getMessage(), "The signature or decryption was invalid");
                 return;
             }
 
-            Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+            assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
             Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-            Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+            assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+            assertEquals("text/xml", responseAttachment.getMimeType());
 
         }
     }
@@ -909,22 +914,22 @@ public class AttachmentTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
 
-        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
         byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", responseAttachment.getMimeType());
         Map<String, String> att1Headers = responseAttachment.getHeaders();
-        Assert.assertEquals(6, att1Headers.size());
+        assertEquals(6, att1Headers.size());
 
         responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
 
         byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/plain", responseAttachment.getMimeType());
+        assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/plain", responseAttachment.getMimeType());
         Map<String, String> att2Headers = responseAttachment.getHeaders();
-        Assert.assertEquals(6, att2Headers.size());
+        assertEquals(6, att2Headers.size());
     }
 
     @Test
@@ -980,14 +985,14 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(3, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
-            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
+            assertEquals(3, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+            assertEquals(childs.item(2).getLocalName(), "Signature");
 
-            Assert.assertEquals(1, attachment[0].getHeaders().size());
+            assertEquals(1, attachment[0].getHeaders().size());
         }
 
         {
@@ -1021,11 +1026,11 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -1113,10 +1118,10 @@ public class AttachmentTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                Assert.assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertTrue(e.getCause().getMessage().startsWith("Invalid digest of reference cid:"));
             }
         }
     }
@@ -1174,14 +1179,14 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(3, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "Signature");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            assertEquals(3, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "Signature");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "EncryptedData");
 
-            Assert.assertEquals(1, attachment[0].getHeaders().size());
+            assertEquals(1, attachment[0].getHeaders().size());
         }
 
         {
@@ -1215,11 +1220,11 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
-        Assert.assertEquals(6, attHeaders.size());
+        assertEquals(6, attHeaders.size());
     }
 
     @Test
@@ -1275,12 +1280,12 @@ public class AttachmentTest extends AbstractTestBase {
             Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
             NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
-            Assert.assertEquals(1, securityHeaderElement.getLength());
+            assertEquals(1, securityHeaderElement.getLength());
             NodeList childs = securityHeaderElement.item(0).getChildNodes();
-            Assert.assertEquals(3, childs.getLength());
-            Assert.assertEquals(childs.item(0).getLocalName(), "Signature");
-            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
-            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            assertEquals(3, childs.getLength());
+            assertEquals(childs.item(0).getLocalName(), "Signature");
+            assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            assertEquals(childs.item(2).getLocalName(), "EncryptedData");
         }
 
         {
@@ -1316,9 +1321,9 @@ public class AttachmentTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Exception expected");
+                fail("Exception expected");
             } catch (XMLStreamException e) {
-                Assert.assertNotNull(e.getMessage());
+                assertNotNull(e.getMessage());
             }
         }
     }

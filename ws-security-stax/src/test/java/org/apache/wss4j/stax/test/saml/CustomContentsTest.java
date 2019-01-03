@@ -50,6 +50,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Tests related to handling of custom contents in SAML data structures.
  */

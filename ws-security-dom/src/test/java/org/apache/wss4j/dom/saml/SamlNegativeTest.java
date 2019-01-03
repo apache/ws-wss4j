@@ -60,11 +60,14 @@ import java.security.KeyStore;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a set of test-cases where the SAML Assertion is altered in some way and so
  * we expect an exception to be thrown when processing it.
  */
-public class SamlNegativeTest extends org.junit.Assert {
+public class SamlNegativeTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlNegativeTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

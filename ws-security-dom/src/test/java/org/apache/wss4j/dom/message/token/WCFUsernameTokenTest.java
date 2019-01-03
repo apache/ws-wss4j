@@ -38,6 +38,9 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * A test-case for WSS-199 - "Add support for WCF non-standard Username Tokens"
@@ -45,7 +48,7 @@ import org.w3c.dom.Document;
  * The issue is that WCF generated Username Tokens where the password type is namespace
  * qualified (incorrectly). WSS-199 added the ability to process these Username Tokens.
  */
-public class WCFUsernameTokenTest extends org.junit.Assert {
+public class WCFUsernameTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WCFUsernameTokenTest.class);
     private static final String SOAPUTMSG =

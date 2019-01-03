@@ -44,12 +44,16 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests for the WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS option.
  * This test verifies some wrapping techniques are properly handled when the afore
  * mentioned option is on.
  */
-public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
+public class RequireSignedEncryptedDataElementsTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(RequireSignedEncryptedDataElementsTest.class);
     private static ResourceBundle resources = ResourceBundle.getBundle("messages.wss4j_errors");

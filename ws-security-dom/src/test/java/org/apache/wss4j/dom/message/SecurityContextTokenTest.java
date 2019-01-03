@@ -37,10 +37,14 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of tests for SecurityContextTokens.
  */
-public class SecurityContextTokenTest extends org.junit.Assert {
+public class SecurityContextTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityContextTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

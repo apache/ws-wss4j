@@ -85,11 +85,14 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class AbstractTestBase extends Assert {
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractTestBase {
 
     //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
     //transformer.transform(new StreamSource(new ByteArrayInputStream(baos.toByteArray())), new StreamResult(System.out));
@@ -664,15 +667,15 @@ public abstract class AbstractTestBase extends Assert {
 
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-            Assert.assertNotNull(securityEvent.getCorrelationID());
-            Assert.assertNotEquals("", securityEvent.getCorrelationID());
+            assertNotNull(securityEvent.getCorrelationID());
+            assertNotEquals("", securityEvent.getCorrelationID());
             receivedSecurityEvents.add(securityEvent);
         }
 
         public void compare() {
             if (expectedEvents.length != receivedSecurityEvents.size()) {
                 printEvents();
-                Assert.fail("event count mismatch");
+                fail("event count mismatch");
             }
             boolean asserted = true;
             for (int i = 0; i < expectedEvents.length; i++) {
@@ -683,7 +686,7 @@ public abstract class AbstractTestBase extends Assert {
             }
             if (!asserted) {
                 printEvents();
-                Assert.fail("event mismatch");
+                fail("event mismatch");
             }
         }
 

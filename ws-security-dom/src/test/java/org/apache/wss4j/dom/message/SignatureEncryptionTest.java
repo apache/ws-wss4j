@@ -45,10 +45,15 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import java.util.List;
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of tests for combined signature/encryption, verification/decryption.
  */
-public class SignatureEncryptionTest extends org.junit.Assert {
+public class SignatureEncryptionTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureEncryptionTest.class);
     private static final String SOAPMSG =

@@ -35,8 +35,10 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class KerberosTokenTest extends AbstractPolicyTestBase {
 
@@ -192,9 +194,9 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "Policy enforces WssKerberosV5ApReqToken11");
+            assertEquals(e.getMessage(), "Policy enforces WssKerberosV5ApReqToken11");
         }
     }
 }

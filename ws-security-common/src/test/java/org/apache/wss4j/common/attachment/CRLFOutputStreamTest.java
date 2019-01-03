@@ -19,11 +19,12 @@
 package org.apache.wss4j.common.attachment;
 
 import org.apache.wss4j.common.util.CRLFOutputStream;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class CRLFOutputStreamTest {
 
@@ -48,7 +49,7 @@ public class CRLFOutputStreamTest {
         crlfOutputStream.write('a');
         crlfOutputStream.write('a');
         crlfOutputStream.close();
-        Assert.assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
+        assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
     }
 
     @Test
@@ -57,7 +58,7 @@ public class CRLFOutputStreamTest {
         CRLFOutputStream crlfOutputStream = new CRLFOutputStream(baos);
         crlfOutputStream.write("\n\r\r\n\n\n\r\r\ra\n\r\naaa".getBytes());
         crlfOutputStream.close();
-        Assert.assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
+        assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
     }
 
     @Test
@@ -66,7 +67,7 @@ public class CRLFOutputStreamTest {
         CRLFOutputStream crlfOutputStream = new CRLFOutputStream(baos);
         crlfOutputStream.write("aaaaaaaaaa".getBytes());
         crlfOutputStream.close();
-        Assert.assertArrayEquals("aaaaaaaaaa".getBytes(), baos.toByteArray());
+        assertArrayEquals("aaaaaaaaaa".getBytes(), baos.toByteArray());
     }
 
     @Test

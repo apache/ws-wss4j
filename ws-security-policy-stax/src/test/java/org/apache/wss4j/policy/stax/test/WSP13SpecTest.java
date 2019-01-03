@@ -25,11 +25,14 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.InboundWSSecurityContextImplTest;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class WSP13SpecTest extends AbstractPolicyTestBase {
 
@@ -214,7 +217,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
                     for (int j = 0; j < securityEventList.size(); j++) {
                         System.out.println(j + " " + securityEventList.get(j));
                     }
-                    Assert.fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
+                    fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
                 }
                 if (ignoreEvent == null || i != eventIndex) {
                     policyEnforcer.registerSecurityEvent(securityEvent);
@@ -223,21 +226,21 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
 
             policyEnforcer.doFinal();
             if (ignoreEvent != null) {
-                Assert.fail("Expected WSSPolicyException");
+                fail("Expected WSSPolicyException");
             }
         } catch (WSSPolicyException e) {
             //Exception for policyEnforcer.doFinal();
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException: " + e.getMessage());
+                fail("Unexpected WSSPolicyException: " + e.getMessage());
             }
-            Assert.assertEquals(e.getMessage(), expectedErrorMessage);
+            assertEquals(e.getMessage(), expectedErrorMessage);
         } catch (WSSecurityException e) {
             //Exception for policyEnforcer.registerSecurityEvent(securityEvent);
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException: " + e.getMessage());
+                fail("Unexpected WSSPolicyException: " + e.getMessage());
             }
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
-            Assert.assertEquals(e.getCause().getMessage(), expectedErrorMessage);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertEquals(e.getCause().getMessage(), expectedErrorMessage);
         }
     }
 }

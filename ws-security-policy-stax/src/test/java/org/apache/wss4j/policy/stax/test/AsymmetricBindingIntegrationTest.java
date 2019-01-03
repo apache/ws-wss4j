@@ -51,9 +51,12 @@ import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
 
@@ -412,12 +415,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Timestamp must not be present");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -662,12 +665,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be signed");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -791,12 +794,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1024,12 +1027,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Asymmetric algorithm http://www.w3.org/2001/04/xmldsig-more#rsa-sha512 does not meet policy");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1144,12 +1147,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "C14N algorithm http://www.w3.org/2006/12/xml-c14n11 does not meet policy");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1264,12 +1267,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            // Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            // assertEquals(e.getCause().getMessage(),
             //        "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
-            // Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            // assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         } finally {
             switchAllowMD5Algorithm(false);
         }
@@ -1383,13 +1386,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Encryption algorithm http://www.w3.org/2001/04/xmlenc#tripledes-cbc does not meet policy\n" +
                     "Symmetric encryption algorithm key length 192 does not meet policy");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1717,10 +1720,10 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1831,12 +1834,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://www.w3.org/2000/09/xmldsig#}Signature must not be encrypted");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -2060,13 +2063,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "OnlySignEntireHeadersAndBody not fulfilled, offending element: " +
                             "/{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body/{http://schemas.xmlsoap.org/wsdl/}definitions");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -2169,13 +2172,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "OnlySignEntireHeadersAndBody not fulfilled, offending element: " +
                             "/{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://schemas.xmlsoap.org/wsdl/}definitions/{http://schemas.xmlsoap.org/wsdl/}service");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -2282,10 +2285,10 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
                     "\torg.apache.wss4j.policy.stax.PolicyViolationException: \n" +
                     "Policy enforces LaxTsFirst but X509Token occured first");
         }
@@ -2667,11 +2670,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "Token must be included");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(), "Token must be included");
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -2781,11 +2784,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "Token must be included");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(), "Token must be included");
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -2894,12 +2897,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Policy enforces SignBeforeEncrypting but the /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body was encrypted and then signed");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -3008,12 +3011,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         }
                     }
             ));
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(e.getCause().getMessage(),
                     "Policy enforces EncryptBeforeSigning but the /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body was signed and then encrypted");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

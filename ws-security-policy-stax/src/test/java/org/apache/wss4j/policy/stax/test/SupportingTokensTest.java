@@ -48,8 +48,11 @@ import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SupportingTokensTest extends AbstractPolicyTestBase {
 
@@ -108,11 +111,11 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(),
+            assertEquals(e.getMessage(),
                     "X509Certificate Version 3 mismatch; Policy enforces WssX509V3Token11");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -186,9 +189,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -350,9 +353,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -514,9 +517,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -660,9 +663,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -804,9 +807,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -948,9 +951,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -1092,9 +1095,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -1258,9 +1261,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -1428,9 +1431,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 
@@ -1568,9 +1571,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            assertTrue(e.getCause() instanceof WSSPolicyException);
         }
     }
 

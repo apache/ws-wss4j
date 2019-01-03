@@ -36,9 +36,12 @@ import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
 
@@ -87,12 +90,12 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.SigDig);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Digest algorithm http://www.w3.org/2001/04/xmlenc#sha256 does not meet policy");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -116,13 +119,13 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes128-cbc does not meet policy\n" +
                     "Symmetric encryption algorithm key length 128 does not meet policy");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -174,13 +177,13 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof PolicyViolationException);
+            assertEquals(e.getCause().getMessage(),
                     "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes128-cbc does not meet policy\n" +
                     "Symmetric encryption algorithm key length 128 does not meet policy");
-            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -275,9 +278,9 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
-            Assert.fail("Exception expected");
+            fail("Exception expected");
         } catch (Exception e) {
-            Assert.assertEquals(e.getCause().getMessage(), "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes256-cbc does not meet policy");
+            assertEquals(e.getCause().getMessage(), "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes256-cbc does not meet policy");
         }
     }
 }

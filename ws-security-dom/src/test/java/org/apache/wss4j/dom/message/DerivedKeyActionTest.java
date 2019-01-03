@@ -44,13 +44,14 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * A set of tests for using a derived key for encryption/signature using WSHandler actions.
  */
-public class DerivedKeyActionTest extends Assert {
+public class DerivedKeyActionTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DerivedKeyActionTest.class);
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
@@ -90,7 +91,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -123,7 +124,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_02));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_02));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -188,7 +189,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -353,7 +354,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -393,7 +394,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -429,7 +430,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -465,7 +466,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -507,7 +508,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -549,7 +550,7 @@ public class DerivedKeyActionTest extends Assert {
         );
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
-        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

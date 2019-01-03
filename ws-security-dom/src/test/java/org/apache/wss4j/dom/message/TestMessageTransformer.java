@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
  * Applies message transformations to the tests in
  * org.apache.wss4j.dom.message.RequireSignedEncryptedDataElementsTest
  */
-public class TestMessageTransformer extends org.junit.Assert {
+public class TestMessageTransformer {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TestMessageTransformer.class);
 
     @org.junit.AfterClass

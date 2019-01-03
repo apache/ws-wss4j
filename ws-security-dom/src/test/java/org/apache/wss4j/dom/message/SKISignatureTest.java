@@ -33,10 +33,13 @@ import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * WS-Security Test Case for SubjectKeyIdentifier.
  */
-public class SKISignatureTest extends org.junit.Assert {
+public class SKISignatureTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SKISignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

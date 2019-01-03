@@ -51,10 +51,13 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some test-cases for replay attacks.
  */
-public class ReplayTest extends org.junit.Assert {
+public class ReplayTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ReplayTest.class);
 

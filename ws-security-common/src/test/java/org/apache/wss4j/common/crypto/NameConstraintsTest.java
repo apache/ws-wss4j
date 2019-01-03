@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.crypto;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -41,6 +42,9 @@ import org.apache.wss4j.common.util.Loader;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Tests the handling of {@code NameConstraint}s with {@code TrustAnchor}s in the
  * {@link Merlin}, {@link MerlinAKI}, and {@link CertificateStore} crypto implementations.
@@ -55,7 +59,7 @@ import org.junit.Test;
  * null Name Constraints added</li>
  * </ul>
  */
-public class NameConstraintsTest extends org.junit.Assert {
+public class NameConstraintsTest {
     private static final String KEY_ROOT = "keys/nameconstraints/";
 
     private static final String SELF_SIGNED = KEY_ROOT + "self_signed.p12";

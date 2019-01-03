@@ -52,10 +52,14 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
  */
-public class SamlConditionsTest extends org.junit.Assert {
+public class SamlConditionsTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlConditionsTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

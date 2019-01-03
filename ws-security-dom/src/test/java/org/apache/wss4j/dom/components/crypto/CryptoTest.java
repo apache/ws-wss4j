@@ -39,7 +39,12 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-public class CryptoTest extends org.junit.Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CryptoTest {
 
     public CryptoTest() {
         WSSConfig.init();

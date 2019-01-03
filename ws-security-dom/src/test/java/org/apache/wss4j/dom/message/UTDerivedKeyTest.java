@@ -48,12 +48,16 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the
  * UsernameTokenProfile 1.1 specification. The derived keys are used to encrypt
  * and sign, as per wsc:DerivedKeyToken.
  */
-public class UTDerivedKeyTest extends org.junit.Assert {
+public class UTDerivedKeyTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UTDerivedKeyTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();

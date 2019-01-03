@@ -42,10 +42,14 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some tests for SAML Authentication Assertions
  */
-public class SamlAuthnTest extends org.junit.Assert {
+public class SamlAuthnTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAuthnTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

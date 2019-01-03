@@ -52,11 +52,16 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion using a
  * derived key.
  */
-public class SamlTokenDerivedTest extends org.junit.Assert {
+public class SamlTokenDerivedTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenDerivedTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

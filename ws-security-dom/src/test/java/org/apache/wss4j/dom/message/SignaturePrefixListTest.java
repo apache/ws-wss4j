@@ -47,11 +47,14 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * A test-case for WSS-626 - "Duplicates in the PrefixList".
  */
-public class SignaturePrefixListTest extends org.junit.Assert {
+public class SignaturePrefixListTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignaturePrefixListTest.class);
 

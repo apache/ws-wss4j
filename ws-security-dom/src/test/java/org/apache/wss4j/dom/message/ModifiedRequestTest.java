@@ -52,10 +52,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This class tests the modification of requests.
  */
-public class ModifiedRequestTest extends org.junit.Assert {
+public class ModifiedRequestTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ModifiedRequestTest.class);
     private static final String SOAPMSG =

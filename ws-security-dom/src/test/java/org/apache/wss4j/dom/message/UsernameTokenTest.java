@@ -57,10 +57,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * WS-Security Test Case for UsernameTokens.
  */
-public class UsernameTokenTest extends org.junit.Assert implements CallbackHandler {
+public class UsernameTokenTest implements CallbackHandler {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameTokenTest.class);
     private static final String SOAPUTMSG =

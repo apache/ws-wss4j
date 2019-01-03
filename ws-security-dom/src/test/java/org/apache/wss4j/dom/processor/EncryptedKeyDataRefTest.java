@@ -41,6 +41,10 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test that checks for correct WSDataRef which should be returned by
  * <code>org.apache.wss4j.dom.processor.EncryptedKeyProcessor</code>
@@ -54,7 +58,7 @@ import org.w3c.dom.Element;
  * WSDataRef object must contain the correct QName of the decrypted element.
  *
  */
-public class EncryptedKeyDataRefTest extends org.junit.Assert {
+public class EncryptedKeyDataRefTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyDataRefTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

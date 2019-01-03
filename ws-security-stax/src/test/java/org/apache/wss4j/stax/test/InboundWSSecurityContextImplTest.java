@@ -65,9 +65,11 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class InboundWSSecurityContextImplTest {
 
@@ -82,23 +84,23 @@ public class InboundWSSecurityContextImplTest {
 
         final List<SecurityEvent> securityEventList = generateTransportBindingSecurityEvents();
 
-        Assert.assertEquals(securityEventList.size(), 11);
+        assertEquals(securityEventList.size(), 11);
 
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
             if (securityEvent instanceof HttpsTokenSecurityEvent) {
                 HttpsTokenSecurityEvent tokenSecurityEvent = (HttpsTokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
             } else if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
             }
         }
     }
@@ -212,61 +214,61 @@ public class InboundWSSecurityContextImplTest {
         boolean encryptedSupportingTokensOccured = false;
         boolean mainEncryptionTokenOccured = false;
         boolean usernameTokenOccured = false;
-        Assert.assertEquals(securityEventList.size(), 34);
+        assertEquals(securityEventList.size(), 34);
         int x509TokenIndex = 0;
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
             if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 0) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
                 mainEncryptionTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 1) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS));
                 signedEndorsingSupportingTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 2) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS));
                 encryptedSupportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 3) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
                 supportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 4) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS));
                 signedEndorsingEncryptedSupportingTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 5) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
                 mainSignatureTokenOccured = true;
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
                 usernameTokenOccured = true;
             }
         }
 
-        Assert.assertTrue(mainSignatureTokenOccured);
-        Assert.assertTrue(mainEncryptionTokenOccured);
-        Assert.assertTrue(signedEndorsingSupportingTokenOccured);
-        Assert.assertTrue(signedEndorsingEncryptedSupportingTokenOccured);
-        Assert.assertTrue(supportingTokensOccured);
-        Assert.assertTrue(encryptedSupportingTokensOccured);
-        Assert.assertTrue(usernameTokenOccured);
+        assertTrue(mainSignatureTokenOccured);
+        assertTrue(mainEncryptionTokenOccured);
+        assertTrue(signedEndorsingSupportingTokenOccured);
+        assertTrue(signedEndorsingEncryptedSupportingTokenOccured);
+        assertTrue(supportingTokensOccured);
+        assertTrue(encryptedSupportingTokensOccured);
+        assertTrue(usernameTokenOccured);
     }
 
     public List<SecurityEvent> generateAsymmetricBindingSecurityEvents() throws Exception {
@@ -517,23 +519,23 @@ public class InboundWSSecurityContextImplTest {
 
         final List<SecurityEvent> securityEventList = generateSymmetricBindingSecurityEvents();
 
-        Assert.assertEquals(securityEventList.size(), 24);
+        assertEquals(securityEventList.size(), 24);
 
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
             if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS));
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
             } else if (securityEvent instanceof SamlTokenSecurityEvent) {
                 SamlTokenSecurityEvent tokenSecurityEvent = (SamlTokenSecurityEvent) securityEvent;
-                Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
+                assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE));
+                assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION));
             }
         }
     }

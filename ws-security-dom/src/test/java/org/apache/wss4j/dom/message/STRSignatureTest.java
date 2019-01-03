@@ -37,7 +37,7 @@ import org.w3c.dom.Document;
  * WS-Security Test Case for signature creation/validation using the
  * SecurityTokenReference transform.
  */
-public class STRSignatureTest extends org.junit.Assert {
+public class STRSignatureTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(STRSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();

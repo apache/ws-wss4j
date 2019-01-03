@@ -44,12 +44,17 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
@@ -105,14 +110,14 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         try {
             doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
-            Assert.assertNotNull(throwable);
+            assertNotNull(throwable);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
-            //Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
-            Assert.assertEquals(throwable.getMessage(), "Recursive key reference detected.");
+            //assertEquals(throwable.getMessage(), "An invalid security token was provided");
+            assertEquals(throwable.getMessage(), "Recursive key reference detected.");
         }
     }
 
@@ -189,11 +194,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         try {
             doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable.getMessage().contains("Invalid digest of reference "));
+            assertNotNull(throwable);
+            assertTrue(throwable.getMessage().contains("Invalid digest of reference "));
         }
     }
 
@@ -248,20 +253,20 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(soap.getBytes()));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
             Throwable throwable = e.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof WSSecurityException);
             throwable = throwable.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof PolicyViolationException);
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof PolicyViolationException);
             throwable = throwable.getCause();
-            Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof PolicyViolationException);
-            Assert.assertEquals(throwable.getMessage(), "No policy alternative could be satisfied");
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof PolicyViolationException);
+            assertEquals(throwable.getMessage(), "No policy alternative could be satisfied");
         }
     }
     */
@@ -289,10 +294,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -327,10 +332,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         } finally {
             changeValueOfMaximumAllowedTransformsPerReference(oldval);
         }
@@ -365,10 +370,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -409,7 +414,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Document document = doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.assertNotNull(document);
+            assertNotNull(document);
         } finally {
             switchAllowMD5Algorithm(false);
         }
@@ -446,9 +451,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertEquals(e.getCause().getMessage(),
                     "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
                     "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
         } finally {
@@ -487,9 +492,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertEquals(e.getCause().getMessage(),
                     "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
                     "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
         } finally {
@@ -539,10 +544,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(inboundSecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof IOException);
-            Assert.assertEquals(e.getCause().getMessage(),
+            assertTrue(e.getCause() instanceof IOException);
+            assertEquals(e.getCause().getMessage(),
                     "Maximum byte count (101) reached.");
         } finally {
             changeValueOfMaximumAllowedDecompressedBytes(oldval);
@@ -562,7 +567,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         NodeList cipherValues = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_CipherValue.getNamespaceURI(), WSSConstants.TAG_xenc_CipherValue.getLocalPart());
         Element cipherValueElement = (Element)cipherValues.item(0);
-        Assert.assertEquals(cipherValueElement.getParentNode().getParentNode().getLocalName(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+        assertEquals(cipherValueElement.getParentNode().getParentNode().getLocalName(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
 
         String cipherValue = cipherValueElement.getTextContent();
         StringBuilder stringBuilder = new StringBuilder(cipherValue);
@@ -588,9 +593,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertFalse(e.getMessage().contains("data hash wrong"));
+            assertFalse(e.getMessage().contains("data hash wrong"));
         }
     }
 
@@ -626,10 +631,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
-            Assert.fail("Expected XMLStreamException");
+            fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 }
