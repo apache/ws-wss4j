@@ -38,7 +38,7 @@
         <geronimo.javamail.version>1.8.4</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
-        <kerby.version>1.1.1</kerby.version>
+        <kerby.version>2.0.0</kerby.version>
         <neethi.version>3.1.1</neethi.version>
         <opensaml.version>3.3.0</opensaml.version>
         <slf4j.version>1.7.25</slf4j.version>
