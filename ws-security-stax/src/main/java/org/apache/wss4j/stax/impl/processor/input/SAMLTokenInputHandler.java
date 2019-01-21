@@ -559,14 +559,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();
-                if (elementPath.equals(WSSConstants.SOAP_11_BODY_PATH)) {
+                if (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, elementPath, true, false)) {
                     bodySignedPartSecurityEvent = signedPartSecurityEvent;
                 }
             } else if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
                 SignedElementSecurityEvent signedPartSecurityEvent = (SignedElementSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();
-                if (elementPath.equals(SAML2_TOKEN_PATH) || elementPath.equals(SAML1_TOKEN_PATH)) {
+                if (WSSUtils.pathMatches(SAML2_TOKEN_PATH, elementPath, true, false)
+                    || WSSUtils.pathMatches(SAML1_TOKEN_PATH, elementPath, true, false)) {
                     samlTokenSignedElementSecurityEvents.add(signedPartSecurityEvent);
                 }
             }
