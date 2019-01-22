@@ -198,7 +198,7 @@ public class NSStack {
      * find one because "pre" is actually mapped to "otherNamespace"
      */
     public String getPrefix(String namespaceURI, boolean noDefault) {
-        if (namespaceURI == null || namespaceURI.equals("")) {
+        if (namespaceURI == null || namespaceURI.isEmpty()) {
             return null;
         }
         int hash = namespaceURI.hashCode();

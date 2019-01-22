@@ -407,7 +407,7 @@ public abstract class AbstractTestBase {
             * defined in the deployment descriptor takes precedence.
             */
             reqData.setUsername((String) getOption(WSHandlerConstants.USER));
-            if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
+            if (reqData.getUsername() == null || reqData.getUsername().isEmpty()) {
                 reqData.setUsername((String) mc.get(WSHandlerConstants.USER));
             }
 
@@ -425,7 +425,7 @@ public abstract class AbstractTestBase {
                     break;
                 }
             }
-            if (usernameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
+            if (usernameRequired && (reqData.getUsername() == null || reqData.getUsername().isEmpty())) {
                 /*
                  * We need a username - if none throw a WSSecurityException. For encryption
                  * there is a specific parameter to get a username.
