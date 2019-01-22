@@ -539,12 +539,12 @@ public class ConfigurationConstants {
      */
     @Deprecated
     public static final String EXPAND_XOP_INCLUDE_FOR_SIGNATURE = "expandXOPIncludeForSignature";
-    
+
     /**
      * Whether to search for and expand xop:Include Elements for encryption and signature (on the outbound
-     * side) or for signature verification (on the inbound side). The default is false on the outbound 
-     * side and true on the inbound side. What this means on the inbound side, is that the relevant attachment 
-     * bytes are BASE-64 encoded and inserted into the Element. This ensures that the actual bytes are signed, 
+     * side) or for signature verification (on the inbound side). The default is false on the outbound
+     * side and true on the inbound side. What this means on the inbound side, is that the relevant attachment
+     * bytes are BASE-64 encoded and inserted into the Element. This ensures that the actual bytes are signed,
      * and not just the reference.
      */
     public static final String EXPAND_XOP_INCLUDE = "expandXOPInclude";
@@ -820,20 +820,27 @@ public class ConfigurationConstants {
     public static final String TTL_FUTURE_USERNAMETOKEN = "utFutureTimeToLive";
 
     /**
-     * This configuration tag is a comma separated String of regular expressions which
-     * will be applied to the subject DN of the certificate used for signature
+     * This configuration tag is a String (separated by the value specified for SIG_CERT_CONSTRAINTS_SEPARATOR)
+     * of regular expressions which will be applied to the subject DN of the certificate used for signature
      * validation, after trust verification of the certificate chain associated with the
      * certificate.
      */
     public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
 
     /**
-     * This configuration tag is a comma separated String of regular expressions which
-     * will be applied to the issuer DN of the certificate used for signature
+     * This configuration tag is a String (separated by the value specified for SIG_CERT_CONSTRAINTS_SEPARATOR)
+     * of regular expressions which will be applied to the issuer DN of the certificate used for signature
      * validation, after trust verification of the certificate chain associated with the
      * certificate.
      */
     public static final String SIG_ISSUER_CERT_CONSTRAINTS = "sigIssuerCertConstraints";
+
+    /**
+     * This configuration tag refers to the separator that is used to parse certificate constraints
+     * configured in the SIG_SUBJECT_CERT_CONSTRAINTS and SIG_ISSUER_CERT_CONSTRAINTS configuration
+     * tags. By default it is a comma - ",".
+     */
+    public static final String SIG_CERT_CONSTRAINTS_SEPARATOR = "sigCertConstraintsSeparator";
 
     /**
      * Time-To-Live is the time difference between creation and expiry time in
