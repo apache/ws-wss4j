@@ -1333,13 +1333,24 @@ public abstract class WSHandler {
         String certConstraints =
             getString(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, reqData.getMsgContext());
         if (certConstraints != null) {
-            Collection<Pattern> subjectCertConstraints = getCertConstraints(certConstraints);
+            String certConstraintsSeparator =
+                getString(WSHandlerConstants.SIG_CERT_CONSTRAINTS_SEPARATOR, reqData.getMsgContext());
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            Collection<Pattern> subjectCertConstraints = getCertConstraints(certConstraints, certConstraintsSeparator);
             reqData.setSubjectCertConstraints(subjectCertConstraints);
         }
         String issuerCertConstraintsStringValue =
             getString(WSHandlerConstants.SIG_ISSUER_CERT_CONSTRAINTS, reqData.getMsgContext());
         if (issuerCertConstraintsStringValue != null) {
-            Collection<Pattern> issuerCertConstraints = getCertConstraints(issuerCertConstraintsStringValue);
+            String certConstraintsSeparator =
+                getString(WSHandlerConstants.SIG_CERT_CONSTRAINTS_SEPARATOR, reqData.getMsgContext());
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            Collection<Pattern> issuerCertConstraints =
+                getCertConstraints(issuerCertConstraintsStringValue, certConstraintsSeparator);
             reqData.setIssuerDNPatterns(issuerCertConstraints);
         }
 
@@ -1359,8 +1370,8 @@ public abstract class WSHandler {
         reqData.setExpandXopInclude(expandXOP);
     }
 
-    private Collection<Pattern> getCertConstraints(String certConstraints) throws WSSecurityException {
-        String[] certConstraintsList = certConstraints.split(",");
+    private Collection<Pattern> getCertConstraints(String certConstraints, String separator) throws WSSecurityException {
+        String[] certConstraintsList = certConstraints.split(separator);
         if (certConstraintsList != null && certConstraintsList.length > 0) {
             Collection<Pattern> certConstraintsCollection =
                 new ArrayList<>(certConstraintsList.length);

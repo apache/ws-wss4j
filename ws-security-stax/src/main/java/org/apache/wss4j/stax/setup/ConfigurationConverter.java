@@ -536,14 +536,26 @@ public final class ConfigurationConverter {
         String certConstraints =
             getString(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, config);
         if (certConstraints != null) {
-            Collection<Pattern> subjectCertConstraints = getCertConstraints(certConstraints);
+            String certConstraintsSeparator =
+                getString(ConfigurationConstants.SIG_CERT_CONSTRAINTS_SEPARATOR, config);
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            Collection<Pattern> subjectCertConstraints =
+                getCertConstraints(certConstraints, certConstraintsSeparator);
             properties.setSubjectCertConstraints(subjectCertConstraints);
         }
         // Subject Cert Constraints
         String issuerCertConstraintsString =
             getString(ConfigurationConstants.SIG_ISSUER_CERT_CONSTRAINTS, config);
         if (issuerCertConstraintsString != null) {
-            Collection<Pattern> issuerCertConstraints = getCertConstraints(certConstraints);
+            String certConstraintsSeparator =
+                getString(ConfigurationConstants.SIG_CERT_CONSTRAINTS_SEPARATOR, config);
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            Collection<Pattern> issuerCertConstraints =
+                getCertConstraints(certConstraints, certConstraintsSeparator);
             properties.setIssuerDNConstraints(issuerCertConstraints);
         }
 
@@ -606,8 +618,8 @@ public final class ConfigurationConverter {
         }
     }
 
-    private static Collection<Pattern> getCertConstraints(String certConstraints) {
-        String[] certConstraintsList = certConstraints.split(",");
+    private static Collection<Pattern> getCertConstraints(String certConstraints, String certConstraintsSeparator) {
+        String[] certConstraintsList = certConstraints.split(certConstraintsSeparator);
         if (certConstraintsList != null && certConstraintsList.length > 0) {
             Collection<Pattern> certConstraintsCollection =
                 new ArrayList<>(certConstraintsList.length);

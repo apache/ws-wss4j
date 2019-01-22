@@ -286,9 +286,16 @@ incoming Timestamp is valid. The default is "60".
 UsernameToken created element. The default is "300".
  * TTL_FUTURE_USERNAMETOKEN (utFutureTimeToLive) - The time in seconds in the future within which the Created time of an
 incoming UsernameToken is valid. The default is "60".
- * SIG_SUBJECT_CERT_CONSTRAINTS (sigSubjectCertConstraints) - A comma separated String of regular expressions which will be applied to
+ * SIG_SUBJECT_CERT_CONSTRAINTS (sigSubjectCertConstraints) - A String (separated by the value specified for SIG_CERT_CONSTRAINTS_SEPARATOR)
+of regular expressions which will be applied to
 the subject DN of the certificate used for signature validation, after trust
 verification of the certificate chain associated with the certificate. 
+ * SIG_ISSUER_CERT_CONSTRAINTS (sigIssuerCertConstraints) - A String (separated by the value specified for SIG_CERT_CONSTRAINTS_SEPARATOR)
+of regular expressions which will be applied to
+the issuer DN of the certificate used for signature validation, after trust
+verification of the certificate chain associated with the certificate. 
+ * *WSS4J 2.2.3* SIG_CERT_CONSTRAINTS_SEPARATOR (sigCertConstraintsSeparator) - The separator that is used to parse certificate constraints configured in the 
+SIG_SUBJECT_CERT_CONSTRAINTS and SIG_ISSUER_CERT_CONSTRAINTS configuration tags. The default is ",".
  * *WSS4J 2.0.0* VALIDATOR_MAP (validatorMap) - A map of QName, Object (Validator) instances to be used to validate
 tokens identified by their QName.
  * *WSS4J 2.0.0* NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. The default
