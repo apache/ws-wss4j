@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.PublicKey;
@@ -215,7 +216,8 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         if (encryptedEphemeralKey == null) {
             if (useThisPublicKey != null) {
-                prepareInternal(symmetricKey, useThisPublicKey, crypto);
+                encryptSymmetricKey(useThisPublicKey, symmetricKey);
+                prepareInternal(useThisPublicKey);
             } else {
                 //
                 // Get the certificate that contains the public key for the public key
@@ -248,58 +250,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
     }
 
-    private void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
-        throws WSSecurityException {
-        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
-        try {
-            OAEPParameterSpec oaepParameterSpec = null;
-            if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(keyEncAlgo)
-                    || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
-                String jceDigestAlgorithm = "SHA-1";
-                if (digestAlgo != null) {
-                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
-                }
-
-                MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
-                    if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
-                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-256");
-                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-384");
-                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-512");
-                    }
-                }
-
-                oaepParameterSpec =
-                    new OAEPParameterSpec(
-                        jceDigestAlgorithm, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT
-                    );
-            }
-            if (oaepParameterSpec == null) {
-                cipher.init(Cipher.WRAP_MODE, encryptingKey);
-            } else {
-                cipher.init(Cipher.WRAP_MODE, encryptingKey, oaepParameterSpec);
-            }
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
-            );
-        }
-        int blockSize = cipher.getBlockSize();
-        LOG.debug("cipher blksize: {}", blockSize);
-
-        try {
-            encryptedEphemeralKey = cipher.wrap(keyToBeEncrypted);
-        } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
-            );
-        }
-    }
-
     /**
      * Encrypt the symmetric key data and prepare the EncryptedKey element
      *
@@ -319,14 +269,43 @@ public class WSSecEncryptedKey extends WSSecBase {
     ) throws WSSecurityException {
         encryptSymmetricKey(remoteCert.getPublicKey(), secretKey);
 
-        //
-        // Now we need to setup the EncryptedKey header block 1) create a
-        // EncryptedKey element and set a wsu:Id for it 2) Generate ds:KeyInfo
-        // element, this wraps the wsse:SecurityTokenReference 3) Create and set
-        // up the SecurityTokenReference according to the keyIdentifier parameter
-        // 4) Create the CipherValue element structure and insert the encrypted
-        // session key
-        //
+        createEncryptedKeyElement(remoteCert, crypto);
+
+        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
+        if (storeBytesInAttachment) {
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
+                                                  encryptedEphemeralKey, attachmentCallbackHandler);
+        } else {
+            Text keyText =
+                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
+            xencCipherValue.appendChild(keyText);
+        }
+    }
+
+    protected void prepareInternal(Key key) throws WSSecurityException {
+        createEncryptedKeyElement(key);
+
+        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
+        if (storeBytesInAttachment) {
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
+                                                  encryptedEphemeralKey, attachmentCallbackHandler);
+        } else {
+            Text keyText =
+                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
+            xencCipherValue.appendChild(keyText);
+        }
+    }
+
+    /**
+     * Now we need to setup the EncryptedKey header block:
+     *  1) create a EncryptedKey element and set a wsu:Id for it
+     *  2) Generate ds:KeyInfo element, this wraps the wsse:SecurityTokenReference
+     *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
+     *  4) Create the CipherValue element structure and insert the encrypted session key
+     */
+    private void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
@@ -438,7 +417,8 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             default:
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
+                                              new Object[] {keyIdentifierType});
             }
             Element keyInfoElement =
                 getDocument().createElementNS(
@@ -451,33 +431,16 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(keyInfoElement);
         }
 
-        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
-        if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
-                                                  encryptedEphemeralKey, attachmentCallbackHandler);
-        } else {
-            Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
-            xencCipherValue.appendChild(keyText);
-        }
     }
 
-    protected void prepareInternal(
-        SecretKey secretKey,
-        PublicKey remoteKey,
-        Crypto crypto
-    ) throws WSSecurityException {
-        encryptSymmetricKey(remoteKey, secretKey);
-
-        //
-        // Now we need to setup the EncryptedKey header block 1) create a
-        // EncryptedKey element and set a wsu:Id for it 2) Generate ds:KeyInfo
-        // element, this wraps the wsse:SecurityTokenReference 3) Create and set
-        // up the SecurityTokenReference according to the keyIdentifier parameter
-        // 4) Create the CipherValue element structure and insert the encrypted
-        // session key
-        //
+    /**
+     * Now we need to setup the EncryptedKey header block:
+     *  1) create a EncryptedKey element and set a wsu:Id for it
+     *  2) Generate ds:KeyInfo element, this wraps the wsse:SecurityTokenReference
+     *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
+     *  4) Create the CipherValue element structure and insert the encrypted session key
+     */
+    private void createEncryptedKeyElement(Key key) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
@@ -487,128 +450,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         if (customEKKeyInfoElement != null) {
             encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else {
-            SecurityTokenReference secToken = null;
-
-            switch (keyIdentifierType) {
-            case WSConstants.CUSTOM_SYMM_SIGNING :
-                secToken = new SecurityTokenReference(getDocument());
-                Reference refCust = new Reference(getDocument());
-                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                    refCust.setValueType(customEKTokenValueType);
-                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                    refCust.setValueType(customEKTokenValueType);
-                } else {
-                    refCust.setValueType(customEKTokenValueType);
-                }
-                refCust.setURI("#" + customEKTokenId);
-                secToken.setReference(refCust);
-                break;
-
-            case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-                secToken = new SecurityTokenReference(getDocument());
-                Reference refCustd = new Reference(getDocument());
-                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                    refCustd.setValueType(customEKTokenValueType);
-                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                    refCustd.setValueType(customEKTokenValueType);
-                } else {
-                    refCustd.setValueType(customEKTokenValueType);
-                }
-                refCustd.setURI(customEKTokenId);
-                secToken.setReference(refCustd);
-                break;
-
-            case WSConstants.CUSTOM_KEY_IDENTIFIER:
-                secToken = new SecurityTokenReference(getDocument());
-                secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
-                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
-                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                }
-                break;
-
-            default:
-                try {
-                    XMLSignatureFactory signatureFactory;
-                    if (provider == null) {
-                        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-                        // not work
-                        try {
-                            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                        } catch (NoSuchProviderException ex) {
-                            signatureFactory = XMLSignatureFactory.getInstance("DOM");
-                        }
-                    } else {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
-                    }
-
-                    KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-                    KeyValue keyValue = keyInfoFactory.newKeyValue(remoteKey);
-                    String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
-                    KeyInfo keyInfo =
-                        keyInfoFactory.newKeyInfo(
-                            java.util.Collections.singletonList(keyValue), keyInfoUri
-                        );
-
-                    keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
-                } catch (java.security.KeyException | MarshalException ex) {
-                    LOG.error("", ex);
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
-                    );
-                }
-            }
-
-            if (secToken != null) {
-                Element keyInfoElement =
-                    getDocument().createElementNS(
-                        WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-                    );
-                keyInfoElement.setAttributeNS(
-                    WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
-                );
-                keyInfoElement.appendChild(secToken.getElement());
-                encryptedKeyElement.appendChild(keyInfoElement);
-            }
-        }
-
-        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
-        if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
-                                                  encryptedEphemeralKey, attachmentCallbackHandler);
-        } else {
-            Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
-            xencCipherValue.appendChild(keyText);
-        }
-    }
-
-    protected void prepareInternal(SecretKey secretKey) throws WSSecurityException {
-        encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
-        if (encKeyId == null || "".equals(encKeyId)) {
-            encKeyId = IDGenerator.generateID("EK-");
-        }
-        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
-
-        if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
-        } else if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
-            || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
-            || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
 
             switch (keyIdentifierType) {
@@ -660,29 +501,111 @@ public class WSSecEncryptedKey extends WSSecBase {
                     }
                     break;
 
-                default:
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
-            }
-            Element keyInfoElement =
-                getDocument().createElementNS(
-                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-                );
-            keyInfoElement.setAttributeNS(
-                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
-            );
-            keyInfoElement.appendChild(secToken.getElement());
-            encryptedKeyElement.appendChild(keyInfoElement);
-        }
+                case WSConstants.KEY_VALUE:
+                    // This is only applicable for the PublicKey case
+                    if (!(key instanceof PublicKey)) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
+                                                      new Object[] {keyIdentifierType});
+                    }
+                    try {
+                        XMLSignatureFactory signatureFactory;
+                        if (provider == null) {
+                            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+                            // not work
+                            try {
+                                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                            } catch (NoSuchProviderException ex) {
+                                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                            }
+                        } else {
+                            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
+                        }
 
-        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
-        if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
-                                                  encryptedEphemeralKey, attachmentCallbackHandler);
-        } else {
-            Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
-            xencCipherValue.appendChild(keyText);
+                        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+                        KeyValue keyValue = keyInfoFactory.newKeyValue((PublicKey)key);
+                        String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
+                        KeyInfo keyInfo =
+                            keyInfoFactory.newKeyInfo(
+                                java.util.Collections.singletonList(keyValue), keyInfoUri
+                            );
+
+                        keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
+                    } catch (java.security.KeyException | MarshalException ex) {
+                        LOG.error("", ex);
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+                        );
+                    }
+                    break;
+
+                default:
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
+                                                  new Object[] {keyIdentifierType});
+            }
+
+            if (WSConstants.KEY_VALUE != keyIdentifierType) {
+                Element keyInfoElement =
+                    getDocument().createElementNS(
+                        WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                    );
+                keyInfoElement.setAttributeNS(
+                    WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+                );
+                keyInfoElement.appendChild(secToken.getElement());
+                encryptedKeyElement.appendChild(keyInfoElement);
+            }
+        }
+    }
+
+    protected void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
+        throws WSSecurityException {
+        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
+        try {
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(keyEncAlgo)
+                    || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
+                String jceDigestAlgorithm = "SHA-1";
+                if (digestAlgo != null) {
+                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
+                }
+
+                MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
+                if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
+                    if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
+                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-256");
+                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-384");
+                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-512");
+                    }
+                }
+
+                oaepParameterSpec =
+                    new OAEPParameterSpec(
+                        jceDigestAlgorithm, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT
+                    );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(Cipher.WRAP_MODE, encryptingKey);
+            } else {
+                cipher.init(Cipher.WRAP_MODE, encryptingKey, oaepParameterSpec);
+            }
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+            );
+        }
+        int blockSize = cipher.getBlockSize();
+        LOG.debug("cipher blksize: {}", blockSize);
+
+        try {
+            encryptedEphemeralKey = cipher.wrap(keyToBeEncrypted);
+        } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+            );
         }
     }
 
@@ -704,7 +627,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @param keyTransportAlgo specifies which algorithm to use to encrypt the symmetric key
      * @return an <code>xenc:EncryptedKey</code> element
      */
-    protected Element createEncryptedKey(Document doc, String keyTransportAlgo) {
+    private Element createEncryptedKey(Document doc, String keyTransportAlgo) {
         Element encryptedKey =
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedKey");
 

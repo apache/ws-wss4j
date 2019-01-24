@@ -122,7 +122,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         //
         if (encryptSymmKey && encryptedEphemeralKey == null) {
             if (getUseThisPublicKey() != null) {
-                prepareInternal(symmetricKey, getUseThisPublicKey(), crypto);
+                encryptSymmetricKey(getUseThisPublicKey(), symmetricKey);
+                prepareInternal(getUseThisPublicKey());
             } else {
                 X509Certificate remoteCert = getUseThisCert();
                 if (remoteCert == null) {
