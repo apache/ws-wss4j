@@ -80,8 +80,7 @@ public final class X509Util {
     public static byte[] getSecretKey(
         Element keyInfoElem,
         String algorithm,
-        CallbackHandler cb,
-        byte[] encryptedKey
+        CallbackHandler cb
     ) throws WSSecurityException {
         String keyName = null;
         Element keyNmElem =
@@ -95,7 +94,6 @@ public final class X509Util {
             LOG.debug("No Key Name available");
         }
         WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
-        pwCb.setEncryptedSecret(encryptedKey);
         pwCb.setAlgorithm(algorithm);
         try {
             cb.handle(new Callback[]{pwCb});

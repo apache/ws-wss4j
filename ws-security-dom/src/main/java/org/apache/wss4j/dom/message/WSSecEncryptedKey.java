@@ -148,6 +148,8 @@ public class WSSecEncryptedKey extends WSSecBase {
     private Element customEKKeyInfoElement;
     private Provider provider;
 
+    private String encryptedKeySHA1;
+
     public WSSecEncryptedKey(WSSecHeader securityHeader) {
         super(securityHeader);
     }
@@ -281,6 +283,8 @@ public class WSSecEncryptedKey extends WSSecBase {
                 WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
             xencCipherValue.appendChild(keyText);
         }
+
+        setEncryptedKeySHA1(encryptedEphemeralKey);
     }
 
     protected void prepareInternal(Key key) throws WSSecurityException {
@@ -296,6 +300,8 @@ public class WSSecEncryptedKey extends WSSecBase {
                 WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
             xencCipherValue.appendChild(keyText);
         }
+
+        setEncryptedKeySHA1(encryptedEphemeralKey);
     }
 
     /**
@@ -823,14 +829,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         return true;
     }
 
-    public byte[] getEncryptedEphemeralKey() {
-        return encryptedEphemeralKey;
-    }
-
-    public void setEncryptedEphemeralKey(byte[] encryptedKey) {
-        encryptedEphemeralKey = encryptedKey;
-    }
-
     public void setCustomEKTokenValueType(String customEKTokenValueType) {
         this.customEKTokenValueType = customEKTokenValueType;
     }
@@ -941,5 +939,12 @@ public class WSSecEncryptedKey extends WSSecBase {
         this.customEKKeyInfoElement = customEKKeyInfoElement;
     }
 
+    protected void setEncryptedKeySHA1(byte[] encryptedEphemeralKey) throws WSSecurityException {
+        byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
+        encryptedKeySHA1 = XMLUtils.encodeToString(encodedBytes);
+    }
 
+    public String getEncryptedKeySHA1() {
+        return encryptedKeySHA1;
+    }
 }

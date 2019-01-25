@@ -220,8 +220,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
 
         if (symmetricKeyWrap) {
-            decryptedBytes = getSymmetricDecryptedBytes(data, data.getWsDocInfo(), keyInfoChildElement,
-                                                        refList, encryptedEphemeralKey);
+            decryptedBytes = getSymmetricDecryptedBytes(data, data.getWsDocInfo(), keyInfoChildElement, refList);
         } else {
             PrivateKey privateKey = getPrivateKey(data, certs, publicKey);
             decryptedBytes = getAsymmetricDecryptedBytes(data, data.getWsDocInfo(), encryptedKeyTransportMethod,
@@ -282,8 +281,7 @@ public class EncryptedKeyProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo,
         Element keyInfoChildElement,
-        Element refList,
-        byte[] encryptedEphemeralKey
+        Element refList
     ) throws WSSecurityException {
         // Get the (first) encryption algorithm
         String uri = getFirstDataRefURI(refList);
@@ -294,8 +292,7 @@ public class EncryptedKeyProcessor implements Processor {
                                                          wsDocInfo, uri);
             algorithmURI = X509Util.getEncAlgo(ee);
         }
-        return X509Util.getSecretKey(keyInfoChildElement, algorithmURI,
-                                     data.getCallbackHandler(), encryptedEphemeralKey);
+        return X509Util.getSecretKey(keyInfoChildElement, algorithmURI, data.getCallbackHandler());
     }
 
     private static byte[] getAsymmetricDecryptedBytes(

@@ -152,7 +152,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         } else if (encryptedEphemeralKey != null) {
             prepareInternal(symmetricKey);
         } else {
-            encryptedEphemeralKey = symmetricKey.getEncoded();
+            setEncryptedKeySHA1(symmetricKey.getEncoded());
         }
     }
 
@@ -330,8 +330,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
-                secToken.setKeyIdentifierEncKeySHA1(org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes));
+                secToken.setKeyIdentifierEncKeySHA1(getEncryptedKeySHA1());
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
@@ -384,8 +383,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
-                secToken.setKeyIdentifierEncKeySHA1(org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes));
+                secToken.setKeyIdentifierEncKeySHA1(getEncryptedKeySHA1());
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());

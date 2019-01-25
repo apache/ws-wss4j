@@ -90,18 +90,6 @@ public class WSPasswordCallback implements Callback {
     public static final int SIGNATURE = 3;
 
     /**
-     * This identifier is deprecated and not used any more.
-     */
-    @Deprecated
-    public static final int KEY_NAME = 4;
-
-    /**
-     * This identifier is deprecated and not used any more.
-     */
-    @Deprecated
-    public static final int USERNAME_TOKEN_UNKNOWN = 5;
-
-    /**
      * SECURITY_CONTEXT_TOKEN usage is for the case of when we want the CallbackHandler to
      * supply the key associated with a SecurityContextToken. The CallbackHandler must set
      * the key via the setKey(byte[]) method.
@@ -115,12 +103,6 @@ public class WSPasswordCallback implements Callback {
      * must set the token via the setCustomToken(Element) method.
      */
     public static final int CUSTOM_TOKEN = 7;
-
-    /**
-     * This identifier is deprecated and not used any more.
-     */
-    @Deprecated
-    public static final int ENCRYPTED_KEY_TOKEN = 8;
 
     /**
      * SECRET_KEY usage is used for the case that we want to obtain a secret key for encryption
@@ -138,7 +120,6 @@ public class WSPasswordCallback implements Callback {
     private String identifier;
     private String password;
     private byte[] secret;
-    private byte[] encryptedSecret;
     private Key key;
     private int usage;
     private String type;
@@ -266,27 +247,6 @@ public class WSPasswordCallback implements Callback {
      */
     public void setCustomToken(Element customToken) {
         this.customToken = customToken;
-    }
-
-    /**
-     * Get the Encrypted Secret. The CallbackHandler may return an encrypted version of the secret key
-     * to be used, instead of having WSS4J explicitly encrypt the key. Alternatively, the recipient can
-     * call this with the cipher content of the EncryptedKey, if a symmetric key wrap algorithm is used.
-     *
-     */
-    public byte[] getEncryptedSecret() {
-        return encryptedSecret;
-    }
-
-    /**
-     * Set the Encrypted Secret. The CallbackHandler may return an encrypted version of the secret key
-     * to be used, instead of having WSS4J explicitly encrypt the key. Alternatively, the recipient can
-     * call this with the cipher content of the EncryptedKey, if a symmetric key wrap algorithm is used.
-     *
-     * @param encryptedSecret
-     */
-    public void setEncryptedSecret(byte[] encryptedSecret) {
-        this.encryptedSecret = encryptedSecret;
     }
 
     /**

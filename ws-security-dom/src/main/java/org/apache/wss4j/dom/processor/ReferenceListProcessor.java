@@ -153,7 +153,7 @@ public class ReferenceListProcessor implements Processor {
         Principal principal = null;
         if (secRefToken == null) {
             byte[] decryptedData =
-                X509Util.getSecretKey(keyInfoElement, symEncAlgo, data.getCallbackHandler(), null);
+                X509Util.getSecretKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
         } else {
             STRParserParameters parameters = new STRParserParameters();
