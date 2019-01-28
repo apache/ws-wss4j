@@ -142,7 +142,7 @@ public abstract class AbstractDerivedAction {
 
             encrKeyBuilder.prepare(actionToken.getCrypto());
 
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             actionToken.setKey(ek);

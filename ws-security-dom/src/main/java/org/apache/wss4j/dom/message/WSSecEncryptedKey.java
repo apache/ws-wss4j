@@ -76,16 +76,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     /**
-     * Encrypted bytes of the ephemeral key
-     */
-    protected byte[] encryptedEphemeralKey;
-
-    /**
-     * Session key used as the secret in key derivation
-     */
-    private byte[] ephemeralKey;
-
-    /**
      * Symmetric key used in the EncryptedKey.
      */
     protected SecretKey symmetricKey;
@@ -188,9 +178,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     public void clean() {
-        ephemeralKey = null;
         symmetricKey = null;
-        encryptedEphemeralKey = null;
     }
 
 
@@ -207,89 +195,49 @@ public class WSSecEncryptedKey extends WSSecBase {
         // Set up the symmetric key
         //
         if (symmetricKey == null) {
-            if (ephemeralKey != null) {
-                symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
-            } else {
-                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
-                symmetricKey = keyGen.generateKey();
-                ephemeralKey = symmetricKey.getEncoded();
-            }
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
+            symmetricKey = keyGen.generateKey();
         }
 
-        if (encryptedEphemeralKey == null) {
-            if (useThisPublicKey != null) {
-                encryptSymmetricKey(useThisPublicKey, symmetricKey);
-                prepareInternal(useThisPublicKey);
-            } else {
-                //
-                // Get the certificate that contains the public key for the public key
-                // algorithm that will encrypt the generated symmetric (session) key.
-                //
-                X509Certificate remoteCert = useThisCert;
-                if (remoteCert == null) {
-                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(user);
-                    if (crypto == null) {
-                        throw new WSSecurityException(
-                                                      WSSecurityException.ErrorCode.FAILURE,
-                                                      "noUserCertsFound",
-                                                      new Object[] {user, "encryption"});
-                    }
-                    X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-                    if (certs == null || certs.length <= 0) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "noUserCertsFound",
-                            new Object[] {user, "encryption"});
-                    }
-                    remoteCert = certs[0];
-                }
-
-                prepareInternal(symmetricKey, remoteCert, crypto);
-            }
+        if (useThisPublicKey != null) {
+            createEncryptedKeyElement(useThisPublicKey);
+            byte[] encryptedEphemeralKey = encryptSymmetricKey(useThisPublicKey, symmetricKey);
+            addCipherValueElement(encryptedEphemeralKey);
         } else {
-            prepareInternal(symmetricKey);
+            //
+            // Get the certificate that contains the public key for the public key
+            // algorithm that will encrypt the generated symmetric (session) key.
+            //
+            X509Certificate remoteCert = useThisCert;
+            if (remoteCert == null) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(user);
+                if (crypto == null) {
+                    throw new WSSecurityException(
+                                                  WSSecurityException.ErrorCode.FAILURE,
+                                                  "noUserCertsFound",
+                                                  new Object[] {user, "encryption"});
+                }
+                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                if (certs == null || certs.length <= 0) {
+                    throw new WSSecurityException(
+                                                  WSSecurityException.ErrorCode.FAILURE,
+                                                  "noUserCertsFound",
+                                                  new Object[] {user, "encryption"});
+                }
+                remoteCert = certs[0];
+            }
+
+            createEncryptedKeyElement(remoteCert, crypto);
+            byte[] encryptedEphemeralKey = encryptSymmetricKey(remoteCert.getPublicKey(), symmetricKey);
+            addCipherValueElement(encryptedEphemeralKey);
         }
     }
 
     /**
-     * Encrypt the symmetric key data and prepare the EncryptedKey element
-     *
-     * This method does the most work for to prepare the EncryptedKey element.
-     * It is also used by the WSSecEncrypt sub-class.
-     *
-     * @param secretKey The symmetric key
-     * @param remoteCert The certificate that contains the public key to encrypt the
-     *                   symmetric key data
-     * @param crypto An instance of the Crypto API to handle keystore and certificates
-     * @throws WSSecurityException
+     * Create and add the CipherValue Element to the EncryptedKey Element.
      */
-    protected void prepareInternal(
-        SecretKey secretKey,
-        X509Certificate remoteCert,
-        Crypto crypto
-    ) throws WSSecurityException {
-        encryptSymmetricKey(remoteCert.getPublicKey(), secretKey);
-
-        createEncryptedKeyElement(remoteCert, crypto);
-
-        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
-        if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
-                                                  encryptedEphemeralKey, attachmentCallbackHandler);
-        } else {
-            Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
-            xencCipherValue.appendChild(keyText);
-        }
-
-        setEncryptedKeySHA1(encryptedEphemeralKey);
-    }
-
-    protected void prepareInternal(Key key) throws WSSecurityException {
-        createEncryptedKeyElement(key);
-
+    protected void addCipherValueElement(byte[] encryptedEphemeralKey) throws WSSecurityException {
         Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
         if (storeBytesInAttachment) {
             final String attachmentId = getIdAllocator().createId("", getDocument());
@@ -311,7 +259,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
      *  4) Create the CipherValue element structure and insert the encrypted session key
      */
-    private void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto) throws WSSecurityException {
+    protected void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
@@ -446,7 +394,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
      *  4) Create the CipherValue element structure and insert the encrypted session key
      */
-    private void createEncryptedKeyElement(Key key) throws WSSecurityException {
+    protected void createEncryptedKeyElement(Key key) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
@@ -563,7 +511,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
     }
 
-    protected void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
+    protected byte[] encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
         throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
@@ -607,7 +555,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         LOG.debug("cipher blksize: {}", blockSize);
 
         try {
-            encryptedEphemeralKey = cipher.wrap(keyToBeEncrypted);
+            return cipher.wrap(keyToBeEncrypted);
         } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
@@ -726,10 +674,12 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * @return Returns the ephemeralKey.
+     * @param ephemeralKey The ephemeralKey to set.
      */
-    public byte[] getEphemeralKey() {
-        return ephemeralKey;
+    public void setEphemeralKey(byte[] ephemeralKey) {
+        if (ephemeralKey != null && symmetricKey == null) {
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
+        }
     }
 
     /**
@@ -792,13 +742,6 @@ public class WSSecEncryptedKey extends WSSecBase {
 
     public String getKeyEncAlgo() {
         return keyEncAlgo;
-    }
-
-    /**
-     * @param ephemeralKey The ephemeralKey to set.
-     */
-    public void setEphemeralKey(byte[] ephemeralKey) {
-        this.ephemeralKey = ephemeralKey;
     }
 
     /**

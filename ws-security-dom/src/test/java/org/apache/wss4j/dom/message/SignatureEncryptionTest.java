@@ -346,15 +346,15 @@ public class SignatureEncryptionTest {
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
-        encrypt.setEphemeralKey(encrKey.getEphemeralKey());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        encrypt.setEphemeralKey(encrKey.getSymmetricKey().getEncoded());
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
-        sign.setSecretKey(encrKey.getEphemeralKey());
+        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 

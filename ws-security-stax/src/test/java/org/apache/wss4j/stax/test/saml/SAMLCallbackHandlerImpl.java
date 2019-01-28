@@ -209,7 +209,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(null);
-            ephemeralKey = encrKey.getEphemeralKey();
+            ephemeralKey = encrKey.getSymmetricKey().getEncoded();
             keyInfo.setEphemeralKey(ephemeralKey);
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 

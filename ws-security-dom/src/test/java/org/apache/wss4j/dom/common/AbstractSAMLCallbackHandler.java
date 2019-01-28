@@ -233,7 +233,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(null);
-            ephemeralKey = encrKey.getEphemeralKey();
+            ephemeralKey = encrKey.getSymmetricKey().getEncoded();
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
             // Append the EncryptedKey to a KeyInfo element

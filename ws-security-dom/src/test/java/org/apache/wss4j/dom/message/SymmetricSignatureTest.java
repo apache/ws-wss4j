@@ -140,7 +140,7 @@ public class SymmetricSignatureTest implements CallbackHandler {
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
-        sign.setSecretKey(encrKey.getEphemeralKey());
+        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
@@ -180,8 +180,8 @@ public class SymmetricSignatureTest implements CallbackHandler {
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
-        encrypt.setEphemeralKey(encrKey.getEphemeralKey());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        encrypt.setEphemeralKey(encrKey.getSymmetricKey().getEncoded());
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
@@ -189,7 +189,7 @@ public class SymmetricSignatureTest implements CallbackHandler {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-        sign.setSecretKey(encrKey.getEphemeralKey());
+        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
         sign.build(crypto);

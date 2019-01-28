@@ -148,7 +148,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -349,7 +349,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -473,7 +473,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -871,7 +871,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -994,7 +994,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
+            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key signature

@@ -107,23 +107,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         // Set up the symmetric key
         //
         if (symmetricKey == null) {
-            if (getEphemeralKey() != null) {
-                symmetricKey =
-                    KeyUtils.prepareSecretKey(getSymmetricEncAlgorithm(), getEphemeralKey());
-            } else {
-                KeyGenerator keyGen = KeyUtils.getKeyGenerator(getSymmetricEncAlgorithm());
-                symmetricKey = keyGen.generateKey();
-            }
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(getSymmetricEncAlgorithm());
+            symmetricKey = keyGen.generateKey();
         }
 
         //
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
         //
-        if (encryptSymmKey && encryptedEphemeralKey == null) {
+        if (encryptSymmKey) {
             if (getUseThisPublicKey() != null) {
-                encryptSymmetricKey(getUseThisPublicKey(), symmetricKey);
-                prepareInternal(getUseThisPublicKey());
+                createEncryptedKeyElement(getUseThisPublicKey());
+                byte[] encryptedEphemeralKey = encryptSymmetricKey(getUseThisPublicKey(), symmetricKey);
+                addCipherValueElement(encryptedEphemeralKey);
             } else {
                 X509Certificate remoteCert = getUseThisCert();
                 if (remoteCert == null) {
@@ -147,10 +143,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     }
                     remoteCert = certs[0];
                 }
-                prepareInternal(symmetricKey, remoteCert, crypto);
+
+                createEncryptedKeyElement(remoteCert, crypto);
+                byte[] encryptedEphemeralKey = encryptSymmetricKey(remoteCert.getPublicKey(), symmetricKey);
+                addCipherValueElement(encryptedEphemeralKey);
             }
-        } else if (encryptedEphemeralKey != null) {
-            prepareInternal(symmetricKey);
         } else {
             setEncryptedKeySHA1(symmetricKey.getEncoded());
         }
