@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -33,6 +35,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -94,7 +97,10 @@ public class EncryptionGCMTest {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
-        Document encryptedDoc = builder.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -116,7 +122,10 @@ public class EncryptionGCMTest {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_256_GCM);
-        Document encryptedDoc = builder.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_256_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -141,7 +150,10 @@ public class EncryptionGCMTest {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP_XENC11);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
-        Document encryptedDoc = builder.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_192_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         String outputString =
                 XMLUtils.prettyDocumentToString(encryptedDoc);

@@ -141,7 +141,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         } else {
             return setupEKReference(wsEncrypt, reqData.getSecHeader(), passwordCallback, encryptionToken, reqData.getSignatureToken(),
                                      reqData.isUse200512Namespace(), doc, encryptionToken.getKeyTransportAlgorithm(),
-                                     encryptionToken.getMgfAlgorithm());
+                                     encryptionToken.getSymmetricAlgorithm(), encryptionToken.getMgfAlgorithm());
         }
     }
 }

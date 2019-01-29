@@ -30,6 +30,7 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
@@ -39,6 +40,8 @@ import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -232,8 +235,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
-            encrKey.prepare(null);
-            ephemeralKey = encrKey.getSymmetricKey().getEncoded();
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKey.prepare(null, symmetricKey);
+            ephemeralKey = symmetricKey.getEncoded();
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
             // Append the EncryptedKey to a KeyInfo element

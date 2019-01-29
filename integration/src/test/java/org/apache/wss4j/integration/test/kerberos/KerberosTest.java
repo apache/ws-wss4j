@@ -483,13 +483,12 @@ public class KerberosTest {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
-        builder.setSymmetricKey(secretKey);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
         try {
-        Document encryptedDoc = builder.build(null);
+        Document encryptedDoc = builder.build(null, secretKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -558,12 +557,11 @@ public class KerberosTest {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
-        builder.setSymmetricKey(secretKey);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        Document encryptedDoc = builder.build(null);
+        Document encryptedDoc = builder.build(null, secretKey);
 
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -631,14 +629,13 @@ public class KerberosTest {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
-        builder.setSymmetricKey(secretKey);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         builder.setEncKeyId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(null);
+        Document encryptedDoc = builder.build(null, secretKey);
 
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -1051,11 +1048,10 @@ public class KerberosTest {
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setSymmetricEncAlgorithm(WSConstants.AES_256);
             SecretKey secretKey = bst.getSecretKey();
-            builder.setSymmetricKey(secretKey);
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             builder.setEncKeyId(bst.getID());
-            builder.build(null);
+            builder.build(null, secretKey);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -1142,14 +1138,13 @@ public class KerberosTest {
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             SecretKey secretKey = bst.getSecretKey();
-            builder.setSymmetricKey(secretKey);
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             builder.setEncKeyId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
-            builder.build(null);
+            builder.build(null, secretKey);
 
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 

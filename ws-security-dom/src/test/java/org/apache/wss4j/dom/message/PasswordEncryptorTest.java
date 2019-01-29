@@ -22,12 +22,15 @@ package org.apache.wss4j.dom.message;
 import java.util.Collections;
 import java.util.Properties;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -145,7 +148,9 @@ public class PasswordEncryptorTest {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
 
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);

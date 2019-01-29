@@ -146,7 +146,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
 
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
             return setupEKReference(wsSign, reqData.getSecHeader(), passwordCallback, signatureToken, reqData.getEncryptionToken(),
-                                     reqData.isUse200512Namespace(), doc, null, null);
+                                     reqData.isUse200512Namespace(), doc, null, null, null);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
             return setupSCTReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),
                                      reqData.isUse200512Namespace(), doc);

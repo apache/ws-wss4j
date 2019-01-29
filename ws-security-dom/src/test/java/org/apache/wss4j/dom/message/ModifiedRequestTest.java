@@ -23,6 +23,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.WSEncryptionPart;
@@ -34,6 +36,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -330,7 +333,9 @@ public class ModifiedRequestTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(wssCrypto, symmetricKey);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod =
@@ -367,7 +372,9 @@ public class ModifiedRequestTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(wssCrypto, symmetricKey);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element cipherValue =
@@ -428,7 +435,9 @@ public class ModifiedRequestTest {
                 "");
         builder.getParts().add(encP);
 
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(wssCrypto, symmetricKey);
 
         Element securityHeader =
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
@@ -479,7 +488,9 @@ public class ModifiedRequestTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(wssCrypto, symmetricKey);
 
         Element encryptedKey =
             XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);

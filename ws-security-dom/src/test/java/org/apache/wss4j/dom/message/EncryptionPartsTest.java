@@ -33,12 +33,15 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
@@ -115,7 +118,9 @@ public class EncryptionPartsTest {
                 "");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -173,7 +178,9 @@ public class EncryptionPartsTest {
             );
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -210,7 +217,9 @@ public class EncryptionPartsTest {
             );
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -246,8 +255,10 @@ public class EncryptionPartsTest {
             );
         encrypt.getParts().add(encP);
 
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
         try {
-            encrypt.build(crypto);
+            encrypt.build(crypto, symmetricKey);
             fail("Failure expected on not encrypting a required element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -276,7 +287,9 @@ public class EncryptionPartsTest {
                 "Header");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -324,7 +337,9 @@ public class EncryptionPartsTest {
                 "Header");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -371,8 +386,10 @@ public class EncryptionPartsTest {
                 "");
         encrypt.getParts().add(encP);
 
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
         try {
-            encrypt.build(crypto);
+            encrypt.build(crypto, symmetricKey);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -400,8 +417,10 @@ public class EncryptionPartsTest {
                 "");
         encrypt.getParts().add(encP);
 
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
         try {
-            encrypt.build(crypto);
+            encrypt.build(crypto, symmetricKey);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -438,7 +457,9 @@ public class EncryptionPartsTest {
                 "");
         encrypt.getParts().add(encP2);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -505,7 +526,9 @@ public class EncryptionPartsTest {
         encP.setElement(bodyElement);
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -548,7 +571,9 @@ public class EncryptionPartsTest {
                 "");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);

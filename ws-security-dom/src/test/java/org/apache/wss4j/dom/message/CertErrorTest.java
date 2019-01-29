@@ -19,16 +19,21 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.junit.Test;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.w3c.dom.Document;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 
 /**
@@ -78,7 +83,10 @@ public class CertErrorTest {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("alice");
         try {
-            builder.build(CryptoFactory.getInstance());
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+
+            builder.build(CryptoFactory.getInstance(), symmetricKey);
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user \"alice\" were found for encryption";

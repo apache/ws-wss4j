@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -32,6 +34,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.Test;
@@ -91,11 +94,13 @@ public class EncryptedDataInHeaderTest {
             );
         encrypt.getParts().add(encP);
 
-        encrypt.prepare(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrypt.prepare(crypto, symmetricKey);
         encrypt.prependToHeader();
 
         // Append Reference List to security header
-        Element refs = encrypt.encrypt();
+        Element refs = encrypt.encrypt(symmetricKey);
         secHeader.getSecurityHeaderElement().appendChild(refs);
 
         if (LOG.isDebugEnabled()) {

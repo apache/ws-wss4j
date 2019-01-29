@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -48,6 +50,7 @@ import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.w3c.dom.Document;
@@ -208,8 +211,11 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
-            encrKey.prepare(null);
-            ephemeralKey = encrKey.getSymmetricKey().getEncoded();
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKey.prepare(null, symmetricKey);
+            ephemeralKey = symmetricKey.getEncoded();
             keyInfo.setEphemeralKey(ephemeralKey);
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 

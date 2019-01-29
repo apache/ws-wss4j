@@ -22,10 +22,15 @@ package org.apache.wss4j.dom.action;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 import org.apache.wss4j.common.SignatureEncryptionActionToken;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
@@ -111,6 +116,7 @@ public abstract class AbstractDerivedAction {
                                         boolean use200512Namespace,
                                         Document doc,
                                         String keyTransportAlgorithm,
+                                        String symmetricKeyAlgorithm,
                                         String mgfAlgorithm) throws WSSecurityException {
         derivedKeyBase.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
@@ -140,9 +146,15 @@ public abstract class AbstractDerivedAction {
                 encrKeyBuilder.setMGFAlgorithm(mgfAlgorithm);
             }
 
-            encrKeyBuilder.prepare(actionToken.getCrypto());
+            if (symmetricKeyAlgorithm == null) {
+                symmetricKeyAlgorithm = WSConstants.AES_128;
+            }
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(symmetricKeyAlgorithm);
+            SecretKey symmetricKey = keyGen.generateKey();
 
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            encrKeyBuilder.prepare(actionToken.getCrypto(), symmetricKey);
+
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             actionToken.setKey(ek);

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -38,6 +39,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -404,14 +406,17 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
-            builder.prepare(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            builder.prepare(crypto, symmetricKey);
 
             WSEncryptionPart bst = new WSEncryptionPart("BinarySecurityToken", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Element");
             WSEncryptionPart def = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
             List<WSEncryptionPart> encryptionParts = new ArrayList<>();
             encryptionParts.add(bst);
             encryptionParts.add(def);
-            Element ref = builder.encryptForRef(null, encryptionParts);
+            Element ref = builder.encryptForRef(null, encryptionParts, symmetricKey);
             ref.removeChild(ref.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "DataReference").item(0));
             builder.addExternalRefElement(ref);
             builder.prependToHeader();

@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.action;
 
 import java.security.cert.X509Certificate;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
@@ -30,6 +32,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -108,7 +111,14 @@ public class EncryptionAction implements Action {
             ephemeralKey = pwcb.getKey();
             wsEncrypt.setCustomEKKeyInfoElement(pwcb.getKeyInfoReference());
         }
-        wsEncrypt.setEphemeralKey(ephemeralKey);
+
+        SecretKey symmetricKey = null;
+        if (ephemeralKey != null) {
+            symmetricKey = KeyUtils.prepareSecretKey(wsEncrypt.getSymmetricEncAlgorithm(), ephemeralKey);
+        } else {
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(wsEncrypt.getSymmetricEncAlgorithm());
+            symmetricKey = keyGen.generateKey();
+        }
 
         if (encryptionToken.getTokenId() != null) {
             wsEncrypt.setEncKeyId(encryptionToken.getTokenId());
@@ -121,7 +131,7 @@ public class EncryptionAction implements Action {
         wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
-            wsEncrypt.build(encryptionToken.getCrypto());
+            wsEncrypt.build(encryptionToken.getCrypto(), symmetricKey);
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during encryption: "});

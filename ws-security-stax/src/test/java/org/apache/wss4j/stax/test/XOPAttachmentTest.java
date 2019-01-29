@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -38,6 +40,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -142,7 +145,10 @@ public class XOPAttachmentTest extends AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "transmitter.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         Crypto crypto = new Merlin(sigProperties, this.getClass().getClassLoader(), null);
-        Document encryptedDoc = encrypt.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         // Find the SOAP Body + replace with a xop:Include to the attachment!
         Element soapBody = WSSecurityUtil.findBodyElement(encryptedDoc);

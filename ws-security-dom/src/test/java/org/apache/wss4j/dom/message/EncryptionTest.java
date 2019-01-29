@@ -124,8 +124,11 @@ public class EncryptionTest {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+
         LOG.info("Before Encryption Triple DES....");
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
         LOG.info("After Encryption Triple DES....");
 
         String outputString =
@@ -152,7 +155,6 @@ public class EncryptionTest {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        builder.setSymmetricKey(null);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -161,7 +163,9 @@ public class EncryptionTest {
         builder.getParts().add(encP);
 
         LOG.info("Before Encryption AES 128/RSA-15....");
-        encryptedDoc = builder.build(crypto);
+        keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        symmetricKey = keyGen.generateKey();
+        encryptedDoc = builder.build(crypto, symmetricKey);
         LOG.info("After Encryption AES 128/RSA-15....");
         outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -208,7 +212,9 @@ public class EncryptionTest {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
 
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -248,7 +254,9 @@ public class EncryptionTest {
         assertNotNull(certs);
         builder.setUseThisPublicKey(certs[0].getPublicKey());
 
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -285,7 +293,9 @@ public class EncryptionTest {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(encCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(encCrypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
@@ -294,7 +304,7 @@ public class EncryptionTest {
             LOG.debug(outputString);
         }
 
-        Document encryptedEncryptedDoc = encrypt.build(encCrypto);
+        Document encryptedEncryptedDoc = encrypt.build(encCrypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
@@ -326,7 +336,9 @@ public class EncryptionTest {
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
         LOG.info("Before Encrypting ThumbprintSHA1....");
-        Document encryptedDoc = builder.build(encCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(encCrypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -367,7 +379,9 @@ public class EncryptionTest {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(encCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(encCrypto, symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -395,11 +409,10 @@ public class EncryptionTest {
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(crypto);
+        Document encryptedDoc = builder.build(crypto, key);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
@@ -416,43 +429,6 @@ public class EncryptionTest {
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, null, secretKeyCallbackHandler);
     }
-
-    /**
-     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key (bytes),
-     * rather than a generated session key which is then encrypted using a public key.
-     *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
-     */
-    @Test
-    public void testEncryptionSHA1SymmetricBytes() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
-        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        builder.setEphemeralKey(keyData);
-        builder.setEncryptSymmKey(false);
-
-        LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(crypto);
-
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = org.apache.xml.security.utils.XMLUtils.encodeToString(encodedBytes);
-        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
-
-        String outputString =
-            XMLUtils.prettyDocumentToString(encryptedDoc);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
-            LOG.debug(outputString);
-        }
-        assertTrue(outputString.contains("#EncryptedKeySHA1"));
-
-        LOG.info("After Encrypting EncryptedKeySHA1....");
-        verify(encryptedDoc, crypto, secretKeyCallbackHandler);
-    }
-
 
     /**
      * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a
@@ -519,7 +495,9 @@ public class EncryptionTest {
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(crypto, symmetricKey);
 
         /*
          * Set up the parts structure to encrypt the body
@@ -537,7 +515,7 @@ public class EncryptionTest {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encrypt(symmetricKey);
         builder.addExternalRefElement(refs);
 
         /*
@@ -588,7 +566,9 @@ public class EncryptionTest {
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(crypto, symmetricKey);
 
         /*
          * Set up the parts structure to encrypt the body
@@ -607,7 +587,7 @@ public class EncryptionTest {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encrypt(symmetricKey);
         builder.addExternalRefElement(refs);
 
         /*
@@ -657,7 +637,10 @@ public class EncryptionTest {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        builder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(crypto, symmetricKey);
         builder.setEmbedEncryptedKey(true);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
@@ -668,7 +651,7 @@ public class EncryptionTest {
                 "Content");
         parts.add(encP);
 
-        builder.encrypt();
+        builder.encrypt(symmetricKey);
 
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
@@ -699,7 +682,9 @@ public class EncryptionTest {
         builder.setDigestAlgorithm(WSConstants.SHA256);
 
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -733,7 +718,9 @@ public class EncryptionTest {
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
 
         Crypto regexpCrypto = CryptoFactory.getInstance("regexp.properties");
-        Document encryptedDoc = builder.build(regexpCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(regexpCrypto, symmetricKey);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =

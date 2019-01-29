@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -44,6 +46,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -385,7 +388,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -445,7 +450,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -504,7 +511,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -559,8 +568,10 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        encrypt.prepare(crypto);
-        Element refs = encrypt.encrypt();
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrypt.prepare(crypto, symmetricKey);
+        Element refs = encrypt.encrypt(symmetricKey);
         encrypt.addAttachmentEncryptedDataElements();
         encrypt.addExternalRefElement(refs);
         encrypt.prependToHeader();
@@ -624,8 +635,10 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        encrypt.prepare(crypto);
-        encrypt.encrypt();
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrypt.prepare(crypto, symmetricKey);
+        encrypt.encrypt(symmetricKey);
         encrypt.addAttachmentEncryptedDataElements();
         //encrypt.addExternalRefElement(refs);
         encrypt.prependToHeader();
@@ -688,7 +701,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
 
@@ -736,7 +751,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -796,7 +813,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -860,7 +879,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -949,7 +970,9 @@ public class AttachmentTest {
             }
         });
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -1014,7 +1037,9 @@ public class AttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        doc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        doc = encrypt.build(crypto, symmetricKey);
 
         WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -1091,7 +1116,9 @@ public class AttachmentTest {
             }
         });
 
-        doc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        doc = encrypt.build(crypto, symmetricKey);
 
         WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

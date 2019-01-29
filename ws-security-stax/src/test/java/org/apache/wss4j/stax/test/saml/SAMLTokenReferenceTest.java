@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -43,6 +45,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -377,7 +380,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             builder.setCustomEKTokenId(samlAssertion.getId());
 
             Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
-            builder.prepare(userCrypto);
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+            SecretKey symmetricKey = keyGen.generateKey();
+            builder.prepare(userCrypto, symmetricKey);
 
             List<WSEncryptionPart> parts = new ArrayList<>();
             WSEncryptionPart encP =
@@ -385,7 +390,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                             "add", "http://ws.apache.org/counter/counter_port_type", "Element"
                     );
             parts.add(encP);
-            Element refElement = builder.encryptForRef(null, parts);
+            Element refElement = builder.encryptForRef(null, parts, symmetricKey);
             builder.addInternalRefElement(refElement);
             builder.appendToHeader();
 
@@ -462,7 +467,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              builder.setCustomEKTokenId(samlAssertion.getId());
 
              Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
-             builder.prepare(userCrypto);
+             KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+             SecretKey symmetricKey = keyGen.generateKey();
+             builder.prepare(userCrypto, symmetricKey);
 
              List<WSEncryptionPart> parts = new ArrayList<>();
              WSEncryptionPart encP =
@@ -470,7 +477,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                              "add", "http://ws.apache.org/counter/counter_port_type", "Element"
                      );
              parts.add(encP);
-             Element refElement = builder.encryptForRef(null, parts);
+             Element refElement = builder.encryptForRef(null, parts, symmetricKey);
              builder.addInternalRefElement(refElement);
              builder.appendToHeader();
 

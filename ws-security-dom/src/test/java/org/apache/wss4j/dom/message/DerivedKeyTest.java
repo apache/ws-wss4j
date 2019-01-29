@@ -32,11 +32,14 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import static org.junit.Assert.assertFalse;
@@ -78,10 +81,13 @@ public class DerivedKeyTest {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -116,10 +122,13 @@ public class DerivedKeyTest {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -150,10 +159,13 @@ public class DerivedKeyTest {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -273,10 +285,13 @@ public class DerivedKeyTest {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -314,10 +329,13 @@ public class DerivedKeyTest {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption

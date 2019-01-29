@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.misc;
 
 import java.io.IOException;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -81,7 +83,10 @@ public class FaultCodeTest implements CallbackHandler {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document encryptedDoc = builder.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         try {
             verify(encryptedDoc);

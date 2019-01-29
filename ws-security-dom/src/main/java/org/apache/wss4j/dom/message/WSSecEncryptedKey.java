@@ -30,7 +30,6 @@ import java.security.spec.MGF1ParameterSpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
@@ -76,19 +75,9 @@ public class WSSecEncryptedKey extends WSSecBase {
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     /**
-     * Symmetric key used in the EncryptedKey.
-     */
-    protected SecretKey symmetricKey;
-
-    /**
      * Algorithm used to encrypt the ephemeral key
      */
     private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOAEP;
-
-    /**
-     * Algorithm to be used with the ephemeral key
-     */
-    private String symEncAlgo = WSConstants.AES_128;
 
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -177,27 +166,18 @@ public class WSSecEncryptedKey extends WSSecBase {
         return encKeyId;
     }
 
-    public void clean() {
-        symmetricKey = null;
-    }
-
-
     /**
-     * Prepare the ephemeralKey and the tokens required to be added to the
-     * security header
+     * Create the EncryptedKey Element for inclusion in the security header, by encrypting the
+     * symmetricKey parameter using either a public key or certificate that is set on the class,
+     * and adding the encrypted bytes as the CipherValue of the EncryptedKey element. The KeyInfo
+     * is constructed according to the keyIdentifierType and also the type of the encrypting
+     * key
      *
      * @param crypto An instance of the Crypto API to handle keystore and certificates
+     * @param symmetricKey The symmetric key to encrypt and insert into the EncryptedKey
      * @throws WSSecurityException
      */
-    public void prepare(Crypto crypto) throws WSSecurityException {
-
-        //
-        // Set up the symmetric key
-        //
-        if (symmetricKey == null) {
-            KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
-            symmetricKey = keyGen.generateKey();
-        }
+    public void prepare(Crypto crypto, SecretKey symmetricKey) throws WSSecurityException {
 
         if (useThisPublicKey != null) {
             createEncryptedKeyElement(useThisPublicKey);
@@ -674,15 +654,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * @param ephemeralKey The ephemeralKey to set.
-     */
-    public void setEphemeralKey(byte[] ephemeralKey) {
-        if (ephemeralKey != null && symmetricKey == null) {
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
-        }
-    }
-
-    /**
      * Set the X509 Certificate to use for encryption.
      *
      * If this is set <b>and</b> the key identifier is set to
@@ -781,40 +752,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * Set the name of the symmetric encryption algorithm to use.
-     *
-     * This encryption algorithm is used to encrypt the data. If the algorithm
-     * is not set then AES128 is used. Refer to WSConstants which algorithms are
-     * supported.
-     *
-     * @param algo Is the name of the encryption algorithm
-     * @see WSConstants#TRIPLE_DES
-     * @see WSConstants#AES_128
-     * @see WSConstants#AES_192
-     * @see WSConstants#AES_256
-     */
-    public void setSymmetricEncAlgorithm(String algo) {
-        symEncAlgo = algo;
-    }
-
-
-    /**
-     * Get the name of symmetric encryption algorithm to use.
-     *
-     * The name of the encryption algorithm to encrypt the data, i.e. the SOAP
-     * Body. Refer to WSConstants which algorithms are supported.
-     *
-     * @return the name of the currently selected symmetric encryption algorithm
-     * @see WSConstants#TRIPLE_DES
-     * @see WSConstants#AES_128
-     * @see WSConstants#AES_192
-     * @see WSConstants#AES_256
-     */
-    public String getSymmetricEncAlgorithm() {
-        return symEncAlgo;
-    }
-
-    /**
      * Set the digest algorithm to use with the RSA-OAEP key transport algorithm. The
      * default is SHA-1.
      *
@@ -848,22 +785,6 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public String getMGFAlgorithm() {
         return mgfAlgo;
-    }
-
-    /**
-     * @return The symmetric key
-     */
-    public SecretKey getSymmetricKey() {
-        return symmetricKey;
-    }
-
-    /**
-     * Set the symmetric key to be used for encryption
-     *
-     * @param key
-     */
-    public void setSymmetricKey(SecretKey key) {
-        this.symmetricKey = key;
     }
 
     public boolean isIncludeEncryptionToken() {

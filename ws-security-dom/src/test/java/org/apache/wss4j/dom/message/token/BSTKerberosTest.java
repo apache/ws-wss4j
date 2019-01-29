@@ -358,11 +358,10 @@ public class BSTKerberosTest {
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(AP_REQ);
         builder.setEncKeyId(bst.getID());
-        Document encryptedDoc = builder.build(crypto);
+        Document encryptedDoc = builder.build(crypto, key);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -396,14 +395,13 @@ public class BSTKerberosTest {
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(keyData);
         builder.setEncKeyId(org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(crypto);
+        Document encryptedDoc = builder.build(crypto, key);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

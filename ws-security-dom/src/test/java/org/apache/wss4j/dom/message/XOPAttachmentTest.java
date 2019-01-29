@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.WSEncryptionPart;
@@ -35,6 +37,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
@@ -126,7 +129,9 @@ public class XOPAttachmentTest {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         // Find the SOAP Body + replace with a xop:Include to the attachment!
         Element soapBody = WSSecurityUtil.findBodyElement(encryptedDoc);
@@ -206,7 +211,9 @@ public class XOPAttachmentTest {
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);
@@ -313,7 +320,9 @@ public class XOPAttachmentTest {
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);
@@ -351,7 +360,9 @@ public class XOPAttachmentTest {
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);
@@ -382,10 +393,13 @@ public class XOPAttachmentTest {
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         encrKeyBuilder.setStoreBytesInAttachment(true);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -432,10 +446,13 @@ public class XOPAttachmentTest {
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         encrKeyBuilder.setStoreBytesInAttachment(true);
-        encrKeyBuilder.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
 
         //Key information from the EncryptedKey
-        byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+        byte[] ek = symmetricKey.getEncoded();
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
@@ -491,7 +508,9 @@ public class XOPAttachmentTest {
         encrypt.setStoreBytesInAttachment(true);
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);

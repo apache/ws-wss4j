@@ -36,9 +36,12 @@ import org.junit.Test;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
@@ -115,7 +118,9 @@ public class SignatureEncryptionTest {
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -164,7 +169,9 @@ public class SignatureEncryptionTest {
                     "Element");
         encrypt.getParts().add(part);
 
-        Document encryptedDoc = encrypt.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -244,7 +251,10 @@ public class SignatureEncryptionTest {
         LOG.info("Before Encryption....");
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
@@ -275,7 +285,10 @@ public class SignatureEncryptionTest {
         encrypt.getParts().add(encP);
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
         LOG.info("WSS198");
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -312,7 +325,10 @@ public class SignatureEncryptionTest {
         LOG.info("Before Sign/Encryption....");
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
@@ -341,25 +357,26 @@ public class SignatureEncryptionTest {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
-        encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_192);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKey.prepare(crypto, symmetricKey);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        encrypt.setEphemeralKey(encrKey.getSymmetricKey().getEncoded());
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
-        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
+        sign.setSecretKey(symmetricKey.getEncoded());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
@@ -475,7 +492,10 @@ public class SignatureEncryptionTest {
         LOG.info("Before Encryption....");
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
 
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);

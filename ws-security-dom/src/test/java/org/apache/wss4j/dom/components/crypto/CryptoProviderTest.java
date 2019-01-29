@@ -27,6 +27,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -35,6 +36,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -203,7 +206,10 @@ public class CryptoProviderTest {
 
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
-            Document encryptedDoc = encrypt.build(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =
@@ -259,7 +265,10 @@ public class CryptoProviderTest {
 
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
-            Document encryptedDoc = encrypt.build(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            Document encryptedDoc = encrypt.build(crypto, symmetricKey);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =

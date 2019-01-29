@@ -40,6 +40,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -53,6 +54,8 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import static org.junit.Assert.assertEquals;
@@ -387,7 +390,10 @@ public class SamlReferenceTest {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document encryptedDoc = builder.build(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         //
         // Remove the assertion its place in the security header and then append it
@@ -445,14 +451,17 @@ public class SamlReferenceTest {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(userCrypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(userCrypto, symmetricKey);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
         builder.getParts().add(encP);
-        Element refElement = builder.encrypt();
+        Element refElement = builder.encrypt(symmetricKey);
         builder.addInternalRefElement(refElement);
         builder.appendToHeader();
 
@@ -521,14 +530,17 @@ public class SamlReferenceTest {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(userCrypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(userCrypto, symmetricKey);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
         builder.getParts().add(encP);
-        Element refElement = builder.encrypt();
+        Element refElement = builder.encrypt(symmetricKey);
         builder.addInternalRefElement(refElement);
         builder.appendToHeader();
 
@@ -849,14 +861,17 @@ public class SamlReferenceTest {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(userCrypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(userCrypto, symmetricKey);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
         builder.getParts().add(encP);
-        Element refElement = builder.encrypt();
+        Element refElement = builder.encrypt(symmetricKey);
         builder.addInternalRefElement(refElement);
         builder.appendToHeader();
 
@@ -925,14 +940,17 @@ public class SamlReferenceTest {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(userCrypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(userCrypto, symmetricKey);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
         builder.getParts().add(encP);
-        Element refElement = builder.encrypt();
+        Element refElement = builder.encrypt(symmetricKey);
         builder.addInternalRefElement(refElement);
         builder.appendToHeader();
 

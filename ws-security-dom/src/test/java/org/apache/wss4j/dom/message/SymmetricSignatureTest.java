@@ -134,13 +134,15 @@ public class SymmetricSignatureTest implements CallbackHandler {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
-        encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_192);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKey.prepare(crypto, symmetricKey);
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
-        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
+        sign.setSecretKey(symmetricKey.getEncoded());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
@@ -175,13 +177,14 @@ public class SymmetricSignatureTest implements CallbackHandler {
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
-        encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(crypto);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_192);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKey.prepare(crypto, symmetricKey);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        encrypt.setEphemeralKey(encrKey.getSymmetricKey().getEncoded());
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
@@ -189,11 +192,11 @@ public class SymmetricSignatureTest implements CallbackHandler {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-        sign.setSecretKey(encrKey.getSymmetricKey().getEncoded());
+        sign.setSecretKey(symmetricKey.getEncoded());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
         sign.build(crypto);
-        Document encryptedSignedDoc = encrypt.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");

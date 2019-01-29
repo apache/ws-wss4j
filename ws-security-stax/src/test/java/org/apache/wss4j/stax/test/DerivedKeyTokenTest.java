@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -39,6 +41,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -145,10 +148,12 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(crypto);
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKeyBuilder.prepare(crypto, symmetricKey);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -346,10 +351,12 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-            encrKeyBuilder.prepare(crypto);
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKeyBuilder.prepare(crypto, symmetricKey);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -470,10 +477,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            encrKeyBuilder.prepare(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKeyBuilder.prepare(crypto, symmetricKey);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -868,10 +878,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKeyBuilder.prepare(crypto, symmetricKey);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key encryption
@@ -991,10 +1004,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(crypto);
+
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+            encrKeyBuilder.prepare(crypto, symmetricKey);
 
             //Key information from the EncryptedKey
-            byte[] ek = encrKeyBuilder.getSymmetricKey().getEncoded();
+            byte[] ek = symmetricKey.getEncoded();
             String tokenIdentifier = encrKeyBuilder.getId();
 
             //Derived key signature

@@ -19,21 +19,18 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.DestroyFailedException;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
@@ -79,6 +76,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private Serializer encryptionSerializer;
 
+    /**
+     * Algorithm to be used with the ephemeral key
+     */
+    private String symEncAlgo = WSConstants.AES_128;
+
     public WSSecEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);
     }
@@ -98,56 +100,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * done explicitly.
      *
      * @param crypto An instance of the Crypto API to handle keystore and certificates
+     * @param symmetricKey The symmetric key to use for encryption
      * @throws WSSecurityException
      */
-    public void prepare(Crypto crypto) throws WSSecurityException {
+    public void prepare(Crypto crypto, SecretKey symmetricKey) throws WSSecurityException {
         attachmentEncryptedDataElements = new ArrayList<>();
 
-        //
-        // Set up the symmetric key
-        //
-        if (symmetricKey == null) {
-            KeyGenerator keyGen = KeyUtils.getKeyGenerator(getSymmetricEncAlgorithm());
-            symmetricKey = keyGen.generateKey();
-        }
-
-        //
-        // Get the certificate that contains the public key for the public key
-        // algorithm that will encrypt the generated symmetric (session) key.
-        //
         if (encryptSymmKey) {
-            if (getUseThisPublicKey() != null) {
-                createEncryptedKeyElement(getUseThisPublicKey());
-                byte[] encryptedEphemeralKey = encryptSymmetricKey(getUseThisPublicKey(), symmetricKey);
-                addCipherValueElement(encryptedEphemeralKey);
-            } else {
-                X509Certificate remoteCert = getUseThisCert();
-                if (remoteCert == null) {
-                    if (crypto == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "encryptionCryptoFailure");
-                    }
-                    CryptoType cryptoType = null;
-                    if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
-                        cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
-                        cryptoType.setEndpoint(user);
-                    } else {
-                        cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                        cryptoType.setAlias(user);
-                    }
-                    X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-                    if (certs == null || certs.length <= 0) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "noUserCertsFound",
-                            new Object[] {user, "encryption"});
-                    }
-                    remoteCert = certs[0];
-                }
-
-                createEncryptedKeyElement(remoteCert, crypto);
-                byte[] encryptedEphemeralKey = encryptSymmetricKey(remoteCert.getPublicKey(), symmetricKey);
-                addCipherValueElement(encryptedEphemeralKey);
-            }
+            super.prepare(crypto, symmetricKey);
         } else {
             setEncryptedKeySHA1(symmetricKey.getEncoded());
         }
@@ -162,17 +122,18 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * encryption</i>.
      *
      * @param crypto an instance of the Crypto API to handle keystore and Certificates
+     * @param symmetricKey The symmetric key to use for encryption
      * @return the SOAP envelope with encrypted Body as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Crypto crypto)
+    public Document build(Crypto crypto, SecretKey symmetricKey)
         throws WSSecurityException {
 
-        prepare(crypto);
+        prepare(crypto, symmetricKey);
 
         LOG.debug("Beginning Encryption...");
 
-        Element refs = encrypt();
+        Element refs = encrypt(symmetricKey);
 
         addAttachmentEncryptedDataElements();
         if (getEncryptedKeyElement() != null) {
@@ -184,23 +145,28 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         prependBSTElementToHeader();
 
-        clean();
         LOG.debug("Encryption complete.");
         return getDocument();
     }
 
-    public Element encrypt() throws WSSecurityException {
+    /**
+     * Perform encryption using the given symmetric key
+     * @param symmetricKey The symmetric key to use for encryption
+     * @return the EncryptedData element
+     * @throws WSSecurityException
+     */
+    public Element encrypt(SecretKey symmetricKey) throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         }
 
-        return encryptForRef(null, getParts());
+        return encryptForRef(null, getParts(), symmetricKey);
     }
 
     /**
      * Encrypt one or more parts or elements of the message.
      *
-     * This method takes a vector of <code>WSEncryptionPart</code> object that
+     * This method takes a list of <code>WSEncryptionPart</code> object that
      * contain information about the elements to encrypt. The method call the
      * encryption method, takes the reference information generated during
      * encryption and add this to the <code>xenc:Reference</code> element.
@@ -215,12 +181,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
+     * @param symmetricKey The symmetric key to use for encryption
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
     public Element encryptForRef(
         Element dataRef,
-        List<WSEncryptionPart> references
+        List<WSEncryptionPart> references,
+        SecretKey symmetricKey
     ) throws WSSecurityException {
         KeyInfo keyInfo = createKeyInfo();
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
@@ -466,6 +434,40 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     public void setEncryptionSerializer(Serializer encryptionSerializer) {
         this.encryptionSerializer = encryptionSerializer;
+    }
+
+    /**
+     * Set the name of the symmetric encryption algorithm to use.
+     *
+     * This encryption algorithm is used to encrypt the data. If the algorithm
+     * is not set then AES128 is used. Refer to WSConstants which algorithms are
+     * supported.
+     *
+     * @param algo Is the name of the encryption algorithm
+     * @see WSConstants#TRIPLE_DES
+     * @see WSConstants#AES_128
+     * @see WSConstants#AES_192
+     * @see WSConstants#AES_256
+     */
+    public void setSymmetricEncAlgorithm(String algo) {
+        symEncAlgo = algo;
+    }
+
+
+    /**
+     * Get the name of symmetric encryption algorithm to use.
+     *
+     * The name of the encryption algorithm to encrypt the data, i.e. the SOAP
+     * Body. Refer to WSConstants which algorithms are supported.
+     *
+     * @return the name of the currently selected symmetric encryption algorithm
+     * @see WSConstants#TRIPLE_DES
+     * @see WSConstants#AES_128
+     * @see WSConstants#AES_192
+     * @see WSConstants#AES_256
+     */
+    public String getSymmetricEncAlgorithm() {
+        return symEncAlgo;
     }
 
 }

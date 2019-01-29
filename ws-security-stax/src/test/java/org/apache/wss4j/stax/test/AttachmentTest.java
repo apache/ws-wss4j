@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -49,6 +51,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -661,8 +664,10 @@ public class AttachmentTest extends AbstractTestBase {
 
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
-        encrypt.prepare(CryptoFactory.getInstance("transmitter-crypto.properties"));
-        Element refs = encrypt.encrypt();
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrypt.prepare(CryptoFactory.getInstance("transmitter-crypto.properties"), symmetricKey);
+        Element refs = encrypt.encrypt(symmetricKey);
         encrypt.addAttachmentEncryptedDataElements();
         encrypt.addExternalRefElement(refs);
         encrypt.prependToHeader();

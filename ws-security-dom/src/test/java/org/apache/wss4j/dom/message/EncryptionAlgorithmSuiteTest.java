@@ -76,7 +76,9 @@ public class EncryptionAlgorithmSuiteTest {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-        Document encryptedDoc = builder.build(crypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -114,7 +116,9 @@ public class EncryptionAlgorithmSuiteTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -151,7 +155,9 @@ public class EncryptionAlgorithmSuiteTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -193,7 +199,9 @@ public class EncryptionAlgorithmSuiteTest {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
 
-        Document encryptedDoc = builder.build(wssCrypto);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = builder.build(crypto, symmetricKey);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -229,10 +237,9 @@ public class EncryptionAlgorithmSuiteTest {
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
 
-        Document encryptedDoc = builder.build(crypto);
+        Document encryptedDoc = builder.build(crypto, key);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

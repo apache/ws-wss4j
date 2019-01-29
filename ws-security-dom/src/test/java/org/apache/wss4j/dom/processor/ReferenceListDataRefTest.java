@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.processor;
 
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -35,6 +37,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.junit.Test;
@@ -94,10 +97,13 @@ public class ReferenceListDataRefTest {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         LOG.info("Before Encryption Triple DES....");
 
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
+        SecretKey symmetricKey = keyGen.generateKey();
+
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(crypto);
+        builder.prepare(crypto, symmetricKey);
 
         /*
          * Set up the parts structure to encrypt the body
@@ -114,7 +120,7 @@ public class ReferenceListDataRefTest {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encrypt(symmetricKey);
         builder.addExternalRefElement(refs);
 
         /*
