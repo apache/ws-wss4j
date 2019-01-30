@@ -103,15 +103,19 @@ public final class EHCacheManagerHolder {
                 cacheManager = findDefaultCacheManager(confName, configFileURL);
             }
         }
-        AtomicInteger a = COUNTS.get(cacheManager.getName());
-        if (a == null) {
-            COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
-            a = COUNTS.get(cacheManager.getName());
+        if (cacheManager != null && cacheManager.getName() != null) {
+            AtomicInteger a = COUNTS.get(cacheManager.getName());
+            if (a == null) {
+                COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
+                a = COUNTS.get(cacheManager.getName());
+            }
+            a.incrementAndGet();
+            // if (a.incrementAndGet() == 1) {
+                //System.out.println("Create!! " + cacheManager.getName());
+            // }
+        } else {
+            LOG.warn("The CacheManager or CacheManager name was null");
         }
-        a.incrementAndGet();
-        // if (a.incrementAndGet() == 1) {
-            //System.out.println("Create!! " + cacheManager.getName());
-        // }
         return cacheManager;
     }
 
