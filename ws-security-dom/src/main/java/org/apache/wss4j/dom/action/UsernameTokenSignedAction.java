@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -30,6 +31,7 @@ import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -67,12 +69,13 @@ public class UsernameTokenSignedAction implements Action {
 
         int iterations = reqData.getDerivedKeyIterations();
         boolean useMac = reqData.isUseDerivedKeyForMAC();
-        builder.addDerivedKey(useMac, null, iterations);
+        builder.addDerivedKey(useMac, iterations);
 
         builder.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         builder.addCreated();
         builder.addNonce();
-        builder.prepare();
+        byte[] salt = UsernameTokenUtil.generateSalt(useMac);
+        builder.prepare(salt);
 
         // Now prepare to sign.
         // First step:  Get a WS Signature object and set config parameters
@@ -104,7 +107,7 @@ public class UsernameTokenSignedAction implements Action {
 
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
-        sign.setSecretKey(builder.getDerivedKey());
+        sign.setSecretKey(builder.getDerivedKey(salt));
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         if (signatureToken.getDigestAlgorithm() != null) {
             sign.setDigestAlgo(signatureToken.getDigestAlgorithm());
@@ -143,5 +146,7 @@ public class UsernameTokenSignedAction implements Action {
             );
         }
         builder.prependToHeader();
+
+        Arrays.fill(salt, (byte)0);
     }
 }

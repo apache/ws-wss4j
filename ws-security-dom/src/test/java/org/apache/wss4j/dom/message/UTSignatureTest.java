@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -80,13 +81,14 @@ public class UTSignatureTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(true, null, 1000);
-        builder.prepare();
+        builder.addDerivedKey(true, 1000);
+        byte[] salt = UsernameTokenUtil.generateSalt(true);
+        builder.prepare(salt);
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
-        sign.setSecretKey(builder.getDerivedKey());
+        sign.setSecretKey(builder.getDerivedKey(salt));
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
@@ -131,13 +133,14 @@ public class UTSignatureTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
-        builder.addDerivedKey(true, null, 1000);
-        builder.prepare();
+        builder.addDerivedKey(true, 1000);
+        byte[] salt = UsernameTokenUtil.generateSalt(true);
+        builder.prepare(salt);
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
-        sign.setSecretKey(builder.getDerivedKey());
+        sign.setSecretKey(builder.getDerivedKey(salt));
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 

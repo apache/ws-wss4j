@@ -331,21 +331,14 @@ public class UsernameToken {
     }
 
     /**
-     * Adds and optionally creates a Salt element to this UsernameToken.
-     *
-     * If the <code>saltValue</code> is <code>null</code> the the method
-     * generates a new salt. Otherwise it uses the the given value.
+     * Adds a Salt element to this UsernameToken.
      *
      * @param doc The Document for the UsernameToken
-     * @param saltValue The salt to add, if null generate a new salt value
+     * @param saltValue The salt to add.
      * @param mac If <code>true</code> then an optionally generated value is
      *            usable for a MAC
-     * @return Returns the added salt
      */
-    public byte[] addSalt(Document doc, byte[] saltValue, boolean mac) {
-        if (saltValue == null) {
-            saltValue = UsernameTokenUtil.generateSalt(mac);
-        }
+    public void addSalt(Document doc, byte[] saltValue, boolean mac) {
         elementSalt =
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
@@ -353,7 +346,6 @@ public class UsernameToken {
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementSalt.appendChild(doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(saltValue)));
         element.appendChild(elementSalt);
-        return saltValue;
     }
 
     /**

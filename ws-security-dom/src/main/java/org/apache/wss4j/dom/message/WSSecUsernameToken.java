@@ -45,7 +45,6 @@ public class WSSecUsernameToken extends WSSecBase {
     private boolean created;
     private boolean useDerivedKey;
     private boolean useMac;
-    private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
     private boolean passwordsAreEncoded;
     private boolean precisionInMilliSeconds = true;
@@ -90,14 +89,12 @@ public class WSSecUsernameToken extends WSSecBase {
     /**
      * Add a derived key to the UsernameToken
      * @param useMac whether the derived key is to be used for a MAC or not
-     * @param saltValue The salt value to use
      * @param iteration The number of iterations to use in deriving a key
      */
-    public void addDerivedKey(boolean useMac, byte[] saltValue, int iteration) {
+    public void addDerivedKey(boolean useMac, int iteration) {
         passwordType = null;
         useDerivedKey = true;
         this.useMac = useMac;
-        this.saltValue = saltValue;
         if (iteration > 0) {
             this.iteration = iteration;
         }
@@ -110,10 +107,11 @@ public class WSSecUsernameToken extends WSSecBase {
      * to compute a derived key. The generation of this secret key is according
      * to the UsernameTokenProfile 1.1 specification (section 4 - Key Derivation).
      *
+     * @param saltValue The salt value to use
      * @return Return the derived key of this token or null if <code>prepare()</code>
      * was not called before.
      */
-    public byte[] getDerivedKey() throws WSSecurityException {
+    public byte[] getDerivedKey(byte[] saltValue) throws WSSecurityException {
         if (ut == null || !useDerivedKey) {
             return null;
         }
@@ -163,13 +161,19 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
+     *
+     * @param The salt value to use if we are using a derived key
      */
     public void prepare() {
+        prepare(null);
+    }
+
+    public void prepare(byte[] saltValue) {
         ut = new UsernameToken(precisionInMilliSeconds, getDocument(), wsTimeSource, passwordType);
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         ut.setName(user);
         if (useDerivedKey) {
-            saltValue = ut.addSalt(getDocument(), saltValue, useMac);
+            ut.addSalt(getDocument(), saltValue, useMac);
             ut.addIteration(getDocument(), iteration);
         } else {
             ut.setPassword(password);
@@ -217,15 +221,20 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>UsernameToken</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      *
+     * @param the salt value to add if we are using a derived key
      * @return Document with UsernameToken added
      */
-    public Document build() {
+    public Document build(byte[] salt) {
         LOG.debug("Begin add username token...");
 
-        prepare();
+        prepare(salt);
         prependToHeader();
 
         return getDocument();
+    }
+
+    public Document build() {
+        return build(null);
     }
 
     /**
