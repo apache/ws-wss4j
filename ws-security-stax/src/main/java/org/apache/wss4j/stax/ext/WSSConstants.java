@@ -268,15 +268,23 @@ public class WSSConstants extends XMLSecurityConstants {
     }
 
     public static final List<QName> SOAP_11_BODY_PATH = new ArrayList<>(2);
+    public static final List<QName> SOAP_12_BODY_PATH = new ArrayList<>(2);
     public static final List<QName> SOAP_11_HEADER_PATH = new ArrayList<>(2);
+    public static final List<QName> SOAP_12_HEADER_PATH = new ArrayList<>(2);
     public static final List<QName> WSSE_SECURITY_HEADER_PATH = new ArrayList<>(3);
 
     static {
         SOAP_11_BODY_PATH.add(WSSConstants.TAG_SOAP11_ENVELOPE);
         SOAP_11_BODY_PATH.add(WSSConstants.TAG_SOAP11_BODY);
 
+        SOAP_12_BODY_PATH.add(WSSConstants.TAG_SOAP12_ENVELOPE);
+        SOAP_12_BODY_PATH.add(WSSConstants.TAG_SOAP12_BODY);
+
         SOAP_11_HEADER_PATH.add(WSSConstants.TAG_SOAP11_ENVELOPE);
         SOAP_11_HEADER_PATH.add(WSSConstants.TAG_SOAP11_HEADER);
+
+        SOAP_12_HEADER_PATH.add(WSSConstants.TAG_SOAP12_ENVELOPE);
+        SOAP_12_HEADER_PATH.add(WSSConstants.TAG_SOAP12_HEADER);
 
         WSSE_SECURITY_HEADER_PATH.addAll(SOAP_11_HEADER_PATH);
         WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);

@@ -625,6 +625,10 @@ public class WSSUtils extends XMLSecurityUtils {
         return (TokenSecurityEvent<? extends InboundSecurityToken>)tokenSecurityEvent;
     }
 
+    public static boolean pathMatches(List<QName> path1, List<QName> path2) {
+        return pathMatches(path1, path2, false, false);
+    }
+
     public static boolean pathMatches(List<QName> path1, List<QName> path2,
                                       boolean matchAnySoapNS, boolean lastElementWildCard) {
         if (path1 == null) {

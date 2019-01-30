@@ -99,14 +99,6 @@ import org.w3c.dom.Node;
  */
 public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final List<QName> SAML1_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-    private static final List<QName> SAML2_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-
-    static {
-        SAML1_TOKEN_PATH.add(WSSConstants.TAG_SAML_ASSERTION);
-        SAML2_TOKEN_PATH.add(WSSConstants.TAG_SAML2_ASSERTION);
-    }
-
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
@@ -221,9 +213,14 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         wsInboundSecurityContext.registerSecurityEvent(samlTokenSecurityEvent);
 
         if (wssSecurityProperties.isValidateSamlSubjectConfirmation()) {
+            boolean soap12 = false;
+            if (elementPath.get(0) != null && WSSConstants.NS_SOAP12.equals(elementPath.get(0).getNamespaceURI())) {
+                soap12 = true;
+            }
             SAMLTokenVerifierInputProcessor samlTokenVerifierInputProcessor =
                     new SAMLTokenVerifierInputProcessor(
-                            securityProperties, samlAssertionWrapper, subjectSecurityTokenProvider, subjectSecurityToken);
+                            securityProperties, samlAssertionWrapper, subjectSecurityTokenProvider, subjectSecurityToken,
+                            soap12);
             wsInboundSecurityContext.addSecurityEventListener(samlTokenVerifierInputProcessor);
             inputProcessorChain.addProcessor(samlTokenVerifierInputProcessor);
         }
@@ -538,16 +535,38 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<>();
         private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
+        private final boolean soap12;
+        private final List<QName> saml1TokenPath;
+        private final List<QName> saml2TokenPath;
+
         SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties,
                                         SamlAssertionWrapper samlAssertionWrapper,
                                         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider,
-                                        InboundSecurityToken subjectSecurityToken) {
+                                        InboundSecurityToken subjectSecurityToken,
+                                        boolean soap12) {
             super(securityProperties);
             this.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
             this.addAfterProcessor(OperationInputProcessor.class.getName());
             this.samlAssertionWrapper = samlAssertionWrapper;
             this.securityTokenProvider = securityTokenProvider;
             this.subjectSecurityToken = subjectSecurityToken;
+
+            this.soap12 = soap12;
+            if (soap12) {
+                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_12_HEADER_PATH);
+                saml1TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml1TokenPath.add(WSSConstants.TAG_SAML_ASSERTION);
+                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_12_HEADER_PATH);
+                saml2TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml2TokenPath.add(WSSConstants.TAG_SAML2_ASSERTION);
+            } else {
+                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_11_HEADER_PATH);
+                saml1TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml1TokenPath.add(WSSConstants.TAG_SAML_ASSERTION);
+                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_11_HEADER_PATH);
+                saml2TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml2TokenPath.add(WSSConstants.TAG_SAML2_ASSERTION);
+            }
         }
 
         @Override
@@ -556,15 +575,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();
-                if (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, elementPath, true, false)) {
+                if (soap12 && WSSUtils.pathMatches(WSSConstants.SOAP_12_BODY_PATH, elementPath)
+                    || !soap12 && WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, elementPath)) {
                     bodySignedPartSecurityEvent = signedPartSecurityEvent;
                 }
             } else if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
                 SignedElementSecurityEvent signedPartSecurityEvent = (SignedElementSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();
-                if (WSSUtils.pathMatches(SAML2_TOKEN_PATH, elementPath, true, false)
-                    || WSSUtils.pathMatches(SAML1_TOKEN_PATH, elementPath, true, false)) {
+                if (WSSUtils.pathMatches(saml2TokenPath, elementPath)
+                    || WSSUtils.pathMatches(saml1TokenPath, elementPath)) {
                     samlTokenSignedElementSecurityEvents.add(signedPartSecurityEvent);
                 }
             }
