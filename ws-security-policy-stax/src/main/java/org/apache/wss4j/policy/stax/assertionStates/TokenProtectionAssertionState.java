@@ -221,7 +221,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         for (int i = 0; i < signedElementEvents.size(); i++) {
             SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
             if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(),
-                                     ((InboundSecurityToken)securityToken).getElementPath(), false, false)) {
+                                     ((InboundSecurityToken)securityToken).getElementPath())) {
 
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
                 signingSecurityToken = getEffectiveSignatureToken(signingSecurityToken);
@@ -265,7 +265,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 boolean found = false;
                 for (int j = 0; j < signedElementEvents.size(); j++) {
                     SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(j);
-                    if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), elementPath, false, false)) {
+                    if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), elementPath)) {
                         SecurityToken elementSignatureToken = getEffectiveSignatureToken(signedElementSecurityEvent.getSecurityToken());
 
                         if (elementSignatureToken != null && elementSignatureToken.getId().equals(securityToken.getId())) {
