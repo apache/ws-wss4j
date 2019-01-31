@@ -51,11 +51,6 @@ public class WSSecSecurityContextToken {
      */
     private String identifier;
 
-    /**
-     * The symmetric secret associated with the SecurityContextToken
-     */
-    private byte[] secret;
-
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     private WSSConfig wssConfig;
     private final WSSecHeader securityHeader;
@@ -113,20 +108,6 @@ public class WSSecSecurityContextToken {
      */
     public void setSct(SecurityContextToken sct) {
         this.sct = sct;
-    }
-
-    /**
-     * @return Returns the ephemeralKey.
-     */
-    public byte[] getSecret() {
-        return secret;
-    }
-
-    /**
-     * @param ephemeralKey The ephemeralKey to set.
-     */
-    protected void setSecret(byte[] ephemeralKey) {
-        secret = ephemeralKey;
     }
 
     /**
