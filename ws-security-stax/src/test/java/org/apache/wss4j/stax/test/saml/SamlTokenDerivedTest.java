@@ -95,7 +95,10 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
             // Create a Derived Key object for signature
             //
             WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml, secHeader);
-            Document securedDocument = sigBuilder.build();
+            Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            java.security.Key key =
+                crypto.getPrivateKey("transmitter", "default");
+            Document securedDocument = sigBuilder.build(key.getEncoded());
 
             //todo remove the following lines when the header ordering no longer does matter...
             /*Node firstChild = secHeader.getSecurityHeader().getFirstChild();
@@ -183,9 +186,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
         secToken.setKeyIdentifierThumb(certs[0]);
 
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        java.security.Key key =
-                crypto.getPrivateKey("transmitter", "default");
-        sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
+        sigBuilder.setStrElem(secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());

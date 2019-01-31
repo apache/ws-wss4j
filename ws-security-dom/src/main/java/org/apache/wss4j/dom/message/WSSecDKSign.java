@@ -105,9 +105,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
 
-    public Document build() throws WSSecurityException {
+    public Document build(byte[] ephemeralKey) throws WSSecurityException {
 
-        prepare();
+        prepare(ephemeralKey);
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         } else {
@@ -129,8 +129,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return getDocument();
     }
 
-    public void prepare() throws WSSecurityException {
-        super.prepare();
+    public void prepare(byte[] ephemeralKey) throws WSSecurityException {
+        super.prepare(ephemeralKey);
         wsDocInfo = new WSDocInfo(getDocument());
         sig = null;
 

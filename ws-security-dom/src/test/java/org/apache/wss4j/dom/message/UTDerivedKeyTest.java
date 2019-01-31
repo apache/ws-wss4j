@@ -158,9 +158,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -211,9 +211,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -265,9 +265,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -316,9 +316,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -365,10 +365,10 @@ public class UTDerivedKeyTest {
         // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build();
+        Document signedDoc = sigBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -417,10 +417,10 @@ public class UTDerivedKeyTest {
         // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build();
+        Document signedDoc = sigBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -481,10 +481,10 @@ public class UTDerivedKeyTest {
         // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build();
+        Document signedDoc = sigBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -527,10 +527,10 @@ public class UTDerivedKeyTest {
         // Derived key signature
         //
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build();
+        Document signedDoc = sigBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -573,9 +573,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setTokenIdentifier(usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -623,9 +623,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setTokenIdentifier(usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -674,9 +674,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
+        encrBuilder.setTokenIdentifier(usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -738,9 +738,9 @@ public class UTDerivedKeyTest {
         //
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_SAML_TOKEN_TYPE);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 
@@ -807,9 +807,8 @@ public class UTDerivedKeyTest {
         strEncKey.setKeyIdentifier(
             WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE, tokenIdentifier, true
         );
-        encrBuilder.setExternalKey(derivedKey, strEncKey.getElement());
-
-        Document encryptedDoc = encrBuilder.build();
+        encrBuilder.setStrElem(strEncKey.getElement());
+        Document encryptedDoc = encrBuilder.build(derivedKey);
 
         builder.prependToHeader();
 

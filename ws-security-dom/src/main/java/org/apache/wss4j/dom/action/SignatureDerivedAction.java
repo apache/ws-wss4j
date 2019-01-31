@@ -21,8 +21,11 @@ package org.apache.wss4j.dom.action;
 
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
@@ -30,6 +33,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -86,8 +90,32 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         }
 
         Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
-        Element tokenElement =
-            setupTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
+
+        String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
+        Element tokenElement = null;
+        SecretKey symmetricKey = null;
+        if ("EncryptedKey".equals(derivedKeyTokenReference)) {
+            if (reqData.getEncryptionToken() == null || reqData.getEncryptionToken().getKey() == null
+                || reqData.getEncryptionToken().getKeyIdentifier() == null) {
+                String symmetricKeyAlgorithm = WSConstants.AES_128;
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symmetricKeyAlgorithm);
+                symmetricKey = keyGen.generateKey();
+            }
+
+            tokenElement = setupEncryptedKeyTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc, symmetricKey);
+        } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
+            tokenElement = setupSCTTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
+        } else {
+            // DirectReference
+            if (signatureToken.getDerivedKeyIdentifier() != 0) {
+                wsSign.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
+            } else {
+                wsSign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+            }
+
+            wsSign.setCrypto(signatureToken.getCrypto());
+        }
+
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
@@ -99,7 +127,8 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            wsSign.prepare();
+            byte[] key = getKey(signatureToken, reqData.getEncryptionToken(), passwordCallback, symmetricKey);
+            wsSign.prepare(key);
 
             List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(wsSign.getParts());
 
@@ -137,28 +166,46 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         }
     }
 
-    private Element setupTokenReference(
-        RequestData reqData, SignatureActionToken signatureToken,
-        WSSecDKSign wsSign, WSPasswordCallback passwordCallback,
-        Document doc
+    private Element setupEncryptedKeyTokenReference(
+                                        RequestData reqData, SignatureActionToken signatureToken,
+                                        WSSecDKSign wsSign, WSPasswordCallback passwordCallback,
+                                        Document doc, SecretKey symmetricKey
     ) throws WSSecurityException {
-        String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
 
-        if ("EncryptedKey".equals(derivedKeyTokenReference)) {
-            return setupEKReference(wsSign, reqData.getSecHeader(), passwordCallback, signatureToken, reqData.getEncryptionToken(),
-                                     reqData.isUse200512Namespace(), doc, null, null, null);
-        } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
-            return setupSCTReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),
-                                     reqData.isUse200512Namespace(), doc);
+        if (symmetricKey == null) {
+            setupEKReference(wsSign, reqData.getEncryptionToken());
+            return null;
         } else {
-            // DirectReference
+            return setupEKReference(wsSign, reqData.getSecHeader(), passwordCallback, signatureToken,
+                                              reqData.isUse200512Namespace(), doc, null, null, symmetricKey);
+        }
+    }
 
-            if (signatureToken.getDerivedKeyIdentifier() != 0) {
-                wsSign.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
-            } else {
-                wsSign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            }
+    private Element setupSCTTokenReference(
+                                        RequestData reqData, SignatureActionToken signatureToken,
+                                        WSSecDKSign wsSign, WSPasswordCallback passwordCallback,
+                                        Document doc
+    ) throws WSSecurityException {
+        if (reqData.getEncryptionToken() != null && reqData.getEncryptionToken().getKey() != null
+            && reqData.getEncryptionToken().getKeyIdentifier() != null) {
+            setupSCTReference(wsSign, reqData.getEncryptionToken(), reqData.isUse200512Namespace());
+            return null;
+        } else {
+            return setupSCTReference(wsSign, passwordCallback, signatureToken, reqData.isUse200512Namespace(), doc);
+        }
+    }
 
+    private byte[] getKey(SignatureActionToken signatureToken,
+                          EncryptionActionToken encryptionToken,
+                          WSPasswordCallback passwordCallback,
+                          SecretKey symmetricKey) throws WSSecurityException {
+        String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
+        boolean directReference = !("EncryptedKey".equals(derivedKeyTokenReference)
+            || "SecurityContextToken".equals(derivedKeyTokenReference));
+
+        if (symmetricKey != null) {
+            return symmetricKey.getEncoded();
+        } else if (directReference) {
             byte[] key = null;
             if (passwordCallback.getKey() != null) {
                 key = passwordCallback.getKey();
@@ -168,10 +215,12 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 Crypto crypto = signatureToken.getCrypto();
                 key = crypto.getPrivateKey(signatureToken.getUser(), passwordCallback.getPassword()).getEncoded();
             }
-            wsSign.setCrypto(signatureToken.getCrypto());
-            wsSign.setExternalKey(key, (String)null);
-
-            return null;
+            return key;
+        } else if (encryptionToken != null && encryptionToken.getKey() != null
+            && encryptionToken.getKeyIdentifier() != null) {
+            return encryptionToken.getKey();
+        } else {
+            return passwordCallback.getKey();
         }
     }
 }

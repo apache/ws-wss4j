@@ -111,7 +111,9 @@ public class SamlTokenDerivedTest {
         // Create a Derived Key object for signature
         //
         WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml, secHeader);
-        Document signedDoc = sigBuilder.build();
+        java.security.Key key =
+            crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        Document signedDoc = sigBuilder.build(key.getEncoded());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Derived (sender vouches):");
@@ -183,9 +185,7 @@ public class SamlTokenDerivedTest {
         secToken.setKeyIdentifierThumb(certs[0]);
 
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        java.security.Key key =
-            crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
+        sigBuilder.setStrElem(secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =

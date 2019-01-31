@@ -93,8 +93,8 @@ public class DerivedKeyTest {
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build();
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -134,8 +134,8 @@ public class DerivedKeyTest {
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build();
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -170,9 +170,9 @@ public class DerivedKeyTest {
 
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(ek, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        /* Document signedDoc = */ sigBuilder.build();
+        /* Document signedDoc = */ sigBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -213,9 +213,9 @@ public class DerivedKeyTest {
 
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
-        sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build();
+        sigBuilder.setStrElem(secToken.getElement());
+        sigBuilder.build(key.getEncoded());
 
         sigBuilder.prependDKElementToHeader();
 
@@ -254,9 +254,9 @@ public class DerivedKeyTest {
 
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
-        sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build();
+        sigBuilder.setStrElem(secToken.getElement());
+        sigBuilder.build(key.getEncoded());
 
         sigBuilder.prependDKElementToHeader();
 
@@ -296,16 +296,16 @@ public class DerivedKeyTest {
 
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(ek, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        sigBuilder.build();
+        sigBuilder.build(ek);
 
         //Derived key signature
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document signedEncryptedDoc = encrBuilder.build();
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
+        Document signedEncryptedDoc = encrBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -341,15 +341,15 @@ public class DerivedKeyTest {
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokenIdentifier);
-        encrBuilder.build();
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
+        encrBuilder.build(ek);
 
         //Derived key signature
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(ek, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        Document encryptedSignedDoc = sigBuilder.build();
+        Document encryptedSignedDoc = sigBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();

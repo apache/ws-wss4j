@@ -23,14 +23,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.apache.wss4j.common.SignatureEncryptionActionToken;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
@@ -72,10 +70,23 @@ public abstract class AbstractDerivedAction {
         return null;
     }
 
+    // Use a previous derived action which has already set up a SecurityContextToken
+    protected void setupSCTReference(WSSecDerivedKeyBase derivedKeyBase,
+                                        SignatureEncryptionActionToken previousActionToken,
+                                        boolean use200512Namespace) throws WSSecurityException {
+        if (use200512Namespace) {
+            derivedKeyBase.setCustomValueType(WSConstants.WSC_SCT_05_12);
+        } else {
+            derivedKeyBase.setCustomValueType(WSConstants.WSC_SCT);
+        }
+
+        String tokenIdentifier = previousActionToken.getKeyIdentifier();
+        derivedKeyBase.setTokenIdentifier(tokenIdentifier);
+    }
+
     protected Element setupSCTReference(WSSecDerivedKeyBase derivedKeyBase,
                                         WSPasswordCallback passwordCallback,
                                         SignatureEncryptionActionToken actionToken,
-                                        SignatureEncryptionActionToken previousActionToken,
                                         boolean use200512Namespace,
                                         Document doc) throws WSSecurityException {
         if (use200512Namespace) {
@@ -84,84 +95,66 @@ public abstract class AbstractDerivedAction {
             derivedKeyBase.setCustomValueType(WSConstants.WSC_SCT);
         }
 
-        // See if a previous derived action has already set up a SecurityContextToken
-        if (previousActionToken != null && previousActionToken.getKey() != null
-            && previousActionToken.getKeyIdentifier() != null) {
-            byte[] secret = previousActionToken.getKey();
-            String tokenIdentifier = previousActionToken.getKeyIdentifier();
-            derivedKeyBase.setExternalKey(secret, tokenIdentifier);
-            return null;
-        }  else {
-            String tokenIdentifier = IDGenerator.generateID("uuid:");
-            derivedKeyBase.setExternalKey(passwordCallback.getKey(), tokenIdentifier);
+        String tokenIdentifier = IDGenerator.generateID("uuid:");
+        derivedKeyBase.setTokenIdentifier(tokenIdentifier);
 
-            actionToken.setKey(passwordCallback.getKey());
-            actionToken.setKeyIdentifier(tokenIdentifier);
+        actionToken.setKey(passwordCallback.getKey());
+        actionToken.setKeyIdentifier(tokenIdentifier);
 
-            int version = ConversationConstants.VERSION_05_12;
-            if (!use200512Namespace) {
-                version = ConversationConstants.VERSION_05_02;
-            }
-
-            SecurityContextToken sct = new SecurityContextToken(version, doc, tokenIdentifier);
-            return sct.getElement();
+        int version = ConversationConstants.VERSION_05_12;
+        if (!use200512Namespace) {
+            version = ConversationConstants.VERSION_05_02;
         }
+
+        SecurityContextToken sct = new SecurityContextToken(version, doc, tokenIdentifier);
+        return sct.getElement();
+    }
+
+    // Use a previous derived action which has already set up an EncryptedKey
+    protected void setupEKReference(WSSecDerivedKeyBase derivedKeyBase,
+                                        SignatureEncryptionActionToken previousActionToken) throws WSSecurityException {
+        derivedKeyBase.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+
+        String tokenIdentifier = previousActionToken.getKeyIdentifier();
+        derivedKeyBase.setTokenIdentifier(tokenIdentifier);
     }
 
     protected Element setupEKReference(WSSecDerivedKeyBase derivedKeyBase,
                                        WSSecHeader securityHeader,
                                         WSPasswordCallback passwordCallback,
                                         SignatureEncryptionActionToken actionToken,
-                                        SignatureEncryptionActionToken previousActionToken,
                                         boolean use200512Namespace,
                                         Document doc,
                                         String keyTransportAlgorithm,
-                                        String symmetricKeyAlgorithm,
-                                        String mgfAlgorithm) throws WSSecurityException {
+                                        String mgfAlgorithm,
+                                        SecretKey symmetricKey) throws WSSecurityException {
         derivedKeyBase.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
-        // See if a previous derived action has already set up an EncryptedKey
-        if (previousActionToken != null && previousActionToken.getKey() != null
-            && previousActionToken.getKeyIdentifier() != null) {
-            byte[] ek = previousActionToken.getKey();
-            String tokenIdentifier = previousActionToken.getKeyIdentifier();
-            derivedKeyBase.setExternalKey(ek, tokenIdentifier);
-            return null;
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(securityHeader);
+        encrKeyBuilder.setUserInfo(actionToken.getUser());
+        if (actionToken.getDerivedKeyIdentifier() != 0) {
+            encrKeyBuilder.setKeyIdentifierType(actionToken.getDerivedKeyIdentifier());
         } else {
-            WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(securityHeader);
-            encrKeyBuilder.setUserInfo(actionToken.getUser());
-            if (actionToken.getDerivedKeyIdentifier() != 0) {
-                encrKeyBuilder.setKeyIdentifierType(actionToken.getDerivedKeyIdentifier());
-            } else {
-                encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            }
-
-            if (actionToken.getDigestAlgorithm() != null) {
-                encrKeyBuilder.setDigestAlgorithm(actionToken.getDigestAlgorithm());
-            }
-            if (keyTransportAlgorithm != null) {
-                encrKeyBuilder.setKeyEncAlgo(keyTransportAlgorithm);
-            }
-            if (mgfAlgorithm != null) {
-                encrKeyBuilder.setMGFAlgorithm(mgfAlgorithm);
-            }
-
-            if (symmetricKeyAlgorithm == null) {
-                symmetricKeyAlgorithm = WSConstants.AES_128;
-            }
-            KeyGenerator keyGen = KeyUtils.getKeyGenerator(symmetricKeyAlgorithm);
-            SecretKey symmetricKey = keyGen.generateKey();
-
-            encrKeyBuilder.prepare(actionToken.getCrypto(), symmetricKey);
-
-            byte[] ek = symmetricKey.getEncoded();
-            String tokenIdentifier = encrKeyBuilder.getId();
-
-            actionToken.setKey(ek);
-            actionToken.setKeyIdentifier(tokenIdentifier);
-
-            derivedKeyBase.setExternalKey(ek, tokenIdentifier);
-            return encrKeyBuilder.getEncryptedKeyElement();
+            encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         }
+
+        if (actionToken.getDigestAlgorithm() != null) {
+            encrKeyBuilder.setDigestAlgorithm(actionToken.getDigestAlgorithm());
+        }
+        if (keyTransportAlgorithm != null) {
+            encrKeyBuilder.setKeyEncAlgo(keyTransportAlgorithm);
+        }
+        if (mgfAlgorithm != null) {
+            encrKeyBuilder.setMGFAlgorithm(mgfAlgorithm);
+        }
+        encrKeyBuilder.prepare(actionToken.getCrypto(), symmetricKey);
+
+        String tokenIdentifier = encrKeyBuilder.getId();
+
+        actionToken.setKey(symmetricKey.getEncoded());
+        actionToken.setKeyIdentifier(tokenIdentifier);
+        derivedKeyBase.setTokenIdentifier(tokenIdentifier);
+
+        return encrKeyBuilder.getEncryptedKeyElement();
     }
 }

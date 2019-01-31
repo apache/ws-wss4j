@@ -405,10 +405,10 @@ public class XOPAttachmentTest {
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        encrBuilder.setExternalKey(ek, tokenIdentifier);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
         encrBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         encrBuilder.setStoreBytesInAttachment(true);
-        Document encryptedDoc = encrBuilder.build();
+        Document encryptedDoc = encrBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -457,11 +457,11 @@ public class XOPAttachmentTest {
 
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
-        sigBuilder.setExternalKey(ek, tokenIdentifier);
+        sigBuilder.setTokenIdentifier(tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         sigBuilder.setStoreBytesInAttachment(true);
-        Document signedDoc = sigBuilder.build();
+        Document signedDoc = sigBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();

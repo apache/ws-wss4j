@@ -60,18 +60,18 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     @Override
-    public void prepare() throws WSSecurityException {
-        super.prepare();
+    public void prepare(byte[] ephemeralKey) throws WSSecurityException {
+        super.prepare(ephemeralKey);
 
         attachmentEncryptedDataElements = new ArrayList<>();
     }
 
-    public Document build() throws WSSecurityException {
+    public Document build(byte[] ephemeralKey) throws WSSecurityException {
 
         //
         // Setup the encrypted key
         //
-        prepare();
+        prepare(ephemeralKey);
         //
         // prepend elements in the right order to the security header
         //

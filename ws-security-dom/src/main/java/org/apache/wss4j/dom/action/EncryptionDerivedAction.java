@@ -21,14 +21,18 @@ package org.apache.wss4j.dom.action;
 
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -82,8 +86,22 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         }
 
         Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
-        Element tokenElement =
-            setupTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
+        String derivedKeyTokenReference = encryptionToken.getDerivedKeyTokenReference();
+        Element tokenElement = null;
+        SecretKey symmetricKey = null;
+        if ("EncryptedKey".equals(derivedKeyTokenReference)) {
+            if (reqData.getSignatureToken() == null || reqData.getSignatureToken().getKey() == null
+                || reqData.getSignatureToken().getKeyIdentifier() == null) {
+                String symmetricKeyAlgorithm = WSConstants.AES_128;
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symmetricKeyAlgorithm);
+                symmetricKey = keyGen.generateKey();
+            }
+
+            tokenElement = setupEncryptedKeyTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc, symmetricKey);
+        } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
+            tokenElement = setupSCTTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
+        }
+
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
@@ -95,7 +113,8 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
                 wsEncrypt.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            wsEncrypt.prepare();
+            byte[] key = getKey(reqData.getSignatureToken(), passwordCallback, symmetricKey);
+            wsEncrypt.prepare(key);
 
             Element externRefList = wsEncrypt.encrypt();
 
@@ -128,20 +147,44 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         }
     }
 
-    private Element setupTokenReference(
+    private Element setupSCTTokenReference(
+                                        RequestData reqData, EncryptionActionToken encryptionToken,
+                                        WSSecDKEncrypt wsEncrypt, WSPasswordCallback passwordCallback,
+                                        Document doc
+        ) throws WSSecurityException {
+        if (reqData.getSignatureToken() != null && reqData.getSignatureToken().getKey() != null
+            && reqData.getSignatureToken().getKeyIdentifier() != null) {
+            setupSCTReference(wsEncrypt, reqData.getSignatureToken(), reqData.isUse200512Namespace());
+            return null;
+        } else {
+            return setupSCTReference(wsEncrypt, passwordCallback, encryptionToken, reqData.isUse200512Namespace(), doc);
+        }
+    }
+
+    private Element setupEncryptedKeyTokenReference(
         RequestData reqData, EncryptionActionToken encryptionToken,
         WSSecDKEncrypt wsEncrypt, WSPasswordCallback passwordCallback,
-        Document doc
+        Document doc, SecretKey symmetricKey
     ) throws WSSecurityException {
-        String derivedKeyTokenReference = encryptionToken.getDerivedKeyTokenReference();
-
-        if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
-            return setupSCTReference(wsEncrypt, passwordCallback, encryptionToken, reqData.getSignatureToken(),
-                                     reqData.isUse200512Namespace(), doc);
+        if (symmetricKey == null) {
+            setupEKReference(wsEncrypt, reqData.getSignatureToken());
+            return null;
         } else {
-            return setupEKReference(wsEncrypt, reqData.getSecHeader(), passwordCallback, encryptionToken, reqData.getSignatureToken(),
-                                     reqData.isUse200512Namespace(), doc, encryptionToken.getKeyTransportAlgorithm(),
-                                     encryptionToken.getSymmetricAlgorithm(), encryptionToken.getMgfAlgorithm());
+            return setupEKReference(wsEncrypt, reqData.getSecHeader(), passwordCallback, encryptionToken,
+                                              reqData.isUse200512Namespace(), doc, null, null, symmetricKey);
+        }
+    }
+
+    private byte[] getKey(SignatureActionToken encryptionToken,
+                          WSPasswordCallback passwordCallback,
+                          SecretKey symmetricKey) throws WSSecurityException {
+        if (symmetricKey != null) {
+            return symmetricKey.getEncoded();
+        } else if (encryptionToken != null && encryptionToken.getKey() != null
+            && encryptionToken.getKeyIdentifier() != null) {
+            return encryptionToken.getKey();
+        } else {
+            return passwordCallback.getKey();
         }
     }
 }

@@ -162,8 +162,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-            encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build();
+            encrBuilder.setTokenIdentifier(tokenId);
+            encrBuilder.build(tempSecret);
 
             sctBuilder.prependSCTElementToHeader();
 
@@ -371,9 +371,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
-            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setTokenIdentifier(tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build();
+            sigBuilder.build(tempSecret);
 
             sctBuilder.prependSCTElementToHeader();
 
@@ -552,10 +552,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
-            sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
+            sigBuilder.setTokenIdentifier(sctBuilder.getIdentifier());
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build();
+            sigBuilder.build(tempSecret);
 
             sctBuilder.prependSCTElementToHeader();
 
@@ -606,9 +606,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             } else {
                 sigBuilder.setCustomValueType(WSConstants.WSC_SCT);
             }
-            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setTokenIdentifier(tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build();
+            sigBuilder.build(tempSecret);
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
@@ -619,8 +619,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 encrBuilder.setCustomValueType(WSConstants.WSC_SCT);
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-            encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build();
+            encrBuilder.setTokenIdentifier(tokenId);
+            encrBuilder.build(tempSecret);
 
             sctBuilder.prependSCTElementToHeader();
 
@@ -830,8 +830,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 encrBuilder.setCustomValueType(WSConstants.WSC_SCT);
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-            encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build();
+            encrBuilder.setTokenIdentifier(tokenId);
+            encrBuilder.build(tempSecret);
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
@@ -841,9 +841,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             } else {
                 sigBuilder.setCustomValueType(WSConstants.WSC_SCT);
             }
-            sigBuilder.setExternalKey(tempSecret, tokenId);
+            sigBuilder.setTokenIdentifier(tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build();
+            sigBuilder.build(tempSecret);
 
             sctBuilder.prependSCTElementToHeader();
 

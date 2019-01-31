@@ -55,11 +55,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     private DerivedKeyToken dkt;
 
     /**
-     * Session key used as the secret in key derivation
-     */
-    private byte[] ephemeralKey;
-
-    /**
      * Client's label value
      */
     private String clientLabel = ConversationConstants.DEFAULT_LABEL;
@@ -120,20 +115,16 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      */
     protected abstract int getDerivedKeyLength() throws WSSecurityException;
 
-    /**
-     * @param ephemeralKey The ephemeralKey to set.
-     */
-    public void setExternalKey(byte[] ephemeralKey, String tokenIdentifier) {
-        this.ephemeralKey = ephemeralKey;
-        this.tokenIdentifier = tokenIdentifier;
+    public Element getStrElem() {
+        return strElem;
     }
 
-    /**
-     * @param ephemeralKey The ephemeralKey to set.
-     */
-    public void setExternalKey(byte[] ephemeralKey, Element strElem) {
-        this.ephemeralKey = ephemeralKey;
+    public void setStrElem(Element strElem) {
         this.strElem = strElem;
+    }
+
+    public void setTokenIdentifier(String tokenIdentifier) {
+        this.tokenIdentifier = tokenIdentifier;
     }
 
     /**
@@ -190,9 +181,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * This method does not add any element to the security header. This must be
      * done explicitly.
      *
+     * @param ephemeralKey The ephemeral key to use for derivation
      * @throws WSSecurityException
      */
-    public void prepare() throws WSSecurityException {
+    public void prepare(byte[] ephemeralKey) throws WSSecurityException {
+
+        if (ephemeralKey == null || ephemeralKey.length == 0) {
+            LOG.debug("No ephemeral key is supplied for id: " + tokenIdentifier);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
+        }
 
         // Create the derived keys
         // At this point figure out the key length according to the symencAlgo
@@ -209,12 +206,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
 
         DerivationAlgorithm algo =
             AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
-
-        if (ephemeralKey == null || ephemeralKey.length == 0) {
-            LOG.debug("No ephemeral key is supplied for id: " + tokenIdentifier);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
-        }
-
         derivedKeyBytes = algo.createKey(ephemeralKey, seed, offset, length);
 
         // Add the DKTs
