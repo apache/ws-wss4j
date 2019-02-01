@@ -92,7 +92,10 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
             if (reqData.getSignatureToken() == null || reqData.getSignatureToken().getKey() == null
                 || reqData.getSignatureToken().getKeyIdentifier() == null) {
-                String symmetricKeyAlgorithm = WSConstants.AES_128;
+                String symmetricKeyAlgorithm = encryptionToken.getSymmetricAlgorithm();
+                if (symmetricKeyAlgorithm == null) {
+                    symmetricKeyAlgorithm = WSConstants.AES_128;
+                }
                 KeyGenerator keyGen = KeyUtils.getKeyGenerator(symmetricKeyAlgorithm);
                 symmetricKey = keyGen.generateKey();
             }

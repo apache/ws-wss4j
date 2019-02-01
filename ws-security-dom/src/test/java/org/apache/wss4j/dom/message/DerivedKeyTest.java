@@ -82,7 +82,7 @@ public class DerivedKeyTest {
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
-        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.TRIPLE_DES);
         SecretKey symmetricKey = keyGen.generateKey();
         encrKeyBuilder.prepare(crypto, symmetricKey);
 
@@ -92,19 +92,20 @@ public class DerivedKeyTest {
 
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
-        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         encrBuilder.setTokenIdentifier(tokenIdentifier);
         Document encryptedDoc = encrBuilder.build(ek);
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
 
+        String outputString =
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString =
-                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
+        assertTrue(outputString.contains(WSConstants.TRIPLE_DES));
         verify(doc);
     }
 
@@ -140,12 +141,51 @@ public class DerivedKeyTest {
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
 
+        String outputString =
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString =
-                XMLUtils.prettyDocumentToString(encryptedDoc);
+            LOG.debug("Encrypted message: AES  + DerivedKeys");
             LOG.debug(outputString);
         }
+        assertTrue(outputString.contains(WSConstants.AES_128));
+        verify(doc);
+    }
+
+    @Test
+    public void testEncryptionDecryptionAES256() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        //EncryptedKey
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
+        encrKeyBuilder.setUserInfo("wss40");
+        encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_256);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
+
+        //Key information from the EncryptedKey
+        byte[] ek = symmetricKey.getEncoded();
+        String tokenIdentifier = encrKeyBuilder.getId();
+
+        //Derived key encryption
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_256);
+        encrBuilder.setTokenIdentifier(tokenIdentifier);
+        Document encryptedDoc = encrBuilder.build(ek);
+
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message: AES  + DerivedKeys");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains(WSConstants.AES_256));
         verify(doc);
      }
 
