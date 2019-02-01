@@ -90,7 +90,7 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
             List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, signedSecurityEvent.getElementPath(), true, false)) {
+            if (WSSUtils.pathMatches(pathElements, signedSecurityEvent.getElementPath())) {
                 if (signedSecurityEvent.isSigned()) {
                     setAsserted(true);
                     policyAsserter.assertPolicy(getAssertion());

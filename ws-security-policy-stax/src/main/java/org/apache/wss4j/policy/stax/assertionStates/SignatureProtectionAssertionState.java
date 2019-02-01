@@ -107,7 +107,7 @@ public class SignatureProtectionAssertionState extends AssertionState implements
             Iterator<List<QName>> pathElementsIterator = elementPaths.iterator();
             while (pathElementsIterator.hasNext()) {
                 List<QName> qNameList = pathElementsIterator.next();
-                if (WSSUtils.pathMatches(qNameList, encryptedElementSecurityEvent.getElementPath(), true, false)) {
+                if (WSSUtils.pathMatches(qNameList, encryptedElementSecurityEvent.getElementPath())) {
                     encryptedElementEvents.add(encryptedElementSecurityEvent);
                 }
             }

@@ -193,6 +193,7 @@ public class InboundWSSec {
         securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
         securityContextImpl.setDisableBSPEnforcement(this.securityProperties.isDisableBSPEnforcement());
         securityContextImpl.setAllowRSA15KeyTransportAlgorithm(this.securityProperties.isAllowRSA15KeyTransportAlgorithm());
+        securityContextImpl.setSoap12(this.securityProperties.isSoap12());
 
         if (!requestSecurityEvents.isEmpty()) {
             try {

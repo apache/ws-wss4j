@@ -116,6 +116,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     private CallbackHandler attachmentCallbackHandler;
     private Object msgContext;
+    private boolean soap12;
 
     public WSSSecurityProperties() {
         super();
@@ -175,6 +176,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.msgContext = wssSecurityProperties.msgContext;
         this.audienceRestrictions = wssSecurityProperties.audienceRestrictions;
         this.requireTimestampExpires = wssSecurityProperties.requireTimestampExpires;
+        this.soap12 = wssSecurityProperties.soap12;
     }
 
     /**
@@ -948,5 +950,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setRequireTimestampExpires(boolean requireTimestampExpires) {
         this.requireTimestampExpires = requireTimestampExpires;
+    }
+
+    public boolean isSoap12() {
+        return soap12;
+    }
+
+    public void setSoap12(boolean soap12) {
+        this.soap12 = soap12;
     }
 }

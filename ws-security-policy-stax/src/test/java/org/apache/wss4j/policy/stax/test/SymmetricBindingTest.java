@@ -68,7 +68,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         List<QName> headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
@@ -93,14 +93,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
@@ -250,7 +250,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, protectionOrder);
         List<QName> headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
@@ -306,14 +306,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         List<QName> headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         headerPath = new ArrayList<>();
-        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);

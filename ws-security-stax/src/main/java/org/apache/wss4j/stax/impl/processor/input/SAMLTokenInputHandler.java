@@ -553,18 +553,14 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             this.soap12 = soap12;
             if (soap12) {
-                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_12_HEADER_PATH);
-                saml1TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
                 saml1TokenPath.add(WSSConstants.TAG_SAML_ASSERTION);
-                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_12_HEADER_PATH);
-                saml2TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
                 saml2TokenPath.add(WSSConstants.TAG_SAML2_ASSERTION);
             } else {
-                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_11_HEADER_PATH);
-                saml1TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml1TokenPath = new ArrayList<>(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
                 saml1TokenPath.add(WSSConstants.TAG_SAML_ASSERTION);
-                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_11_HEADER_PATH);
-                saml2TokenPath.add(WSSConstants.TAG_WSSE_SECURITY);
+                saml2TokenPath = new ArrayList<>(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
                 saml2TokenPath.add(WSSConstants.TAG_SAML2_ASSERTION);
             }
         }

@@ -626,11 +626,10 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     public static boolean pathMatches(List<QName> path1, List<QName> path2) {
-        return pathMatches(path1, path2, false, false);
+        return pathMatches(path1, path2, false);
     }
 
-    public static boolean pathMatches(List<QName> path1, List<QName> path2,
-                                      boolean matchAnySoapNS, boolean lastElementWildCard) {
+    public static boolean pathMatches(List<QName> path1, List<QName> path2, boolean lastElementWildCard) {
         if (path1 == null) {
             throw new IllegalArgumentException("Internal error");
         }
@@ -642,12 +641,7 @@ public class WSSUtils extends XMLSecurityUtils {
         while (path1Iterator.hasNext()) {
             QName qName1 = path1Iterator.next();
             QName qName2 = path2Iterator.next();
-            if (matchAnySoapNS && (WSSConstants.NS_SOAP11.equals(qName1.getNamespaceURI())
-                    || WSSConstants.NS_SOAP12.equals(qName1.getNamespaceURI()))) {
-                if (!qName1.getLocalPart().equals(qName2.getLocalPart())) {
-                    return false;
-                }
-            } else if (!qName1.equals(qName2)) {
+            if (!qName1.equals(qName2)) {
                 if (!path1Iterator.hasNext() && lastElementWildCard) {
                     if (!qName1.getNamespaceURI().equals(qName2.getNamespaceURI())) {
                         return false;

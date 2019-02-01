@@ -83,7 +83,7 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
             List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, contentEncryptedElementSecurityEvent.getElementPath(), true, false)) {
+            if (WSSUtils.pathMatches(pathElements, contentEncryptedElementSecurityEvent.getElementPath())) {
                 if (contentEncryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
                     policyAsserter.assertPolicy(getAssertion());

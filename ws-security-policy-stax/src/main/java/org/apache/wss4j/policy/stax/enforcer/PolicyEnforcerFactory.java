@@ -431,11 +431,13 @@ public class PolicyEnforcerFactory {
      * @param roleOrActor The actor or role of the security processing. Must be set to the same value
      * as WSSSecurityProperties#setActor()
      * @param attachmentCount The number of Attachments received in the message
+     * @param Whether we are using SOAP 1.2 or not
      * @return the newly created PolicyEnforcer instance
      * @throws WSSPolicyException
      */
     public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator,
-                                            String roleOrActor, int attachmentCount) throws WSSPolicyException {
-        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor, attachmentCount);
+                                            String roleOrActor, int attachmentCount,
+                                            boolean soap12) throws WSSPolicyException {
+        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor, attachmentCount, null, soap12);
     }
 }

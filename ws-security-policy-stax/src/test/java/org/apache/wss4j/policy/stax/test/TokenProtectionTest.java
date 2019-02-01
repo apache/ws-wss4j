@@ -85,11 +85,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         List<SecurityToken> securityTokens = new LinkedList<>();
@@ -164,11 +164,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         List<SecurityToken> securityTokens = new LinkedList<>();
@@ -242,7 +242,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<>();
-        path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        path.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
@@ -288,7 +288,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<>();
-        path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        path.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
@@ -334,7 +334,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<>();
-        path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        path.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
@@ -382,7 +382,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<SecurityToken> securityTokens = new LinkedList<>();
@@ -458,11 +458,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         for (int i = 0; i < tokenUsages.size(); i++) {
@@ -520,15 +520,15 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> ekPath = new ArrayList<>();
-        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -587,15 +587,15 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> ekPath = new ArrayList<>();
-        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -660,15 +660,15 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         List<QName> bstPath = new ArrayList<>();
-        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
 
         List<QName> ekPath = new ArrayList<>();
-        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
         List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);

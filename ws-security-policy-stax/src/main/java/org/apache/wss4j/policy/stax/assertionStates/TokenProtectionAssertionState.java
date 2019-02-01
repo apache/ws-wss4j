@@ -52,10 +52,12 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private final List<SignedElementSecurityEvent> signedElementEvents = new ArrayList<>();
     private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
     private PolicyAsserter policyAsserter;
+    private final boolean soap12;
 
     public TokenProtectionAssertionState(Assertion assertion,
                                          PolicyAsserter policyAsserter,
-                                         boolean initialAssertionState) {
+                                         boolean initialAssertionState,
+                                         boolean soap12) {
         super(assertion, initialAssertionState);
 
         this.policyAsserter = policyAsserter;
@@ -67,6 +69,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
         }
+
+        this.soap12 = soap12;
     }
 
     @Override
@@ -201,12 +205,16 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private boolean signsMainSignature(SecurityToken securityToken) throws XMLSecurityException {
 
         List<QName> signaturePath = new LinkedList<>();
-        signaturePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        if (soap12) {
+            signaturePath.addAll(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
+        } else {
+            signaturePath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
+        }
         signaturePath.add(WSSConstants.TAG_dsig_Signature);
 
         for (int i = 0; i < signedElementEvents.size(); i++) {
             SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
-            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), signaturePath, true, false)) {
+            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), signaturePath)) {
                 SecurityToken signingSecurityToken = getEffectiveSignatureToken(signedElementSecurityEvent.getSecurityToken());
                 //todo ATM me just check if the token signs a signature but we don't know if it's the main signature
                 if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {

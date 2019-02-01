@@ -44,10 +44,12 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
 
     private final Map<Header, Boolean> headers = new HashMap<>();
     private PolicyAsserter policyAsserter;
+    private final boolean soap12;
 
     public RequiredPartsAssertionState(AbstractSecurityAssertion assertion,
                                        PolicyAsserter policyAsserter,
-                                       boolean asserted) {
+                                       boolean asserted,
+                                       boolean soap12) {
         super(assertion, asserted);
 
         RequiredParts requiredParts = (RequiredParts) assertion;
@@ -64,6 +66,8 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }
+
+        this.soap12 = soap12;
     }
 
     @Override
@@ -83,11 +87,15 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
             Header header = next.getKey();
             QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
 
-            List<QName> header11Path = new LinkedList<>();
-            header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-            header11Path.add(headerQName);
+            List<QName> headerPath = new LinkedList<>();
+            if (soap12) {
+                headerPath.addAll(WSSConstants.SOAP_12_HEADER_PATH);
+            } else {
+                headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+            }
+            headerPath.add(headerQName);
 
-            if (WSSUtils.pathMatches(header11Path, requiredPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
+            if (WSSUtils.pathMatches(headerPath, requiredPartSecurityEvent.getElementPath(), header.getName() == null)) {
                 next.setValue(Boolean.TRUE);
                 break;
             }

@@ -61,6 +61,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     private boolean messageEncryptionTokenOccured = false;
     private boolean allowRSA15KeyTransportAlgorithm = false;
     private boolean disableBSPEnforcement;
+    private boolean soap12;
 
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
 
@@ -262,14 +263,16 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             List<InboundSecurityToken> signingSecurityTokens =
                 isSignedToken(tokenSecurityEvent, securityEventDeque, httpsTokenSecurityEvent);
 
+            List<QName> securityHeader =
+                soap12 ? WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH : WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH;
             List<QName> signatureElementPath = new ArrayList<>(4);
-            signatureElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+            signatureElementPath.addAll(securityHeader);
             signatureElementPath.add(WSSConstants.TAG_dsig_Signature);
             boolean signsSignature = signsElement(tokenSecurityEvent, signatureElementPath, securityEventDeque);
             boolean encryptsSignature = encryptsElement(tokenSecurityEvent, signatureElementPath, securityEventDeque);
 
             List<QName> signatureConfirmationElementPath = new ArrayList<>(4);
-            signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+            signatureConfirmationElementPath.addAll(securityHeader);
             signatureConfirmationElementPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
             boolean signsSignatureConfirmation =
                 signsElement(tokenSecurityEvent, signatureConfirmationElementPath, securityEventDeque);
@@ -277,12 +280,12 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 encryptsElement(tokenSecurityEvent, signatureConfirmationElementPath, securityEventDeque);
 
             List<QName> timestampElementPath = new ArrayList<>(4);
-            timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+            timestampElementPath.addAll(securityHeader);
             timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
             boolean signsTimestamp = signsElement(tokenSecurityEvent, timestampElementPath, securityEventDeque);
 
             List<QName> usernameTokenElementPath = new ArrayList<>(4);
-            usernameTokenElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+            usernameTokenElementPath.addAll(securityHeader);
             usernameTokenElementPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
             boolean encryptsUsernameToken = encryptsElement(tokenSecurityEvent, usernameTokenElementPath, securityEventDeque);
 
@@ -462,7 +465,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (signedElementSecurityEvent.isSigned()
                         && WSSUtils.pathMatches(
                         signedElementSecurityEvent.getElementPath(),
-                        ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getElementPath(), true, false)
+                        ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getElementPath(), false)
                         ) {
                     signingSecurityTokens.add((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken());
                 }
@@ -504,7 +507,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                         && signedElementSecurityEvent.getXmlSecEvent() != null
                         && signedElementSecurityEvent.getXmlSecEvent()
                             == ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
-                        && !securityTokenList.contains((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken())) {
+                        && !securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken());
                 }
             }
@@ -530,7 +533,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                         && encryptedElementSecurityEvent.getXmlSecEvent() != null
                         && encryptedElementSecurityEvent.getXmlSecEvent()
                             == ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
-                        && !securityTokenList.contains((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken())) {
+                        && !securityTokenList.contains(encryptedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken());
                 }
             }
@@ -548,7 +551,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                         && matchesTokenOrWrappedTokenId(tokenSecurityEvent.getSecurityToken(),
                         signedElementSecurityEvent.getSecurityToken().getId(),
                         SecurityTokenConstants.TokenUsage_Signature)
-                        && WSSUtils.pathMatches(elementPath, signedElementSecurityEvent.getElementPath(), true, false)) {
+                        && WSSUtils.pathMatches(elementPath, signedElementSecurityEvent.getElementPath(), false)) {
                     return true;
                 }
             }
@@ -580,7 +583,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && encryptedElementSecurityEvent.getSecurityToken().getId().equals(tokenSecurityEvent.getSecurityToken().getId())
-                        && WSSUtils.pathMatches(elementPath, encryptedElementSecurityEvent.getElementPath(), true, false)) {
+                        && WSSUtils.pathMatches(elementPath, encryptedElementSecurityEvent.getElementPath(), false)) {
                     return true;
                 }
             } else if (WSSecurityEventConstants.ContentEncrypted.equals(securityEvent.getSecurityEventType())) {
@@ -591,7 +594,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                         && contentEncryptedElementSecurityEvent.getSecurityToken().getId().equals(tokenId)
                         && contentEncryptedElementSecurityEvent.getXmlSecEvent()
                             == ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
-                        && WSSUtils.pathMatches(elementPath, contentEncryptedElementSecurityEvent.getElementPath(), true, false)) {
+                        && WSSUtils.pathMatches(elementPath, contentEncryptedElementSecurityEvent.getElementPath(), false)) {
                     return true;
                 }
             }
@@ -633,6 +636,14 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
         this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
+    }
+
+    public boolean isSoap12() {
+        return soap12;
+    }
+
+    public void setSoap12(boolean soap12) {
+        this.soap12 = soap12;
     }
 
     private static class MessageTokens {

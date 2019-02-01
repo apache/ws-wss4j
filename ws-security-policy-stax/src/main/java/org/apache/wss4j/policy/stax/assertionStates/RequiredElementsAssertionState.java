@@ -91,7 +91,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
         while (elementMapIterator.hasNext()) {
             Map.Entry<List<QName>, Boolean> next = elementMapIterator.next();
             List<QName> qNameList = next.getKey();
-            if (WSSUtils.pathMatches(qNameList, requiredElementSecurityEvent.getElementPath(), true, false)) {
+            if (WSSUtils.pathMatches(qNameList, requiredElementSecurityEvent.getElementPath())) {
                 next.setValue(Boolean.TRUE);
                 break;
             }

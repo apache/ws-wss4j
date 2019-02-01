@@ -47,10 +47,11 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
     private int signedAttachmentCount;
     private boolean signedAttachmentRequired;
     private PolicyAsserter policyAsserter;
+    private final boolean soap12;
 
     public SignedPartsAssertionState(
         AbstractSecurityAssertion assertion, PolicyAsserter policyAsserter,
-        boolean asserted, int attachmentCount
+        boolean asserted, int attachmentCount, boolean soap12
     ) {
         super(assertion, asserted);
         this.attachmentCount = attachmentCount;
@@ -63,6 +64,8 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }
+
+        this.soap12 = soap12;
     }
 
     @Override
@@ -88,8 +91,9 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
             }
         }
 
+        List<QName> bodyPath = soap12 ? WSSConstants.SOAP_12_BODY_PATH : WSSConstants.SOAP_11_BODY_PATH;
         if (signedParts.isBody()
-                && WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false)) {
+                && WSSUtils.pathMatches(bodyPath, signedPartSecurityEvent.getElementPath())) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
                 policyAsserter.assertPolicy(getAssertion());
@@ -118,11 +122,15 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
                 Header header = signedParts.getHeaders().get(i);
                 QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
 
-                List<QName> header11Path = new LinkedList<>();
-                header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-                header11Path.add(headerQName);
+                List<QName> headerPath = new LinkedList<>();
+                if (soap12) {
+                    headerPath.addAll(WSSConstants.SOAP_12_HEADER_PATH);
+                } else {
+                    headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+                }
+                headerPath.add(headerQName);
 
-                if (WSSUtils.pathMatches(header11Path, signedPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
+                if (WSSUtils.pathMatches(headerPath, signedPartSecurityEvent.getElementPath(), header.getName() == null)) {
                     if (signedPartSecurityEvent.isSigned()) {
                         setAsserted(true);
                         policyAsserter.assertPolicy(getAssertion());

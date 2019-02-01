@@ -143,19 +143,16 @@ public class PolicyEnforcer implements SecurityEventListener {
     private boolean noSecurityHeader;
     private boolean faultOccurred;
     private final PolicyAsserter policyAsserter;
+    private boolean soap12;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
-                          String actorOrRole, int attachmentCount) throws WSSPolicyException {
-        this(operationPolicies, soapAction, initiator, actorOrRole, attachmentCount, null);
-    }
-
-    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
-                          String actorOrRole, int attachmentCount, PolicyAsserter policyAsserter
+                          String actorOrRole, int attachmentCount, PolicyAsserter policyAsserter, boolean soap12
     ) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
         this.initiator = initiator;
         this.actorOrRole = actorOrRole;
         this.attachmentCount = attachmentCount;
+        this.soap12 = soap12;
         assertionStateMap = new LinkedList<>();
         failedAssertionStateMap = new LinkedList<>();
 
@@ -319,7 +316,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } else if (abstractSecurityAssertion instanceof EncryptedParts) {
             // initialized with asserted=true with the same reason as by the EncryptedParts above
-            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount));
+            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount, soap12));
         } else if (abstractSecurityAssertion instanceof EncryptedElements) {
             // initialized with asserted=true with the same reason as by the EncryptedParts above
             assertableList.add(new EncryptedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
@@ -328,14 +325,14 @@ public class PolicyEnforcer implements SecurityEventListener {
             // therefore these element are also signed
             // the test if it is really signed is done via the PolicyInputProcessor which emits SignedElementEvents for
             // unsigned elements with the unsigned flag
-            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount));
+            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount, soap12));
         } else if (abstractSecurityAssertion instanceof SignedElements) {
             // initialized with asserted=true with the same reason as by the SignedParts above
             assertableList.add(new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } else if (abstractSecurityAssertion instanceof RequiredElements) {
             assertableList.add(new RequiredElementsAssertionState(abstractSecurityAssertion, policyAsserter, false));
         } else if (abstractSecurityAssertion instanceof RequiredParts) {
-            assertableList.add(new RequiredPartsAssertionState(abstractSecurityAssertion, policyAsserter, false));
+            assertableList.add(new RequiredPartsAssertionState(abstractSecurityAssertion, policyAsserter, false, soap12));
         } else if (abstractSecurityAssertion instanceof UsernameToken) {
             assertableList.add(new UsernameTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof IssuedToken) {
@@ -385,14 +382,18 @@ public class PolicyEnforcer implements SecurityEventListener {
                     assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, policyAsserter,
                                                                                       true, actorOrRole));
                 }
-                assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, policyAsserter, true));
+                assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, policyAsserter, true, soap12));
             }
 
             //WSP1.3, 6.2 Timestamp Property
             assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, policyAsserter, true));
             if (abstractBinding.isIncludeTimestamp()) {
                 List<QName> timestampElementPath = new LinkedList<>();
-                timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+                if (soap12) {
+                    timestampElementPath.addAll(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
+                } else {
+                    timestampElementPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
+                }
                 timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
                 RequiredElementsAssertionState requiredElementsAssertionState =
                     new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
@@ -435,7 +436,11 @@ public class PolicyEnforcer implements SecurityEventListener {
                     if (initiator) {
                         //9 WSS: SOAP Message Security Options [Signature Confirmation]
                         List<QName> signatureConfirmationElementPath = new LinkedList<>();
-                        signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+                        if (soap12) {
+                            signatureConfirmationElementPath.addAll(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
+                        } else {
+                            signatureConfirmationElementPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
+                        }
                         signatureConfirmationElementPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
                         RequiredElementsAssertionState requiredElementsAssertionState =
                             new RequiredElementsAssertionState(wss11, policyAsserter, false);
@@ -787,4 +792,5 @@ public class PolicyEnforcer implements SecurityEventListener {
     public void doFinal() throws WSSPolicyException {
         verifyPolicy();
     }
+
 }

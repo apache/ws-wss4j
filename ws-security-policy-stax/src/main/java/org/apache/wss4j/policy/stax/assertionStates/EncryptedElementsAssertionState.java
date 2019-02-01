@@ -85,7 +85,7 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
             List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, encryptedElementSecurityEvent.getElementPath(), true, false)) {
+            if (WSSUtils.pathMatches(pathElements, encryptedElementSecurityEvent.getElementPath())) {
                 if (encryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
                     policyAsserter.assertPolicy(getAssertion());

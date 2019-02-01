@@ -271,7 +271,8 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final List<QName> SOAP_12_BODY_PATH = new ArrayList<>(2);
     public static final List<QName> SOAP_11_HEADER_PATH = new ArrayList<>(2);
     public static final List<QName> SOAP_12_HEADER_PATH = new ArrayList<>(2);
-    public static final List<QName> WSSE_SECURITY_HEADER_PATH = new ArrayList<>(3);
+    public static final List<QName> SOAP_11_WSSE_SECURITY_HEADER_PATH = new ArrayList<>(3);
+    public static final List<QName> SOAP_12_WSSE_SECURITY_HEADER_PATH = new ArrayList<>(3);
 
     static {
         SOAP_11_BODY_PATH.add(WSSConstants.TAG_SOAP11_ENVELOPE);
@@ -286,8 +287,11 @@ public class WSSConstants extends XMLSecurityConstants {
         SOAP_12_HEADER_PATH.add(WSSConstants.TAG_SOAP12_ENVELOPE);
         SOAP_12_HEADER_PATH.add(WSSConstants.TAG_SOAP12_HEADER);
 
-        WSSE_SECURITY_HEADER_PATH.addAll(SOAP_11_HEADER_PATH);
-        WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);
+        SOAP_11_WSSE_SECURITY_HEADER_PATH.addAll(SOAP_11_HEADER_PATH);
+        SOAP_11_WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);
+
+        SOAP_12_WSSE_SECURITY_HEADER_PATH.addAll(SOAP_12_HEADER_PATH);
+        SOAP_12_WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);
 
     }
 }
