@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 
@@ -363,5 +364,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
 
     protected SecretKey getDerivedKey(String algorithm) {
         return KeyUtils.prepareSecretKey(algorithm, derivedKeyBytes);
+    }
+
+    @Override
+    public void clean() {
+        super.clean();
+        if (derivedKeyBytes != null) {
+            Arrays.fill(derivedKeyBytes, (byte)0);
+        }
     }
 }

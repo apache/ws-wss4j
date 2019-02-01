@@ -234,4 +234,9 @@ public class WSSecBase {
     public void setWsDocInfo(WSDocInfo wsDocInfo) {
         this.wsDocInfo = wsDocInfo;
     }
+
+    public void clean() {
+        user = null;
+        password = null;
+    }
 }

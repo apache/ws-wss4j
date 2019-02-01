@@ -160,6 +160,8 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             }
 
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
+
+            wsSign.clean();
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during Signature: "});
