@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.handler;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -495,10 +494,6 @@ public class RequestData {
     public void setIgnoredBSPRules(List<BSPRule> bspRules) {
         ignoredBSPRules.clear();
         ignoredBSPRules.addAll(bspRules);
-    }
-
-    public List<BSPRule> getIgnoredBSPRules() {
-        return Collections.unmodifiableList(ignoredBSPRules);
     }
 
     public BSPEnforcer getBSPEnforcer() {

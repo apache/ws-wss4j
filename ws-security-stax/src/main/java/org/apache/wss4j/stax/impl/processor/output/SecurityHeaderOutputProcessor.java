@@ -66,14 +66,9 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     //set correct namespace on secure parts
                     List<SecurePart> encryptionParts = securityProperties.getEncryptionSecureParts();
                     if (!encryptionParts.isEmpty()) {
-                        for (int i = 0; i < encryptionParts.size(); i++) {
-                            SecurePart securePart = encryptionParts.get(i);
+                        for (SecurePart securePart : encryptionParts) {
                             // Check to see if the wrong SOAP NS was used
-                            SecurePart convertedPart = convertSecurePart(securePart, soapMessageVersion);
-                            if (securePart != convertedPart) {
-                                securePart = convertedPart;
-                                encryptionParts.set(i, securePart);
-                            }
+                            changeSOAPNamespace(securePart, soapMessageVersion);
 
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
@@ -92,14 +87,9 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     }
                     List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
                     if (!signatureParts.isEmpty()) {
-                        for (int i = 0; i < signatureParts.size(); i++) {
-                            SecurePart securePart = signatureParts.get(i);
+                        for (SecurePart securePart : signatureParts) {
                             // Check to see if the wrong SOAP NS was used
-                            SecurePart convertedPart = convertSecurePart(securePart, soapMessageVersion);
-                            if (securePart != convertedPart) {
-                                securePart = convertedPart;
-                                signatureParts.set(i, securePart);
-                            }
+                            changeSOAPNamespace(securePart, soapMessageVersion);
 
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
@@ -168,33 +158,23 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         }
     }
 
-    private SecurePart convertSecurePart(SecurePart securePart, String soapVersion) {
+    private void changeSOAPNamespace(SecurePart securePart, String soapVersion) {
         final QName secureName = securePart.getName();
-        if (secureName == null) {
-            return securePart;
+        if (secureName != null) {
+            QName newName = secureName;
+
+            if (WSSConstants.NS_SOAP11.equals(secureName.getNamespaceURI())
+                && WSSConstants.NS_SOAP12.equals(soapVersion)) {
+                newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
+            } else if (WSSConstants.NS_SOAP12.equals(secureName.getNamespaceURI())
+                && WSSConstants.NS_SOAP11.equals(soapVersion)) {
+                newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
+            }
+
+            if (!secureName.equals(newName)) {
+                securePart.setName(newName);
+            }
         }
-
-        QName newName = secureName;
-
-        if (WSSConstants.NS_SOAP11.equals(secureName.getNamespaceURI())
-            && WSSConstants.NS_SOAP12.equals(soapVersion)) {
-            newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
-        } else if (WSSConstants.NS_SOAP12.equals(secureName.getNamespaceURI())
-            && WSSConstants.NS_SOAP11.equals(soapVersion)) {
-            newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
-        }
-
-        if (!secureName.equals(newName)) {
-            SecurePart newPart =
-                new SecurePart(newName, securePart.isGenerateXPointer(), securePart.getModifier(),
-                               securePart.getTransforms(), securePart.getDigestMethod());
-            newPart.setExternalReference(securePart.getExternalReference());
-            newPart.setIdToReference(securePart.getIdToReference());
-            newPart.setIdToSign(securePart.getIdToSign());
-            return newPart;
-        }
-
-        return securePart;
     }
 
     private void buildSecurityHeader(

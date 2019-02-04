@@ -21,7 +21,7 @@ package org.apache.wss4j.policy.stax;
 import org.apache.wss4j.policy.model.XPath;
 
 import javax.xml.namespace.QName;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class PolicyUtils {
@@ -31,7 +31,7 @@ public final class PolicyUtils {
     }
 
     public static List<QName> getElementPath(XPath xPath) {
-        List<QName> elements = new LinkedList<>();
+        List<QName> elements = new ArrayList<>();
         String[] xPathElements = xPath.getXPath().split("/");
         for (int j = 0; j < xPathElements.length; j++) {
             String xPathElement = xPathElements[j];
