@@ -6,7 +6,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
@@ -69,7 +69,7 @@ public class CustomTokenAction implements Action {
             securityHeader.appendChild(customToken);
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "customTokenAppendFailure");
+                    "empty", new Object[] {"Error appending custom token"});
         }
     }
 }
