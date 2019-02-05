@@ -6,7 +6,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
@@ -19,20 +19,20 @@
 
 package org.apache.wss4j.dom.action;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-
-import org.w3c.dom.Element;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
+import org.w3c.dom.Element;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 
 public class CustomTokenAction implements Action {
 
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
-        throws WSSecurityException {
+            throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
@@ -40,28 +40,36 @@ public class CustomTokenAction implements Action {
 
         if (callbackHandler == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noCallback"
+                    WSSecurityException.ErrorCode.FAILURE, "noCallback"
             );
         }
 
         WSPasswordCallback wsPasswordCallback =
-            new WSPasswordCallback(reqData.getUsername(), WSPasswordCallback.CUSTOM_TOKEN);
+                new WSPasswordCallback(reqData.getUsername(), WSPasswordCallback.CUSTOM_TOKEN);
 
         try {
             callbackHandler.handle(new Callback[]{wsPasswordCallback});
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "empty", new Object[] {"WSHandler: password callback failed"});
+                    "empty", new Object[]{"WSHandler: password callback failed"});
         }
 
         Element customToken = wsPasswordCallback.getCustomToken();
         if (customToken == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[] {"CustomToken"}
+                    WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[]{"CustomToken"}
             );
         }
 
-        Element securityHeader = reqData.getSecHeader().getSecurityHeaderElement();
-        securityHeader.appendChild(securityHeader.getOwnerDocument().adoptNode(customToken));
+        try {
+            Element securityHeader = reqData.getSecHeader().getSecurityHeaderElement();
+            //Prepare custom token for appending step
+            customToken = (Element) securityHeader.getOwnerDocument().importNode(customToken, true);
+            //Append custom token to security header
+            securityHeader.appendChild(customToken);
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "customTokenAppendFailure");
+        }
     }
 }
