@@ -395,15 +395,10 @@ public final class EncryptionUtils {
         try {
             document = org.apache.xml.security.utils.XMLUtils.read(new ByteArrayInputStream(bytes), false);
         } catch (SAXException ex) {
-            // See if a prefix was not bound. Try to fix the DOM Element in this case.
-            if (ex.getMessage() != null && ex.getMessage().startsWith("The prefix")
-                && ex.getMessage().endsWith("is not bound.")) {
-                String fixedElementStr = setParentPrefixes(encData, new String(bytes));
-                document = org.apache.xml.security.utils.XMLUtils.read(
-                    new ByteArrayInputStream(fixedElementStr.getBytes()), false);
-            } else {
-                throw ex;
-            }
+            // A prefix may not have been bound, try to fix the DOM Element in this case.
+            String fixedElementStr = setParentPrefixes(encData, new String(bytes));
+            document = org.apache.xml.security.utils.XMLUtils.read(
+                new ByteArrayInputStream(fixedElementStr.getBytes()), false);
         }
 
         Node decryptedNode =
