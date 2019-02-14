@@ -398,14 +398,9 @@ public final class EncryptionUtils {
         try {
             document = db.parse(new ByteArrayInputStream(bytes));
         } catch (SAXException ex) {
-            // See if a prefix was not bound. Try to fix the DOM Element in this case.
-            if (ex.getMessage() != null && ex.getMessage().startsWith("The prefix")
-                && ex.getMessage().endsWith("is not bound.")) {
-                String fixedElementStr = setParentPrefixes(encData, new String(bytes));
-                document = db.parse(new ByteArrayInputStream(fixedElementStr.getBytes()));
-            } else {
-                throw ex;
-            }
+            // A prefix may not have been bound, try to fix the DOM Element in this case.
+            String fixedElementStr = setParentPrefixes(encData, new String(bytes));
+            document = db.parse(new ByteArrayInputStream(fixedElementStr.getBytes()));
         }
 
         Node decryptedNode =
