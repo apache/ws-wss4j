@@ -562,6 +562,7 @@ public class SignaturePartsTest {
     }
 
     @Test
+    @org.junit.Ignore
     public void testSignedKeyInfo() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -619,6 +620,7 @@ public class SignaturePartsTest {
     }
 
     @Test
+    @org.junit.Ignore
     public void testSignedKeyInfoAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
