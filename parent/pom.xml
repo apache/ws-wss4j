@@ -41,7 +41,7 @@
         <kerby.version>2.0.0</kerby.version>
         <neethi.version>3.1.1</neethi.version>
         <opensaml.version>3.3.0</opensaml.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.26</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
         <xz.version>1.8</xz.version>
