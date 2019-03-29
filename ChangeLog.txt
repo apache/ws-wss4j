@@ -5,6 +5,45 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.3
+==============
+
+Bug
+
+    [WSS-634] - Nodes are not imported correctly when creating headers
+    [WSS-644] - Error when a SOAP-Fault is thrown with MTOM enabled
+
+Improvement
+
+    [WSS-640] - Streaming Sender-Vouches validation does not work with SOAP 1.2
+    [WSS-641] - Add the ability to configure a different separator for certificate constraints
+    [WSS-642] - Use LinkedHashSet instead of TreeSet within getInclusivePrefixes
+
+
+Release 2.2.2
+==============
+
+Bug
+
+    [WSS-624] - Support for SAAJ-RI 1.4.0
+    [WSS-625] - Use RFC4648 base64 encoder for signature values and BST
+    [WSS-626] - Duplicates in the PrefixList
+
+New Feature
+
+    [WSS-623] - NameIdBean SPNameQualifier support
+
+Improvement
+
+    [WSS-627] - Java 10 SAAJ support
+    [WSS-628] - Support processing xop:Include for the streaming WS-Security stack
+    [WSS-629] - Support additional elements in SubjectConfirmationData
+
+Wish
+
+    [WSS-622] - from SAMLCallback no possible setting SAML2 SubjectConfirmation.NameID
+
+
 Release 2.2.1
 ==============
 
