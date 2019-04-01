@@ -19,12 +19,12 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.security.MessageDigest;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -188,14 +188,14 @@ public final class DOMSAMLUtil  {
         WSSecurityEngineResult signedResult
     ) {
         if (secretKey != null && subjectSecretKey != null) {
-            if (Arrays.equals(secretKey, subjectSecretKey)) {
+            if (MessageDigest.isEqual(secretKey, subjectSecretKey)) {
                 return true;
             } else {
                 Principal principal =
                     (Principal)signedResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
                 if (principal instanceof WSDerivedKeyTokenPrincipal) {
                     secretKey = ((WSDerivedKeyTokenPrincipal)principal).getSecret();
-                    if (Arrays.equals(secretKey, subjectSecretKey)) {
+                    if (MessageDigest.isEqual(secretKey, subjectSecretKey)) {
                         return true;
                     }
                 }
