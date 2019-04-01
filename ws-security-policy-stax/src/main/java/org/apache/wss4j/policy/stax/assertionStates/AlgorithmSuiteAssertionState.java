@@ -70,118 +70,112 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = (AlgorithmSuiteSecurityEvent) securityEvent;
         AlgorithmSuite algorithmSuite = (AlgorithmSuite) getAssertion();
+        if (algorithmSuite.getAlgorithmSuiteType() == null) {
+            setAsserted(false);
+            setErrorMessage("There is an error with the AlgorithmSuite policy");
+            policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
+            return isAsserted();
+        }
 
         XMLSecurityConstants.AlgorithmUsage keyUsage = algorithmSuiteSecurityEvent.getAlgorithmUsage();
         int keyLength = algorithmSuiteSecurityEvent.getKeyLength();
         String algorithmURI = algorithmSuiteSecurityEvent.getAlgorithmURI();
         if (WSSConstants.Sym_Sig.equals(keyUsage)) {
-            if (algorithmSuite.getSymmetricSignature() != null
-                && !algorithmSuite.getSymmetricSignature().equals(algorithmURI)) {
+            if (algorithmSuite.getAlgorithmSuiteType().getSymmetricSignature() != null
+                && !algorithmSuite.getAlgorithmSuiteType().getSymmetricSignature().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Symmetric signature algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-            if (algorithmSuite.getAlgorithmSuiteType() != null) {
-                if (!algorithmSuiteSecurityEvent.isDerivedKey()
-                    && (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
+
+            if (!algorithmSuiteSecurityEvent.isDerivedKey()
+                && (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
                     || algorithmSuite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength() < keyLength)) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric signature algorithm key length " + keyLength  + " does not meet policy");
-                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
-                } else if (algorithmSuiteSecurityEvent.isDerivedKey()
-                        && algorithmSuite.getAlgorithmSuiteType().getSignatureDerivedKeyLength() != keyLength) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric signature algorithm derived key length " + keyLength + " does not meet policy");
-                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
-                }
+                setAsserted(false);
+                setErrorMessage("Symmetric signature algorithm key length " + keyLength  + " does not meet policy");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
+            } else if (algorithmSuiteSecurityEvent.isDerivedKey()
+                && algorithmSuite.getAlgorithmSuiteType().getSignatureDerivedKeyLength() != keyLength) {
+                setAsserted(false);
+                setErrorMessage("Symmetric signature algorithm derived key length " + keyLength + " does not meet policy");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.Asym_Sig.equals(keyUsage)) {
-            if (algorithmSuite.getAsymmetricSignature() != null
-                    && !algorithmSuite.getAsymmetricSignature().equals(algorithmURI)) {
+            if (algorithmSuite.getAlgorithmSuiteType().getAsymmetricSignature() != null
+                && !algorithmSuite.getAlgorithmSuiteType().getAsymmetricSignature().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Asymmetric algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && (algorithmSuite.getAlgorithmSuiteType().getMinimumAsymmetricKeyLength() > keyLength
-                    || algorithmSuite.getAlgorithmSuiteType().getMaximumAsymmetricKeyLength() < keyLength)) {
+            if (algorithmSuite.getAlgorithmSuiteType().getMinimumAsymmetricKeyLength() > keyLength
+                || algorithmSuite.getAlgorithmSuiteType().getMaximumAsymmetricKeyLength() < keyLength) {
                 setAsserted(false);
                 setErrorMessage("Asymmetric signature algorithm key length " + keyLength + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.SigDig.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getDigest().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getDigest().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Digest algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.Enc.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getEncryption().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getEncryption().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Encryption algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-            if (algorithmSuite.getAlgorithmSuiteType() != null) {
-                if (!algorithmSuiteSecurityEvent.isDerivedKey()
-                    && (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
+
+            if (!algorithmSuiteSecurityEvent.isDerivedKey()
+                && (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
                     || algorithmSuite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength() < keyLength)) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric encryption algorithm key length " + keyLength  + " does not meet policy");
-                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
-                } else if (algorithmSuiteSecurityEvent.isDerivedKey()
-                        && algorithmSuite.getAlgorithmSuiteType().getEncryptionDerivedKeyLength() != keyLength) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric encryption algorithm derived key length " + keyLength  + " does not meet policy");
-                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
-                }
+                setAsserted(false);
+                setErrorMessage("Symmetric encryption algorithm key length " + keyLength  + " does not meet policy");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
+            } else if (algorithmSuiteSecurityEvent.isDerivedKey()
+                && algorithmSuite.getAlgorithmSuiteType().getEncryptionDerivedKeyLength() != keyLength) {
+                setAsserted(false);
+                setErrorMessage("Symmetric encryption algorithm derived key length " + keyLength  + " does not meet policy");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.Sym_Key_Wrap.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getSymmetricKeyWrap().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getSymmetricKeyWrap().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Symmetric key wrap algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
-                    || algorithmSuite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength() < keyLength)) {
+            if (algorithmSuite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength() > keyLength
+                || algorithmSuite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength() < keyLength) {
                 setAsserted(false);
                 setErrorMessage("Symmetric key wrap algorithm key length " + keyLength  + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.Asym_Key_Wrap.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Asymmetric key wrap algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && (algorithmSuite.getAlgorithmSuiteType().getMinimumAsymmetricKeyLength() > keyLength
-                    || algorithmSuite.getAlgorithmSuiteType().getMaximumAsymmetricKeyLength() < keyLength)) {
+            if (algorithmSuite.getAlgorithmSuiteType().getMinimumAsymmetricKeyLength() > keyLength
+                || algorithmSuite.getAlgorithmSuiteType().getMaximumAsymmetricKeyLength() < keyLength) {
                 setAsserted(false);
                 setErrorMessage("Asymmetric key wrap algorithm key length " + keyLength + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.COMP_KEY.equals(keyUsage)) {
-            if (algorithmSuite.getComputedKey() != null
-                    && !algorithmSuite.getComputedKey().equals(algorithmURI)) {
+            if (!algorithmSuite.getComputedKey().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Computed key algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.ENC_KD.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getEncryptionKeyDerivation().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getEncryptionKeyDerivation().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Encryption key derivation algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.SIG_KD.equals(keyUsage)) {
-            if (algorithmSuite.getAlgorithmSuiteType() != null
-                    && !algorithmSuite.getAlgorithmSuiteType().getSignatureKeyDerivation().equals(algorithmURI)) {
+            if (!algorithmSuite.getAlgorithmSuiteType().getSignatureKeyDerivation().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Signature key derivation algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
