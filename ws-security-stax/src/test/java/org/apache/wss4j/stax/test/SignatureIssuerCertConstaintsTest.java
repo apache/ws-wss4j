@@ -74,7 +74,7 @@ public class SignatureIssuerCertConstaintsTest extends AbstractTestBase {
         //done signature; now test sig-verification: This should pass with a correct cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40CA.jks"), "security".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("keys/wss40CA.jks"), "security".toCharArray());
             String certConstraint = ".*CN=Werner.*OU=Apache.*";
             Pattern issuerDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setIssuerDNConstraints(Collections.singletonList(issuerDNPattern));
@@ -93,7 +93,7 @@ public class SignatureIssuerCertConstaintsTest extends AbstractTestBase {
         //done signature; now test sig-verification: This should fail with an incorrect cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40CA.jks"), "security".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("keys/wss40CA.jks"), "security".toCharArray());
             String certConstraint = ".*CN=Werner2.*OU=Apache.*";
             Pattern issuerDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setIssuerDNConstraints(Collections.singletonList(issuerDNPattern));
@@ -132,7 +132,7 @@ public class SignatureIssuerCertConstaintsTest extends AbstractTestBase {
         //done signature; now test sig-verification: This should pass with a correct cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40CA.jks"), "security".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("keys/wss40CA.jks"), "security".toCharArray());
             String certConstraint = ".*CN=Werner.*OU=Apache.*";
             Pattern issuerDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setIssuerDNConstraints(Collections.singletonList(issuerDNPattern));
@@ -151,7 +151,7 @@ public class SignatureIssuerCertConstaintsTest extends AbstractTestBase {
         //done signature; now test sig-verification: This should fail with an incorrect cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40CA.jks"), "security".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("keys/wss40CA.jks"), "security".toCharArray());
             String certConstraint = ".*CN=Werner2.*OU=Apache.*";
             Pattern issuerDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setIssuerDNConstraints(Collections.singletonList(issuerDNPattern));
@@ -181,7 +181,7 @@ public class SignatureIssuerCertConstaintsTest extends AbstractTestBase {
 
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
-        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "wss40.jks");
+        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "security");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40");
         wss4JHandler.setPassword(messageContext, "security");

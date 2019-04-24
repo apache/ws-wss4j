@@ -57,7 +57,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setActions(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("keys/wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
 
@@ -109,7 +109,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setEnableRevocation(true);
             securityProperties.setActions(actions);
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("keys/wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.loadCRLCertStore(this.getClass().getClassLoader().getResource("wss40CACRL.pem"));
