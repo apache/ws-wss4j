@@ -46,6 +46,27 @@ public class SKITest {
         Crypto crypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SKITest.class);
+        InputStream input = Merlin.loadInputStream(loader, "keys/rsa1024.jks");
+        keyStore.load(input, "security".toCharArray());
+        input.close();
+        ((Merlin)crypto).setKeyStore(keyStore);
+
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertTrue(certs != null && certs.length > 0);
+
+        byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
+        String knownBase64Encoding = "H7dt0lv9M8uYOy4SedV0kPOs22A=";
+        assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
+    }
+
+    @Test
+    public void testRSA2048() throws Exception {
+        // Load the keystore
+        Crypto crypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(SKITest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
         input.close();
@@ -57,28 +78,7 @@ public class SKITest {
         assertTrue(certs != null && certs.length > 0);
 
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
-        String knownBase64Encoding = "VPWiTCLlm0OwNWTwrnRTUF3qcIk=";
-        assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
-    }
-
-    @Test
-    public void testRSA2048() throws Exception {
-        // Load the keystore
-        Crypto crypto = new Merlin();
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        ClassLoader loader = Loader.getClassLoader(SKITest.class);
-        InputStream input = Merlin.loadInputStream(loader, "keys/rsa2048.jks");
-        keyStore.load(input, "password".toCharArray());
-        input.close();
-        ((Merlin)crypto).setKeyStore(keyStore);
-
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("test");
-        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        assertTrue(certs != null && certs.length > 0);
-
-        byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
-        String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
+        String knownBase64Encoding = "5LsTsLDSb7XxlaCffjNBHM5n+1A=";
         assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
     }
 

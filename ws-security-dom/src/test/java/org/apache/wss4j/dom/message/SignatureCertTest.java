@@ -55,7 +55,7 @@ import static org.junit.Assert.fail;
  *
  * Generate the CA keys/certs + export the CA cert to a keystore
  *
- * openssl req -x509 -newkey rsa:1024 -keyout wss40CAKey.pem -out wss40CA.pem
+ * openssl req -x509 -newkey rsa:2048 -keyout wss40CAKey.pem -out wss40CA.pem
  * -config ca.config -days 3650
  * openssl x509 -outform DER -in wss40CA.pem -out wss40CA.crt
  * keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40CA.jks
@@ -121,49 +121,6 @@ public class SignatureCertTest {
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(cert);
-    }
-
-    //disabling this test as the certs are expired
-    @Test
-    @org.junit.Ignore
-    public void testBSTCertChain() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        //
-        // This test fails with the IBM JDK
-        //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            return;
-        }
-        Crypto clientCrypto = CryptoFactory.getInstance("wss40_client.properties");
-        WSSecSignature sign = new WSSecSignature(secHeader);
-        sign.setUserInfo("Client_CertChain", "password");
-        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        sign.setUseSingleCertificate(false);
-
-        Document signedDoc = sign.build(clientCrypto);
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(signedDoc);
-            LOG.debug("BST CA Cert");
-            LOG.debug(outputString);
-        }
-        //
-        // Verify the signature
-        //
-        Crypto serverCrypto = CryptoFactory.getInstance("wss40_server.properties");
-        WSHandlerResult results = verify(signedDoc, serverCrypto);
-        WSSecurityEngineResult result =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
-        X509Certificate cert =
-            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertNotNull(cert);
-        X509Certificate[] certs =
-            (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-        assertTrue(certs != null && certs.length == 2);
     }
 
     /**
