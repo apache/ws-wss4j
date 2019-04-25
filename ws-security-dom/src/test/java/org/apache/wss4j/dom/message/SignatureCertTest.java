@@ -51,7 +51,7 @@ import java.util.Properties;
  *
  * Generate the CA keys/certs + export the CA cert to a keystore
  *
- * openssl req -x509 -newkey rsa:1024 -keyout wss40CAKey.pem -out wss40CA.pem
+ * openssl req -x509 -newkey rsa:2048 -keyout wss40CAKey.pem -out wss40CA.pem
  * -config ca.config -days 3650
  * openssl x509 -outform DER -in wss40CA.pem -out wss40CA.crt
  * keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40CA.jks

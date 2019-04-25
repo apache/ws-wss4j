@@ -78,8 +78,8 @@ public class AssertionSigningTest extends Assert {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(AssertionSigningTest.class);
         InputStream input = Merlin.loadInputStream(loader,
-                "keys/client_keystore.jks");
-        keyStore.load(input, "password".toCharArray());
+                "keys/wss40.jks");
+        keyStore.load(input, "security".toCharArray());
         input.close();
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
 
@@ -104,7 +104,7 @@ public class AssertionSigningTest extends Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
+        samlAssertion.signAssertion("wss40", "security", issuerCrypto,
                 false);
         Signature signature = samlAssertion.getSaml2().getSignature();
         Assert.assertTrue(signature.getSignatureAlgorithm().equalsIgnoreCase(
@@ -117,7 +117,7 @@ public class AssertionSigningTest extends Assert {
         // Verify Signature
         SAMLKeyInfo keyInfo = new SAMLKeyInfo();
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("client_certchain");
+        cryptoType.setAlias("wss40");
         keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
 
         Document doc = dbf.newDocumentBuilder().newDocument();
@@ -145,7 +145,7 @@ public class AssertionSigningTest extends Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
+        samlAssertion.signAssertion("wss40", "security", issuerCrypto,
                 false, customCanonicalizationAlgorithm,
                 customSignatureAlgorithm, customSignatureDigestAlgorithm);
         Signature signature = samlAssertion.getSaml2().getSignature();
@@ -164,7 +164,7 @@ public class AssertionSigningTest extends Assert {
         // Verify Signature
         SAMLKeyInfo keyInfo = new SAMLKeyInfo();
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("client_certchain");
+        cryptoType.setAlias("wss40");
         keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
 
         samlAssertion = new SamlAssertionWrapper(assertionElement);
