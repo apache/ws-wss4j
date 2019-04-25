@@ -97,3 +97,23 @@ mv wss40expca.jks wss40badca.jks
 
 =====
 
+wss40rev:
+
+keytool -genkey -validity 3650 -alias wss40rev -keyalg RSA -keystore wss40rev.jks -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
+keytool -certreq -alias wss40rev -keystore wss40rev.jks -file wss40rev.cer
+openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40rev.pem -infiles wss40rev.cer
+openssl x509 -outform DER -in wss40rev.pem -out wss40rev.crt
+
+Import the CA cert into wss40.jks and import the new signed certificate
+
+keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40rev.jks
+keytool -import -file wss40rev.crt -alias wss40rev -keystore wss40rev.jks
+
+Generate a Revocation list
+
+openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem -config ca.config -crldays 3650
+openssl ca -revoke wss40rev.pem -keyfile wss40CAKey.pem -cert wss40CA.pem -config ca.config
+openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem -config ca.config -crldays 3650
+
+=====
+
