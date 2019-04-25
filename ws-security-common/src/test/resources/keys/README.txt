@@ -58,3 +58,22 @@ keytool -import -file wss40CA.crt -alias wss40CA -keystore rsa1024.jks
 keytool -import -file rsa1024.crt -alias wss40 -keystore rsa1024.jks
 
 =====
+
+WSS40CADupl:
+
+cp wss40CA.jks wss40CADupl.jks
+keytool -genkey -validity 3650 -alias wss40dupl -keyalg RSA -keystore wss40CADupl.jks -dname "CN=Werner, OU=Apache WSS4J, O=Home, L=Munich, ST=Bayern, C=DE"
+
+=====
+
+wss40exp:
+
+keytool -genkey -validity 1 -alias wss40exp -keyalg RSA -keystore wss40exp.jks -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
+keytool -certreq -alias wss40exp -keystore wss40exp.jks -file wss40exp.cer
+openssl ca -config ca.config -policy policy_anything -days 1 -out wss40exp.pem -infiles wss40exp.cer
+openssl x509 -outform DER -in wss40exp.pem -out wss40exp.crt
+keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40exp.jks
+keytool -import -file wss40exp.crt -alias wss40exp -keystore wss40exp.jks
+
+=====
+
