@@ -77,3 +77,23 @@ keytool -import -file wss40exp.crt -alias wss40exp -keystore wss40exp.jks
 
 =====
 
+wss40expca:
+
+Create a CA that will shortly expire:
+
+openssl req -x509 -newkey rsa:2048 -keyout wss40CAKey.pem -out wss40CA.pem -config ca.config -days 1
+openssl x509 -outform DER -in wss40CA.pem -out wss40CA.crt
+keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40CA.jks
+
+keytool -genkey -validity 3650 -alias wss40expca -keyalg RSA -keystore wss40expca.jks -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
+keytool -certreq -alias wss40expca -keystore wss40expca.jks -file wss40expca.cer
+openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40expca.pem -infiles wss40expca.cer
+openssl x509 -outform DER -in wss40expca.pem -out wss40expca.crt
+keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40expca.jks
+keytool -import -file wss40expca.crt -alias wss40expca -keystore wss40expca.jks
+
+mv wss40CA.jks wss40badcatrust.jks
+mv wss40expca.jks wss40badca.jks
+
+=====
+

@@ -239,7 +239,7 @@ public class SignatureCertTest extends org.junit.Assert {
     @Test
     public void testSignatureBadCACert() throws Exception {
         WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("wss4jcertdsa", "security");
+        sign.setUserInfo("wss40expca", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
