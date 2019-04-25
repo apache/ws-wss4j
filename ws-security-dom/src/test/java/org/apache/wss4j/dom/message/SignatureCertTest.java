@@ -243,7 +243,7 @@ public class SignatureCertTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         WSSecSignature sign = new WSSecSignature(secHeader);
-        sign.setUserInfo("wss4jcertdsa", "security");
+        sign.setUserInfo("wss40expca", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
