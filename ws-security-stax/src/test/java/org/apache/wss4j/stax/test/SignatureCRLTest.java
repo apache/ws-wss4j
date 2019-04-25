@@ -98,7 +98,7 @@ public class SignatureCRLTest extends AbstractTestBase {
         //done signature; now test sig-verification: This should pass as revocation is not enabled
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("keys/wss40rev.jks"), "security".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -115,7 +115,7 @@ public class SignatureCRLTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setEnableRevocation(true);
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
-            securityProperties.loadCRLCertStore(this.getClass().getClassLoader().getResource("wss40CACRL.pem"));
+            securityProperties.loadCRLCertStore(this.getClass().getClassLoader().getResource("keys/wss40CACRL.pem"));
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -141,10 +141,10 @@ public class SignatureCRLTest extends AbstractTestBase {
 
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
-        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "wss40rev.jks");
+        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40rev.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "security");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40rev");
-        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.x509crl.file", "wss40CACRL.pem");
+        sigProperties.setProperty("org.apache.wss4j.crypto.merlin.x509crl.file", "keys/wss40CACRL.pem");
         wss4JHandler.setPassword(messageContext, "security");
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
