@@ -42,13 +42,13 @@ public class SKITest extends org.junit.Assert {
         Crypto crypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SKITest.class);
-        InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
+        InputStream input = Merlin.loadInputStream(loader, "keys/rsa1024.jks");
         keyStore.load(input, "security".toCharArray());
         input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
 
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("wss40_server");
+        cryptoType.setAlias("wss40");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
 
@@ -63,13 +63,13 @@ public class SKITest extends org.junit.Assert {
         Crypto crypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SKITest.class);
-        InputStream input = Merlin.loadInputStream(loader, "keys/rsa2048.jks");
-        keyStore.load(input, "password".toCharArray());
+        InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
+        keyStore.load(input, "security".toCharArray());
         input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
 
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("test");
+        cryptoType.setAlias("wss40_server");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
 
