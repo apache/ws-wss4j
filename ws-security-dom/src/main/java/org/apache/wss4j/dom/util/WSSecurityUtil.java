@@ -44,7 +44,13 @@ import org.w3c.dom.Text;
 //import com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +68,30 @@ public final class WSSecurityUtil {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
+
+    private static final ClassValue<Method> GET_DOM_ELEMENTS_METHODS = new ClassValue<Method>() {
+        @Override
+        protected Method computeValue(Class<?> type) {
+            try {
+                return getMethod(type, "getDomElement");
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+                return null;
+            }
+        }
+    };
+
+    private static final ClassValue<Method> GET_ENVELOPE_METHODS = new ClassValue<Method>() {
+        @Override
+        protected Method computeValue(Class<?> type) {
+            try {
+                return getMethod(type, "getEnvelope");
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+                return null;
+            }
+        }
+    };
 
     static {
         try {
@@ -97,6 +127,31 @@ public final class WSSecurityUtil {
         // Complete
     }
 
+    private static Method getMethod(final Class<?> clazz, final String name,
+                                   final Class<?>... parameterTypes) throws NoSuchMethodException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                public Method run() throws Exception {
+                    return clazz.getMethod(name, parameterTypes);
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException)e;
+            }
+            throw new SecurityException(e);
+        }
+    }
+
+    private static <T extends AccessibleObject> T setAccessible(final T o) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            public T run() {
+                o.setAccessible(true);
+                return o;
+            }
+        });
+    }
 
     public static Element getSOAPHeader(Document doc) {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
@@ -364,12 +419,13 @@ public final class WSSecurityUtil {
                 if (isSAAJ14) {
                     try {
                         Node node = null;
-                        try {
-                            Method method = doc.getClass().getMethod("getEnvelope");
-                            node = (Node)method.invoke(doc);
-                        } catch (java.lang.NoSuchMethodException nsme) {
-                            //node the SAAJ node, use
-                            node = null;
+                        Method method = GET_ENVELOPE_METHODS.get(doc.getClass());
+                        if (method != null) {
+                            try {
+                                node = (Node)setAccessible(method).invoke(doc);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                            }
                         }
                         if (node != null) {
                             header = createElementInSameNamespace(node, WSConstants.ELEM_HEADER);
@@ -621,7 +677,7 @@ public final class WSSecurityUtil {
     public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
         clonedElement = (Element)clonedElement.cloneNode(true);
         if (isSAAJ14) {
-            // here we need regiter the javax.xml.soap.Node with new instance
+            // here we need register the javax.xml.soap.Node with new instance
             clonedElement = (Element)doc.importNode(clonedElement, true);
             clonedElement = (Element)getDomElement(clonedElement);
         }
@@ -637,13 +693,13 @@ public final class WSSecurityUtil {
     private static Node getDomElement(Node node) throws WSSecurityException {
         if (node != null && isSAAJ14) {
 
-            try {
-                Method method = node.getClass().getMethod("getDomElement");
-                node = (Node)method.invoke(node);
-            } catch (NoSuchMethodException e) {
-                LOG.debug("Not the saaj node with java9");
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            Method method = GET_DOM_ELEMENTS_METHODS.get(node.getClass());
+            if (method != null) {
+                try {
+                    return (Node)setAccessible(method).invoke(node);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
             }
         }
         return node;
