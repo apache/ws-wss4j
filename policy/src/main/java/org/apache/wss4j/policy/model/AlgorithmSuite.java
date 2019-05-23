@@ -435,6 +435,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             return asymmetricSignature;
         }
 
+        public void setSymmetricSignature(String symmetricSignature) {
+            this.symmetricSignature = symmetricSignature;
+        }
+
+        public void setAsymmetricSignature(String asymmetricSignature) {
+            this.asymmetricSignature = asymmetricSignature;
+        }
+
         public int getEncryptionDerivedKeyLength() {
             return encryptionDerivedKeyLength;
         }
