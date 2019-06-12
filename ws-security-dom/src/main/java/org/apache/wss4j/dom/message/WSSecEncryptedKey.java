@@ -337,6 +337,9 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
 
             switch (keyIdentifierType) {
             case WSConstants.X509_KEY_IDENTIFIER:
@@ -610,6 +613,9 @@ public class WSSecEncryptedKey extends WSSecBase {
             || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
             || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
 
             switch (keyIdentifierType) {
 
@@ -695,6 +701,9 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         bstAddedToSecurityHeader = false;
         bstToken.setID(IDGenerator.generateID(null));
+        if (addWSUNamespace) {
+            bstToken.addWSUNamespace();
+        }
     }
 
     /**

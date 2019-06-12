@@ -454,6 +454,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                 getDocument().createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
             bstToken.setAttributeNS(null, "EncodingType", WSS4JConstants.BASE64_ENCODING);
             bstToken.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", certUri);
+            if (addWSUNamespace) {
+                bstToken.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+            }
 
             byte[] certBytes = null;
             if (!useSingleCert) {
@@ -484,6 +487,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                 ((X509Security) binarySecurity).setX509Certificate(certs[0]);
             }
             binarySecurity.setID(certUri);
+            if (addWSUNamespace) {
+                binarySecurity.addWSUNamespace();
+            }
             bstToken = binarySecurity.getElement();
             getWsDocInfo().addTokenElement(bstToken, false);
         }

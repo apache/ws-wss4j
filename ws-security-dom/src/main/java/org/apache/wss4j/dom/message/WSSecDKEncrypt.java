@@ -161,6 +161,9 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         KeyInfo keyInfo = new KeyInfo(getDocument());
         SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
         secToken.addWSSENamespace();
+        if (addWSUNamespace) {
+            secToken.addWSUNamespace();
+        }
         Reference ref = new Reference(getDocument());
         ref.setURI("#" + getId());
         String ns =

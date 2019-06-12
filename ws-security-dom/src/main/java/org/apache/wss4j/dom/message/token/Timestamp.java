@@ -119,12 +119,12 @@ public class Timestamp {
                 if (!ZoneOffset.UTC.equals(createdDateTime.getZone())) {
                     bspEnforcer.handleBSPRule(BSPRule.R3217);
                 }
-                
+
                 created = createdDateTime.toInstant();
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            
+
             if (created.getNano() > 0) {
                 int milliseconds = created.get(ChronoField.MILLI_OF_SECOND);
                 if (milliseconds * 1000000 != created.getNano()) {
@@ -139,12 +139,12 @@ public class Timestamp {
                 if (!ZoneOffset.UTC.equals(expiresDateTime.getZone())) {
                     bspEnforcer.handleBSPRule(BSPRule.R3223);
                 }
-                
+
                 expires = expiresDateTime.toInstant();
             } catch (DateTimeParseException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            
+
             if (expires.getNano() > 0) {
                 int milliseconds = expires.get(ChronoField.MILLI_OF_SECOND);
                 if (milliseconds * 1000000 != expires.getNano()) {
@@ -185,13 +185,13 @@ public class Timestamp {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         created = timeSource.now();
-        
+
         DateTimeFormatter formatter = DateUtil.getDateTimeFormatter(milliseconds);
         elementCreated.appendChild(doc.createTextNode(created.atZone(ZoneOffset.UTC).format(formatter)));
-        
+
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            expires = created.plusSeconds((long)ttl);
+            expires = created.plusSeconds(ttl);
 
             Element elementExpires =
                 doc.createElementNS(
@@ -207,7 +207,7 @@ public class Timestamp {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
     }
 
     /**

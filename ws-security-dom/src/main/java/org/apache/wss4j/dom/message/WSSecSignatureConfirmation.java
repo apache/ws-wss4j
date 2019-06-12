@@ -63,6 +63,9 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     public void prepare() {
         sc = new SignatureConfirmation(getDocument(), signatureValue);
         sc.setID(getIdAllocator().createId("SC-", sc));
+        if (addWSUNamespace) {
+            sc.addWSUNamespace();
+        }
     }
 
     /**

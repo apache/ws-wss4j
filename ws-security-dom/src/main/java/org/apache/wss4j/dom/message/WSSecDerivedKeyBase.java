@@ -225,11 +225,17 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         dkt.setLength(length);
         dkt.setNonce(XMLUtils.encodeToString(nonce));
         dkt.setID(dktId);
+        if (addWSUNamespace) {
+            dkt.addWSUNamespace();
+        }
 
         if (strElem == null) {
             SecurityTokenReference secRef = new SecurityTokenReference(getDocument());
             String strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.setID(strUri);
+            if (addWSUNamespace) {
+                secRef.addWSUNamespace();
+            }
 
             X509Certificate[] certs = getSigningCerts();
 
