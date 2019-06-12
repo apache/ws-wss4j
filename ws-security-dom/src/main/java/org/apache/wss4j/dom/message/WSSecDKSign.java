@@ -156,6 +156,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         secRef = new SecurityTokenReference(getDocument());
         strUri = getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
+        if (addWSUNamespace) {
+            secRef.addWSUNamespace();
+        }
 
         Reference ref = new Reference(getDocument());
         ref.setURI("#" + getId());

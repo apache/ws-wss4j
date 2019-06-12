@@ -48,6 +48,7 @@ public class WSSecBase {
     protected CallbackHandler attachmentCallbackHandler;
     protected boolean storeBytesInAttachment;
     protected boolean expandXopInclude;
+    protected boolean addWSUNamespace;
 
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
@@ -62,6 +63,9 @@ public class WSSecBase {
         } else {
             doc = null;
         }
+
+        // Explicitly add the WSU Namespace if we already have a different prefix
+        addWSUNamespace = securityHeader.getWsuPrefix() != null && !WSConstants.WSU_PREFIX.equals(securityHeader.getWsuPrefix());
     }
 
     public WSSecBase(Document doc) {

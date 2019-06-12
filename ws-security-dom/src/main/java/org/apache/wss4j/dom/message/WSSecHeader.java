@@ -43,6 +43,8 @@ public class WSSecHeader {
 
     private final Document doc;
 
+    private String wsuPrefix = WSConstants.WSU_PREFIX;
+
     /**
      * Constructor.
      * @param doc The Document to use when creating the security header
@@ -92,7 +94,7 @@ public class WSSecHeader {
     public void setMustUnderstand(boolean mu) {
         mustunderstand = mu;
     }
-    
+
     /**
      * Get the security header document of this instance.
      *
@@ -194,7 +196,7 @@ public class WSSecHeader {
                 mustUnderstandLocal
             );
         }
-        XMLUtils.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        wsuPrefix = XMLUtils.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
 
         return securityHeader;
     }
@@ -216,6 +218,10 @@ public class WSSecHeader {
             Node parent = securityHeader.getParentNode();
             parent.removeChild(securityHeader);
         }
+    }
+
+    public String getWsuPrefix() {
+        return wsuPrefix;
     }
 
 }

@@ -117,7 +117,7 @@ public class SecurityTokenReference {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**

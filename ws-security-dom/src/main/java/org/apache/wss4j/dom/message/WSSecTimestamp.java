@@ -73,6 +73,9 @@ public class WSSecTimestamp extends WSSecBase {
         ts = new Timestamp(precisionInMilliSeconds, getDocument(), wsTimeSource, timeToLive);
         String tsId = getIdAllocator().createId("TS-", ts);
         ts.setID(tsId);
+        if (addWSUNamespace) {
+            ts.addWSUNamespace();
+        }
     }
 
     /**

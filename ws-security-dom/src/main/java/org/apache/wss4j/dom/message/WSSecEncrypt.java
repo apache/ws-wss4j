@@ -291,6 +291,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(getEncryptedKeyElement());
         } else if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
@@ -301,18 +304,27 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, getId());
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, getId());
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             secToken.setKeyIdentifier(customReferenceValue, getId(), true);
@@ -325,6 +337,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(securityTokenReference.getElement());
         } else if (getId() != null) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             Reference ref = new Reference(getDocument());
             if (encKeyIdDirectId) {
@@ -344,6 +359,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (!encryptSymmKey && keyIdentifierType == WSConstants.ISSUER_SERIAL) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
+            if (addWSUNamespace) {
+                secToken.addWSUNamespace();
+            }
             secToken.addWSSENamespace();
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
