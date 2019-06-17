@@ -25,6 +25,7 @@ import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -179,7 +180,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
+        String passDigest = UsernameTokenUtil.doPasswordDigest(nonceVal, created, pwCb.getPassword());
         if (!passwordType.getValue().equals(passDigest)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }

@@ -41,6 +41,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -249,8 +250,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         String createdString = DateUtil.getDateTimeFormatter(true).format(created);
         String digest =
-            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
-                "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
+            UsernameTokenUtil.doPasswordDigest(
+                XMLUtils.decode("Ex2YESUvsa1qne1m6TM8XA=="), createdString, "default"
             );
 
         String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -299,8 +300,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
-            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
-                "Ex2YEKVvsa1qne1m6TM8XA==", createdString, "default"
+            UsernameTokenUtil.doPasswordDigest(
+                XMLUtils.decode("Ex2YEKVvsa1qne1m6TM8XA=="), createdString, "default"
             );
 
         String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -343,8 +344,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
-            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
-                "Ex2YEKVvSa1qne1m6TM8XA==", createdString, "default"
+            UsernameTokenUtil.doPasswordDigest(
+                XMLUtils.decode("Ex2YEKVvSa1qne1m6TM8XA=="), createdString, "default"
             );
 
         String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -380,8 +381,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         String createdString = DateUtil.getDateTimeFormatter(true).format(created);
 
         String digest =
-            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
-                "Ex2YEKVvsa1Qne1m6TM8XA==", createdString, "default"
+            UsernameTokenUtil.doPasswordDigest(
+                XMLUtils.decode("Ex2YEKVvsa1Qne1m6TM8XA=="), createdString, "default"
             );
 
         String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

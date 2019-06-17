@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -42,7 +41,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
@@ -500,11 +498,12 @@ public class UsernameToken {
         Text node = getFirstNode(elementPassword);
         try {
             if (hashed) {
+                byte[] decodedNonce = org.apache.xml.security.utils.XMLUtils.decode(getNonce());
                 if (passwordsAreEncoded) {
-                    node.setData(doPasswordDigest(getNonce(), getCreated(),
+                    node.setData(UsernameTokenUtil.doPasswordDigest(decodedNonce, getCreated(),
                                                   org.apache.xml.security.utils.XMLUtils.decode(pwd)));
                 } else {
-                    node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
+                    node.setData(UsernameTokenUtil.doPasswordDigest(decodedNonce, getCreated(), pwd));
                 }
             } else {
                 node.setData(pwd);
@@ -554,40 +553,6 @@ public class UsernameToken {
      */
     public boolean getPasswordsAreEncoded() {
         return passwordsAreEncoded;
-    }
-
-    public static String doPasswordDigest(String nonce, String created, byte[] password) {
-        String passwdDigest = null;
-        try {
-            byte[] b1 = nonce != null ? org.apache.xml.security.utils.XMLUtils.decode(nonce) : new byte[0];
-            byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
-            byte[] b3 = password;
-            byte[] b4 = new byte[b1.length + b2.length + b3.length];
-            int offset = 0;
-            System.arraycopy(b1, 0, b4, offset, b1.length);
-            offset += b1.length;
-
-            System.arraycopy(b2, 0, b4, offset, b2.length);
-            offset += b2.length;
-
-            System.arraycopy(b3, 0, b4, offset, b3.length);
-
-            byte[] digestBytes = KeyUtils.generateDigest(b4);
-            passwdDigest = org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes);
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return passwdDigest;
-    }
-
-    public static String doPasswordDigest(String nonce, String created, String password) {
-        String passwdDigest = null;
-        try {
-            passwdDigest = doPasswordDigest(nonce, created, password.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            LOG.debug(e.getMessage(), e);
-        }
-        return passwdDigest;
     }
 
     /**

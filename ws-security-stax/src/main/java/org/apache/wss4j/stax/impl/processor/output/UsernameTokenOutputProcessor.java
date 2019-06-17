@@ -204,7 +204,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
                             ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType()
                                 == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                                    ? WSSUtils.doPasswordDigest(this.nonceValue, created, this.password)
+                                    ? UsernameTokenUtil.doPasswordDigest(this.nonceValue, created, this.password)
                                     : this.password);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_PASSWORD);
                 }

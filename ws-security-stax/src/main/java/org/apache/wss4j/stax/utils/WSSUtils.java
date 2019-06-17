@@ -19,7 +19,6 @@
 package org.apache.wss4j.stax.utils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -110,30 +109,6 @@ public class WSSUtils extends XMLSecurityUtils {
             } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
-        }
-    }
-
-    public static String doPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
-        try {
-            byte[] b1 = nonce != null ? nonce : new byte[0];
-            byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
-            byte[] b3 = password.getBytes(StandardCharsets.UTF_8);
-            byte[] b4 = new byte[b1.length + b2.length + b3.length];
-            int offset = 0;
-            System.arraycopy(b1, 0, b4, offset, b1.length);
-            offset += b1.length;
-
-            System.arraycopy(b2, 0, b4, offset, b2.length);
-            offset += b2.length;
-
-            System.arraycopy(b3, 0, b4, offset, b3.length);
-
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            sha.reset();
-            sha.update(b4);
-            return XMLUtils.encodeToString(sha.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         }
     }
 

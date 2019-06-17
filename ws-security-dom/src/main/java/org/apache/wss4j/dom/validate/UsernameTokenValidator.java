@@ -27,6 +27,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.xml.security.utils.XMLUtils;
@@ -166,11 +167,12 @@ public class UsernameTokenValidator implements Validator {
         }
         if (usernameToken.isHashed()) {
             String passDigest;
+            byte[] decodedNonce = XMLUtils.decode(nonce);
             if (passwordsAreEncoded) {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime,
+                passDigest = UsernameTokenUtil.doPasswordDigest(decodedNonce, createdTime,
                                                             XMLUtils.decode(origPassword));
             } else {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
+                passDigest = UsernameTokenUtil.doPasswordDigest(decodedNonce, createdTime, origPassword);
             }
             if (!passDigest.equals(password)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);

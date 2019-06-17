@@ -36,6 +36,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -174,7 +175,8 @@ public class UsernameTokenTest implements CallbackHandler {
         String nonce = "0x7bXAPZVn40AdCD0Xbt0g==";
         String created = "2010-06-28T15:16:37Z";
         String expectedPasswordDigest = "C0rena/6gKpRZ9ATj+e6ss5sAbQ=";
-        String actualPasswordDigest = UsernameToken.doPasswordDigest(nonce, created, passwordHash);
+        byte[] decodedNonce = org.apache.xml.security.utils.XMLUtils.decode(nonce);
+        String actualPasswordDigest = UsernameTokenUtil.doPasswordDigest(decodedNonce, created, passwordHash);
         assertEquals("the password digest is not as expected", expectedPasswordDigest, actualPasswordDigest);
     }
 
