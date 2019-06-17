@@ -442,7 +442,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 try {
-                    DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
+                    DocumentBuilder db = XMLUtils.createDocumentBuilder(true);
                     outputDOMElement(samlAssertionWrapper.toDOM(db.newDocument()), subOutputProcessorChain);
                     XMLUtils.repoolDocumentBuilder(db);
                 } catch (ParserConfigurationException ex) {

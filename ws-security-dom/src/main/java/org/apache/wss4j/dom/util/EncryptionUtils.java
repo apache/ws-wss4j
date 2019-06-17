@@ -391,7 +391,7 @@ public final class EncryptionUtils {
         // For the xop:Include case, we need to replace the xop:Include Element with the
         // decrypted Element
         DocumentBuilder db =
-                org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
+                org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(true);
         byte[] bytes = JavaUtils.getBytesFromStream(attachmentInputStream);
 
         Document document = null;
