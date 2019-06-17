@@ -253,7 +253,6 @@ public class SignatureSTRParser implements STRParser {
             UsernameToken usernameToken =
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
-            usernameToken.setRawPassword(data.getCallbackHandler());
             parserResult.setSecretKey((byte[])result.get(WSSecurityEngineResult.TAG_SECRET));
 
             parserResult.setPrincipal(usernameToken.createPrincipal());

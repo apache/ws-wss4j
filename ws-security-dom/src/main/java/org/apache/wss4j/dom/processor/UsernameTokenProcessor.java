@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.w3c.dom.Element;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -67,8 +68,10 @@ public class UsernameTokenProcessor implements Processor {
         if (token.getPassword() == null) {
             action = WSConstants.UT_NOPASSWORD;
             if (token.isDerivedKey()) {
-                token.setRawPassword(data.getCallbackHandler());
-                secretKey = token.getDerivedKey(data.getBSPEnforcer());
+                String rawPassword =
+                    UsernameTokenUtil.getRawPassword(data.getCallbackHandler(), token.getName(),
+                                                     token.getPassword(), token.getPasswordType());
+                secretKey = token.getDerivedKey(data.getBSPEnforcer(), rawPassword);
             }
         }
         WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);

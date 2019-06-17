@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message.token;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -29,14 +28,10 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
@@ -77,7 +72,6 @@ public class UsernameToken {
     private Element elementIteration;
     private String passwordType;
     private boolean hashed = true;
-    private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded;
     private Instant created;
 
@@ -494,7 +488,6 @@ public class UsernameToken {
             }
         }
 
-        rawPassword = pwd;             // enhancement by Alberto coletti
         Text node = getFirstNode(elementPassword);
         try {
             if (hashed) {
@@ -514,31 +507,6 @@ public class UsernameToken {
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);
         }
-    }
-
-    /**
-     * Set the raw (plain text) password used to compute secret key.
-     */
-    public void setRawPassword(CallbackHandler callbackHandler) throws WSSecurityException {
-        if (callbackHandler == null) {
-            LOG.debug("CallbackHandler is null");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-        }
-
-        WSPasswordCallback pwCb =
-            new WSPasswordCallback(
-                getName(), getPassword(), getPasswordType(),
-                WSPasswordCallback.USERNAME_TOKEN
-            );
-        try {
-            callbackHandler.handle(new Callback[]{pwCb});
-        } catch (IOException | UnsupportedCallbackException e) {
-            LOG.debug(e.getMessage(), e);
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
-            );
-        }
-        rawPassword = pwCb.getPassword();
     }
 
     /**
@@ -609,10 +577,11 @@ public class UsernameToken {
     /**
      * This method gets a derived key as defined in WSS Username Token Profile.
      *
+     * @param rawPassword The raw password to use to derive the key
      * @return Returns the derived key as a byte array
      * @throws WSSecurityException
      */
-    public byte[] getDerivedKey(BSPEnforcer bspEnforcer) throws WSSecurityException {
+    public byte[] getDerivedKey(BSPEnforcer bspEnforcer, String rawPassword) throws WSSecurityException {
         if (rawPassword == null) {
             LOG.debug("The raw password was null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
