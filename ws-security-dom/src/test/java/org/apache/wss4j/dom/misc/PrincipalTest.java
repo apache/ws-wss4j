@@ -55,11 +55,12 @@ import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test various principal objects after processing a security token.
@@ -70,7 +71,7 @@ public class PrincipalTest {
 
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

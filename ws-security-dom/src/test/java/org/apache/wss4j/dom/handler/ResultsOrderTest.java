@@ -23,10 +23,11 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class ResultsOrderTest {
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

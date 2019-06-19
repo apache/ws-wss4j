@@ -39,14 +39,14 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test for Certificate Revocation List checking. A message is signed and sent to the
@@ -83,7 +83,7 @@ public class SignatureCRLTest extends AbstractTestBase {
      * TODO Re-enable once CRL issue fixed
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignatureDirectReference() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

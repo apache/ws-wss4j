@@ -41,14 +41,14 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
@@ -58,7 +58,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
      * @Ignoring as SOAP Action spoofing detection should be left to the SOAP stack
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSOAPActionSpoofing() throws Exception {
         WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
         outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());

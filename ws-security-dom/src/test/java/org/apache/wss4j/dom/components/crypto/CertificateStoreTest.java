@@ -37,7 +37,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
@@ -46,9 +47,9 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test for the CertificateStore Crypto instance. This class does not know anything
@@ -62,7 +63,7 @@ public class CertificateStoreTest {
     private Crypto receiverCrypto;
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

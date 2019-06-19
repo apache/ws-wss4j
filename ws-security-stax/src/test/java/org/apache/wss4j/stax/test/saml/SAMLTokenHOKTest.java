@@ -61,12 +61,12 @@ import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SAMLTokenHOKTest extends AbstractTestBase {
 
@@ -467,7 +467,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
     // TODO Not working with OpenSAML 3.0 upgrade
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSAML1AttrAssertionInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -967,7 +967,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
     // TODO Not working with OpenSAML 3.0 upgrade
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSAML2AttrAssertionInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

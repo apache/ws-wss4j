@@ -34,13 +34,14 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test for Certificate Revocation List checking. A message is signed and sent to the
@@ -74,7 +75,7 @@ public class SignatureCRLTest {
     private Crypto crypto;
     private Crypto cryptoCA;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -91,7 +92,7 @@ public class SignatureCRLTest {
      * TODO Re-enable once CRL issue fixed
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignatureDirectReference() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -125,7 +126,7 @@ public class SignatureCRLTest {
      * TODO Re-enable once CRL issue fixed
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignatureDirectReferenceRevocation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -163,7 +164,7 @@ public class SignatureCRLTest {
      * TODO Re-enable once CRL issue fixed
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignatureDirectReferenceRevocationKeyStore() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);

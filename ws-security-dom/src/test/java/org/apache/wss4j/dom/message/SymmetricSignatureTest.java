@@ -45,8 +45,9 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 
@@ -64,7 +65,7 @@ public class SymmetricSignatureTest implements CallbackHandler {
     private byte[] keyData;
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -80,7 +81,7 @@ public class SymmetricSignatureTest implements CallbackHandler {
      *
      * @throws Exception Thrown when there is a problem in setup
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);

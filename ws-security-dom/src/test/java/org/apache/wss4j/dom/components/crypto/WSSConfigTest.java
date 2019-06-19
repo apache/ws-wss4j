@@ -23,10 +23,10 @@ import java.security.Security;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test loading and removing security providers via WSSConfig

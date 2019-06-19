@@ -39,17 +39,18 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests using GCM. See:
@@ -68,7 +69,7 @@ public class EncryptionGCMTest {
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -82,7 +83,7 @@ public class EncryptionGCMTest {
      *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }

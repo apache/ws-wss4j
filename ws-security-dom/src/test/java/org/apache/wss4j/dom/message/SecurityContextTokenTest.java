@@ -34,12 +34,13 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A set of tests for SecurityContextTokens.
@@ -55,7 +56,7 @@ public class SecurityContextTokenTest {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -80,12 +81,12 @@ public class SecurityContextTokenTest {
             }
 
             assertTrue(
-                "SecurityContextToken missing",
-                out.indexOf(ConversationConstants.SECURITY_CONTEXT_TOKEN_LN) > 0
+                out.indexOf(ConversationConstants.SECURITY_CONTEXT_TOKEN_LN) > 0,
+                "SecurityContextToken missing"
             );
             assertTrue(
-                "wsc:Identifier missing",
-                out.indexOf(ConversationConstants.IDENTIFIER_LN) > 0
+                out.indexOf(ConversationConstants.IDENTIFIER_LN) > 0,
+                "wsc:Identifier missing"
             );
 
         } catch (Exception e) {

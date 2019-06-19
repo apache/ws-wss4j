@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Arrays;
 import java.util.Collections;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -45,12 +44,14 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the
@@ -63,7 +64,7 @@ public class UTDerivedKeyTest {
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -130,7 +131,7 @@ public class UTDerivedKeyTest {
         int iteration = 1049;
         byte[] expectedDerivedKey = org.apache.xml.security.utils.XMLUtils.decode("C7Ll/OY4TECb6hZuMMiX/5hzszo=");
         byte[] derivedKey = UsernameTokenUtil.generateDerivedKey(passwordHash, salt, iteration);
-        assertTrue("the derived key is not as expected", Arrays.equals(expectedDerivedKey, derivedKey));
+        assertArrayEquals(expectedDerivedKey, derivedKey, "the derived key is not as expected");
     }
 
     /**

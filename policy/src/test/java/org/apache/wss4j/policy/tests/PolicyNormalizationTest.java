@@ -20,12 +20,12 @@ package org.apache.wss4j.policy.tests;
 
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PolicyNormalizationTest extends AbstractTestBase {
 

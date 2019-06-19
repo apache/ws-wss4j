@@ -35,15 +35,16 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -54,7 +55,7 @@ public class CustomActionProcessorTest {
         org.slf4j.LoggerFactory.getLogger(CustomActionProcessorTest.class);
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -107,7 +108,7 @@ public class CustomActionProcessorTest {
                 found = true;
             }
         }
-        assertTrue("Unable to find result from CustomProcessor", found);
+        assertTrue(found, "Unable to find result from CustomProcessor");
     }
 
     /**
@@ -151,7 +152,7 @@ public class CustomActionProcessorTest {
                 found = true;
             }
         }
-        assertTrue("Unable to find result from CustomProcessor", found);
+        assertTrue(found, "Unable to find result from CustomProcessor");
     }
 
     /**

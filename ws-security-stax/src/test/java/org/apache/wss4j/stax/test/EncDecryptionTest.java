@@ -81,16 +81,16 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.utils.XMLUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class EncDecryptionTest extends AbstractTestBase {
 
@@ -2252,7 +2252,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     }
 
     @Test
-    @org.junit.Ignore //WSS4J does not support OAEPParams atm
+    @org.junit.jupiter.api.Disabled //WSS4J does not support OAEPParams atm
     public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

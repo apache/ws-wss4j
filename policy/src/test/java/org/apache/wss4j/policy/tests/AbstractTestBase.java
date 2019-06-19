@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -70,11 +69,8 @@ import org.apache.wss4j.policy.builders.UsernameTokenBuilder;
 import org.apache.wss4j.policy.builders.WSS10Builder;
 import org.apache.wss4j.policy.builders.WSS11Builder;
 import org.apache.wss4j.policy.builders.X509TokenBuilder;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import static org.junit.Assert.assertEquals;
+import org.hamcrest.MatcherAssert;
+import org.xmlunit.matchers.CompareMatcher;
 
 public abstract class AbstractTestBase {
     protected XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -89,11 +85,7 @@ public abstract class AbstractTestBase {
     }
 
     protected void assertXMLisEqual(String actual, String expected) throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-        final Diff diff = new Diff(expected, actual);
-        DetailedDiff myDiff = new DetailedDiff(diff);
-        List<?> allDifferences = myDiff.getAllDifferences();
-        assertEquals(myDiff.toString(), 0, allDifferences.size());
+        MatcherAssert.assertThat(actual, CompareMatcher.isIdenticalTo(expected).ignoreWhitespace());
     }
 
     protected String loadPolicyFile(String classpathResource) throws Exception {

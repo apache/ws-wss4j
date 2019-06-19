@@ -33,7 +33,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RelTokenTest extends AbstractPolicyTestBase {
 

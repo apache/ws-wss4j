@@ -21,11 +21,12 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for DerivedKeyToken type.
@@ -54,7 +55,7 @@ public class DerivedKeyTokenTest {
     private DerivedKeyToken tokenEqual;
     private DerivedKeyToken tokenNotEqual;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

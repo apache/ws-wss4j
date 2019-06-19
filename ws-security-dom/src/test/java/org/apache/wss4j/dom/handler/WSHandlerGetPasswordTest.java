@@ -27,14 +27,15 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * WS-Security Test Case for the getPassword method in WSHandler.
@@ -45,7 +46,7 @@ public class WSHandlerGetPasswordTest {
         org.slf4j.LoggerFactory.getLogger(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

@@ -39,11 +39,12 @@ import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests the handling of {@code NameConstraint}s with {@code TrustAnchor}s in the
@@ -74,7 +75,7 @@ public class NameConstraintsTest {
 
     private static final Pattern SUBJ_PATTERN = Pattern.compile(".*OU=wss4j,O=apache");
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         WSProviderConfig.init();
     }
@@ -240,7 +241,7 @@ public class NameConstraintsTest {
                 getMerlinAkiBc());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinBreaking() throws Exception {
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
@@ -251,10 +252,12 @@ public class NameConstraintsTest {
                         .getClassLoader(),
                 null);
 
-        withKeyStoreUsingMerlin(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED), merlin);
+        Assertions.assertThrows(Exception.class, () -> {
+            withKeyStoreUsingMerlin(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED), merlin);
+        });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAkiBreaking() throws Exception {
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
@@ -265,7 +268,9 @@ public class NameConstraintsTest {
                         .getClassLoader(),
                 null);
 
-        withKeyStoreUsingMerlin(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED), merlin);
+        Assertions.assertThrows(Exception.class, () -> {
+            withKeyStoreUsingMerlin(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED), merlin);
+        });
     }
 
     @Test

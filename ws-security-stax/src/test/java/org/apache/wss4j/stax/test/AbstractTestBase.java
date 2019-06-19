@@ -84,13 +84,13 @@ import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProc
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class AbstractTestBase {
 
@@ -109,7 +109,7 @@ public abstract class AbstractTestBase {
         WSSConfig.init();
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

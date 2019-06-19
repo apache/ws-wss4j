@@ -62,7 +62,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,11 +70,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InteroperabilityTest extends AbstractTestBase {
 
@@ -1312,7 +1312,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
-                    assertFalse(stringWriter.toString(), t instanceof NullPointerException);
+                    assertFalse(t instanceof NullPointerException, stringWriter.toString());
                     t = t.getCause();
                 }
             }

@@ -73,16 +73,16 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class KerberosTest {
 
@@ -97,7 +97,7 @@ public class KerberosTest {
 
     private static SimpleKdcServer kerbyServer;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
 
         WSSConfig.init();
@@ -144,7 +144,7 @@ public class KerberosTest {
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         SecurityTestUtil.cleanup();
         if (kerbyServer != null) {

@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -66,40 +64,25 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(value = org.junit.runners.Parameterized.class)
 public class DerivedKeyTokenTest extends AbstractTestBase {
 
-    final int version;
-
-    public DerivedKeyTokenTest(int version) {
-        this.version = version;
-    }
-
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
         WSSConfig.init();
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<Object[]> data() {
-
-        return Arrays.asList(new Object[][] {{ConversationConstants.VERSION_05_02},
-                                             {ConversationConstants.VERSION_05_12}
-        });
-    }
-
-    @Test
-    public void testEncryptionDecryptionTRIPLEDESOutbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionTRIPLEDESOutbound(int version) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -130,8 +113,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionTRIPLEDESInbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionTRIPLEDESInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -224,8 +208,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionTRIPLEDESInboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionTRIPLEDESInboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -301,8 +286,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionAES128Outbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionAES128Outbound(int version) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -333,8 +319,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionAES128Inbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionAES128Inbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -389,8 +376,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionAES128InboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionAES128InboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -429,7 +417,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSignatureOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -463,8 +452,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureInbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -518,8 +508,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureInboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureInboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -557,8 +548,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureThumbprintSHA1Outbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureThumbprintSHA1Outbound(int version) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -602,8 +594,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureThumbprintSHA1Inbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureThumbprintSHA1Inbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -650,8 +643,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
 
-    @Test
-    public void testSignatureThumbprintSHA1InboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureThumbprintSHA1InboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -688,7 +682,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSignatureSKIOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -733,8 +728,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureSKIInbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureSKIInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -780,8 +776,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureSKIInboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureSKIInboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -819,8 +816,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureEncryptOutbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureEncryptOutbound(int version) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -863,8 +861,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureEncryptInbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testSignatureEncryptInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -989,8 +988,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptSignatureInbound() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptSignatureInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -1058,8 +1058,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptSignatureInboundAction() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptSignatureInboundAction(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

@@ -19,12 +19,12 @@
 package org.apache.wss4j.common.attachment;
 
 import org.apache.wss4j.common.util.CRLFOutputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class CRLFOutputStreamTest {
 

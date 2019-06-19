@@ -46,7 +46,8 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -60,8 +61,8 @@ import java.security.KeyStore;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a set of test-cases where the SAML Assertion is altered in some way and so
@@ -76,7 +77,7 @@ public class SamlNegativeTest {
     private Crypto issuerCrypto;
     private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

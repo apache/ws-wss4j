@@ -27,13 +27,14 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test case for WSS-245 - "WSHandlerConstants.PW_CALLBACK_REF isn't correctly searched for"
@@ -45,7 +46,7 @@ public class CallbackRefTest {
         org.slf4j.LoggerFactory.getLogger(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

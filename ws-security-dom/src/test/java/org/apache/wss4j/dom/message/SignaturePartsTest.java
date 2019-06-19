@@ -47,7 +47,8 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.saml.SignedSamlTokenHOKTest;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -58,11 +59,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is some unit tests for signing using signature parts. Note that the "soapMsg" below
@@ -94,7 +95,7 @@ public class SignaturePartsTest {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -562,7 +563,7 @@ public class SignaturePartsTest {
     }
 
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignedKeyInfo() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -620,7 +621,7 @@ public class SignaturePartsTest {
     }
 
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testSignedKeyInfoAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

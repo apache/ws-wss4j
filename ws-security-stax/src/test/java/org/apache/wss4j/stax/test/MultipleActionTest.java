@@ -35,15 +35,15 @@ import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A test for 2x Signatures + 2x Encryption. This is not supported for now, but these tests are mainly to
@@ -52,7 +52,7 @@ import static org.junit.Assert.fail;
 public class MultipleActionTest extends AbstractTestBase {
 
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testTwoSignatureActions() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -93,7 +93,7 @@ public class MultipleActionTest extends AbstractTestBase {
     }
 
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testTwoEncryptionActions() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

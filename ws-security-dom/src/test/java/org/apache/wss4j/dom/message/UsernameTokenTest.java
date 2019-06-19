@@ -52,17 +52,18 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * WS-Security Test Case for UsernameTokens.
@@ -123,7 +124,7 @@ public class UsernameTokenTest implements CallbackHandler {
 
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -177,7 +178,7 @@ public class UsernameTokenTest implements CallbackHandler {
         String expectedPasswordDigest = "C0rena/6gKpRZ9ATj+e6ss5sAbQ=";
         byte[] decodedNonce = org.apache.xml.security.utils.XMLUtils.decode(nonce);
         String actualPasswordDigest = UsernameTokenUtil.doPasswordDigest(decodedNonce, created, passwordHash);
-        assertEquals("the password digest is not as expected", expectedPasswordDigest, actualPasswordDigest);
+        assertEquals(expectedPasswordDigest, actualPasswordDigest, "the password digest is not as expected");
     }
 
     /**

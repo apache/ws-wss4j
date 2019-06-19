@@ -39,11 +39,12 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -59,7 +60,7 @@ public class EncryptionCRLTest {
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -73,7 +74,7 @@ public class EncryptionCRLTest {
      *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
@@ -126,7 +127,7 @@ public class EncryptionCRLTest {
      * TODO Re-enable once CRL issue fixed
      */
     @Test
-    @org.junit.Ignore
+    @org.junit.jupiter.api.Disabled
     public void testEncryptionWithRevocationCheck() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

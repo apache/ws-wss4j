@@ -60,12 +60,13 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPath2FilterContainer;
 import org.apache.xml.security.utils.Constants;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  */
@@ -75,7 +76,7 @@ public class SamlTokenCustomSignatureTest {
 
     private Crypto crypto;
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -125,7 +126,7 @@ public class SamlTokenCustomSignatureTest {
         // This should pass as we are disabling signature profile validation in the Validator
         verifyWithoutProfile(doc);
     }
-    
+
     @Test
     public void testSAML1AuthnAssertionValidatorMap() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -162,7 +163,7 @@ public class SamlTokenCustomSignatureTest {
 
         // This should pass as we are disabling signature profile validation in the Validator,
         // which is configured via ConfigurationConstants.VALIDATOR_MAP
-        
+
         SamlAssertionValidator validator = new SamlAssertionValidator();
         validator.setValidateSignatureAgainstProfile(false);
         Map<QName, Validator> validatorMap = new HashMap<>();
@@ -174,16 +175,16 @@ public class SamlTokenCustomSignatureTest {
         config.put(WSHandlerConstants.VALIDATOR_MAP, validatorMap);
         requestData.setMsgContext(config);
         requestData.setSigVerCrypto(crypto);
-        
+
         CustomHandler handler = new CustomHandler();
 
         List<Integer> actions = new ArrayList<>();
         actions.add(WSConstants.ST_SIGNED);
         handler.receive(actions, requestData);
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, requestData);
-        
+
         String outputString = XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
     }

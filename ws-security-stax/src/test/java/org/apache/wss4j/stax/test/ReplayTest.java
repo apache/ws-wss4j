@@ -44,14 +44,14 @@ import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.utils.XMLUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ReplayTest extends AbstractTestBase {
 

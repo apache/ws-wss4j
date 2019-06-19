@@ -49,12 +49,13 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
@@ -64,7 +65,7 @@ public class SamlConditionsTest {
         org.slf4j.LoggerFactory.getLogger(SamlConditionsTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
-    @org.junit.AfterClass
+    @AfterAll
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
@@ -218,7 +219,7 @@ public class SamlConditionsTest {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     @Test
     public void testSAML2NoNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
