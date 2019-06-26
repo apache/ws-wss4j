@@ -47,7 +47,6 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.ByteArrayInputStream;
@@ -390,23 +389,21 @@ public final class EncryptionUtils {
 
         // For the xop:Include case, we need to replace the xop:Include Element with the
         // decrypted Element
-        DocumentBuilder db =
-                org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(true);
         byte[] bytes = JavaUtils.getBytesFromStream(attachmentInputStream);
 
         Document document = null;
         try {
-            document = db.parse(new ByteArrayInputStream(bytes));
+            document = org.apache.xml.security.utils.XMLUtils.read(new ByteArrayInputStream(bytes), false);
         } catch (SAXException ex) {
             // A prefix may not have been bound, try to fix the DOM Element in this case.
             String fixedElementStr = setParentPrefixes(encData, new String(bytes));
-            document = db.parse(new ByteArrayInputStream(fixedElementStr.getBytes()));
+            document = org.apache.xml.security.utils.XMLUtils.read(
+                new ByteArrayInputStream(fixedElementStr.getBytes()), false);
         }
 
         Node decryptedNode =
             encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
         encData.getParentNode().appendChild(decryptedNode);
-        org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
         encData.getParentNode().removeChild(encData);
         return decryptedNode;
     }
