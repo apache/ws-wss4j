@@ -43,6 +43,7 @@ import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -104,7 +105,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 );
             }
 
-            String attachmentId = referenceType.getURI().substring(4);
+            String attachmentId = AttachmentUtils.getAttachmentId(referenceType.getURI());
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
             attachmentRequestCallback.setAttachmentId(attachmentId);

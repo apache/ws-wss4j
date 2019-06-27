@@ -21,6 +21,9 @@ package org.apache.wss4j.common.token;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -218,7 +221,11 @@ public class BinarySecurity {
             element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSS4JConstants.XOP_NS);
             Element xopInclude =
                 document.createElementNS(WSS4JConstants.XOP_NS, "xop:Include");
-            xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
+            try {
+                xopInclude.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
+            } catch (UnsupportedEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
             element.appendChild(xopInclude);
 
             Attachment resultAttachment = new Attachment();

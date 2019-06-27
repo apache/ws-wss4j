@@ -22,6 +22,8 @@ import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.CRLFOutputStream;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.c14n.CanonicalizationException;
@@ -102,7 +104,12 @@ public class AttachmentContentSignatureTransform extends TransformService {
     public Data transform(Data data, XMLCryptoContext context, OutputStream os) throws TransformException {
 
         String attachmentUri = ((ApacheOctetStreamData) data).getURI();
-        String attachmentId = attachmentUri.substring(4);
+        String attachmentId = null;
+        try {
+            attachmentId = AttachmentUtils.getAttachmentId(attachmentUri);
+        } catch (WSSecurityException e) {
+            throw new TransformException(e);
+        }
 
         Attachment attachment;
         if (attachmentTransformParameterSpec != null) {

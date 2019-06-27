@@ -205,7 +205,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             final String externalReference = securePart.getExternalReference();
             if (externalReference != null && externalReference.startsWith("cid:")) {
                 attachmentSecurePart = securePart;
-                externalId = externalReference.substring("cid:".length());
+                externalId = AttachmentUtils.getAttachmentId(externalReference);
                 break;
             }
         }
