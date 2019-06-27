@@ -344,7 +344,7 @@ public class Encryptor {
         }
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-        String id = attachmentEncryptionPart.getId().substring(4);
+        String id = AttachmentUtils.getAttachmentId(attachmentEncryptionPart.getId());
         attachmentRequestCallback.setAttachmentId(id);
         try {
             attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});

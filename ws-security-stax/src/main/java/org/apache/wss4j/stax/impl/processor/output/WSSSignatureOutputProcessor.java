@@ -36,6 +36,7 @@ import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform;
@@ -162,7 +163,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             }
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-            String id = securePart.getExternalReference().substring("cid:".length());
+            String id = AttachmentUtils.getAttachmentId(securePart.getExternalReference());
             attachmentRequestCallback.setAttachmentId(id);
             try {
                 attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});

@@ -39,6 +39,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -188,7 +189,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     for (Element elementToSign : elementsToSign) {
                         String wsuId = setWsuId(elementToSign);
-                        
+
                         cloneElement(elementToSign);
 
                         TransformParameterSpec transformSpec = null;
@@ -239,7 +240,7 @@ public class WSSecSignatureBase extends WSSecBase {
                 // Clone the Element to be signed + insert the clone into the tree at the same level
                 // We will expand the xop:Include for one of the nodes + sign that (and then remove it),
                 // while leaving the original in the tree to be sent in the message
-                                
+
                 clonedElements.add(element);
                 Document doc = this.getSecurityHeader().getSecurityHeaderDoc();
                 element.getParentNode().appendChild(WSSecurityUtil.cloneElement(doc, element));
@@ -264,7 +265,7 @@ public class WSSecSignatureBase extends WSSecBase {
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
         //no mime type must be set for signature:
         //attachmentCallback.setResultingMimeType(null);
-        String id = encPart.getId().substring(4);
+        String id = AttachmentUtils.getAttachmentId(encPart.getId());
         attachmentRequestCallback.setAttachmentId(id);
         try {
             attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});

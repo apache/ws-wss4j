@@ -44,9 +44,12 @@ import org.w3c.dom.Text;
 //import com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -737,7 +740,11 @@ public final class WSSecurityUtil {
         parentElement.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSConstants.XOP_NS);
         Element xopInclude =
             doc.createElementNS(WSConstants.XOP_NS, "xop:Include");
-        xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
+        try {
+            xopInclude.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
         parentElement.appendChild(xopInclude);
 
         Attachment resultAttachment = new Attachment();

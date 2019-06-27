@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -219,6 +220,59 @@ public class XOPAttachmentTest {
         assertNotNull(encryptedAttachments);
         // Should have EncryptedKey + EncryptedData stored in attachments...
         assertTrue(encryptedAttachments.size() == 2);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback =
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, inboundAttachmentCallback);
+
+        String processedDoc = XMLUtils.prettyDocumentToString(encryptedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+    }
+
+    // See https://issues.apache.org/jira/browse/CXF-8061
+    @Test
+    public void testEncryptedSOAPBodyURLEncoding() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
+
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        // Should have EncryptedKey + EncryptedData stored in attachments...
+        assertTrue(encryptedAttachments.size() == 2);
+
+        // Override the Attachment ID + URL encode something that will break as the Attachment ID if it is not
+        // URL encoded
+        String newId = "http://tempuri.org/1/636966400494014846";
+        String oldId = encryptedAttachments.get(1).getId();
+        encryptedAttachments.get(1).setId(newId);
+        List<Element> xopElements =
+            XMLUtils.findElements(doc.getDocumentElement(), "Include", "http://www.w3.org/2004/08/xop/include");
+        for (Element xop : xopElements) {
+            if (xop.hasAttribute("href") && xop.getAttributeNS(null, "href").equals("cid:" + oldId)) {
+                xop.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(newId, StandardCharsets.UTF_8.name()));
+            }
+        }
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);

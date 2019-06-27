@@ -215,7 +215,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
 
-        final String attachmentId = href.substring(4);
+        final String attachmentId = AttachmentUtils.getAttachmentId(href);
 
         CallbackHandler attachmentCallbackHandler =
             ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
@@ -322,7 +322,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             final InboundSecurityToken inboundSecurityToken = deferredAttachment.getInboundSecurityToken();
             final Cipher cipher = deferredAttachment.getCipher();
             final String uri = encryptedDataType.getCipherData().getCipherReference().getURI();
-            final String attachmentId = uri.substring(4);
+            final String attachmentId = AttachmentUtils.getAttachmentId(uri);
 
             CallbackHandler attachmentCallbackHandler =
                 ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();

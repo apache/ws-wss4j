@@ -300,7 +300,7 @@ public final class EncryptionUtils {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
 
-            final String attachmentId = uri.substring("cid:".length());
+            final String attachmentId = AttachmentUtils.getAttachmentId(uri);
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
             attachmentRequestCallback.setAttachmentId(attachmentId);
@@ -364,7 +364,7 @@ public final class EncryptionUtils {
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
-        final String attachmentId = xopURI.substring("cid:".length());
+        final String attachmentId = AttachmentUtils.getAttachmentId(xopURI);
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
         attachmentRequestCallback.setAttachmentId(attachmentId);
