@@ -242,9 +242,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
 
-        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
-        SecretKey symmetricKey = keyGen.generateKey();
-        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
+        Document encryptedDoc = encrypt.build(crypto);
 
         List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
         assertNotNull(encryptedAttachments);
