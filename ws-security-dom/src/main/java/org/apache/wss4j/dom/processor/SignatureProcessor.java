@@ -434,18 +434,7 @@ public class SignatureProcessor implements Processor {
                 // Look for xop:Include Nodes
                 List<Element> includeElements =
                     XMLUtils.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);
-                for (Element includeElement : includeElements) {
-                    String xopURI = includeElement.getAttributeNS(null, "href");
-                    if (xopURI != null) {
-                        // Store the bytes in the attachment to calculate the signature
-                        byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
-                        String encodedBytes = org.apache.xml.security.utils.XMLUtils.encodeToString(attachmentBytes);
-
-                        Node newCipherValueChild =
-                            includeElement.getOwnerDocument().createTextNode(encodedBytes);
-                        includeElement.getParentNode().replaceChild(newCipherValueChild, includeElement);
-                    }
-                }
+                WSSecurityUtil.inlineAttachments(includeElements, data.getAttachmentCallbackHandler(), true);
             }
         }
     }
