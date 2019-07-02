@@ -72,7 +72,7 @@ public class UsernameTokenValidator implements Validator {
         LOG.debug("UsernameToken password type {}", pwType);
 
         if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
-            LOG.debug("Authentication failed as the received password type does not "
+            LOG.warn("Authentication failed as the received password type does not "
                 + "match the required password type of: {}", requiredPasswordType);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
@@ -90,7 +90,7 @@ public class UsernameTokenValidator implements Validator {
             verifyPlaintextPassword(usernameToken, data);
         } else if (password != null) {
             if (!handleCustomPasswordTypes) {
-                LOG.debug("Authentication failed as handleCustomUsernameTokenTypes is false");
+                LOG.warn("Authentication failed as handleCustomUsernameTokenTypes is false");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             verifyCustomPassword(usernameToken, data);
@@ -162,7 +162,7 @@ public class UsernameTokenValidator implements Validator {
         }
         String origPassword = pwCb.getPassword();
         if (origPassword == null) {
-            LOG.debug("Callback supplied no password for: {}", user);
+            LOG.warn("Callback supplied no password for: {}", user);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         if (usernameToken.isHashed()) {
@@ -195,7 +195,7 @@ public class UsernameTokenValidator implements Validator {
 
         boolean allowUsernameTokenDerivedKeys = data.isAllowUsernameTokenNoPassword();
         if (!allowUsernameTokenDerivedKeys) {
-            LOG.debug("Authentication failed as the received UsernameToken does not "
+            LOG.warn("Authentication failed as the received UsernameToken does not "
                 + "contain any password element");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }

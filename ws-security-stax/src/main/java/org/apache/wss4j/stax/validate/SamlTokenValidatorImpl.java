@@ -156,11 +156,11 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods == null || methods.isEmpty()) {
             if (requiredSubjectConfirmationMethod != null) {
-                LOG.debug("A required subject confirmation method was not present");
+                LOG.warn("A required subject confirmation method was not present");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             } else if (requireStandardSubjectConfirmationMethod) {
-                LOG.debug("A standard subject confirmation method was not present");
+                LOG.warn("A standard subject confirmation method was not present");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             }
@@ -173,7 +173,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             // The assertion must have been signed for HOK
             if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
                 if (!signed) {
-                    LOG.debug("A holder-of-key assertion must be signed");
+                    LOG.warn("A holder-of-key assertion must be signed");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                   "invalidSAMLsecurity");
                 }
@@ -188,7 +188,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                     || SAML1Constants.CONF_BEARER.equals(method)) {
                     standardMethodFound = true;
                     if (requireBearerSignature && !signed) {
-                        LOG.debug("A Bearer Assertion was not signed");
+                        LOG.warn("A Bearer Assertion was not signed");
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                       "invalidSAMLsecurity");
                     }
@@ -200,13 +200,13 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         }
 
         if (!requiredMethodFound && requiredSubjectConfirmationMethod != null) {
-            LOG.debug("A required subject confirmation method was not present");
+            LOG.warn("A required subject confirmation method was not present");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
         }
 
         if (!standardMethodFound && requireStandardSubjectConfirmationMethod) {
-            LOG.debug("A standard subject confirmation method was not present");
+            LOG.warn("A standard subject confirmation method was not present");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                       "invalidSAMLsecurity");
         }

@@ -829,13 +829,13 @@ public class SamlAssertionWrapper {
             DateTime currentTime = new DateTime();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (validFrom.isAfter(currentTime)) {
-                LOG.debug("SAML Token condition (Not Before) not met");
+                LOG.warn("SAML Token condition (Not Before) not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
 
         if (validTill != null && validTill.isBeforeNow()) {
-            LOG.debug("SAML Token condition (Not On Or After) not met");
+            LOG.warn("SAML Token condition (Not On Or After) not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
@@ -861,7 +861,7 @@ public class SamlAssertionWrapper {
         if (issueInstant != null) {
             DateTime currentTime = new DateTime().plusSeconds(futureTTL);
             if (issueInstant.isAfter(currentTime)) {
-                LOG.debug("SAML Token IssueInstant not met");
+                LOG.warn("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
 
@@ -870,7 +870,7 @@ public class SamlAssertionWrapper {
                 currentTime = new DateTime().minusSeconds(ttl);
 
                 if (issueInstant.isBefore(currentTime)) {
-                    LOG.debug("SAML Token IssueInstant not met. The assertion was created too long ago.");
+                    LOG.warn("SAML Token IssueInstant not met. The assertion was created too long ago.");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
             }
@@ -987,13 +987,13 @@ public class SamlAssertionWrapper {
         DateTime currentTime = new DateTime();
         currentTime = currentTime.plusSeconds(futureTTL);
         if (authnInstant.isAfter(currentTime)) {
-            LOG.debug("SAML Token AuthnInstant not met");
+            LOG.warn("SAML Token AuthnInstant not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
         // Stale SessionNotOnOrAfter
         if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBeforeNow()) {
-            LOG.debug("SAML Token SessionNotOnOrAfter not met");
+            LOG.warn("SAML Token SessionNotOnOrAfter not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
@@ -1001,7 +1001,7 @@ public class SamlAssertionWrapper {
         if (subjectLocalityAddress != null
             && !(InetAddressUtils.isIPv4Address(subjectLocalityAddress)
                 || InetAddressUtils.isIPv6Address(subjectLocalityAddress))) {
-            LOG.debug("SAML Token SubjectLocality address is not valid: " + subjectLocalityAddress);
+            LOG.warn("SAML Token SubjectLocality address is not valid: " + subjectLocalityAddress);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }

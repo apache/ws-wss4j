@@ -23,12 +23,12 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 public final class DateUtil {
-    
+
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(DateUtil.class);
-    
+
     private static final DateTimeFormatter MILLISECOND_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    
+
     private static final DateTimeFormatter SECOND_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private DateUtil() {
@@ -54,20 +54,20 @@ public final class DateUtil {
 
         Instant validCreation = Instant.now();
         if (futureTimeToLive > 0) {
-            validCreation = validCreation.plusSeconds((long)futureTimeToLive);
+            validCreation = validCreation.plusSeconds(futureTimeToLive);
         }
         // Check to see if the created time is in the future
         if (created.isAfter(validCreation)) {
-            LOG.debug("Validation of Created: The message was created in the future!");
+            LOG.warn("Validation of Created: The message was created in the future!");
             return false;
         }
 
         // Calculate the time that is allowed for the message to travel
-        validCreation = Instant.now().minusSeconds((long)timeToLive);
+        validCreation = Instant.now().minusSeconds(timeToLive);
 
         // Validate the time it took the message to travel
         if (created.isBefore(validCreation)) {
-            LOG.debug("Validation of Created: The message was created too long ago");
+            LOG.warn("Validation of Created: The message was created too long ago");
             return false;
         }
 

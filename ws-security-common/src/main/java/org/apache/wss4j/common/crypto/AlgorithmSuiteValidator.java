@@ -56,7 +56,7 @@ public class AlgorithmSuiteValidator {
         Set<String> allowedSignatureMethods = algorithmSuite.getSignatureMethods();
         if (!allowedSignatureMethods.isEmpty()
             && !allowedSignatureMethods.contains(signatureMethod)) {
-            LOG.debug(
+            LOG.warn(
                 "SignatureMethod " + signatureMethod + " does not match required values"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -71,7 +71,7 @@ public class AlgorithmSuiteValidator {
     ) throws WSSecurityException {
         Set<String> allowedC14nAlgorithms = algorithmSuite.getC14nAlgorithms();
         if (!allowedC14nAlgorithms.isEmpty() && !allowedC14nAlgorithms.contains(c14nAlgorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "C14nMethod " + c14nAlgorithm + " does not match required value"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -101,7 +101,7 @@ public class AlgorithmSuiteValidator {
             Set<String> allowedDigestAlgorithms = algorithmSuite.getDigestAlgorithms();
             if (!allowedDigestAlgorithms.isEmpty()
                     && !allowedDigestAlgorithms.contains(digestMethod)) {
-                LOG.debug(
+                LOG.warn(
                     "DigestMethod " + digestMethod + " does not match required value"
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -115,7 +115,7 @@ public class AlgorithmSuiteValidator {
                         algorithmSuite.getTransformAlgorithms();
                 if (!allowedTransformAlgorithms.isEmpty()
                         && !allowedTransformAlgorithms.contains(algorithm)) {
-                    LOG.debug(
+                    LOG.warn(
                         "Transform method " + algorithm + " does not match required value"
                     );
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -130,7 +130,7 @@ public class AlgorithmSuiteValidator {
         Set<String> keyWrapAlgorithms = algorithmSuite.getKeyWrapAlgorithms();
         if (!keyWrapAlgorithms.isEmpty()
             && !keyWrapAlgorithms.contains(keyWrapAlgorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "The Key transport method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -143,7 +143,7 @@ public class AlgorithmSuiteValidator {
         Set<String> encryptionMethods = algorithmSuite.getEncryptionMethods();
         if (!encryptionMethods.isEmpty()
             && !encryptionMethods.contains(symmetricAlgorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "The encryption algorithm does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -191,7 +191,7 @@ public class AlgorithmSuiteValidator {
             int modulus = ((RSAPublicKey)publicKey).getModulus().bitLength();
             if (modulus < algorithmSuite.getMinimumAsymmetricKeyLength()
                 || modulus > algorithmSuite.getMaximumAsymmetricKeyLength()) {
-                LOG.debug(
+                LOG.warn(
                     "The asymmetric key length does not match the requirement"
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -200,13 +200,13 @@ public class AlgorithmSuiteValidator {
             int length = ((DSAPublicKey)publicKey).getParams().getP().bitLength();
             if (length < algorithmSuite.getMinimumAsymmetricKeyLength()
                 || length > algorithmSuite.getMaximumAsymmetricKeyLength()) {
-                LOG.debug(
+                LOG.warn(
                     "The asymmetric key length does not match the requirement"
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         } else {
-            LOG.debug(
+            LOG.warn(
                 "An unknown public key was provided"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -221,7 +221,7 @@ public class AlgorithmSuiteValidator {
     ) throws WSSecurityException {
         if (secretKeyLength < (algorithmSuite.getMinimumSymmetricKeyLength() / 8)
             || secretKeyLength > (algorithmSuite.getMaximumSymmetricKeyLength() / 8)) {
-            LOG.debug(
+            LOG.warn(
                 "The symmetric key length does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -236,7 +236,7 @@ public class AlgorithmSuiteValidator {
     ) throws WSSecurityException {
         int requiredKeyLength = algorithmSuite.getSignatureDerivedKeyLength();
         if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
-            LOG.debug(
+            LOG.warn(
                 "The signature derived key length of " + derivedKeyLength + " does not match"
                 + "the requirement of " + requiredKeyLength
             );
@@ -251,7 +251,7 @@ public class AlgorithmSuiteValidator {
     ) throws WSSecurityException {
         int requiredKeyLength = algorithmSuite.getEncryptionDerivedKeyLength();
         if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
-            LOG.debug(
+            LOG.warn(
                 "The encryption derived key length of " + derivedKeyLength + " does not match"
                 + "the requirement of " + requiredKeyLength
             );
@@ -267,7 +267,7 @@ public class AlgorithmSuiteValidator {
         Set<String> derivedKeyAlgorithms = algorithmSuite.getDerivedKeyAlgorithms();
         if (!derivedKeyAlgorithms.isEmpty()
             && !derivedKeyAlgorithms.contains(algorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "The Derived Key Algorithm does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);

@@ -583,7 +583,7 @@ public class UsernameToken {
      */
     public byte[] getDerivedKey(BSPEnforcer bspEnforcer, String rawPassword) throws WSSecurityException {
         if (rawPassword == null) {
-            LOG.debug("The raw password was null");
+            LOG.warn("The raw password was null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 

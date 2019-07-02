@@ -375,7 +375,7 @@ public class SignatureProcessor implements Processor {
             // Log the exact signature error
             //
             if (LOG.isDebugEnabled()) {
-                LOG.debug("XML Signature verification has failed");
+                LOG.warn("XML Signature verification has failed");
                 boolean signatureValidationCheck =
                     xmlSignature.getSignatureValue().validate(context);
                 LOG.debug("Signature Validation check: " + signatureValidationCheck);

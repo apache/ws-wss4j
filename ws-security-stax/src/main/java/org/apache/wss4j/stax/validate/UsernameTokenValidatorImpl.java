@@ -63,14 +63,14 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
         if (requiredPasswordType != null) {
             if (passwordType == null || passwordType.getType() == null) {
-                LOG.debug("Authentication failed as the received password type does not "
+                LOG.warn("Authentication failed as the received password type does not "
                     + "match the required password type of: {}", requiredPasswordType);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType =
                 WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
             if (requiredPasswordType != usernameTokenPasswordType) {
-                LOG.debug("Authentication failed as the received password type does not "
+                LOG.warn("Authentication failed as the received password type does not "
                     + "match the required password type of: {}", requiredPasswordType);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }

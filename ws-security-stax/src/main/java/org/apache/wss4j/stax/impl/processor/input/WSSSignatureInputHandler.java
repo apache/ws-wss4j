@@ -68,7 +68,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         if (securityProperties.getSignatureAlgorithm() != null
             && !securityProperties.getSignatureAlgorithm().equals(algorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "The Signature method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);

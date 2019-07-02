@@ -56,7 +56,7 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             && encryptionMethodType != null) {
             String encryptionMethod = encryptionMethodType.getAlgorithm();
             if (!securityProperties.getEncryptionKeyTransportAlgorithm().equals(encryptionMethod)) {
-                LOG.debug(
+                LOG.warn(
                     "The Key transport method does not match the requirement"
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);

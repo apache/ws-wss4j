@@ -570,7 +570,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         // EncryptionAlgorithm cannot be null
         if (symEncAlgo == null) {
-            LOG.debug("No encryption algorithm was specified in the request");
+            LOG.warn("No encryption algorithm was specified in the request");
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo",
                                           new Object[] {null});
 

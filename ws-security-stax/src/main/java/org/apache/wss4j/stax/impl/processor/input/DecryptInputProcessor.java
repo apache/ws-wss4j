@@ -260,7 +260,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         String encryptionAlgorithm = encryptedDataType.getEncryptionMethod().getAlgorithm();
         if (this.getSecurityProperties().getEncryptionSymAlgorithm() != null
             && !this.getSecurityProperties().getEncryptionSymAlgorithm().equals(encryptionAlgorithm)) {
-            LOG.debug(
+            LOG.warn(
                 "The Key encryption method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
