@@ -37,7 +37,7 @@
         <ehcache.version>2.10.6</ehcache.version>
         <geronimo.javamail.version>1.8.4</geronimo.javamail.version>
         <hamcrest.version>2.1</hamcrest.version>
-        <jasypt.version>1.9.2</jasypt.version>
+        <jasypt.version>1.9.3</jasypt.version>
         <junit.version>5.4.2</junit.version>
         <kerby.version>2.0.0</kerby.version>
         <neethi.version>3.1.1</neethi.version>
