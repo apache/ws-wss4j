@@ -427,11 +427,6 @@
             </build>
             <dependencies>
                  <dependency>
-                     <groupId>javax.activation</groupId>
-                     <artifactId>activation</artifactId>
-                     <version>1.1.1</version>
-                 </dependency>
-                 <dependency>
                      <groupId>javax.xml.ws</groupId>
                      <artifactId>jaxws-api</artifactId>
                      <version>2.2.9</version>
