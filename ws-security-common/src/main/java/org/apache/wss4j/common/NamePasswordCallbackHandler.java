@@ -80,6 +80,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
      * If found, it invokes the callback method on the object and returns true.
      * If not, it returns false.
      */
+    @SuppressWarnings("InexactVarargsConditional")
     private boolean invokePasswordCallback(Callback callback) {
         String cbname = passwordCallbackName == null
                         ? PASSWORD_CALLBACK_NAME : passwordCallbackName;
