@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.4
+==============
+
+Bug
+
+    [WSS-648] - Performance problem with very big request
+    [WSS-651] - Incorrect signature if document has WSU_NS declared on SOAP Header or Envelope
+    [WSS-652] - MTOM Content-Id handling doesn't comply with RFC2392: .NET issues
+
+Task
+
+    [WSS-633] - Upgrade ErrorProne to support Java 11
+    [WSS-649] - Remove Doctypes from the streaming schemas
+
+
 Release 2.2.3
 ==============
 
