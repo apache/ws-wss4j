@@ -73,10 +73,10 @@ public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
 
-    private Provider provider;
+    private final Provider provider;
 
     public EncryptedKeyProcessor() {
-        // complete
+        this(null);
     }
 
     public EncryptedKeyProcessor(Provider provider) {
