@@ -77,7 +77,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             if (password == null && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
-                final Object[] args = { ((WSSSecurityProperties) getSecurityProperties()).getTokenUser() };
+                final Object[] args = {((WSSSecurityProperties) getSecurityProperties()).getTokenUser() };
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", args);
             }
 
