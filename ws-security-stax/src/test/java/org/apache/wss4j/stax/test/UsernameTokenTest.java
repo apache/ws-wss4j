@@ -521,6 +521,38 @@ public class UsernameTokenTest extends AbstractTestBase {
     }
 
     @Test
+    public void testOutboundPW_TEXT_withEmptyPassword() throws Exception {
+        String transmitter = "sender";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.USERNAMETOKEN);
+            securityProperties.setActions(actions);
+            securityProperties.setTokenUser(transmitter);
+            securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+            securityProperties.setCallbackHandler(x -> {});
+
+            try {
+                OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+                XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+                XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+                xmlStreamWriter.close();
+                fail("Expecting an XMLStreamException");
+            } catch (XMLStreamException e) {
+                assertNotNull(e.getCause());
+                assertTrue(WSSecurityException.class.isAssignableFrom(e.getCause().getClass()));
+                WSSecurityException root = (WSSecurityException)e.getCause();
+                assertEquals(root.getErrorCode(), WSSecurityException.ErrorCode.FAILURE);
+                assertEquals("noPassword", root.getMsgID());
+                assertTrue(root.getMessage().contains(transmitter));
+            }
+        }
+    }
+
+    @Test
     public void testOutboundSign() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
