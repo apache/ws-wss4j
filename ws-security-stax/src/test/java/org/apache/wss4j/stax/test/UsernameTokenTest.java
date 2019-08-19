@@ -59,6 +59,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.utils.XMLUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -522,6 +524,38 @@ public class UsernameTokenTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.USERNAME_TOKEN;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "transmitter", "sender", "randomUsername" })
+    public void testOutboundPW_TEXT_withEmptyPassword(String transmitter) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.USERNAMETOKEN);
+            securityProperties.setActions(actions);
+            securityProperties.setTokenUser(transmitter);
+            securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+            securityProperties.setCallbackHandler(x -> {});
+
+            try {
+                OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+                XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+                XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+                xmlStreamWriter.close();
+                fail("Expecting an XMLStreamException");
+            } catch (XMLStreamException e) {
+                assertNotNull(e.getCause());
+                assertTrue(WSSecurityException.class.isAssignableFrom(e.getCause().getClass()), "Cause should be a WSSecurityException");
+                WSSecurityException root = (WSSecurityException)e.getCause();
+                assertEquals(root.getErrorCode(), WSSecurityException.ErrorCode.FAILURE);
+                assertEquals("noPassword", root.getMsgID());
+                assertTrue(root.getMessage().contains(transmitter), () -> "Message string: <" + root.getMessage() + "> to include <" + transmitter + '>');
+            }
         }
     }
 
