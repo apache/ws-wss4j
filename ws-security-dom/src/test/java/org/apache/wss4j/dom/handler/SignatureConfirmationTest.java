@@ -205,6 +205,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("SignatureConfirmation"));
+        assertTrue(outputString.contains("Value"));
     }
 
 
@@ -310,6 +311,59 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         newEngine.processSecurityHeader(doc, data);
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSignatureResponseForUnsignedRequest() throws Exception {
+        final RequestData reqData = new RequestData();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
+        msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
+        reqData.setMsgContext(msgContext);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.NO_SECURITY);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString =
+                XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        //
+        // Verify the inbound request, and create a response with a Signature Confirmation
+        //
+        WSHandlerResult results = verify(doc);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        List<WSHandlerResult> receivedResults = new ArrayList<>();
+        receivedResults.add(results);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
+        action = new HandlerAction(WSConstants.NO_SECURITY);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            false
+        );
+        String outputString =
+            XMLUtils.prettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signature Confirmation response....");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("SignatureConfirmation"));
+        // We should have no Value attribute
+        assertFalse(outputString.contains("Value"));
+    }
 
     /**
      * Verifies the soap envelope
