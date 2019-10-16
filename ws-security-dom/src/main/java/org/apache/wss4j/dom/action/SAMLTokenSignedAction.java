@@ -85,6 +85,7 @@ public class SAMLTokenSignedAction implements Action {
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
         wsSign.setWsDocInfo(reqData.getWsDocInfo());
         wsSign.setExpandXopInclude(reqData.isExpandXopInclude());
+        wsSign.setSignatureProvider(reqData.getSignatureProvider());
 
         CallbackHandler callbackHandler =
             handler.getPasswordCallbackHandler(reqData);

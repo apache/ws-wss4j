@@ -347,6 +347,9 @@ public class SignatureProcessor implements Processor {
         context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
+        if (data.getSignatureProvider() != null) {
+            context.setProperty("org.jcp.xml.dsig.internal.dom.SignatureProvider", data.getSignatureProvider());
+        }
 
         context.setProperty(AttachmentContentSignatureTransform.ATTACHMENT_CALLBACKHANDLER,
                             data.getAttachmentCallbackHandler());

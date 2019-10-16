@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.handler;
 
+import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +95,7 @@ public class RequestData {
     private boolean storeBytesInAttachment;
     private Serializer encryptionSerializer;
     private WSDocInfo wsDocInfo;
+    private Provider signatureProvider;
 
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -765,5 +767,16 @@ public class RequestData {
 
     public void setWsDocInfo(WSDocInfo wsDocInfo) {
         this.wsDocInfo = wsDocInfo;
+    }
+
+    public Provider getSignatureProvider() {
+        return signatureProvider;
+    }
+
+    /**
+     * Set a security Provider instance to use for Signature
+     */
+    public void setSignatureProvider(Provider signatureProvider) {
+        this.signatureProvider = signatureProvider;
     }
 }
