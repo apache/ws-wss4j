@@ -512,6 +512,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
             } else {
                 signContext = new DOMSignContext(key, securityHeaderElement);
             }
+            if (getSignatureProvider() != null) {
+                signContext.setProperty("org.jcp.xml.dsig.internal.dom.SignatureProvider", getSignatureProvider());
+            }
+
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
             if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(getSigCanonicalization())) {
                 signContext.putNamespacePrefix(

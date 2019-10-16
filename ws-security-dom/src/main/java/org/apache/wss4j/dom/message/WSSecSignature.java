@@ -109,6 +109,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private boolean includeSignatureToken;
     private boolean addInclusivePrefixes = true;
     private Element customKeyInfoElement;
+    private Provider signatureProvider;
 
     public WSSecSignature(WSSecHeader securityHeader) {
         super(securityHeader);
@@ -598,6 +599,9 @@ public class WSSecSignature extends WSSecSignatureBase {
             } else {
                 signContext = new DOMSignContext(key, securityHeaderElement);
             }
+            if (signatureProvider != null) {
+                signContext.setProperty("org.jcp.xml.dsig.internal.dom.SignatureProvider", signatureProvider);
+            }
 
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
             if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)) {
@@ -924,5 +928,13 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     public Element getCustomKeyInfoElement() {
         return customKeyInfoElement;
+    }
+
+    public Provider getSignatureProvider() {
+        return signatureProvider;
+    }
+
+    public void setSignatureProvider(Provider signatureProvider) {
+        this.signatureProvider = signatureProvider;
     }
 }

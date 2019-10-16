@@ -204,6 +204,9 @@ public class SAMLTokenProcessor implements Processor {
             XMLValidateContext context = new DOMValidateContext(key, sig.getDOM());
             context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
             context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
+            if (data.getSignatureProvider() != null) {
+                context.setProperty("org.jcp.xml.dsig.internal.dom.SignatureProvider", data.getSignatureProvider());
+            }
 
             XMLSignature xmlSignature;
             try {
@@ -264,7 +267,7 @@ public class SAMLTokenProcessor implements Processor {
 
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
-                List<Transform> transforms = (List<Transform>)reference.getTransforms();
+                List<Transform> transforms = reference.getTransforms();
                 List<String> transformAlgorithms = new ArrayList<>(transforms.size());
                 for (Transform transform : transforms) {
                     transformAlgorithms.add(transform.getAlgorithm());
