@@ -78,13 +78,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/trunk/
-        </connection>
-        <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/trunk/
-        </developerConnection>
-        <url>https://svn.apache.org/repos/asf/webservices/wss4j/trunk</url>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/ws-wss4j.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/ws-wss4j.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf?p=ws-wss4j.git;a=summary</url>
     </scm>
     <organization>
         <name>The Apache Software Foundation</name>
@@ -270,7 +266,6 @@
                         <exclude>*.txt</exclude>
                         <exclude>.gitignore</exclude>
                         <exclude>.git/**</exclude>
-                        <exclude>.svn/**</exclude>
                         <exclude>.pmd/**</exclude>
                         <exclude>.externalToolBuilders/**</exclude>
                         <exclude>.checkstyle/**</exclude>
