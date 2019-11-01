@@ -37,8 +37,8 @@ used to create SAML Assertions in WSS4J, code changes will be required.
 
 The most common OpenSAML dependency is to include a "SAMLVersion" to tell
 the SAMLCallback whether to create a SAML 2.0 or 1.1 Assertion. WSS4J 2.1
-provides an alternative way of specifying the SAML Version, via a https://svn.apache.org/repos/asf/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/saml/bean/Version.java[Version] bean. See
-https://svn.apache.org/repos/asf/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/common/SAML2CallbackHandler.java[here] for an example.
+provides an alternative way of specifying the SAML Version, via a https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/saml/bean/Version.java[Version] bean. See
+https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/common/SAML2CallbackHandler.java[here] for an example.
 
 ==== Custom processor changes
 

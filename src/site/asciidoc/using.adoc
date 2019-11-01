@@ -40,7 +40,7 @@ outbound SOAP request, by parsing configuration that is supplied to it via
 a subclass. Typically a web services stack that uses WSS4J for WS-Security
 will subclass WSHandler. An example of a subclass is the
 http://cxf.apache.org/docs/ws-security.html[WSS4JOutInterceptor]
-in Apache CXF. The configuration tags are defined in the http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants] class (WSHandlerConstants in WSS4J 1.6.x). For a more detailed explanation
+in Apache CXF. The configuration tags are defined in the https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants] class (WSHandlerConstants in WSS4J 1.6.x). For a more detailed explanation
 of the configuration tags, please refer to the link:config.html[configuration] page. The next few paragraphs will
 describe the most fundamental configuration tags that are used in most
 cases.
@@ -137,11 +137,11 @@ WS-SecurityPolicy based approaches. This functionality is only available for
 the DOM code. The best way of finding out how to do this is to take a look at
 the test sources. For example: 
 
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/UsernameTokenTest.java?view=markup[Username Token Test]
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/EncryptionTest.java?view=markup[Encryption Test]
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/SignatureTest.java?view=markup[Signature Test]
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/TimestampTest.java?view=markup[Timestamp Test]
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/saml/SamlTokenTest.java?view=markup[SAML Token Test]
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/UsernameTokenTest.java?view=markup[Username Token Test]
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/EncryptionTest.java?view=markup[Encryption Test]
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/SignatureTest.java?view=markup[Signature Test]
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/TimestampTest.java?view=markup[Timestamp Test]
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-dom/src/test/java/org/apache/wss4j/dom/saml/SamlTokenTest.java?view=markup[SAML Token Test]
 
 === SOAP Stacks
 

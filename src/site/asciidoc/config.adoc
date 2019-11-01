@@ -28,13 +28,13 @@ Apache WSS4J uses the Crypto interface to get keys and certificates for
 encryption/decryption and for signature creation/verification. WSS4J ships
 with three implementations:
 
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/Merlin.java?view=markup[
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/Merlin.java?view=markup[
 Merlin]: The standard implementation, based around two JDK keystores for
 key/cert retrieval, and trust verification.
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/CertificateStore.java?view=markup[
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/CertificateStore.java?view=markup[
 CertificateStore]: Holds an array of X509 Certificates. Can only be used
 for encryption and signature verification.
- * http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/MerlinDevice.java?view=markup[
+ * https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/crypto/MerlinDevice.java?view=markup[
 MerlinDevice]: Based on Merlin, allows loading of keystores using a null
 InputStream - for example on a smart-card device.
 
@@ -102,7 +102,7 @@ be signed.
 Apache WSS4J provides a set of configuration tags that can be used to configure
 both the DOM-based and StAX-based (WSS4J 2.0.0 onwards) outbound and inbound
 processing. As both DOM and StAX code are very similar, both approaches share
-a set of common configuration tags given in http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants]. Note
+a set of common configuration tags given in https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants]. Note
 that the WSS4J 1.6.x configuration class (WSHandlerConstants) extends this
 class in WSS4J 2.0.0, so there is no need to change any configuration code
 when upgrading.

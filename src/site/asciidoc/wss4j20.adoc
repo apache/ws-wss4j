@@ -110,7 +110,7 @@ can be set to sign the Assertion:
 In WSS4J 1.6.x, configuration tags were configured in the WSHandlerConstants
 class. In WSS4J 2.0.0, both the DOM and StAX-based code largely share the 
 same configuration options, and so the configuration tags are defined in
-http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants]. Note that the WSS4J 1.6.x configuration class
+https://github.com/apache/ws-wss4j/tree/master/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup[ConfigurationConstants]. Note that the WSS4J 1.6.x configuration class
 (WSHandlerConstants) extends this class in WSS4J 2.0.0, so there is no need to
 change any configuration code when upgrading.
 
