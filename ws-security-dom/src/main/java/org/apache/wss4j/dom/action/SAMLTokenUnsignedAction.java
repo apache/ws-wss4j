@@ -69,5 +69,10 @@ public class SAMLTokenUnsignedAction implements Action {
 
         // add the SAMLAssertion Token to the SOAP Envelope
         builder.build(samlAssertion);
+
+        byte[] signatureValue = samlAssertion.getSignatureValue();
+        if (signatureValue != null) {
+            reqData.getSignatureValues().add(signatureValue);
+        }
     }
 }
