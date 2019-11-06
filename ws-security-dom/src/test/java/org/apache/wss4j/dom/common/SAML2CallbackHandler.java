@@ -95,6 +95,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 }
                 callback.setSubject(subjectBean);
                 createAndSetStatement(null, callback);
+                callback.setSignAssertion(signAssertion);
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

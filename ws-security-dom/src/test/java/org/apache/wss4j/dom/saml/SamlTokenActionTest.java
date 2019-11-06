@@ -29,16 +29,19 @@ import org.w3c.dom.Document;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
+import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -100,7 +103,14 @@ public class SamlTokenActionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        verify(doc, callbackHandler);
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
     }
 
     @Test
@@ -136,7 +146,14 @@ public class SamlTokenActionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        verify(doc, callbackHandler);
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
     }
 
 
@@ -154,6 +171,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         samlCallbackHandler.setIssuerCrypto(crypto);
         samlCallbackHandler.setIssuerName("wss40");
         samlCallbackHandler.setIssuerPassword("security");
+        samlCallbackHandler.setSignAssertion(true);
 
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
@@ -174,7 +192,14 @@ public class SamlTokenActionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        verify(doc, callbackHandler);
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertTrue(receivedSamlAssertion.isSigned());
     }
 
     @Test
@@ -213,7 +238,59 @@ public class SamlTokenActionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        verify(doc, callbackHandler);
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+
+    @Test
+    public void testSignedSAML2AssertionAction() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+
+        CallbackHandler callbackHandler = new KeystoreCallbackHandler();
+
+        SAML2CallbackHandler samlCallbackHandler = new SAML2CallbackHandler();
+        samlCallbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        samlCallbackHandler.setIssuer("www.example.com");
+        samlCallbackHandler.setSignAssertion(true);
+        samlCallbackHandler.setIssuerCrypto(crypto);
+        samlCallbackHandler.setIssuerName("wss40");
+        samlCallbackHandler.setIssuerPassword("security");
+
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
+        config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
+        reqData.setMsgContext(config);
+
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertTrue(receivedSamlAssertion.isSigned());
     }
 
     private WSHandlerResult verify(

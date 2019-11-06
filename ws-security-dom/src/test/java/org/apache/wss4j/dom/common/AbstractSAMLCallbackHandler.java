@@ -82,6 +82,15 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private Element assertionAdviceElement;
     private Element keyInfoElement;
     protected NameIDBean subjectConfirmationNameID;
+    protected boolean signAssertion;
+
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
+    }
 
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
