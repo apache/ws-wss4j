@@ -118,6 +118,7 @@ public class SAMLTokenProcessor implements Processor {
         if (samlAssertion.isSigned()) {
             result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, samlAssertion);
             result.put(WSSecurityEngineResult.TAG_DATA_REF_URIS, dataRefs);
+            result.put(WSSecurityEngineResult.TAG_SIGNATURE_VALUE, samlAssertion.getSignatureValue());
         } else {
             result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, samlAssertion);
         }

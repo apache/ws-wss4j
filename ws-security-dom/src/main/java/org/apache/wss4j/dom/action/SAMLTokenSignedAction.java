@@ -129,7 +129,12 @@ public class SAMLTokenSignedAction implements Action {
                     samlCallback.getIssuerCrypto(),
                     samlCallback.getIssuerKeyName(),
                     samlCallback.getIssuerKeyPassword());
+
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
+            byte[] signatureValue = samlAssertion.getSignatureValue();
+            if (signatureValue != null) {
+                reqData.getSignatureValues().add(signatureValue);
+            }
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error when signing the SAML token: "});
