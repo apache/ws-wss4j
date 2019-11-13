@@ -106,7 +106,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <targetJdk>1.8</targetJdk>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
-        <maven-owasp-plugin-version>5.2.1</maven-owasp-plugin-version>
+        <maven-owasp-plugin-version>5.2.4</maven-owasp-plugin-version>
     </properties>
 
     <modules>
