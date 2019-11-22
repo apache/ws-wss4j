@@ -32,7 +32,7 @@ public final class AlgoFactory {
      *
      * @param algorithm The algorithm identifier
      * @return A derivation algorithm
-     * @throws ConversationException If the specified algorithm is not available
+     * @throws WSSecurityException If the specified algorithm is not available
      *                               in default implementations
      */
     public static DerivationAlgorithm getInstance(String algorithm) throws WSSecurityException {
