@@ -154,10 +154,11 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     /**
-     * Create a KeyInfo object
-     * @throws ConversationException
+     * Create a KeyInfo object.
+     *
+     * @return Returns the created KeyInfo object.
      */
-    private KeyInfo createKeyInfo() throws WSSecurityException {
+    private KeyInfo createKeyInfo() {
         KeyInfo keyInfo = new KeyInfo(getDocument());
         SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
         secToken.addWSSENamespace();

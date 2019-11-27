@@ -605,7 +605,7 @@ public class SamlAssertionWrapper {
     /**
      * Verify the signature of this assertion
      *
-     * @throws ValidationException
+     * @throws WSSecurityException
      */
     public void verifySignature(
         SAMLKeyInfoProcessor keyInfoProcessor, Crypto sigCrypto
@@ -631,7 +631,7 @@ public class SamlAssertionWrapper {
     /**
      * Verify the signature of this assertion
      *
-     * @throws ValidationException
+     * @throws WSSecurityException
      */
     public void verifySignature(SAMLKeyInfo samlKeyInfo) throws WSSecurityException {
         Signature sig = getSignature();
