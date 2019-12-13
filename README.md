@@ -2,27 +2,29 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/wss4j)](https://lgtm.com/projects/g/apache/wss4j/alerts/)
 
-* Apache WSS4J *
+Apache WSS4J
+======================
 
 The Apache WSS4J© project provides a Java implementation of the primary
 security standards for Web Services, namely the OASIS Web Services Security
 (WS-Security) specifications from the OASIS Web Services Security TC. WSS4J
 provides an implementation of the following WS-Security standards:
 
-    SOAP Message Security 1.1
-    Username Token Profile 1.1
-    X.509 Certificate Token Profile 1.1
-    SAML Token Profile 1.1
-    Kerberos Token Profile 1.1
-    SOAP with Attachments (SWA) Profile 1.1
-    Basic Security Profile 1.1
+ * SOAP Message Security 1.1
+ * Username Token Profile 1.1
+ * X.509 Certificate Token Profile 1.1
+ * SAML Token Profile 1.1
+ * Kerberos Token Profile 1.1
+ * SOAP with Attachments (SWA) Profile 1.1
+ * Basic Security Profile 1.1
 
 Apache WSS4J, Apache, and the Apache feather logo are trademarks of The Apache
 Software Foundation. 
 
 The master link to WSS4J: http://ws.apache.org/wss4j/
 
-* Crypto Notice *
+Crypto Notice
+======================
 
    This distribution includes cryptographic software.  The country in
    which you currently reside may have restrictions on the import,
@@ -50,7 +52,8 @@ The master link to WSS4J: http://ws.apache.org/wss4j/
    Apache WSS4J     : http://ws.apache.org/wss4j/
    Bouncycastle     : http://www.bouncycastle.org/
 
-* Test Requirements *
+Test Requirements
+======================
 
 The WSS4J unit tests use STRONG encryption. The default encryption algorithms
 included in a JRE is not adequate for these samples. The Java Cryptography
