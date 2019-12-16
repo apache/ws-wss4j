@@ -170,32 +170,34 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         boolean signed = samlAssertion.isSigned();
         boolean requiredMethodFound = false;
         boolean standardMethodFound = false;
-        for (String method : methods) {
-            // The assertion must have been signed for HOK
-            if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
-                if (!signed) {
-                    LOG.debug("A holder-of-key assertion must be signed");
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                                  "invalidSAMLsecurity");
-                }
-                standardMethodFound = true;
-            }
-
-            if (method != null) {
-                if (method.equals(requiredSubjectConfirmationMethod)) {
-                    requiredMethodFound = true;
-                }
-                if (SAML2Constants.CONF_BEARER.equals(method)
-                    || SAML1Constants.CONF_BEARER.equals(method)) {
-                    standardMethodFound = true;
-                    if (requireBearerSignature && !signed) {
-                        LOG.debug("A Bearer Assertion was not signed");
+        if (methods != null) {
+            for (String method : methods) {
+                // The assertion must have been signed for HOK
+                if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
+                    if (!signed) {
+                        LOG.debug("A holder-of-key assertion must be signed");
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                       "invalidSAMLsecurity");
                     }
-                } else if (SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
-                    || SAML1Constants.CONF_SENDER_VOUCHES.equals(method)) {
                     standardMethodFound = true;
+                }
+
+                if (method != null) {
+                    if (method.equals(requiredSubjectConfirmationMethod)) {
+                        requiredMethodFound = true;
+                    }
+                    if (SAML2Constants.CONF_BEARER.equals(method)
+                        || SAML1Constants.CONF_BEARER.equals(method)) {
+                        standardMethodFound = true;
+                        if (requireBearerSignature && !signed) {
+                            LOG.debug("A Bearer Assertion was not signed");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                                          "invalidSAMLsecurity");
+                        }
+                    } else if (SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
+                        || SAML1Constants.CONF_SENDER_VOUCHES.equals(method)) {
+                        standardMethodFound = true;
+                    }
                 }
             }
         }

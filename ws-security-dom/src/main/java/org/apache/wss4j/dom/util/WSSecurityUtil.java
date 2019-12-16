@@ -619,7 +619,7 @@ public final class WSSecurityUtil {
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
-                    if (wssConfig.getAction(parsedAction) == null) {
+                    if (wssConfig == null || wssConfig.getAction(parsedAction) == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                                       new Object[] {"Unknown action defined: " + single[i]}
                         );
