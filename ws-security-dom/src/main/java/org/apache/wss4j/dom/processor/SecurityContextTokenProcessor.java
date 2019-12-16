@@ -92,7 +92,7 @@ public class SecurityContextTokenProcessor implements Processor {
      * Get the secret from the provided callback handler and return it.
      *
      * @param cb
-     * @param sct
+     * @param identifier
      * @return The key collected using the callback handler
      */
     private byte[] getSecret(CallbackHandler cb, String identifier)

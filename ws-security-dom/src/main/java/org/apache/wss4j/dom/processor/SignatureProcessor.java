@@ -408,8 +408,8 @@ public class SignatureProcessor implements Processor {
      * Retrieve the Reference elements and set them on the ValidateContext
      * @param xmlSignature the XMLSignature object to get the references from
      * @param context the ValidateContext
+     * @param data The RequestData object
      * @param wsDocInfo the WSDocInfo object where tokens are stored
-     * @param doc the owner document from which to find elements
      * @throws WSSecurityException
      */
     private void setElementsOnContext(

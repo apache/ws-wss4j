@@ -238,7 +238,7 @@ public class AlgorithmSuiteValidator {
         if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
             LOG.warn(
                 "The signature derived key length of " + derivedKeyLength + " does not match"
-                + "the requirement of " + requiredKeyLength
+                + " the requirement of " + requiredKeyLength
             );
         }
     }
@@ -253,7 +253,7 @@ public class AlgorithmSuiteValidator {
         if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
             LOG.warn(
                 "The encryption derived key length of " + derivedKeyLength + " does not match"
-                + "the requirement of " + requiredKeyLength
+                + " the requirement of " + requiredKeyLength
             );
         }
     }

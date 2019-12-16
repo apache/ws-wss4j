@@ -161,8 +161,6 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
-     *
-     * @param The salt value to use if we are using a derived key
      */
     public void prepare() {
         prepare(null);
@@ -224,7 +222,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>UsernameToken</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      *
-     * @param the salt value to add if we are using a derived key
+     * @param salt the salt value to add if we are using a derived key
      * @return Document with UsernameToken added
      */
     public Document build(byte[] salt) {

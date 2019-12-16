@@ -64,7 +64,6 @@ public final class STRParserUtil {
      * @param secRef the SecurityTokenReference to the SAML Assertion
      * @param strElement The SecurityTokenReference DOM element
      * @param request The RequestData instance used to obtain configuration
-     * @param wsDocInfo The WSDocInfo object that holds previous results
      * @return an SamlAssertionWrapper object
      * @throws WSSecurityException
      */

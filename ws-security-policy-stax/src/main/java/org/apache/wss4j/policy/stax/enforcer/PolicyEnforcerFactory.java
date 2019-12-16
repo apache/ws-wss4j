@@ -431,7 +431,7 @@ public class PolicyEnforcerFactory {
      * @param roleOrActor The actor or role of the security processing. Must be set to the same value
      * as WSSSecurityProperties#setActor()
      * @param attachmentCount The number of Attachments received in the message
-     * @param Whether we are using SOAP 1.2 or not
+     * @param soap12 Whether we are using SOAP 1.2 or not
      * @return the newly created PolicyEnforcer instance
      * @throws WSSPolicyException
      */
