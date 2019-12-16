@@ -58,7 +58,7 @@ public class ConditionsBean {
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
@@ -85,7 +85,7 @@ public class ConditionsBean {
     public ConditionsBean(
         int tokenPeriodMinutes
     ) {
-        this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
+        this.tokenPeriodSeconds = tokenPeriodMinutes * 60L;
     }
 
     /**
@@ -105,7 +105,7 @@ public class ConditionsBean {
     public void setNotBefore(DateTime notBefore) {
         this.notBefore = notBefore;
     }
-    
+
     /**
      * Set the notBefore instance
      *
@@ -136,7 +136,7 @@ public class ConditionsBean {
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Set the notAfter instance
      *
@@ -165,7 +165,7 @@ public class ConditionsBean {
      * @param tokenPeriodMinutes the tokenPeriodMinutes to set
      */
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
-        this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
+        this.tokenPeriodSeconds = tokenPeriodMinutes * 60L;
     }
 
     /**

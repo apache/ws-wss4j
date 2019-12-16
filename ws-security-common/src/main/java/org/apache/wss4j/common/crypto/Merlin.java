@@ -282,10 +282,7 @@ public class Merlin extends CryptoBase {
                 loadCacerts = loadCacerts.trim();
             }
             if (Boolean.valueOf(loadCacerts)) {
-                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-                if (cacertsPath != null) {
-                    cacertsPath = cacertsPath.trim();
-                }
+                String cacertsPath = (System.getProperty("java.home") + "/lib/security/cacerts").trim();
                 try (InputStream is = Files.newInputStream(Paths.get(cacertsPath))) {
                     String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                     if (cacertsPasswd != null) {
