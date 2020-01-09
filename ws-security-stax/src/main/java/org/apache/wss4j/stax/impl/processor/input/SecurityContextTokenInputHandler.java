@@ -47,18 +47,17 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
     public void handle(InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        @SuppressWarnings("unchecked")
         JAXBElement<AbstractSecurityContextTokenType> securityContextTokenTypeJAXBElement =
-                (JAXBElement<AbstractSecurityContextTokenType>) parseStructure(eventQueue, index, securityProperties);
+                parseStructure(eventQueue, index, securityProperties);
         final AbstractSecurityContextTokenType securityContextTokenType = securityContextTokenTypeJAXBElement.getValue();
         if (securityContextTokenType.getId() == null) {
             securityContextTokenType.setId(IDGenerator.generateID(null));
         }
 
-        final QName elementName = new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(),
+        final QName identifierElementName = new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(),
                 WSSConstants.TAG_WSC0502_IDENTIFIER.getLocalPart());
-        final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
-                elementName);
+        final String identifier = XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
+                identifierElementName);
 
         final WSInboundSecurityContext wsInboundSecurityContext =
             (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
@@ -69,6 +68,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final TokenContext tokenContext =
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
+        final QName elementName = securityContextTokenTypeJAXBElement.getName();
         SecurityContextTokenValidator securityContextTokenValidator = wssSecurityProperties.getValidator(elementName);
         if (securityContextTokenValidator == null) {
             securityContextTokenValidator = new SecurityContextTokenValidatorImpl();
@@ -108,9 +108,17 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         wsInboundSecurityContext.registerSecurityTokenProvider(identifier, securityTokenProviderDirectReference);
 
         //fire a tokenSecurityEvent
+        SecurityContextTokenSecurityEvent securityEvent = createTokenSecurityEvent(securityContextTokenType, securityTokenProvider);
+        wsInboundSecurityContext.registerSecurityEvent(securityEvent);
+    }
+
+    private SecurityContextTokenSecurityEvent createTokenSecurityEvent(AbstractSecurityContextTokenType securityContextTokenType,
+                                                                       SecurityTokenProvider<InboundSecurityToken> securityTokenProvider)
+            throws XMLSecurityException {
         SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityContextTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         securityContextTokenSecurityEvent.setCorrelationID(securityContextTokenType.getId());
-        wsInboundSecurityContext.registerSecurityEvent(securityContextTokenSecurityEvent);
+        return securityContextTokenSecurityEvent;
     }
+
 }
