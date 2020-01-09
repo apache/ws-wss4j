@@ -27,12 +27,14 @@ import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.DocumentCreatorImpl;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.processor.output.BinarySecurityTokenOutputProcessor;
@@ -128,7 +130,7 @@ public class OutboundWSSec {
         final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
         outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
         outboundSecurityContext.addSecurityEventListener(securityEventListener);
-        return processOutMessage((Object) outputStream, encoding, outboundSecurityContext);
+        return processOutMessage(outputStream, encoding, outboundSecurityContext);
     }
 
     /**
@@ -703,9 +705,25 @@ public class OutboundWSSec {
                 final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
+                if (securityProperties.getDocumentCreator() == null) {
+                    try {
+                        securityProperties.setDocumentCreator(new DocumentCreatorImpl());
+                    } catch (ParserConfigurationException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                }
+
             } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
                 final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
+
+                if (securityProperties.getDocumentCreator() == null) {
+                    try {
+                        securityProperties.setDocumentCreator(new DocumentCreatorImpl());
+                    } catch (ParserConfigurationException e) {
+                        throw new XMLSecurityException(e);
+                    }
+                }
             } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                 configuredAction.kerberos = true;
                 configuredAction.signatureKerberos = true;

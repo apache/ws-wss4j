@@ -406,7 +406,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             throws XMLSecurityException {
         Document document = null;
         try {
-            document = XMLUtils.newDocument();
+            document = ((WSSSecurityProperties) securityProperties).getDocumentCreator().newDocument();
         } catch (ParserConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }

@@ -23,11 +23,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.DocumentCreatorImpl;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
@@ -194,6 +196,14 @@ public class InboundWSSec {
         securityContextImpl.setDisableBSPEnforcement(this.securityProperties.isDisableBSPEnforcement());
         securityContextImpl.setAllowRSA15KeyTransportAlgorithm(this.securityProperties.isAllowRSA15KeyTransportAlgorithm());
         securityContextImpl.setSoap12(this.securityProperties.isSoap12());
+
+        if (securityProperties.getDocumentCreator() == null) {
+            try {
+                securityProperties.setDocumentCreator(new DocumentCreatorImpl());
+            } catch (ParserConfigurationException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
+        }
 
         if (!requestSecurityEvents.isEmpty()) {
             try {

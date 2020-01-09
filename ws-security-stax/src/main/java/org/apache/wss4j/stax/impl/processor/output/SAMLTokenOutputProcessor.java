@@ -58,8 +58,8 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.apache.xml.security.utils.XMLUtils;
 import org.opensaml.saml.common.SAMLVersion;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
@@ -466,7 +466,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 try {
-                    outputDOMElement(samlAssertionWrapper.toDOM(XMLUtils.newDocument()), subOutputProcessorChain);
+                    Document doc = ((WSSSecurityProperties) getSecurityProperties()).getDocumentCreator().newDocument();
+                    outputDOMElement(samlAssertionWrapper.toDOM(doc), subOutputProcessorChain);
                 } catch (ParserConfigurationException ex) {
                     LOG.debug("Error writing out SAML Assertion", ex);
                     throw new XMLSecurityException(ex);
