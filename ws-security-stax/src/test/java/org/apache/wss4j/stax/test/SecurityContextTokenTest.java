@@ -1171,8 +1171,12 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                     return super.validate(securityContextTokenType, identifier, tokenContext);
                 }
             };
-            securityProperties.addValidator(WSSConstants.TAG_WSC0502_SCT, validator);
-            securityProperties.addValidator(WSSConstants.TAG_WSC0512_SCT, validator);
+
+            if (version == ConversationConstants.VERSION_05_02) {
+                securityProperties.addValidator(WSSConstants.TAG_WSC0502_SCT, validator);
+            } else {
+                securityProperties.addValidator(WSSConstants.TAG_WSC0512_SCT, validator);
+            }
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 

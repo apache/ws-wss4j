@@ -68,7 +68,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final TokenContext tokenContext =
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
-        final QName elementName = extractElementName(securityContextTokenTypeJAXBElement);
+        final QName elementName = securityContextTokenTypeJAXBElement.getName();
         SecurityContextTokenValidator securityContextTokenValidator = wssSecurityProperties.getValidator(elementName);
         if (securityContextTokenValidator == null) {
             securityContextTokenValidator = new SecurityContextTokenValidatorImpl();
@@ -110,11 +110,6 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         //fire a tokenSecurityEvent
         SecurityContextTokenSecurityEvent securityEvent = createTokenSecurityEvent(securityContextTokenType, securityTokenProvider);
         wsInboundSecurityContext.registerSecurityEvent(securityEvent);
-    }
-
-    private QName extractElementName(JAXBElement<?> jaxbElement) {
-        QName qName = jaxbElement.getName();
-        return new QName(qName.getNamespaceURI(), qName.getLocalPart());
     }
 
     private SecurityContextTokenSecurityEvent createTokenSecurityEvent(AbstractSecurityContextTokenType securityContextTokenType,
