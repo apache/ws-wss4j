@@ -393,12 +393,12 @@ public final class EncryptionUtils {
 
         Document document = null;
         try {
-            document = org.apache.xml.security.utils.XMLUtils.read(new ByteArrayInputStream(bytes));
+            document = org.apache.xml.security.utils.XMLUtils.read(new ByteArrayInputStream(bytes), true);
         } catch (SAXException ex) {
             // A prefix may not have been bound, try to fix the DOM Element in this case.
             String fixedElementStr = setParentPrefixes(encData, new String(bytes));
             document = org.apache.xml.security.utils.XMLUtils.read(
-                new ByteArrayInputStream(fixedElementStr.getBytes()));
+                new ByteArrayInputStream(fixedElementStr.getBytes()), true);
         }
 
         Node decryptedNode =
