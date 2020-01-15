@@ -55,8 +55,4 @@ public class ResolverAttachment extends ResourceResolverSpi {
         return false;
     }
 
-    @Override
-    public boolean engineIsThreadSafe() {
-        return true;
-    }
 }

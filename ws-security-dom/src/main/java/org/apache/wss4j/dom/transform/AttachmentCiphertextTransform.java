@@ -18,16 +18,36 @@
  */
 package org.apache.wss4j.dom.transform;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.xml.security.c14n.CanonicalizationException;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
+import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformSpi;
+import org.apache.xml.security.transforms.TransformationException;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
- * Fake class to be able to create a Tranforms object
+ * Fake class to be able to create a Transforms object
  */
 public class AttachmentCiphertextTransform extends TransformSpi {
 
     @Override
     protected String engineGetURI() {
         return WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS;
+    }
+
+    @Override
+    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input, OutputStream os,
+                                                       Element transformElement, String baseURI,
+                                                       boolean secureValidation)
+        throws IOException, CanonicalizationException, InvalidCanonicalizerException, TransformationException,
+        ParserConfigurationException, SAXException {
+        return null;
     }
 }
