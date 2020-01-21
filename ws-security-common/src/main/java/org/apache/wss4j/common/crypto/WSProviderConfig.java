@@ -271,24 +271,7 @@ public final class WSProviderConfig {
         Provider currentProvider = Security.getProvider(name);
         if (currentProvider == null) {
             try {
-                //
-                // Install the provider after the SUN provider (see WSS-99)
-                // Otherwise fall back to the old behaviour of inserting
-                // the provider in position 2. For AIX, install it after
-                // the IBMJCE provider.
-                //
-                int ret = 0;
-                Provider[] provs = Security.getProviders();
-                for (int i = 0; i < provs.length; i++) {
-                    if ("SUN".equals(provs[i].getName())
-                        || "IBMJCE".equals(provs[i].getName())) {
-                        ret = Security.insertProviderAt(provider, i + 2);
-                        break;
-                    }
-                }
-                if (ret == 0) {
-                    ret = Security.insertProviderAt(provider, 2);
-                }
+                int ret = Security.addProvider(provider);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(
                         "The provider " + provider.getName() + " - "
