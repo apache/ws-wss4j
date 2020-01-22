@@ -20,8 +20,8 @@
 package org.apache.wss4j.dom.transform;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Iterator;
@@ -177,8 +177,6 @@ public class STRTransform extends TransformService {
 
             Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
 
-            byte[] buf = null;
-
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
@@ -214,16 +212,15 @@ public class STRTransform extends TransformService {
             //
             // C14n with specified algorithm. According to WSS Specification.
             //
-            buf = canon.canonicalizeSubtree(dereferencedToken, "#default", true);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("after c14n: " + new String(buf, StandardCharsets.UTF_8));
-            }
-
             if (os != null) {
-                os.write(buf);
+                canon.canonicalizeSubtree(dereferencedToken, "#default", true, os);
                 return null;
             }
-            return new OctetStreamData(new ByteArrayInputStream(buf));
+
+            try (ByteArrayOutputStream writer = new ByteArrayOutputStream()) {
+                canon.canonicalizeSubtree(dereferencedToken, "#default", true, writer);
+                return new OctetStreamData(new ByteArrayInputStream(writer.toByteArray()));
+            }
         } catch (Exception ex) {
             throw new TransformException(ex);
         }

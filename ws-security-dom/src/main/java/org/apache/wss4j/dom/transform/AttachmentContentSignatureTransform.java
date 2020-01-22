@@ -199,10 +199,9 @@ public class AttachmentContentSignatureTransform extends TransformService {
                  * attribute SHOULD be empty or not present.
                  */
                 Canonicalizer canon = Canonicalizer.getInstance(WSConstants.C14N_EXCL_OMIT_COMMENTS);
-                canon.setWriter(outputStream);
 
                 XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(inputStream);
-                canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet());
+                canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet(), outputStream);
 
             } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
                 CRLFOutputStream crlfOutputStream = new CRLFOutputStream(outputStream);
