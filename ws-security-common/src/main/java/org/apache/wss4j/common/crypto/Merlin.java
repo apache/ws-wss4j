@@ -1222,15 +1222,12 @@ public class Merlin extends CryptoBase {
         // object fails (e.g. if the DN contains "E" instead of "EMAILADDRESS"), then fall
         // back on a direct conversion to a BC X509Name
         //
-        Object subject;
         try {
             X500Principal subjectRDN = new X500Principal(subjectDN);
-            subject = createBCX509Name(subjectRDN.getName());
+            return createBCX509Name(subjectRDN.getName());
         } catch (java.lang.IllegalArgumentException ex) {
-            subject = createBCX509Name(subjectDN);
+            return createBCX509Name(subjectDN);
         }
-
-        return subject;
     }
 
     /**

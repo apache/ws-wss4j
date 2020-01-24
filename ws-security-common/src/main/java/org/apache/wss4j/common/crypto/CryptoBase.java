@@ -391,10 +391,7 @@ public abstract class CryptoBase implements Crypto {
      * @return the NameConstraints, or null if not present
      * @throws WSSecurityException if a processing error occurs decoding the Octet String
      */
-    protected byte[]
-    getNameConstraints(
-            final X509Certificate cert
-    ) throws WSSecurityException {
+    protected byte[] getNameConstraints(final X509Certificate cert) throws WSSecurityException {
         byte[] bytes = cert.getExtensionValue(NAME_CONSTRAINTS_OID);
         if (bytes == null || bytes.length <= 0) {
             return null;

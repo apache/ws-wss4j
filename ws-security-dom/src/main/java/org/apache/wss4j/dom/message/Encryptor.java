@@ -280,7 +280,6 @@ public class Encryptor {
         // Serialize and encrypt the element
         AbstractSerializer serializer = new TransformSerializer();
         serializer.setCanonicalizer(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_PHYSICAL));
-        serializer.setSecureValidation(true);
 
         byte[] serializedOctets = null;
         if (type.equals(EncryptionConstants.TYPE_CONTENT)) {
