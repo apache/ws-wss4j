@@ -179,9 +179,10 @@ public final class EncryptionUtils {
 
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
             if (encryptionSerializer != null) {
-                xmlCipher.setSerializer(encryptionSerializer);
+                xmlCipher = XMLCipher.getInstance(symEncAlgo, encryptionSerializer);
+            } else {
+                xmlCipher = XMLCipher.getInstance(symEncAlgo);
             }
             xmlCipher.setSecureValidation(true);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);

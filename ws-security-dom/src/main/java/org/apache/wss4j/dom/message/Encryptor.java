@@ -48,7 +48,6 @@ import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.Serializer;
@@ -91,14 +90,15 @@ public class Encryptor {
 
         XMLCipher xmlCipher = null;
         try {
-            xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
+            if (encryptionSerializer != null) {
+                xmlCipher = XMLCipher.getInstance(encryptionAlgorithm, encryptionSerializer);
+            } else {
+                xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
+            }
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
-        }
-        if (encryptionSerializer != null) {
-            xmlCipher.setSerializer(encryptionSerializer);
         }
 
         List<String> encDataRef = new ArrayList<>();
@@ -278,8 +278,7 @@ public class Encryptor {
         Cipher cipher = createCipher(encryptionAlgorithm, secretKey);
 
         // Serialize and encrypt the element
-        AbstractSerializer serializer = new TransformSerializer();
-        serializer.setCanonicalizer(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_PHYSICAL));
+        AbstractSerializer serializer = new TransformSerializer(true);
 
         byte[] serializedOctets = null;
         if (type.equals(EncryptionConstants.TYPE_CONTENT)) {
