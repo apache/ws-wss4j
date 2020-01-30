@@ -30,7 +30,9 @@
     
     <properties>
         <wss4j.osgi.dynamic.import>
-            org.bouncycastle.jce.provider
+            org.bouncycastle.jce.provider,
+            com.sun.xml.messaging.saaj.soap,
+            com.sun.xml.internal.messaging.saaj.soap
         </wss4j.osgi.dynamic.import>
         <wss4j.module.name>org.apache.wss4j.dom</wss4j.module.name>
     </properties>
