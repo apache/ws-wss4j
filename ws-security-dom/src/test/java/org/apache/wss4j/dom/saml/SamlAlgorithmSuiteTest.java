@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.saml;
 
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -192,6 +193,53 @@ public class SamlAlgorithmSuiteTest {
         }
 
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
+        verify(securityHeader, algorithmSuite, crypto);
+    }
+
+    @Test
+    public void signWithEcdsaAlgorithm() throws Exception {
+        crypto = CryptoFactory.getInstance("wss40.properties");
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        samlAssertion.signAssertion(
+            "wss40ec", "security", crypto, false,
+            CanonicalizationMethod.EXCLUSIVE, WSConstants.ECDSA_SHA256);
+
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document signedDoc = wsSign.build(samlAssertion);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString =
+                XMLUtils.prettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+
+        Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
+        AlgorithmSuite algorithmSuite = createAlgorithmSuite();
+
+        try {
+            verify(securityHeader, algorithmSuite, crypto);
+            fail("Expected failure as C14n algorithm is not allowed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        algorithmSuite.addSignatureMethod(WSConstants.ECDSA_SHA1);
+        algorithmSuite.setMinimumAsymmetricKeyLength(256);
+
         verify(securityHeader, algorithmSuite, crypto);
     }
 
