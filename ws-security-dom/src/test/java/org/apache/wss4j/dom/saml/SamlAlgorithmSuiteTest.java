@@ -238,7 +238,6 @@ public class SamlAlgorithmSuiteTest {
         }
 
         algorithmSuite.addSignatureMethod(WSConstants.ECDSA_SHA1);
-        algorithmSuite.setMinimumAsymmetricKeyLength(256);
 
         verify(securityHeader, algorithmSuite, crypto);
     }

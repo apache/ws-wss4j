@@ -210,9 +210,9 @@ public class AlgorithmSuiteValidator {
             final ECPublicKey ecpriv = (ECPublicKey) publicKey;
             final java.security.spec.ECParameterSpec spec = ecpriv.getParams();
             int length = spec.getOrder().bitLength();
-            if (length < algorithmSuite.getMinimumAsymmetricKeyLength()
-                    || length > algorithmSuite.getMaximumAsymmetricKeyLength()) {
-                LOG.warn("The asymmetric key length does not match the requirement");
+            if (length < algorithmSuite.getMinimumEllipticCurveKeyLength()
+                    || length > algorithmSuite.getMaximumEllipticCurveKeyLength()) {
+                LOG.warn("The elliptic curve key length does not match the requirement");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         } else {

@@ -44,6 +44,8 @@ public class AlgorithmSuite {
     private int minimumSymmetricKeyLength = 128;
     private int maximumAsymmetricKeyLength = 4096;
     private int minimumAsymmetricKeyLength = 1024;
+    private int maximumEllipticCurveKeyLength = 512;
+    private int minimumEllipticCurveKeyLength = 160;
 
     private int signatureDerivedKeyLength;
     private int encryptionDerivedKeyLength;
@@ -171,6 +173,22 @@ public class AlgorithmSuite {
 
     public void setMinimumSymmetricKeyLength(int minimumSymmetricKeyLength) {
         this.minimumSymmetricKeyLength = minimumSymmetricKeyLength;
+    }
+
+    public int getMaximumEllipticCurveKeyLength() {
+        return maximumEllipticCurveKeyLength;
+    }
+
+    public void setMaximumEllipticCurveKeyLength(int maximumEllipticCurveKeyLength) {
+        this.maximumEllipticCurveKeyLength = maximumEllipticCurveKeyLength;
+    }
+
+    public int getMinimumEllipticCurveKeyLength() {
+        return minimumEllipticCurveKeyLength;
+    }
+
+    public void setMinimumEllipticCurveKeyLength(int minimumEllipticCurveKeyLength) {
+        this.minimumEllipticCurveKeyLength = minimumEllipticCurveKeyLength;
     }
 
 }
