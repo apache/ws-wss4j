@@ -148,6 +148,14 @@ public class WSS4JConstants {
         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
     public static final String HMAC_MD5 =
         "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
+    public static final String ECDSA_SHA1 =
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
+    public static final String ECDSA_SHA384 =
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
+    public static final String ECDSA_SHA256 =
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
+    public static final String ECDSA_SHA512 =
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
 
     public static final String MGF_SHA1 = "http://www.w3.org/2009/xmlenc11#mgf1sha1";
     public static final String MGF_SHA224 = "http://www.w3.org/2009/xmlenc11#mgf1sha224";
