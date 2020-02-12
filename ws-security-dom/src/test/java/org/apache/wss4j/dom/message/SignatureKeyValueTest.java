@@ -176,5 +176,43 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             ((PublicKeyPrincipal)principal).getPublicKey();
         assertTrue(publicKey instanceof java.security.interfaces.DSAPublicKey);
     }
+    
+    /**
+     * Successful ECKeyValue test.
+     */
+    @Test
+    public void testECKeyValue() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40ec", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        Document signedDoc = builder.build(crypto);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(signedDoc);
+        LOG.debug(outputString);
+        assertTrue(outputString.contains("ECKeyValue"));
+
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
+        final WSHandlerResult results =
+            secEngine.processSecurityHeader(signedDoc, data);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertNotNull(actionResult);
+
+        java.security.Principal principal =
+            (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal instanceof PublicKeyPrincipal);
+        java.security.PublicKey publicKey =
+            ((PublicKeyPrincipal)principal).getPublicKey();
+        assertTrue(publicKey instanceof java.security.interfaces.ECPublicKey);
+    }
 
 }

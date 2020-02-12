@@ -22,6 +22,7 @@ package org.apache.wss4j.common.crypto;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Set;
 
@@ -203,6 +204,15 @@ public class AlgorithmSuiteValidator {
                 LOG.debug(
                     "The asymmetric key length does not match the requirement"
                 );
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            }
+        } else if (publicKey instanceof ECPublicKey) {
+            final ECPublicKey ecpriv = (ECPublicKey) publicKey;
+            final java.security.spec.ECParameterSpec spec = ecpriv.getParams();
+            int length = spec.getOrder().bitLength();
+            if (length < algorithmSuite.getMinimumEllipticCurveKeyLength()
+                    || length > algorithmSuite.getMaximumEllipticCurveKeyLength()) {
+                LOG.warn("The elliptic curve key length does not match the requirement");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         } else {

@@ -895,6 +895,8 @@ public class WSSecSignature extends WSSecSignatureBase {
                     sigAlgo = WSConstants.DSA;
                 } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
                     sigAlgo = WSConstants.RSA;
+                } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
+                    sigAlgo = WSConstants.ECDSA_SHA256;
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
