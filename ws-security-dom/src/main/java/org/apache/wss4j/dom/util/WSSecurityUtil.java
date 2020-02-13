@@ -107,8 +107,8 @@ public final class WSSecurityUtil {
                     break;
                 }
             }
-        } catch (ClassNotFoundException cnfe) {
-            LOG.debug("Can't load class com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl", cnfe);
+        } catch (Throwable t) {
+            LOG.debug("Can't load class com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl", t);
 
             try {
                 Method[] methods = WSSecurityUtil.class.getClassLoader().
@@ -120,8 +120,8 @@ public final class WSSecurityUtil {
                         break;
                     }
                 }
-            } catch (ClassNotFoundException cnfe1) {
-                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", cnfe1);
+            } catch (Throwable t1) {
+                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", t1);
             }
         }
     }
