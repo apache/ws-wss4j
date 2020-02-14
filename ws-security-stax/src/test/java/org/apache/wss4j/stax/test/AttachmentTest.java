@@ -69,7 +69,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.junit.Assume.assumeFalse;
+
 public class AttachmentTest extends AbstractTestBase {
+
+    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     public AttachmentTest() throws Exception {
     }
@@ -482,6 +486,7 @@ public class AttachmentTest extends AbstractTestBase {
 
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
+        assumeFalse(isIBMJdK);
 
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();

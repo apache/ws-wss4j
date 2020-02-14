@@ -43,6 +43,8 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assume.assumeFalse;
+
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests using GCM. See:
  * https://issues.apache.org/jira/browse/WSS-325
@@ -59,6 +61,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
+
+    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -81,6 +85,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES128GCM() throws Exception {
+        assumeFalse(isIBMJdK);
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -103,6 +109,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES256GCM() throws Exception {
+        assumeFalse(isIBMJdK);
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -125,6 +133,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES192GCM_RSAOAEP_SHA256_MGFSHA256() throws Exception {
+        assumeFalse(isIBMJdK);
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();

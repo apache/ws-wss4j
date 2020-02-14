@@ -58,6 +58,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.junit.Assume.assumeFalse;
+
 public class AttachmentTest extends Assert {
 
     private static final org.slf4j.Logger LOG =
@@ -65,6 +67,8 @@ public class AttachmentTest extends Assert {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
+
+    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     public AttachmentTest() throws Exception {
         WSSConfig.init();
@@ -417,6 +421,8 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
+        assumeFalse(isIBMJdK);
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
