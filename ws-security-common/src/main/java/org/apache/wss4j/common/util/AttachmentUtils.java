@@ -497,7 +497,7 @@ public final class AttachmentUtils {
                 }
 
                 AlgorithmParameterSpec paramSpec =
-                    XMLCipherUtil.constructBlockCipherParameters(encAlgo, ivBytes, AttachmentUtils.class);
+                    XMLCipherUtil.constructBlockCipherParameters(encAlgo, ivBytes);
 
                 try {
                     cipher.init(Cipher.DECRYPT_MODE, key, paramSpec);

@@ -427,7 +427,7 @@ public class Encryptor {
             int ivLen = JCEMapper.getIVLengthFromURI(encryptionAlgorithm) / 8;
             byte[] iv = XMLSecurityConstants.generateBytes(ivLen);
             AlgorithmParameterSpec paramSpec =
-                XMLCipherUtil.constructBlockCipherParameters(encryptionAlgorithm, iv, Encryptor.class);
+                XMLCipherUtil.constructBlockCipherParameters(encryptionAlgorithm, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
 
             return cipher;

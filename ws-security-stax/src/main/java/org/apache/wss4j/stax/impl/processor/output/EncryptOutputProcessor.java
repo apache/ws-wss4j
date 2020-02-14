@@ -269,7 +269,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     int ivLen = JCEMapper.getIVLengthFromURI(encryptionSymAlgorithm) / 8;
                     byte[] iv = XMLSecurityConstants.generateBytes(ivLen);
                     AlgorithmParameterSpec paramSpec =
-                        XMLCipherUtil.constructBlockCipherParameters(encryptionSymAlgorithm, iv, this.getClass());
+                        XMLCipherUtil.constructBlockCipherParameters(encryptionSymAlgorithm, iv);
                     cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), paramSpec);
 
                 } catch (Exception e) {
