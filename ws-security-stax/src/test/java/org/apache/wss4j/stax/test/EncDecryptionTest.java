@@ -91,8 +91,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class EncDecryptionTest extends AbstractTestBase {
+
+    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     @Test
     public void testEncDecryptionDefaultConfigurationOutbound() throws Exception {
@@ -1832,6 +1835,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      */
     @Test
     public void testKeyWrappingRSAOAEPMGF1AESGCM128Outbound() throws Exception {
+        assumeFalse(isIBMJdK);
         try {
             Security.addProvider(new BouncyCastleProvider());
             ByteArrayOutputStream baos;
@@ -1892,7 +1896,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
     @Test
     public void testKeyWrappingRSAOAEPMGF1AESGCM128Inbound() throws Exception {
-
+        assumeFalse(isIBMJdK);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1938,6 +1942,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     */
     @Test
     public void testKeyWrappingRSAOAEPAESGCM192SHA256Outbound() throws Exception {
+        assumeFalse(isIBMJdK);
         try {
             Security.addProvider(new BouncyCastleProvider());
             ByteArrayOutputStream baos;
@@ -2001,7 +2006,8 @@ public class EncDecryptionTest extends AbstractTestBase {
     }
 
     @Test
-    public void testKeyWrappingRSAOAEPAESGMC192SHA256Inbound() throws Exception {
+    public void testKeyWrappingRSAOAEPAESGCM192SHA256Inbound() throws Exception {
+        assumeFalse(isIBMJdK);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2053,6 +2059,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      */
     @Test
     public void testKeyWrappingRSAOAEPAES192GCMSHA384MGF1sha384Outbound() throws Exception {
+        assumeFalse(isIBMJdK);
         try {
             Security.addProvider(new BouncyCastleProvider());
 
@@ -2124,6 +2131,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testKeyWrappingRSAOAEPAES192GCMSHA384MGF1sha1Inbound() throws Exception {
 
+        assumeFalse(isIBMJdK);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2179,6 +2187,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
     @Test
     public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceOutbound() throws Exception {
+        assumeFalse(isIBMJdK);
         try {
             Security.addProvider(new BouncyCastleProvider());
             ByteArrayOutputStream baos;
@@ -2254,6 +2263,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Disabled //WSS4J does not support OAEPParams atm
     public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceInbound() throws Exception {
+        assumeFalse(isIBMJdK);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
