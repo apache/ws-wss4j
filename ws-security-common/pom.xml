@@ -131,7 +131,17 @@
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.cryptacular</groupId>
+                    <artifactId>cryptacular</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.cryptacular</groupId>
+            <artifactId>cryptacular</artifactId>
+            <version>${cryptacular.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
