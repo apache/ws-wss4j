@@ -37,7 +37,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
 
     public static synchronized void install() {
         Security.insertProviderAt(new ThreadLocalSecurityProvider(),
-                                  Security.getProviders().length);
+                Security.getProviders().length);
         installed = true;
     }
 
@@ -66,28 +66,32 @@ public final class ThreadLocalSecurityProvider extends Provider {
         return PROVIDER.get();
     }
 
-    public void clear() {
+    @Override
+    public synchronized void clear() {
         Provider p = getProvider();
         if (p != null) {
             p.clear();
         }
     }
 
-    public void load(InputStream inStream) throws IOException {
+    @Override
+    public synchronized void load(InputStream inStream) throws IOException {
         Provider p = getProvider();
         if (p != null) {
             p.load(inStream);
         }
     }
 
-    public void putAll(Map<?, ?> t) {
+    @Override
+    public synchronized void putAll(Map<?, ?> t) {
         Provider p = getProvider();
         if (p != null) {
             p.putAll(t);
         }
     }
 
-    public Set<Map.Entry<Object, Object>> entrySet() {
+    @Override
+    public synchronized Set<Map.Entry<Object, Object>> entrySet() {
         Provider p = getProvider();
         if (p != null) {
             return p.entrySet();
@@ -96,6 +100,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public Set<Object> keySet() {
         Provider p = getProvider();
         if (p != null) {
@@ -105,6 +110,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public Collection<Object> values() {
         Provider p = getProvider();
         if (p != null) {
@@ -114,7 +120,8 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
-    public Object put(Object key, Object value) {
+    @Override
+    public synchronized Object put(Object key, Object value) {
         Provider p = getProvider();
         if (p != null) {
             return p.put(key, value);
@@ -123,7 +130,8 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
-    public Object remove(Object key) {
+    @Override
+    public synchronized Object remove(Object key) {
         Provider p = getProvider();
         if (p != null) {
             return p.remove(key);
@@ -132,6 +140,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public Object get(Object key) {
         Provider p = getProvider();
         if (p != null) {
@@ -141,6 +150,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public Enumeration<Object> keys() {
         Provider p = getProvider();
         if (p != null) {
@@ -150,6 +160,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public Enumeration<Object> elements() {
         Provider p = getProvider();
         if (p != null) {
@@ -159,6 +170,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
+    @Override
     public String getProperty(String key) {
         Provider p = getProvider();
         if (p != null) {
@@ -168,7 +180,8 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
-    public Service getService(String type, String algorithm) {
+    @Override
+    public synchronized Service getService(String type, String algorithm) {
         Provider p = getProvider();
         if (p != null) {
             return p.getService(type, algorithm);
@@ -177,7 +190,8 @@ public final class ThreadLocalSecurityProvider extends Provider {
         }
     }
 
-    public Set<Service> getServices() {
+    @Override
+    public synchronized Set<Service> getServices() {
         Provider p = getProvider();
         if (p != null) {
             return p.getServices();
