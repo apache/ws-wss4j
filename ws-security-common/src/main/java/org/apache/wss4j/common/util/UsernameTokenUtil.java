@@ -64,7 +64,7 @@ public final class UsernameTokenUtil {
 
         MessageDigest sha = null;
         try {
-            sha = MessageDigest.getInstance("SHA1");
+            sha = MessageDigest.getInstance("SHA-512");
         } catch (NoSuchAlgorithmException e) {
             LOG.debug(e.getMessage(), e);
             throw new WSSecurityException(
