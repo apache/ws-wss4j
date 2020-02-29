@@ -236,7 +236,7 @@ public final class KeyUtils {
     public static synchronized byte[] generateDigest(byte[] inputBytes) throws WSSecurityException {
         try {
             if (digest == null) {
-                digest = MessageDigest.getInstance("SHA-1");
+                digest = MessageDigest.getInstance("SHA-512");
             }
             return digest.digest(inputBytes);
         } catch (Exception e) {
