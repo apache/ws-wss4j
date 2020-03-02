@@ -124,7 +124,8 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
             }
         }
 
-        return UsernameTokenUtil.generateDerivedKey(password, salt, iteration.intValue());
+        int iterationCount = iteration != null ? iteration.intValue() : (int)DEFAULT_ITERATION;
+        return UsernameTokenUtil.generateDerivedKey(password, salt, iterationCount);
     }
 
     @Override

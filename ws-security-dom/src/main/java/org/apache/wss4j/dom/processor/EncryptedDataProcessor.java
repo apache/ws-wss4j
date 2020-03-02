@@ -140,6 +140,12 @@ public class EncryptedDataProcessor implements Processor {
             );
         }
 
+        if (key == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncKey"
+            );
+        }
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {

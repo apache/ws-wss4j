@@ -65,7 +65,8 @@ public class WSSecBase {
         }
 
         // Explicitly add the WSU Namespace if we already have a different prefix
-        addWSUNamespace = securityHeader.getWsuPrefix() != null && !WSConstants.WSU_PREFIX.equals(securityHeader.getWsuPrefix());
+        addWSUNamespace = securityHeader != null && securityHeader.getWsuPrefix() != null
+            && !WSConstants.WSU_PREFIX.equals(securityHeader.getWsuPrefix());
     }
 
     public WSSecBase(Document doc) {
