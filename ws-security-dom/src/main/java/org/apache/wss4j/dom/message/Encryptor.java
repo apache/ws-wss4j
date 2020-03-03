@@ -320,7 +320,7 @@ public class Encryptor {
             elementToEncrypt.getParentNode().replaceChild(encryptedData, elementToEncrypt);
         }
 
-        WSSecurityUtil.storeBytesInAttachment(cipherValue, doc, attachmentId,
+        AttachmentUtils.storeBytesInAttachment(cipherValue, doc, attachmentId,
                                               finalEncryptedBytes, attachmentCallbackHandler);
 
         return encEncryptedDataId;

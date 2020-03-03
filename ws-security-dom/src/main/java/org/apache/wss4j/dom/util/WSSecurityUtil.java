@@ -26,8 +26,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -43,13 +41,9 @@ import org.w3c.dom.Text;
 
 //import com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -58,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 
@@ -729,39 +722,5 @@ public final class WSSecurityUtil {
     public static String getAttachmentId(String xopUri) throws WSSecurityException {
         return AttachmentUtils.getAttachmentId(xopUri);
     }
-
-    public static void storeBytesInAttachment(
-        Element parentElement,
-        Document doc,
-        String attachmentId,
-        byte[] bytes,
-        CallbackHandler attachmentCallbackHandler
-    ) throws WSSecurityException {
-        parentElement.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSConstants.XOP_NS);
-        Element xopInclude =
-            doc.createElementNS(WSConstants.XOP_NS, "xop:Include");
-        try {
-            xopInclude.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
-        parentElement.appendChild(xopInclude);
-
-        Attachment resultAttachment = new Attachment();
-        resultAttachment.setId(attachmentId);
-        resultAttachment.setMimeType("application/ciphervalue");
-        resultAttachment.setSourceStream(new ByteArrayInputStream(bytes));
-
-        AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
-        attachmentResultCallback.setAttachmentId(attachmentId);
-        attachmentResultCallback.setAttachment(resultAttachment);
-        try {
-            attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
-
-    }
-
 
 }

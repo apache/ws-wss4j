@@ -18,13 +18,17 @@
  */
 package org.apache.wss4j.common.util;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.stax.impl.util.MultiInputStream;
 import org.apache.xml.security.utils.JavaUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -35,6 +39,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -649,5 +654,38 @@ public final class AttachmentUtils {
                 "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
             );
         }
+    }
+
+    public static void storeBytesInAttachment(
+        Element parentElement,
+        Document doc,
+        String attachmentId,
+        byte[] bytes,
+        CallbackHandler attachmentCallbackHandler
+    ) throws WSSecurityException {
+        parentElement.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSS4JConstants.XOP_NS);
+        Element xopInclude =
+            doc.createElementNS(WSS4JConstants.XOP_NS, "xop:Include");
+        try {
+            xopInclude.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+        parentElement.appendChild(xopInclude);
+
+        Attachment resultAttachment = new Attachment();
+        resultAttachment.setId(attachmentId);
+        resultAttachment.setMimeType("application/ciphervalue");
+        resultAttachment.setSourceStream(new ByteArrayInputStream(bytes));
+
+        AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+        attachmentResultCallback.setAttachmentId(attachmentId);
+        attachmentResultCallback.setAttachment(resultAttachment);
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+
     }
 }

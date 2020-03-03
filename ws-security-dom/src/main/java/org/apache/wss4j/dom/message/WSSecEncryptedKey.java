@@ -49,6 +49,7 @@ import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -221,7 +222,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
         if (storeBytesInAttachment) {
             final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
+            AttachmentUtils.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
                                                   encryptedEphemeralKey, attachmentCallbackHandler);
         } else {
             Text keyText =

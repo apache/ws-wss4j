@@ -19,31 +19,25 @@
 
 package org.apache.wss4j.common.token;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.QName;
 
 /**
  * Binary Security Token.
@@ -215,32 +209,9 @@ public class BinarySecurity {
             throw new IllegalArgumentException("data == null");
         }
         if (storeBytesInAttachment && attachmentCallbackHandler != null) {
-            Document document = element.getOwnerDocument();
             final String attachmentId = "_" + UUID.randomUUID().toString();
-
-            element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSS4JConstants.XOP_NS);
-            Element xopInclude =
-                document.createElementNS(WSS4JConstants.XOP_NS, "xop:Include");
-            try {
-                xopInclude.setAttributeNS(null, "href", "cid:" + URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
-            } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
-            element.appendChild(xopInclude);
-
-            Attachment resultAttachment = new Attachment();
-            resultAttachment.setId(attachmentId);
-            resultAttachment.setMimeType("application/ciphervalue");
-            resultAttachment.setSourceStream(new ByteArrayInputStream(data));
-
-            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
-            attachmentResultCallback.setAttachmentId(attachmentId);
-            attachmentResultCallback.setAttachment(resultAttachment);
-            try {
-                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
+            AttachmentUtils.storeBytesInAttachment(element, element.getOwnerDocument(), attachmentId,
+                                                  data, attachmentCallbackHandler);
         } else {
             Text node = getFirstNode();
             node.setData(org.apache.xml.security.utils.XMLUtils.encodeToString(data));

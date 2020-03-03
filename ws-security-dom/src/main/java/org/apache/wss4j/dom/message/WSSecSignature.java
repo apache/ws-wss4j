@@ -57,6 +57,7 @@ import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -476,7 +477,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             }
 
             final String attachmentId = getIdAllocator().createId("", getDocument());
-            WSSecurityUtil.storeBytesInAttachment(bstToken, getDocument(), attachmentId,
+            AttachmentUtils.storeBytesInAttachment(bstToken, getDocument(), attachmentId,
                                                   certBytes, attachmentCallbackHandler);
             getWsDocInfo().addTokenElement(bstToken, false);
         } else {
