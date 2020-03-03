@@ -342,6 +342,13 @@ public class SignatureProcessor implements Processor {
             key = KeyUtils.prepareSecretKey(signatureMethod, secretKey);
         }
 
+        if (data.isExpandXopInclude()) {
+            // Look for xop:Include Nodes and expand them
+            List<Element> includeElements =
+                XMLUtils.findElements(elem.getFirstChild(), "Include", WSConstants.XOP_NS);
+            WSSecurityUtil.inlineAttachments(includeElements, data.getAttachmentCallbackHandler(), true);
+        }
+
         XMLValidateContext context = new DOMValidateContext(key, elem);
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
         context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
@@ -370,6 +377,7 @@ public class SignatureProcessor implements Processor {
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
 
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo);
+
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
