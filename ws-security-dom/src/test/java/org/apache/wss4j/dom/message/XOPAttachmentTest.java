@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -660,6 +661,57 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
+    // We can't put the SignatureValue bytes into an attachment as we are using the JSR-105 API, but for now
+    // let's test that we can process such messages
+    @Test
+    public void testSignatureValueInAttachment() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        builder.setStoreBytesInAttachment(true);
+
+        Document signedDoc = builder.build(crypto);
+
+        List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(signedAttachments);
+        assertTrue(signedAttachments.size() == 1);
+
+        // Find the SignatureValue + replace with a xop:Include to the attachment!
+        Element signatureValue = XMLUtils.findElement(signedDoc.getDocumentElement(), "SignatureValue", WSConstants.SIG_NS);
+        assertNotNull(signatureValue);
+
+        String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setId(attachmentId);
+        byte[] decodedBytes = Base64.getMimeDecoder().decode(signatureValue.getTextContent());
+        attachment.setSourceStream(new ByteArrayInputStream(decodedBytes));
+        signedAttachments.add(attachment);
+
+        XMLUtils.setNamespace(signatureValue, WSS4JConstants.XOP_NS, "xop");
+
+        Element signatureValueChild = signedDoc.createElementNS(WSConstants.XOP_NS, "xop:Include");
+        signatureValueChild.setAttributeNS(null, "href", "cid:" + attachmentId);
+        signatureValue.replaceChild(signatureValueChild, signatureValue.getFirstChild());
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString =
+                XMLUtils.prettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback =
+            new AttachmentCallbackHandler(signedAttachments);
+        verify(signedDoc, inboundAttachmentCallback);
+    }
+
     /**
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
@@ -672,6 +724,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         requestData.setSigVerCrypto(crypto);
         requestData.setDecCrypto(crypto);
         requestData.setCallbackHandler(new KeystoreCallbackHandler());
+        requestData.setExpandXopInclude(true);
         return secEngine.processSecurityHeader(doc, requestData);
     }
 }
