@@ -39,8 +39,8 @@ The current stable release is Apache WSS4J 2.2.4:
 </p>
 <p>
 <a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.2.4/wss4j-2.2.4-source-release.zip">wss4j-2.2.4-source-release.zip</a>
-(<a href="https://www.apache.org/dist/ws/wss4j/2.2.4/wss4j-2.2.4-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.2.4/wss4j-2.2.4-source-release.zip.sha512">SHA-512</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.2.4/wss4j-2.2.4-source-release.zip.asc">PGP</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.2.4/wss4j-2.2.4-source-release.zip.sha512">SHA-512</a>)
 </p>
 </li>
 <li>
@@ -49,8 +49,8 @@ The current release on the older 2.1.x-fixes branch is Apache WSS4J 2.1.12:
 </p>
 <p>
 <a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip">wss4j-2.1.12-source-release.zip</a>
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.sha1">SHA1</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.asc">PGP</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.1.12/wss4j-2.1.12-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
@@ -59,8 +59,8 @@ The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.10:
 </p>
 <p>
 <a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip">wss4j-2.0.10-source-release.zip</a>
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.sha1">SHA1</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.asc">PGP</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.0.10/wss4j-2.0.10-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 </ul>
@@ -69,7 +69,7 @@ The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.10:
 <p>
 When downloading from a mirror please check the SHA-512/SHA1 checksums as well
 as verifying the OpenPGP compatible signature available from the main Apache
-site. The <a href="https://www.apache.org/dist/ws/wss4j/KEYS">KEYS</a> file
+site. The <a href="https://downloads.apache.org/ws/wss4j/KEYS">KEYS</a> file
 contains the public keys used for signing the release. It is recommended that a
 web of trust is used to confirm the identity of these keys.
 </p>
