@@ -5,6 +5,26 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.5
+==============
+
+Bug
+
+    [WSS-659] - SecurityContextToken validator set by wrong QName
+    [WSS-663] - Missing ECC key support
+
+Improvement
+
+    [WSS-653] - Better diagnostics for null password
+    [WSS-656] - Add the ability to specify a security Provider to use with Signature
+    [WSS-658] - Enable signature confirmation for signed SAML tokens
+    [WSS-666] - Support processing SignatureValue bytes stored in attachments
+
+Task
+
+    [WSS-665] - Add cryptacular dependency and upgrade to 1.2.4 to fix CVE-2020-7226
+
+
 Release 2.2.4
 ==============
 
