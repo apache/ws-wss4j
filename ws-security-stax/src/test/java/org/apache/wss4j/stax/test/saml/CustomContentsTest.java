@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.test.saml;
 
 import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
@@ -59,6 +60,8 @@ public class CustomContentsTest extends AbstractTestBase {
 
     @Test
     public void testSubjectConfirmationDataExtensibility() throws Exception {
+
+        OpenSAMLUtil.initSamlEngine();
 
         // create a data structure with custom contents
         SubjectConfirmationDataBean subjectConfirmationDataBean = new SubjectConfirmationDataBean();

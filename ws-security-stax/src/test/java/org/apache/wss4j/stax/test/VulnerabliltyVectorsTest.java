@@ -20,31 +20,23 @@ package org.apache.wss4j.stax.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
-import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.setup.WSSec;
-import org.apache.xml.security.stax.config.Init;
-import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.junit.jupiter.api.Test;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -302,47 +294,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
     }
 
     @Test
-    public void testMaximumAllowedTransformsPerReference() throws Exception {
-
-        if (getJavaSpecificationVersion() > 1.7) {
-            System.out.println("testMaximumAllowedTransformsPerReference skipped");
-            return;
-        }
-
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-
-        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        Properties properties = new Properties();
-        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-
-        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-
-        int oldval = 0;
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            oldval = changeValueOfMaximumAllowedTransformsPerReference(0);
-            doInboundSecurity(securityProperties,
-                    xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())));
-            fail("Expected XMLStreamException");
-        } catch (XMLStreamException e) {
-            assertTrue(e.getCause() instanceof WSSecurityException);
-            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
-        } finally {
-            changeValueOfMaximumAllowedTransformsPerReference(oldval);
-        }
-    }
-
-
-    @Test
     public void testDisallowMD5Algorithm() throws Exception {
         WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
         outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -374,183 +325,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             assertTrue(e.getCause() instanceof WSSecurityException);
             assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
-        }
-    }
-
-
-    @Test
-    public void testAllowMD5Algorithm() throws Exception {
-
-        if (getJavaSpecificationVersion() >= 1.7) {
-            System.out.println("testAllowMD5Algorithm skipped");
-            return;
-        }
-
-        WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
-        outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        outboundSecurityProperties.setEncryptionUser("receiver");
-        outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        outboundSecurityProperties.setSignatureUser("transmitter");
-        outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-        List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
-        outboundSecurityProperties.setActions(actions);
-
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-        ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
-
-        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
-        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inboundsecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
-
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            switchAllowMD5Algorithm(true);
-            Document document = doInboundSecurity(inboundsecurityProperties,
-                    xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())));
-            assertNotNull(document);
-        } finally {
-            switchAllowMD5Algorithm(false);
-        }
-    }
-
-    @Test
-    public void testMaximumAllowedXMLStructureDepth() throws Exception {
-
-        if (getJavaSpecificationVersion() >= 1.7) {
-            System.out.println("testAllowMD5Algorithm skipped");
-            return;
-        }
-
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-
-        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE;
-        Properties properties = new Properties();
-        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-
-        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-
-        int oldval = 0;
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
-            doInboundSecurity(securityProperties,
-                    xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())));
-            fail("Expected XMLStreamException");
-        } catch (XMLStreamException e) {
-            assertEquals(e.getCause().getMessage(),
-                    "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
-                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
-        } finally {
-            changeValueOfMaximumAllowedXMLStructureDepth(oldval);
-        }
-    }
-
-    @Test
-    public void testMaximumAllowedXMLStructureDepthInEncryptedContent() throws Exception {
-
-        if (getJavaSpecificationVersion() >= 1.7) {
-            System.out.println("testAllowMD5Algorithm skipped");
-            return;
-        }
-
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-
-        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        Properties properties = new Properties();
-        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-
-        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-
-        int oldval = 0;
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
-            doInboundSecurity(securityProperties,
-                    xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())));
-            fail("Expected XMLStreamException");
-        } catch (XMLStreamException e) {
-            assertEquals(e.getCause().getMessage(),
-                    "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
-                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
-        } finally {
-            changeValueOfMaximumAllowedXMLStructureDepth(oldval);
-        }
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testMaximumAllowedDecompressedBytes() throws Exception {
-
-        long oldval = 0;
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            Field algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapOut");
-            algorithmsClassMapField.setAccessible(true);
-            Map<String, Class<?>> map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);
-            map.put("http://www.apache.org/2012/04/xmlsec/xz", XZCompressorOutputStream.class);
-            algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapIn");
-            algorithmsClassMapField.setAccessible(true);
-            map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);
-            map.put("http://www.apache.org/2012/04/xmlsec/xz", XZCompressorInputStream.class);
-            oldval = changeValueOfMaximumAllowedDecompressedBytes(101L);
-
-            WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
-            outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            outboundSecurityProperties.setEncryptionUser("receiver");
-            outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            outboundSecurityProperties.setSignatureUser("transmitter");
-            outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.TIMESTAMP);
-            actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
-            outboundSecurityProperties.setActions(actions);
-            outboundSecurityProperties.setEncryptionCompressionAlgorithm("http://www.apache.org/2012/04/xmlsec/xz");
-
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
-
-
-            WSSSecurityProperties inboundSecurityProperties = new WSSSecurityProperties();
-            inboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            inboundSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            inboundSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-
-            doInboundSecurity(inboundSecurityProperties,
-                    xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())));
-            fail("Expected XMLStreamException");
-        } catch (XMLStreamException e) {
-            assertTrue(e.getCause() instanceof IOException);
-            assertEquals(e.getCause().getMessage(),
-                    "Maximum byte count (101) reached.");
-        } finally {
-            changeValueOfMaximumAllowedDecompressedBytes(oldval);
         }
     }
 

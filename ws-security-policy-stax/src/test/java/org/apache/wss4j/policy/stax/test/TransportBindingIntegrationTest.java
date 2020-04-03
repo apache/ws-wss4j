@@ -42,9 +42,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
-import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.junit.jupiter.api.Test;
@@ -1324,128 +1322,6 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             assertEquals(e.getCause().getMessage(),
                     "C14N algorithm http://www.w3.org/2006/12/xml-c14n11 does not meet policy");
             assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
-        }
-    }
-
-    @Test
-    public void testSignatureDigestAlgorithmSuiteNegative() throws Exception {
-
-        String policyString =
-                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
-                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
-                        "            <wsp:All>\n" +
-                        "                <sp:TransportBinding>\n" +
-                        "                    <wsp:Policy>\n" +
-                        "                        <sp:TransportToken>\n" +
-                        "                            <wsp:Policy>\n" +
-                        "                                <sp:HttpsToken>\n" +
-                        "                                    <!--<sp:Issuer>wsa:EndpointReferenceType</sp:Issuer>-->\n" +
-                        "                                    <sp:IssuerName>transmitter</sp:IssuerName>\n" +
-                        "                                    <wsp:Policy>\n" +
-                        "                                        <sp:HttpBasicAuthentication/>\n" +
-                        "                                    </wsp:Policy>\n" +
-                        "                                </sp:HttpsToken>\n" +
-                        "                            </wsp:Policy>\n" +
-                        "                        </sp:TransportToken>\n" +
-                        "                        <sp:AlgorithmSuite>\n" +
-                        "                            <wsp:Policy>\n" +
-                        "                                <sp:Basic256/>\n" +
-                        "                            </wsp:Policy>\n" +
-                        "                        </sp:AlgorithmSuite>\n" +
-                        "                        <sp:Layout>\n" +
-                        "                            <wsp:Policy>\n" +
-                        "                                <sp:Lax/>\n" +
-                        "                            </wsp:Policy>\n" +
-                        "                        </sp:Layout>\n" +
-                        "                        <sp:IncludeTimestamp/>\n" +
-                        "                    </wsp:Policy>\n" +
-                        "                </sp:TransportBinding>\n" +
-                        "                <sp:SignedParts>\n" +
-                        "                    <sp:Body/>\n" +
-                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
-                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
-                        "                </sp:SignedParts>\n" +
-                        "                <sp:SignedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:SignedElements>\n" +
-                        "                <sp:EncryptedParts>\n" +
-                        "                    <sp:Body/>\n" +
-                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
-                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
-                        "                </sp:EncryptedParts>\n" +
-                        "                <sp:EncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:EncryptedElements>\n" +
-                        "                <sp:ContentEncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
-                        "                </sp:ContentEncryptedElements>\n" +
-                        "            </wsp:All>\n" +
-                        "        </wsp:ExactlyOne>";
-
-        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
-        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        outSecurityProperties.setEncryptionUser("receiver");
-        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
-        outSecurityProperties.setActions(actions);
-
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
-
-        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
-        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5420);
-
-        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
-
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setIssuerName("transmitter");
-        httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
-        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-
-        List<SecurityEvent> securityEventList = new ArrayList<>();
-        securityEventList.add(httpsTokenSecurityEvent);
-
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-            switchAllowMD5Algorithm(true);
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
-
-            //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(document), new StreamResult(
-                    new OutputStream() {
-                        @Override
-                        public void write(int b) throws IOException {
-                            // > /dev/null
-                        }
-                    }
-            ));
-            fail("Exception expected");
-        } catch (XMLStreamException e) {
-            assertTrue(e.getCause() instanceof WSSecurityException);
-            //assertEquals(e.getCause().getMessage(),
-            //        "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
-            // assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
-        } finally {
-            switchAllowMD5Algorithm(false);
         }
     }
 

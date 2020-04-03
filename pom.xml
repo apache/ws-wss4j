@@ -237,7 +237,6 @@
                         <target>${targetJdk}</target>
                         <compilerArgs>
                             <arg>-XDcompilePolicy=simple</arg>
-                            <arg>-Xplugin:ErrorProne</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>

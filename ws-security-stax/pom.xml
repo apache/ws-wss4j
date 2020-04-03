@@ -114,6 +114,7 @@
                     <systemPropertyVariables>
                         <log4j.configuration>log4j-wss.xml</log4j.configuration>
                     </systemPropertyVariables>
+                    <reuseForks>false</reuseForks>
                     <!--<debugForkedProcess>true</debugForkedProcess>-->
                 </configuration>
             </plugin>

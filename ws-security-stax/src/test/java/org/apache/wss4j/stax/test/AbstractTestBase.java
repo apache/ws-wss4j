@@ -21,8 +21,6 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -68,7 +66,6 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.impl.processor.input.DecryptInputProcessor;
 import org.apache.wss4j.stax.setup.ConfigurationConverter;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.OutboundWSSec;
@@ -77,10 +74,6 @@ import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.InboundSecurityContextImpl;
-import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
-import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
-import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
@@ -702,99 +695,6 @@ public abstract class AbstractTestBase {
                 System.out.println("WSSecurityEventConstants." + securityEvent.getSecurityEventType() + ",");
             }
         }
-    }
-
-    //sometimes I really like reflection. We can fix jdk bugs which will never be fixed, we can do other funny things and
-    //we can also change "private static final" fields for testing:-)
-    //But keep in mind that this only works for Objects and not primitive types. Primitive types will be inlined...
-    public static void switchAllowNotSameDocumentReferences(Boolean value) throws NoSuchFieldException, IllegalAccessException {
-
-        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("allowNotSameDocumentReferences");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, value);
-    }
-
-    public static void switchDoNotThrowExceptionForManifests(Boolean value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("doNotThrowExceptionForManifests");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, value);
-    }
-
-    public static int changeValueOfMaximumAllowedReferencesPerManifest(Integer value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("maximumAllowedReferencesPerManifest");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        Integer oldval = (Integer)field.get(null);
-        field.set(null, value);
-        return oldval;
-    }
-
-    public static int changeValueOfMaximumAllowedTransformsPerReference(Integer value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("maximumAllowedTransformsPerReference");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        Integer oldval = (Integer)field.get(null);
-        field.set(null, value);
-        return oldval;
-    }
-
-    public static void switchAllowMD5Algorithm(Boolean value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = InboundSecurityContextImpl.class.getDeclaredField("allowMD5Algorithm");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, value);
-    }
-
-    public static int changeValueOfMaximumAllowedXMLStructureDepth(Integer value) throws NoSuchFieldException, IllegalAccessException {
-        Field xmlEventReaderInputProcessorField = XMLEventReaderInputProcessor.class.getDeclaredField("maximumAllowedXMLStructureDepth");
-        xmlEventReaderInputProcessorField.setAccessible(true);
-        Field abstractDecryptInputProcessorField = AbstractDecryptInputProcessor.class.getDeclaredField("maximumAllowedXMLStructureDepth");
-        abstractDecryptInputProcessorField.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(xmlEventReaderInputProcessorField, xmlEventReaderInputProcessorField.getModifiers() & ~Modifier.FINAL);
-        modifiersField.setInt(abstractDecryptInputProcessorField, abstractDecryptInputProcessorField.getModifiers() & ~Modifier.FINAL);
-
-        Integer oldval = (Integer)xmlEventReaderInputProcessorField.get(null);
-        xmlEventReaderInputProcessorField.set(null, value);
-        abstractDecryptInputProcessorField.set(null, value);
-        return oldval;
-    }
-
-    public static long changeValueOfMaximumAllowedDecompressedBytes(Long value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = DecryptInputProcessor.class.getDeclaredField("MAX_ALLOWED_DECOMPRESSED_BYTES");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        Long oldval = (Long) field.get(null);
-        field.set(null, value);
-        return oldval;
     }
 
     public static Double getJavaSpecificationVersion() {
