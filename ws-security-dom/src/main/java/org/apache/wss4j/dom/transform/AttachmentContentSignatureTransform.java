@@ -29,8 +29,8 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
+import org.apache.xml.security.parser.XMLParserException;
 import org.apache.xml.security.signature.XMLSignatureInput;
-import org.xml.sax.SAXException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -42,7 +42,6 @@ import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -239,7 +238,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
             }
             return null;
         } catch (IOException | InvalidCanonicalizerException | CanonicalizationException
-            | ParserConfigurationException | SAXException e) {
+            | XMLParserException e) {
             throw new TransformException(e);
         }
     }

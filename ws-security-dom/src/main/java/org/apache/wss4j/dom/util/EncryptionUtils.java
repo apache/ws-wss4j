@@ -33,6 +33,7 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.parser.XMLParserException;
 import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -360,7 +361,7 @@ public final class EncryptionUtils {
        SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
        String xopURI, Element encData
    ) throws WSSecurityException, IOException, UnsupportedCallbackException, NoSuchAlgorithmException,
-        NoSuchPaddingException, ParserConfigurationException, SAXException {
+        NoSuchPaddingException, ParserConfigurationException, XMLParserException {
 
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -395,11 +396,13 @@ public final class EncryptionUtils {
         Document document = null;
         try {
             document = org.apache.xml.security.utils.XMLUtils.read(new ByteArrayInputStream(bytes), true);
-        } catch (SAXException ex) {
-            // A prefix may not have been bound, try to fix the DOM Element in this case.
-            String fixedElementStr = setParentPrefixes(encData, new String(bytes));
-            document = org.apache.xml.security.utils.XMLUtils.read(
-                new ByteArrayInputStream(fixedElementStr.getBytes()), true);
+        } catch (XMLParserException ex) {
+            if (ex.getCause() instanceof SAXException) {
+                // A prefix may not have been bound, try to fix the DOM Element in this case.
+                String fixedElementStr = setParentPrefixes(encData, new String(bytes));
+                document = org.apache.xml.security.utils.XMLUtils.read(
+                    new ByteArrayInputStream(fixedElementStr.getBytes()), true);
+            }
         }
 
         Node decryptedNode =
