@@ -44,11 +44,32 @@ public class ReplayCacheTest {
     }
 
     @Test
-    public void testEhCacheReplayCache() throws InterruptedException, IOException {
+    public void testEhCacheReplayCache() throws Exception {
         ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
 
         testReplayCacheInstance(replayCache);
 
+        replayCache.close();
+    }
+
+    @Test
+    public void testEhCacheDifferentCaches() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null);
+        ReplayCache replayCache2 = new EHCacheReplayCache("cba", (URL)null);
+
+        String id = UUID.randomUUID().toString();
+        replayCache.add(id);
+        assertTrue(replayCache.contains(id));
+        assertFalse(replayCache2.contains(id));
+
+        replayCache.close();
+        replayCache2.close();
+    }
+
+    @Test
+    public void testEhCacheCloseCacheTwice() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL) null);
+        replayCache.close();
         replayCache.close();
     }
 

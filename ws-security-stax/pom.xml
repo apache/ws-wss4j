@@ -47,7 +47,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <scope>runtime</scope>
         </dependency>
