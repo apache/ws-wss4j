@@ -19,16 +19,28 @@
 
 package org.apache.wss4j.common.cache;
 
-
-import org.apache.wss4j.common.ext.WSSecurityException;
+import java.io.Serializable;
 
 /**
- * A factory to return a MemoryReplayCache instance.
+ * A cache value for EHCache. It contains the identifier to be cached as well as a custom expiry.
  */
-public class MemoryReplayCacheFactory extends ReplayCacheFactory {
+public class EHCacheValue implements Serializable {
 
-    public ReplayCache newReplayCache(String key, Object configuration) throws WSSecurityException {
-        return new MemoryReplayCache();
+    private final String identifier;
+    private final long expiry;
+
+    public EHCacheValue(String identifier, long expiry) {
+        this.identifier = identifier;
+        this.expiry = expiry;
     }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public long getExpiry() {
+        return expiry;
+    }
+
 
 }

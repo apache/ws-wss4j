@@ -22,6 +22,7 @@ package org.apache.wss4j.common.cache;
 import java.io.IOException;
 import java.net.URL;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 
 /**
@@ -36,7 +37,7 @@ public abstract class ReplayCacheFactory {
 
     static {
         try {
-            Class<?> cacheManagerClass = Class.forName("net.sf.ehcache.CacheManager");
+            Class<?> cacheManagerClass = Class.forName("org.ehcache.CacheManager");
             if (cacheManagerClass != null) {
                 ehCacheInstalled = true;
             }
@@ -58,7 +59,7 @@ public abstract class ReplayCacheFactory {
         return new MemoryReplayCacheFactory();
     }
 
-    public abstract ReplayCache newReplayCache(String key, Object configuration);
+    public abstract ReplayCache newReplayCache(String key, Object configuration) throws WSSecurityException;
 
     protected URL getConfigFileURL(Object o) {
         if (o instanceof String) {
