@@ -104,11 +104,7 @@ public class EHCacheReplayCache implements ReplayCache {
             return;
         }
 
-        long ttl = 0;
-        if (expiry != null) {
-            ttl = expiry.getEpochSecond() - Instant.now().getEpochSecond();
-        }
-        cache.put(identifier, new EHCacheValue(identifier, ttl));
+        cache.put(identifier, new EHCacheValue(identifier, expiry));
     }
 
     /**
@@ -121,6 +117,11 @@ public class EHCacheReplayCache implements ReplayCache {
         }
         EHCacheValue element = cache.get(identifier);
         return element != null;
+    }
+
+    // Only exposed for testing
+    EHCacheValue get(String identifier) {
+        return cache.get(identifier);
     }
 
     @Override

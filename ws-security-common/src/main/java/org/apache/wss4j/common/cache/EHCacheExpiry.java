@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.cache;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Supplier;
 
@@ -32,25 +33,26 @@ import org.ehcache.expiry.ExpiryPolicy;
 public class EHCacheExpiry implements ExpiryPolicy<String, EHCacheValue> {
 
     /**
-     * The default time to live (60 minutes)
+     * The default time to live in seconds (60 minutes)
      */
     public static final long DEFAULT_TTL = 3600L;
 
     /**
-     * The max time to live (12 hours)
+     * The max time to live in seconds (12 hours)
      */
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
 
 
     @Override
     public Duration getExpiryForCreation(String s, EHCacheValue ehCacheValue) {
-        long parsedTTL = ehCacheValue.getExpiry();
-        if (parsedTTL <= 0 || parsedTTL > MAX_TTL) {
-            // Use default value
-            parsedTTL = DEFAULT_TTL;
+        Instant expiry = ehCacheValue.getExpiry();
+        Instant now = Instant.now();
+
+        if (expiry == null || expiry.isBefore(now) || expiry.isAfter(now.plusSeconds(MAX_TTL))) {
+            return Duration.of(DEFAULT_TTL, ChronoUnit.SECONDS);
         }
 
-        return Duration.of(parsedTTL, ChronoUnit.SECONDS);
+        return Duration.of(expiry.toEpochMilli() - now.toEpochMilli(), ChronoUnit.MILLIS);
     }
 
     @Override
