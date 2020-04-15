@@ -32,6 +32,11 @@
         <wss4j.osgi.dynamic.import>
             org.bouncycastle.jce.provider
         </wss4j.osgi.dynamic.import>
+        <wss4j.osgi.import>
+            com.sun.xml.messaging.saaj.soap;resolution:=optional,
+            com.sun.xml.internal.messaging.saaj.soap;resolution:=optional,
+            *
+        </wss4j.osgi.import>
         <wss4j.module.name>org.apache.wss4j.dom</wss4j.module.name>
     </properties>
         
