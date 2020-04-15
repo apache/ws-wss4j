@@ -41,6 +41,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurePart;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -210,10 +211,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             finalSAMLTokenOutputProcessor.init(outputProcessorChain);
 
             if (includeSTR) {
-                SecurePart securePart =
-                        new SecurePart(
-                                new QName(WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM),
-                                tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
+                WSSSecurePart securePart =
+                        new WSSSecurePart(
+                                new QName(WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM), SecurePart.Modifier.Element);
+                securePart.setIdToSign(tokenId);
+                securePart.setIdToReference(securityTokenReferenceId);
                 outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
             }
 

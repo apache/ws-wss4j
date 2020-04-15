@@ -38,6 +38,7 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurePart;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform;
 import org.apache.wss4j.stax.utils.WSSUtils;
@@ -111,7 +112,9 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         }
                     } else {
                         if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(securePart.getName().getLocalPart())) {
-                            signaturePartDef.setSigRefId(securePart.getIdToReference());
+                            if (securePart instanceof WSSSecurePart) {
+                                signaturePartDef.setSigRefId(((WSSSecurePart)securePart).getIdToReference());
+                            }
                             String[] transforms = new String[]{
                                     WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM,
                                     WSSConstants.NS_C14N_EXCL
