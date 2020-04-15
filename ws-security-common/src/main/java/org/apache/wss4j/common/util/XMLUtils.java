@@ -275,7 +275,7 @@ public final class XMLUtils {
         Element foundElement = null;
         String id = XMLUtils.getIDFromReference(value);
 
-        while (startNode != null) {
+        while (startNode != null && id != null) {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
@@ -452,7 +452,7 @@ public final class XMLUtils {
         // Replace the formerly recursive implementation with a depth-first-loop
         // lookup
         //
-        if (startNode == null) {
+        if (startNode == null || value == null) {
             return null;
         }
         Node startParent = startNode.getParentNode();
