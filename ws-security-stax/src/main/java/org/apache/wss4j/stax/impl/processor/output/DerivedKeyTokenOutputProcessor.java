@@ -91,7 +91,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                         length = KeyUtils.getKeyLength(getSecurityProperties().getSignatureAlgorithm()) / 8;
                     }
                 }
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 if (((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength() > 0) {
                     length = ((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength();
                 } else {
@@ -172,7 +172,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuIdDKT);
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, wsuIdDKT);
             }
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);

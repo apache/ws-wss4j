@@ -91,7 +91,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
             securityProperties.setCallbackHandler(callbackHandler);

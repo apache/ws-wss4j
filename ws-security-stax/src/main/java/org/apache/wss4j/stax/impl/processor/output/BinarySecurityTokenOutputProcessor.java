@@ -60,7 +60,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
             } else if (WSSConstants.ENCRYPTION.equals(action)) {
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
-            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
+            } else if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(getAction())
                 || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                 || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS);
@@ -119,7 +119,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
-                } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
+                } else if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor =
@@ -158,7 +158,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
                 final QName headerElementName = WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN;
 
-                if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
+                if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
                     OutputProcessorUtils.updateSecurityHeaderOrder(
@@ -175,7 +175,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                                 ((KerberosClientSecurityToken)securityToken).getTicket())
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
-                    if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())) {
+                    if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(getAction())) {
                         OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList,
                                                                        getAction(), false);
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);

@@ -2255,7 +2255,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
-        actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+        actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
         outSecurityProperties.setActions(actions);
         SAMLCallbackHandlerImpl samlCallbackHandler = new SAMLCallbackHandlerImpl();
         samlCallbackHandler.setSamlVersion(Version.SAML_20);
@@ -2385,7 +2385,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
-        actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+        actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
         outSecurityProperties.setActions(actions);
         SAMLCallbackHandlerImpl samlCallbackHandler = new SAMLCallbackHandlerImpl();
         samlCallbackHandler.setSamlVersion(Version.SAML_20);

@@ -580,7 +580,7 @@ public class OutboundWSSec {
             for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
                 if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                     derivedSignatureButNotDerivedEncryption = true;
-                } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+                } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                     derivedSignatureButNotDerivedEncryption = false;
                     break;
                 }
@@ -665,7 +665,7 @@ public class OutboundWSSec {
                 final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 configuredAction.encryptionAction = true;
                 configuredAction.derivedEncryption = true;
 
@@ -733,7 +733,7 @@ public class OutboundWSSec {
 
                 final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(action)) {
                 configuredAction.kerberos = true;
                 configuredAction.encryptionKerberos = true;
                 final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =

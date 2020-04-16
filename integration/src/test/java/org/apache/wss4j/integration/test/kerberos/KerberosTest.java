@@ -947,6 +947,86 @@ public class KerberosTest {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN);
+            securityProperties.setActions(actions);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+            securityProperties.setCallbackHandler(new CallbackHandler() {
+                @Override
+                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                    if (callbacks[0] instanceof KerberosContextAndServiceNameCallback) {
+                        KerberosContextAndServiceNameCallback kerberosContextAndServiceNameCallback =
+                                (KerberosContextAndServiceNameCallback) callbacks[0];
+                        kerberosContextAndServiceNameCallback.setContextName("alice");
+                        kerberosContextAndServiceNameCallback.setServiceName("bob@service.ws.apache.org");
+                    } else if (callbacks[0] instanceof PasswordCallback) {
+                        PasswordCallback passwordCallback = (PasswordCallback) callbacks[0];
+                        if (passwordCallback.getPrompt().contains("alice")) {
+                            passwordCallback.setPassword("alice".toCharArray());
+                        }
+                    }
+                }
+            });
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
+            assertEquals(1, nodeList.getLength());
+        }
+
+        {
+            // Configure the Validator
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            KerberosTokenValidator validator = new KerberosTokenValidator();
+            validator.setContextName("bob");
+            validator.setServiceName("bob@service.ws.apache.org");
+            wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            secEngine.setWssConfig(wssConfig);
+
+            CallbackHandler callbackHandler = new CallbackHandler() {
+                @Override
+                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                    if (callbacks[0] instanceof PasswordCallback) {
+                        PasswordCallback passwordCallback = (PasswordCallback) callbacks[0];
+                        if (passwordCallback.getPrompt().contains("bob")) {
+                            passwordCallback.setPassword("bob".toCharArray());
+                        }
+                    }
+                }
+            };
+
+            WSHandlerResult results =
+                    secEngine.processSecurityHeader(document, null, callbackHandler, null);
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.BST).get(0);
+            BinarySecurity token =
+                    (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+            assertNotNull(token);
+
+            Principal principal = (Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            assertTrue(principal instanceof KerberosPrincipal);
+            assertTrue(principal.getName().contains("alice"));
+        }
+    }
+
+    @Test
+    public void testKerberosEncryptionOutboundDeprecatedTag() throws Exception {
+        if (!runTests) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
+        Document document;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
             securityProperties.setActions(actions);
             securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);

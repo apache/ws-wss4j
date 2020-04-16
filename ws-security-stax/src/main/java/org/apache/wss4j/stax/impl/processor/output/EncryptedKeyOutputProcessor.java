@@ -143,7 +143,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
                 finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -152,7 +152,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
                     }

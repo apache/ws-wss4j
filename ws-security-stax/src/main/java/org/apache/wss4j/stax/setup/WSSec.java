@@ -224,7 +224,7 @@ public class WSSec {
                 checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 checkOutboundSignatureDerivedProperties(securityProperties);
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 checkOutboundEncryptionDerivedProperties(securityProperties);
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
@@ -266,7 +266,7 @@ public class WSSec {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
                 checkDefaultSecureParts(true, securityProperties);
-            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }

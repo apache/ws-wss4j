@@ -219,11 +219,15 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action USERNAMETOKEN_SIGNED = new Action(ConfigurationConstants.USERNAME_TOKEN_SIGNATURE);
     public static final Action SIGNATURE_CONFIRMATION = new Action("SignatureConfirmation");
     public static final Action SIGNATURE_WITH_DERIVED_KEY = new Action("SignatureWithDerivedKey");
-    public static final Action ENCRYPT_WITH_DERIVED_KEY = new Action("EncryptWithDerivedKey");
+    public static final Action ENCRYPTION_WITH_DERIVED_KEY = new Action("EncryptionWithDerivedKey");
+    @Deprecated
+    public static final Action ENCRYPT_WITH_DERIVED_KEY = ENCRYPTION_WITH_DERIVED_KEY;
     public static final Action SAML_TOKEN_SIGNED = new Action(ConfigurationConstants.SAML_TOKEN_SIGNED);
     public static final Action SAML_TOKEN_UNSIGNED = new Action(ConfigurationConstants.SAML_TOKEN_UNSIGNED);
     public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SignatureWithKerberosToken");
-    public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("EncryptWithKerberosToken");
+    public static final Action ENCRYPTION_WITH_KERBEROS_TOKEN = new Action("EncryptionWithKerberosToken");
+    @Deprecated
+    public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = ENCRYPTION_WITH_KERBEROS_TOKEN;
     public static final Action KERBEROS_TOKEN = new Action("KerberosToken");
     public static final Action CUSTOM_TOKEN = new Action("CustomToken");
 

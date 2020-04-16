@@ -109,11 +109,12 @@ public final class ConfigurationConverter {
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE_DERIVED)) {
                 actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
             } else if (single[i].equals(ConfigurationConstants.ENCRYPT_DERIVED)) {
-                actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+                actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
                 actions.add(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN);
-            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
-                actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
+            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_WITH_KERBEROS_TOKEN)
+                || single[i].equals(ConfigurationConstants.ENCRYPTION_WITH_KERBEROS_TOKEN)) {
+                actions.add(WSSConstants.ENCRYPTION_WITH_KERBEROS_TOKEN);
             } else if (single[i].equals(ConfigurationConstants.KERBEROS_TOKEN)) {
                 actions.add(WSSConstants.KERBEROS_TOKEN);
             } else if (single[i].equals(ConfigurationConstants.CUSTOM_TOKEN)) {

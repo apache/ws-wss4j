@@ -117,7 +117,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 } else {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
-            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());

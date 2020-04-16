@@ -87,7 +87,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             byte[] secret = WSSConstants.generateBytes(192 / 8);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
@@ -95,6 +95,38 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
+        }
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
+    public void testEncryptionDecryptionOutboundDeprecatedTag(int version) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
+            byte[] secret = WSSConstants.generateBytes(192 / 8);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -293,7 +325,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             byte[] secret = WSSConstants.generateBytes(128 / 8);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
@@ -824,7 +856,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
-            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);

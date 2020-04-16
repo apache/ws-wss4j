@@ -106,7 +106,14 @@ public class ConfigurationConstants {
      * Perform a Encryption action with a kerberos token. The signature specific parameters define how
      * to encrypt, which keys to use, and so on.
      */
+    @Deprecated
     public static final String ENCRYPT_WITH_KERBEROS_TOKEN = "EncryptWithKerberosToken";
+
+    /**
+     * Perform a Encryption action with a kerberos token. The signature specific parameters define how
+     * to encrypt, which keys to use, and so on.
+     */
+    public static final String ENCRYPTION_WITH_KERBEROS_TOKEN = "EncryptionWithKerberosToken";
 
     /**
      * Add a kerberos token.
