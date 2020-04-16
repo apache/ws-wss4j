@@ -287,7 +287,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
             outboundWSSec = WSSec.getOutboundWSSec(securityProperties);
@@ -314,7 +314,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
             securityProperties.setEncryptionCompressionAlgorithm(compress);

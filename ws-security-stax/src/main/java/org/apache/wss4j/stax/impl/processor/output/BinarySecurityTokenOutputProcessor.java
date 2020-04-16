@@ -58,7 +58,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (WSSConstants.SIGNATURE.equals(action)
                     || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
-            } else if (WSSConstants.ENCRYPT.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION.equals(action)) {
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
             } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
                 || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
@@ -81,7 +81,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 && !getSecurityProperties().getSignatureKeyIdentifiers().isEmpty()) {
                 includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
                 keyIdentifier = getSecurityProperties().getSignatureKeyIdentifiers().get(0);
-            } else if (WSSConstants.ENCRYPT.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION.equals(action)) {
                 includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeEncryptionToken();
                 keyIdentifier = getSecurityProperties().getEncryptionKeyIdentifier();
             }
@@ -108,7 +108,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
-                } else if (WSSConstants.ENCRYPT.equals(action)
+                } else if (WSSConstants.ENCRYPTION.equals(action)
                     && (includeToken || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier))
                     && (securityToken.getTokenType() == null
                         || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {

@@ -77,7 +77,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -113,7 +113,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -188,7 +188,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -289,7 +289,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);

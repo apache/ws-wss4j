@@ -60,7 +60,7 @@ public class VulnerabliltyVectorsDecompressedBytesTest extends AbstractTestBase 
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.TIMESTAMP);
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             outboundSecurityProperties.setActions(actions);
             outboundSecurityProperties.setEncryptionCompressionAlgorithm("http://www.apache.org/2012/04/xmlsec/xz");
 

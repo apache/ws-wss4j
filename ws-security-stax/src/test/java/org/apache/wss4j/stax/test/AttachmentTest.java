@@ -437,7 +437,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -509,7 +509,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -580,7 +580,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -735,7 +735,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -808,7 +808,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -896,7 +896,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -957,7 +957,7 @@ public class AttachmentTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
@@ -1058,7 +1058,7 @@ public class AttachmentTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
             actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
@@ -1150,7 +1150,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -1251,7 +1251,7 @@ public class AttachmentTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());

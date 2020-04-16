@@ -113,7 +113,7 @@ public class PasswordEncryptorTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             List<WSSConstants.Action> actions = new ArrayList<>();
-            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.ENCRYPTION);
             securityProperties.setActions(actions);
             Properties properties =
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());

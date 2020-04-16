@@ -97,7 +97,7 @@ public final class ConfigurationConverter {
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE)) {
                 actions.add(WSSConstants.SIGNATURE);
             } else if (single[i].equals(ConfigurationConstants.ENCRYPT)) {
-                actions.add(WSSConstants.ENCRYPT);
+                actions.add(WSSConstants.ENCRYPTION);
             } else if (single[i].equals(ConfigurationConstants.SAML_TOKEN_UNSIGNED)) {
                 actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
             } else if (single[i].equals(ConfigurationConstants.SAML_TOKEN_SIGNED)) {

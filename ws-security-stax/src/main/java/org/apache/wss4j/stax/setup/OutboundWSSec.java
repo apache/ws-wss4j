@@ -601,7 +601,7 @@ public class OutboundWSSec {
                 final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-            } else if (WSSConstants.ENCRYPT.equals(action)) {
+            } else if (WSSConstants.ENCRYPTION.equals(action)) {
                 configuredAction.encryptionAction = true;
 
                 EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;

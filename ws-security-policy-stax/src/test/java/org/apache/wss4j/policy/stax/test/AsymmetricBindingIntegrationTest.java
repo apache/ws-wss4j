@@ -137,7 +137,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -280,7 +280,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -386,7 +386,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -515,7 +515,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -636,7 +636,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -765,7 +765,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -886,7 +886,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         actions.add(WSSConstants.SIGNATURE);
         outSecurityProperties.setActions(actions);
 
@@ -996,7 +996,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1115,7 +1115,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1235,7 +1235,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1352,7 +1352,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1461,7 +1461,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1569,7 +1569,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1683,7 +1683,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1812,7 +1812,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1912,7 +1912,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2021,7 +2021,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2134,7 +2134,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPTION};
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2519,7 +2519,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2633,7 +2633,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2745,7 +2745,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         actions.add(WSSConstants.SIGNATURE);
         outSecurityProperties.setActions(actions);
 
@@ -2860,7 +2860,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");

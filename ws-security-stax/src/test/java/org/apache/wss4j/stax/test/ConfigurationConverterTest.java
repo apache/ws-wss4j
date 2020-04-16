@@ -138,7 +138,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
 
         assertEquals(properties.getEncryptionUser(), "transmitter");
         assertEquals(properties.getActions().size(), 1);
-        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPTION);
         assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
         assertEquals(properties.getEncryptionKeyTransportAlgorithm(),
                             WSSConstants.NS_XENC_RSA15);
@@ -166,7 +166,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         WSSSecurityProperties properties = ConfigurationConverter.convert(config);
 
         assertEquals(properties.getActions().size(), 1);
-        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPT);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPTION);
         assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
         assertNotNull(properties.getDecryptionCrypto());
 

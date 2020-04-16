@@ -111,7 +111,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
-            if (WSSConstants.ENCRYPT.equals(action)) {
+            if (WSSConstants.ENCRYPTION.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -119,7 +119,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT)
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
                         finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
@@ -342,7 +342,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData);
 
-                if (outputReferenceList && WSSConstants.ENCRYPT.equals(getAction())) {
+                if (outputReferenceList && WSSConstants.ENCRYPTION.equals(getAction())) {
                     WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                 }
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);

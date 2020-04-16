@@ -49,7 +49,7 @@ public class OutputChainTest extends AbstractTestBase {
     public void testEncryptionAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         securityProperties.setActions(actions);
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setEncryptionUser("receiver");

@@ -305,7 +305,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outboundSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -389,7 +389,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.ENCRYPTION);
         outboundSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
