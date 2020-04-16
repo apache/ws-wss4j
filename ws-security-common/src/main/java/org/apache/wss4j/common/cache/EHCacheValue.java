@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,16 +19,29 @@
 
 package org.apache.wss4j.common.cache;
 
-
-import org.apache.wss4j.common.ext.WSSecurityException;
+import java.io.Serializable;
+import java.time.Instant;
 
 /**
- * A factory to return a MemoryReplayCache instance.
+ * A cache value for EHCache. It contains the identifier to be cached as well as a custom expiry.
  */
-public class MemoryReplayCacheFactory extends ReplayCacheFactory {
+public class EHCacheValue implements Serializable {
 
-    public ReplayCache newReplayCache(String key, Object configuration) throws WSSecurityException {
-        return new MemoryReplayCache();
+    private final String identifier;
+    private final Instant expiry;
+
+    public EHCacheValue(String identifier, Instant expiry) {
+        this.identifier = identifier;
+        this.expiry = expiry;
     }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public Instant getExpiry() {
+        return expiry;
+    }
+
 
 }

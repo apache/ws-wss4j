@@ -22,11 +22,15 @@ package org.apache.wss4j.common.cache;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -44,10 +48,82 @@ public class ReplayCacheTest {
     }
 
     @Test
-    public void testEhCacheReplayCache() throws InterruptedException, IOException {
+    public void testEhCacheReplayCache() throws Exception {
         ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
 
         testReplayCacheInstance(replayCache);
+
+        replayCache.close();
+    }
+
+    @Test
+    public void testEhCacheDifferentCaches() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null);
+        ReplayCache replayCache2 = new EHCacheReplayCache("cba", (URL)null);
+
+        String id = UUID.randomUUID().toString();
+        replayCache.add(id);
+        assertTrue(replayCache.contains(id));
+        assertFalse(replayCache2.contains(id));
+
+        replayCache.close();
+        replayCache2.close();
+    }
+
+    @Test
+    public void testEhCacheCloseCacheTwice() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL) null);
+        replayCache.close();
+        replayCache.close();
+    }
+
+    // No expiry specified so it falls back to the default
+    @Test
+    public void testEhCacheReplayCacheNoExpirySpecified() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+
+        String id = UUID.randomUUID().toString();
+        replayCache.add(id);
+        assertTrue(replayCache.contains(id));
+
+        EHCacheValue ehCacheValue = ((EHCacheReplayCache) replayCache).get(id);
+        assertNotNull(ehCacheValue);
+        assertNull(ehCacheValue.getExpiry());
+        assertEquals(id, ehCacheValue.getIdentifier());
+
+        replayCache.close();
+    }
+
+    // The negative expiry is rejected and it falls back to the default
+    @Test
+    public void testEhCacheReplayCacheNegativeExpiry() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+
+        String id = UUID.randomUUID().toString();
+        replayCache.add(id, Instant.now().minusSeconds(100L));
+        assertTrue(replayCache.contains(id));
+
+        EHCacheValue ehCacheValue = ((EHCacheReplayCache) replayCache).get(id);
+        assertNotNull(ehCacheValue);
+        assertNotNull(ehCacheValue.getExpiry());
+        assertEquals(id, ehCacheValue.getIdentifier());
+
+        replayCache.close();
+    }
+
+    // The huge expiry is rejected and it falls back to the default
+    @Test
+    public void testEhCacheReplayCacheHugeExpiry() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+
+        String id = UUID.randomUUID().toString();
+        replayCache.add(id, Instant.now().plus(14, ChronoUnit.HOURS));
+        assertTrue(replayCache.contains(id));
+
+        EHCacheValue ehCacheValue = ((EHCacheReplayCache) replayCache).get(id);
+        assertNotNull(ehCacheValue);
+        assertNotNull(ehCacheValue.getExpiry());
+        assertEquals(id, ehCacheValue.getIdentifier());
 
         replayCache.close();
     }

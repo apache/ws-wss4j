@@ -19,16 +19,20 @@
 
 package org.apache.wss4j.common.cache;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Random;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Status;
-import net.sf.ehcache.config.CacheConfiguration;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.Status;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 
 /**
  * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the
@@ -36,64 +40,50 @@ import net.sf.ehcache.config.CacheConfiguration;
  */
 public class EHCacheReplayCache implements ReplayCache {
 
-    public static final long DEFAULT_TTL = 3600L;
-    public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    protected Ehcache cache;
-    protected CacheManager cacheManager;
-    private long ttl = DEFAULT_TTL;
+    private static final org.slf4j.Logger LOG =
+            org.slf4j.LoggerFactory.getLogger(EHCacheReplayCache.class);
+    private static final String CACHE_TEMPLATE_NAME = "wss4jCache";
 
-    public EHCacheReplayCache(String key, URL configFileURL) {
-        this(key, EHCacheManagerHolder.getCacheManager("", configFileURL));
+    private final Cache<String, EHCacheValue> cache;
+    private final CacheManager cacheManager;
+    private final String key;
+
+    public EHCacheReplayCache(String key, URL configFileURL) throws WSSecurityException {
+        this.key = key;
+        try {
+            XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
+            CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_TEMPLATE_NAME, String.class, EHCacheValue.class);
+            // Note, we don't require strong random values here
+            String diskKey = key + "-" + Math.abs(new Random().nextInt());
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder)
+                     .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
+
+            cacheManager.init();
+            cache = cacheManager.getCache(key, String.class, EHCacheValue.class);
+        } catch (Exception ex) {
+            LOG.error("Error configuring EHCacheReplayCache", ex.getMessage());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
+        }
     }
 
-    public EHCacheReplayCache(String key, CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-
-        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
-
-        Cache newCache = new RefCountCache(cc);
-        cache = cacheManager.addCacheIfAbsent(newCache);
-        synchronized (cache) {
-            if (cache.getStatus() != Status.STATUS_ALIVE) {
-                cache = cacheManager.addCacheIfAbsent(newCache);
+    private URL getConfigFileURL(URL suppliedConfigFileURL) {
+        if (suppliedConfigFileURL == null) {
+            //using the default
+            String defaultConfigFile = "/wss4j-ehcache.xml";
+            URL configFileURL = null;
+            try {
+                configFileURL = Loader.getResource(defaultConfigFile);
+                if (configFileURL == null) {
+                    configFileURL = new URL(defaultConfigFile);
+                }
+                return configFileURL;
+            } catch (IOException e) {
+                // Do nothing
+                LOG.debug(e.getMessage());
             }
-            if (cache instanceof RefCountCache) {
-                ((RefCountCache)cache).incrementAndGet();
-            }
         }
-
-        // Set the TimeToLive value from the CacheConfiguration
-        ttl = cc.getTimeToLiveSeconds();
-    }
-
-    private static class RefCountCache extends Cache {
-        private AtomicInteger count = new AtomicInteger();
-        RefCountCache(CacheConfiguration cc) {
-            super(cc);
-        }
-        public int incrementAndGet() {
-            return count.incrementAndGet();
-        }
-        public int decrementAndGet() {
-            return count.decrementAndGet();
-        }
-    }
-
-
-    /**
-     * Set a new (default) TTL value in seconds
-     * @param newTtl a new (default) TTL value in seconds
-     */
-    public void setTTL(long newTtl) {
-        ttl = newTtl;
-    }
-
-    /**
-     * Get the (default) TTL value in seconds
-     * @return the (default) TTL value in seconds
-     */
-    public long getTTL() {
-        return ttl;
+        return suppliedConfigFileURL;
     }
 
     /**
@@ -101,32 +91,20 @@ public class EHCacheReplayCache implements ReplayCache {
      * @param identifier The identifier to be added
      */
     public void add(String identifier) {
-        add(identifier, Instant.now().plusSeconds(DEFAULT_TTL));
+        add(identifier, null);
     }
 
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
-     * @param expiry A custom expiry time for the identifier
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default expiry is used.
      */
     public void add(String identifier, Instant expiry) {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
 
-        int parsedTTL = (int)(expiry.getEpochSecond() - Instant.now().getEpochSecond());
-        if (parsedTTL < 0 || parsedTTL > MAX_TTL) {
-            // Default to configured value
-            parsedTTL = (int)ttl;
-            if (ttl != parsedTTL) {
-                // Fall back to 60 minutes if the default TTL is set incorrectly
-                parsedTTL = 3600;
-            }
-        }
-
-        Element cacheElement = new Element(identifier, identifier, parsedTTL, parsedTTL);
-        cacheElement.resetAccessStatistics();
-        cache.put(cacheElement);
+        cache.put(identifier, new EHCacheValue(identifier, expiry));
     }
 
     /**
@@ -137,33 +115,20 @@ public class EHCacheReplayCache implements ReplayCache {
         if (cache == null) {
             return false;
         }
-        Element element = cache.get(identifier);
-        if (element != null) {
-            if (cache.isExpired(element)) {
-                cache.remove(identifier);
-                return false;
-            }
-            return true;
-        }
-        return false;
+        EHCacheValue element = cache.get(identifier);
+        return element != null;
+    }
+
+    // Only exposed for testing
+    EHCacheValue get(String identifier) {
+        return cache.get(identifier);
     }
 
     @Override
     public synchronized void close() {
-        if (cacheManager != null) {
-            // this step is especially important for global shared cache manager
-            if (cache != null) {
-                synchronized (cache) {
-                    if (cache instanceof RefCountCache
-                        && ((RefCountCache)cache).decrementAndGet() == 0) {
-                        cacheManager.removeCache(cache.getName());
-                    }
-                }
-            }
-
-            EHCacheManagerHolder.releaseCacheManger(cacheManager);
-            cacheManager = null;
-            cache = null;
+        if (cacheManager.getStatus() == Status.AVAILABLE) {
+            cacheManager.removeCache(key);
+            cacheManager.close();
         }
     }
 

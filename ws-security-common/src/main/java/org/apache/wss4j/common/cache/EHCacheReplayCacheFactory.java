@@ -21,12 +21,14 @@ package org.apache.wss4j.common.cache;
 
 import java.net.URL;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+
 /**
  * A factory to return an EHCacheReplayCache instance.
  */
 public class EHCacheReplayCacheFactory extends ReplayCacheFactory {
 
-    public ReplayCache newReplayCache(String key, Object configuration) {
+    public ReplayCache newReplayCache(String key, Object configuration) throws WSSecurityException {
         URL configFileURL = getConfigFileURL(configuration);
         return new EHCacheReplayCache(key, configFileURL);
     }

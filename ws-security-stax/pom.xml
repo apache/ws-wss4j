@@ -31,6 +31,7 @@
 
     <properties>
         <wss4j.module.name>org.apache.wss4j.stax</wss4j.module.name>
+        <wss4j.osgi.import>javax.xml.bind*;version=!</wss4j.osgi.import>
     </properties>
 
     <dependencies>
@@ -47,7 +48,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
+            <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <scope>runtime</scope>
         </dependency>
