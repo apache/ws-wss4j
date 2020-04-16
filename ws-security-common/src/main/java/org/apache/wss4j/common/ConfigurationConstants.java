@@ -77,7 +77,14 @@ public class ConfigurationConstants {
      * Perform an Encryption action. The encryption specific parameters define how
      * to encrypt, which keys to use, and so on.
      */
+    @Deprecated
     public static final String ENCRYPT = "Encrypt";
+
+    /**
+     * Perform an Encryption action. The encryption specific parameters define how
+     * to encrypt, which keys to use, and so on.
+     */
+    public static final String ENCRYPTION = "Encryption";
 
     /**
      * Add a timestamp to the security header.
@@ -94,7 +101,14 @@ public class ConfigurationConstants {
      * Perform an Encryption action with derived keys. The encryption specific parameters define how
      * to encrypt, which keys to use, and so on.
      */
+    @Deprecated
     public static final String ENCRYPT_DERIVED = "EncryptDerived";
+
+    /**
+     * Perform an Encryption action with derived keys. The encryption specific parameters define how
+     * to encrypt, which keys to use, and so on.
+     */
+    public static final String ENCRYPTION_DERIVED = "EncryptionDerived";
 
     /**
      * Perform a Signature action with a kerberos token. The signature specific parameters define how

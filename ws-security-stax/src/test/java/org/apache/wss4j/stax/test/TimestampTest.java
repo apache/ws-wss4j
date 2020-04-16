@@ -225,7 +225,7 @@ public class TimestampTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
             outboundProperties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");

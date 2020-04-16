@@ -119,11 +119,13 @@ The configuration tags for Actions are as follows:
  * SAML_TOKEN_UNSIGNED (SAMLTokenUnsigned) - Perform an unsigned SAML Token action.
  * SAML_TOKEN_SIGNED (SAMLTokenSigned) - Perform a signed SAML Token action.
  * SIGNATURE (Signature) - Perform a signature action.
- * ENCRYPT (Encrypt) - Perform an encryption action.
+ * *WSS4J 2.3.0* ENCRYPTION (Encryption) - Perform an encryption action.
+Note that for previous releases, this configuration tag was called ENCRYPT (Encrypt).
  * TIMESTAMP (Timestamp) - Perform a Timestamp action.
  * *WSS4J 2.0.0* SIGNATURE_DERIVED (SignatureDerived) - Perform a Signature action with derived keys.
- * *WSS4J 2.0.0* ENCRYPT_DERIVED (EncryptDerived) - Perform a Encryption action with derived keys.
- * *WSS4J 2.0.0* SIGNATURE_WITH_KERBEROS_TOKEN (SignatureWithKerberosToken) - Perform a Signature action with a kerberos token. Only for StAX code.
+ * *WSS4J 2.3.0* ENCRYPTION_DERIVED (EncryptionDerived) - Perform a Encryption action with derived keys.
+Note that for releases from 2.0.0 → 2.2.x, this configuration tag was called ENCRYPT_DERIVED (EncryptDerived).
+* *WSS4J 2.0.0* SIGNATURE_WITH_KERBEROS_TOKEN (SignatureWithKerberosToken) - Perform a Signature action with a kerberos token. Only for StAX code.
  * *WSS4J 2.3.0* ENCRYPTION_WITH_KERBEROS_TOKEN (EncryptionWithKerberosToken) - Perform a Encryption action with a kerberos token. Only for StAX code.
 Note that for releases from 2.0.0 -> 2.2.x, this configuration tag was called ENCRYPT_WITH_KERBEROS_TOKEN (EncryptWithKerberosToken).
  * *WSS4J 2.0.0* KERBEROS_TOKEN (KerberosToken) - Add a kerberos token. Only for StAX code.

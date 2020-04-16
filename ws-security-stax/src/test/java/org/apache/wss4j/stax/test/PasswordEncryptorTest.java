@@ -159,7 +159,7 @@ public class PasswordEncryptorTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

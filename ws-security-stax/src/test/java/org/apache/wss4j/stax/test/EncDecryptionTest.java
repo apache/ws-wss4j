@@ -146,7 +146,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -158,7 +158,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
@@ -290,7 +290,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -302,7 +302,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
@@ -430,7 +430,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -442,7 +442,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Content}{http://www.w3.org/1999/XMLSchema}simpleType;");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -705,7 +705,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -744,7 +744,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -755,7 +755,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
 
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}simpleType;");
@@ -872,7 +872,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
 
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Header}{http://www.example.com}testEncryptedHeader;");
@@ -1073,7 +1073,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1084,7 +1084,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "IssuerSerial");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1150,7 +1150,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1161,7 +1161,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1201,7 +1201,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      * ByteArrayOutputStream baos = new ByteArrayOutputStream();
      * {
      * InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-     * String action = WSHandlerConstants.ENCRYPT;
+     * String action = WSHandlerConstants.ENCRYPTION;
      * Properties properties = new Properties();
      * properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
      * Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1319,7 +1319,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
@@ -1331,7 +1331,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1397,7 +1397,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1408,7 +1408,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "SKIKeyIdentifier");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1474,7 +1474,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1485,7 +1485,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "Thumbprint");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -1555,7 +1555,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1666,7 +1666,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -1886,7 +1886,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             //done encryption; now test decryption:
             {
-                String action = WSHandlerConstants.ENCRYPT;
+                String action = WSHandlerConstants.ENCRYPTION;
                 doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
             }
         } finally {
@@ -1900,7 +1900,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes128-gcm");
             properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
@@ -1997,7 +1997,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             }
             //done encryption; now test decryption:
             {
-                String action = WSHandlerConstants.ENCRYPT;
+                String action = WSHandlerConstants.ENCRYPTION;
                 doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
             }
         } finally {
@@ -2011,7 +2011,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes192-gcm");
             properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
@@ -2387,7 +2387,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             Map<String, Object> config = new HashMap<>();
-            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
             config.put(ConfigurationConstants.ENCRYPTION_USER, "receiver");
             config.put(ConfigurationConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
 
@@ -2454,7 +2454,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //test streaming decryption
         {
             Map<String, Object> config = new HashMap<>();
-            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
             config.put(ConfigurationConstants.DEC_PROP_FILE, "receiver-crypto.properties");
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
 

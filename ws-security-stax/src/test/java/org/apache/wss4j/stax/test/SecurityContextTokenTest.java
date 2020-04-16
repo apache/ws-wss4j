@@ -119,7 +119,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             assertEquals(nodeList.getLength(), 0);
         }
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             Properties properties = new Properties();
             WSS4JCallbackHandlerImpl callbackHandler = new WSS4JCallbackHandlerImpl(secret);
             properties.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
@@ -222,7 +222,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT_DERIVED;
+            String action = WSHandlerConstants.ENCRYPTION_DERIVED;
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
@@ -707,7 +707,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action =
-                WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPT_DERIVED;
+                WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPTION_DERIVED;
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
@@ -933,7 +933,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action =
-                WSHandlerConstants.ENCRYPT_DERIVED + " " + WSHandlerConstants.SIGNATURE_DERIVED;
+                WSHandlerConstants.ENCRYPTION_DERIVED + " " + WSHandlerConstants.SIGNATURE_DERIVED;
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);

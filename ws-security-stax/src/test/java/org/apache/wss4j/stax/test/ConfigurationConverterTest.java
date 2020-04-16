@@ -125,7 +125,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
     @Test
     public void testOutboundEncryptionConfiguration() throws Exception {
         Map<String, Object> config = new HashMap<>();
-        config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         config.put(ConfigurationConstants.USER, "transmitter");
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
         config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSSConstants.NS_XENC_RSA15);
@@ -156,7 +156,58 @@ public class ConfigurationConverterTest extends AbstractTestBase {
     }
 
     @Test
+    public void testOutboundEncryptionConfigurationOldConfigTag() throws Exception {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        config.put(ConfigurationConstants.USER, "transmitter");
+        config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
+        config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSSConstants.NS_XENC_RSA15);
+        config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+        config.put(ConfigurationConstants.ENC_PROP_FILE, "receiver-crypto.properties");
+        config.put(ConfigurationConstants.ENCRYPTION_PARTS,
+                "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+
+        WSSSecurityProperties properties = ConfigurationConverter.convert(config);
+
+        assertEquals(properties.getEncryptionUser(), "transmitter");
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPTION);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertEquals(properties.getEncryptionKeyTransportAlgorithm(),
+                WSSConstants.NS_XENC_RSA15);
+        assertEquals(properties.getEncryptionKeyIdentifier(),
+                WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        assertNotNull(properties.getEncryptionCrypto());
+        assertNotNull(properties.getEncryptionSecureParts());
+        assertEquals(properties.getEncryptionSecureParts().size(), 1);
+        assertEquals(properties.getEncryptionSecureParts().get(0).getName().getLocalPart(),
+                "Body");
+        assertEquals(properties.getEncryptionSecureParts().get(0).getName().getNamespaceURI(),
+                "http://schemas.xmlsoap.org/soap/envelope/");
+
+        WSSec.validateAndApplyDefaultsToOutboundSecurityProperties(properties);
+    }
+
+    @Test
     public void testInboundEncryptionConfiguration() throws Exception {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
+        config.put(ConfigurationConstants.DEC_PROP_FILE, "receiver-crypto.properties");
+        config.put(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
+
+        WSSSecurityProperties properties = ConfigurationConverter.convert(config);
+
+        assertEquals(properties.getActions().size(), 1);
+        assertEquals(properties.getActions().get(0), WSSConstants.ENCRYPTION);
+        assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
+        assertNotNull(properties.getDecryptionCrypto());
+
+        WSSec.validateAndApplyDefaultsToInboundSecurityProperties(properties);
+    }
+
+    @Test
+    public void testInboundEncryptionConfigurationOldConfigTag() throws Exception {
         Map<String, Object> config = new HashMap<>();
         config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());

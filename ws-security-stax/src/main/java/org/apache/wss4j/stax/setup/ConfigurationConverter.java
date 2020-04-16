@@ -96,7 +96,8 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.USERNAMETOKEN);
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE)) {
                 actions.add(WSSConstants.SIGNATURE);
-            } else if (single[i].equals(ConfigurationConstants.ENCRYPT)) {
+            } else if (single[i].equals(ConfigurationConstants.ENCRYPT)
+                || single[i].equals(ConfigurationConstants.ENCRYPTION)) {
                 actions.add(WSSConstants.ENCRYPTION);
             } else if (single[i].equals(ConfigurationConstants.SAML_TOKEN_UNSIGNED)) {
                 actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
@@ -108,7 +109,8 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.USERNAMETOKEN_SIGNED);
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE_DERIVED)) {
                 actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
-            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_DERIVED)) {
+            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_DERIVED)
+                || single[i].equals(ConfigurationConstants.ENCRYPTION_DERIVED)) {
                 actions.add(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY);
             } else if (single[i].equals(ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
                 actions.add(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN);

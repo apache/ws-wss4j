@@ -254,7 +254,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
         properties.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
         properties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "" + 60 * 60 * 24 * 7);
-        Document doc = doOutboundSecurityWithWSS4J(new FileInputStream(input), WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT, properties);
+        Document doc = doOutboundSecurityWithWSS4J(new FileInputStream(input), WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION, properties);
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(doc), new StreamResult(output));
     }
@@ -287,7 +287,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
     }
 
     private void doDOMInSecurity(File input) throws Exception {
-        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "" + 60 * 60 * 24 * 7);
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(input), action, properties, false);

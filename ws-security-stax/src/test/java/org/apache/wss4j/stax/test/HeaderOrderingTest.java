@@ -521,7 +521,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -592,7 +592,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -772,7 +772,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

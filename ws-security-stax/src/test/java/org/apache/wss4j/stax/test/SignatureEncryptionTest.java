@@ -101,7 +101,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.TIMESTAMP;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION + " " + WSHandlerConstants.TIMESTAMP;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -175,7 +175,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.TIMESTAMP;
+            String action = WSHandlerConstants.ENCRYPTION + " " + WSHandlerConstants.TIMESTAMP;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -277,7 +277,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.TIMESTAMP;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION + " " + WSHandlerConstants.TIMESTAMP;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -379,7 +379,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
         //done encryption; now test decryption:
         {
-            String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
+            String action = WSHandlerConstants.ENCRYPTION + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

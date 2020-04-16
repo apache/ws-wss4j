@@ -108,7 +108,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
         }
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -140,7 +140,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
         }
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -247,7 +247,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT_DERIVED;
+            String action = WSHandlerConstants.ENCRYPTION_DERIVED;
 
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
@@ -346,7 +346,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
         }
         {
-            String action = WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -415,7 +415,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENCRYPT_DERIVED;
+            String action = WSHandlerConstants.ENCRYPTION_DERIVED;
 
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
@@ -479,7 +479,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -621,7 +621,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.getLength(), 1);
         }
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -755,7 +755,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.getLength(), 1);
         }
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -888,7 +888,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             assertEquals(nodeList.getLength(), 1);
         }
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -1098,7 +1098,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPT_DERIVED;
+            String action = WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPTION_DERIVED;
 
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
