@@ -110,10 +110,10 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         outputProcessorChain.getSecurityContext().getAsMap(WSSConstants.SIGNATURE_PARTS);
                     if (dynamicSecureParts != null && securePart.getName() != null
                         && securePart.equals(dynamicSecureParts.get(securePart.getName()))) {
-                        securePart.setIdToSign(encryptionPartDef.getEncRefId());
+                        securePart.setIdToSecure(encryptionPartDef.getEncRefId());
                         outputProcessorChain.getSecurityContext().putAsMap(
                             WSSConstants.SIGNATURE_PARTS,
-                            securePart.getIdToSign(),
+                            securePart.getIdToSecure(),
                             securePart
                         );
                     }

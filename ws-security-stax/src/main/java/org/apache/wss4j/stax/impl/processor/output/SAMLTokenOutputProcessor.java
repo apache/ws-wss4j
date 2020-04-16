@@ -186,7 +186,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     securityProperties.getSignatureSecureParts().iterator();
                 while (signaturePartsIterator.hasNext()) {
                     SecurePart securePart = signaturePartsIterator.next();
-                    if (samlAssertionWrapper.getId().equals(securePart.getIdToSign())
+                    if (samlAssertionWrapper.getId().equals(securePart.getIdToSecure())
                         || assertionName.equals(securePart.getName())) {
                         includeSTR = true;
                         signaturePartsIterator.remove();
@@ -214,7 +214,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 WSSSecurePart securePart =
                         new WSSSecurePart(
                                 new QName(WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM), SecurePart.Modifier.Element);
-                securePart.setIdToSign(tokenId);
+                securePart.setIdToSecure(tokenId);
                 securePart.setIdToReference(securityTokenReferenceId);
                 outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
             }

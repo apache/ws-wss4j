@@ -29,6 +29,10 @@ public class WSSSecurePart extends SecurePart {
 
     private String idToReference;
 
+    public WSSSecurePart(Modifier modifier) {
+        super(modifier);
+    }
+
     public WSSSecurePart(QName name, Modifier modifier) {
         super(name, modifier);
     }

@@ -70,7 +70,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                             // Check to see if the wrong SOAP NS was used
                             changeSOAPNamespace(securePart, soapMessageVersion);
 
-                            if (securePart.getIdToSign() == null) {
+                            if (securePart.getIdToSecure() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.ENCRYPTION_PARTS,
                                         securePart.getName(),
@@ -79,7 +79,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                             } else {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.ENCRYPTION_PARTS,
-                                        securePart.getIdToSign(),
+                                        securePart.getIdToSecure(),
                                         securePart
                                 );
                             }
@@ -91,7 +91,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                             // Check to see if the wrong SOAP NS was used
                             changeSOAPNamespace(securePart, soapMessageVersion);
 
-                            if (securePart.getIdToSign() == null) {
+                            if (securePart.getIdToSecure() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.SIGNATURE_PARTS,
                                         securePart.getName(),
@@ -100,7 +100,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                             } else {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.SIGNATURE_PARTS,
-                                        securePart.getIdToSign(),
+                                        securePart.getIdToSecure(),
                                         securePart
                                 );
                             }

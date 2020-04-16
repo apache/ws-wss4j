@@ -98,7 +98,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         signaturePartDef.setDigestAlgo(getSecurityProperties().getSignatureDigestAlgorithm());
                     }
 
-                    if (securePart.getIdToSign() == null) {
+                    if (securePart.getIdToSecure() == null) {
                         signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
                         signaturePartDef.setSigRefId(IDGenerator.generateID(null));
 
@@ -121,7 +121,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                             };
                             signaturePartDef.setTransforms(transforms);
                         } else {
-                            signaturePartDef.setSigRefId(securePart.getIdToSign());
+                            signaturePartDef.setSigRefId(securePart.getIdToSecure());
                         }
                     }
 
