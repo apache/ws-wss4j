@@ -233,7 +233,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
 
-        algorithmSuite.addSignatureMethod(WSConstants.ECDSA_SHA1);
+        algorithmSuite.addSignatureMethod(WSConstants.ECDSA_SHA256);
 
         verify(securityHeader, algorithmSuite, crypto);
     }
