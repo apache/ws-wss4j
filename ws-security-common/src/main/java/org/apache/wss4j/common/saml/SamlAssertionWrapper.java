@@ -484,7 +484,7 @@ public class SamlAssertionWrapper {
 
         signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto,
                 sendKeyValue, defaultCanonicalizationAlgorithm,
-                defaultRSASignatureAlgorithm, defaultSignatureDigestAlgorithm);
+                null, defaultSignatureDigestAlgorithm);
     }
 
     /**
@@ -550,13 +550,13 @@ public class SamlAssertionWrapper {
         String sigAlgo = signatureAlgorithm;
         if (sigAlgo == null) {
             sigAlgo = defaultRSASignatureAlgorithm;
-        }
-        String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        LOG.debug("automatic sig algo detection: {}", pubKeyAlgo);
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-            sigAlgo = defaultDSASignatureAlgorithm;
-        } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
-            sigAlgo = defaultECDSASignatureAlgorithm;
+            String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
+            LOG.debug("automatic sig algo detection: {}", pubKeyAlgo);
+            if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+                sigAlgo = defaultDSASignatureAlgorithm;
+            } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
+                sigAlgo = defaultECDSASignatureAlgorithm;
+            }
         }
         LOG.debug("Using Signature algorithm {}", sigAlgo);
         PrivateKey privateKey;
