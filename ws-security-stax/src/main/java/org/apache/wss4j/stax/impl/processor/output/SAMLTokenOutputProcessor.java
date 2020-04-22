@@ -74,7 +74,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processNextEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain)
+    public void processEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
 
         try {
@@ -442,7 +442,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
 
             outputProcessorChain.processEvent(xmlSecEvent);

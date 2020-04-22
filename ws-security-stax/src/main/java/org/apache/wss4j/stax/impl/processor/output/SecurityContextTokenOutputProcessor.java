@@ -50,7 +50,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
     }
 
     @Override
-    public void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
         try {
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN);
@@ -152,7 +152,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         }
 
         @Override
-        public void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
 
             outputProcessorChain.processEvent(xmlSecEvent);
