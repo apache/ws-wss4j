@@ -60,7 +60,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
         //test if non encrypted element have to be encrypted per policy
         init(inputProcessorChain);
@@ -100,7 +100,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
 
         List<QName> elementPath = null;

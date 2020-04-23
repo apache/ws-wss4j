@@ -42,7 +42,7 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
     }
 
     @Override
-    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+    public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
 
         XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
@@ -93,7 +93,7 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
     }
 
     @Override
-    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+    public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
         //should never be called
         return null;

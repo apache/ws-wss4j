@@ -62,13 +62,13 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+    public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
         return null;
     }
 
     @Override
-    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+    public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
 
         //buffer all events until the end of the security header
@@ -237,7 +237,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
             xmlSecEventList.push(xmlSecEvent);
@@ -245,7 +245,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             //should never be called because we remove this processor before
             return null;
@@ -265,13 +265,13 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         }
 
         @Override
-        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             return null;
         }
 
         @Override
-        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
 
             if (!xmlSecEventList.isEmpty()) {

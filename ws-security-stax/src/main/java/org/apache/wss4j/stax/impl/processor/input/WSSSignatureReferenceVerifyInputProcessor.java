@@ -265,14 +265,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     }
 
     @Override
-    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         //this is the earliest possible point to check for an replay attack
         if (!replayChecked) {
             replayChecked = true;
             detectReplayAttack(inputProcessorChain);
         }
-        return super.processNextEvent(inputProcessorChain);
+        return super.processEvent(inputProcessorChain);
     }
 
     @Override

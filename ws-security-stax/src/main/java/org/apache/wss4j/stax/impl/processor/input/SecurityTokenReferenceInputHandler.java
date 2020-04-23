@@ -119,13 +119,13 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         }
 
         @Override
-        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processHeaderEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public XMLSecEvent processNextEvent(final InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processEvent(final InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
             switch (xmlSecEvent.getEventType()) {
