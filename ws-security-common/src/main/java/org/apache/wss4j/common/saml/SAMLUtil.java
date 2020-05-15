@@ -46,6 +46,18 @@ import org.w3c.dom.Element;
  */
 public final class SAMLUtil {
 
+    /**
+     * This constant defines the maximum amount of child elements of a Signature KeyInfo, associated with a
+     * signed SAML assertion. Any other child element will be ignored.
+     */
+    private static final int MAX_KEYINFO_CONTENT_LIST_SIZE = 3;
+
+    /**
+     * This constant defines the maximum amount of child elements of a X509Data KeyInfo, associated with a
+     * signed SAML assertion. Any other child element will be ignored.
+     */
+    private static final int MAX_X509DATA_SIZE = 5;
+
     private static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
 
     private SAMLUtil() {
@@ -195,7 +207,6 @@ public final class SAMLUtil {
         // Next marshal the KeyInfo DOM element into a javax KeyInfo object and get the
         // (public key) credential
         //
-        X509Certificate[] certs = null;
         KeyInfoFactory keyInfoFactory = null;
         try {
             keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
@@ -209,19 +220,27 @@ public final class SAMLUtil {
                 keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
             List<?> list = keyInfo.getContent();
 
+            X509Certificate[] certs = null;
+            PublicKey publicKey = null;
             for (int i = 0; i < list.size(); i++) {
+                // Put a hard bound on how many child elements there can be of KeyInfo
+                if (i >= MAX_KEYINFO_CONTENT_LIST_SIZE) {
+                    break;
+                }
                 XMLStructure xmlStructure = (XMLStructure) list.get(i);
-                if (xmlStructure instanceof KeyValue) {
-                    PublicKey publicKey = ((KeyValue)xmlStructure).getPublicKey();
-                    return new SAMLKeyInfo(publicKey);
+                if (xmlStructure instanceof KeyValue && publicKey == null) {
+                    publicKey = ((KeyValue)xmlStructure).getPublicKey();
                 } else if (xmlStructure instanceof X509Data) {
                     List<?> x509Data = ((X509Data)xmlStructure).getContent();
                     for (int j = 0; j < x509Data.size(); j++) {
+                        // Put a hard bound on how many child elements there can be of X509Data
+                        if (j >= MAX_X509DATA_SIZE || certs != null) {
+                            break;
+                        }
                         Object x509obj = x509Data.get(j);
                         if (x509obj instanceof X509Certificate) {
                             certs = new X509Certificate[1];
                             certs[0] = (X509Certificate)x509obj;
-                            return new SAMLKeyInfo(certs);
                         } else if (x509obj instanceof X509IssuerSerial) {
                             if (sigCrypto == null) {
                                 throw new WSSecurityException(
@@ -240,10 +259,15 @@ public final class SAMLUtil {
                                     new Object[] {"cannot get certificate or key"}
                                 );
                             }
-                            return new SAMLKeyInfo(certs);
                         }
                     }
                 }
+            }
+
+            if (certs != null || publicKey != null) {
+                SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(certs);
+                samlKeyInfo.setPublicKey(publicKey);
+                return samlKeyInfo;
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
