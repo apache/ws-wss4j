@@ -19,11 +19,10 @@
 
 package org.apache.wss4j.common.cache;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Random;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
@@ -48,16 +47,17 @@ public class EHCacheReplayCache implements ReplayCache {
     private final CacheManager cacheManager;
     private final String key;
 
-    public EHCacheReplayCache(String key, URL configFileURL) throws WSSecurityException {
+    public EHCacheReplayCache(String key, URL configFileURL, Path diskstorePath) throws WSSecurityException {
         this.key = key;
         try {
             XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
             CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
                     xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_TEMPLATE_NAME, String.class, EHCacheValue.class);
-            // Note, we don't require strong random values here
-            String diskKey = key + "-" + Math.abs(new Random().nextInt());
-            cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder)
-                     .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
+            CacheManagerBuilder builder = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder);
+            if (diskstorePath != null) {
+                builder = builder.with(CacheManagerBuilder.persistence(diskstorePath.toFile()));
+            }
+            cacheManager = builder.build();
 
             cacheManager.init();
             cache = cacheManager.getCache(key, String.class, EHCacheValue.class);

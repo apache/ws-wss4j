@@ -19,10 +19,13 @@
 
 package org.apache.wss4j.common.cache;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Random;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -49,7 +52,7 @@ public class ReplayCacheTest {
 
     @Test
     public void testEhCacheReplayCache() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("abc"));
 
         testReplayCacheInstance(replayCache);
 
@@ -58,8 +61,9 @@ public class ReplayCacheTest {
 
     @Test
     public void testEhCacheDifferentCaches() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null);
-        ReplayCache replayCache2 = new EHCacheReplayCache("cba", (URL)null);
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null, getDiskstorePath("abc"));
+
+        ReplayCache replayCache2 = new EHCacheReplayCache("cba", (URL)null, getDiskstorePath("cba"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id);
@@ -72,7 +76,7 @@ public class ReplayCacheTest {
 
     @Test
     public void testEhCacheCloseCacheTwice() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL) null);
+        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null, getDiskstorePath("abc"));
         replayCache.close();
         replayCache.close();
     }
@@ -80,7 +84,7 @@ public class ReplayCacheTest {
     // No expiry specified so it falls back to the default
     @Test
     public void testEhCacheReplayCacheNoExpirySpecified() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id);
@@ -97,7 +101,7 @@ public class ReplayCacheTest {
     // The negative expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheReplayCacheNegativeExpiry() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id, Instant.now().minusSeconds(100L));
@@ -114,7 +118,7 @@ public class ReplayCacheTest {
     // The huge expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheReplayCacheHugeExpiry() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null);
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id, Instant.now().plus(14, ChronoUnit.HOURS));
@@ -145,6 +149,11 @@ public class ReplayCacheTest {
         replayCache.add(id, Instant.now().plusSeconds(1L));
         Thread.sleep(1250L);
         assertFalse(replayCache.contains(id));
+    }
 
+    private Path getDiskstorePath(String prefix) {
+        String diskKey = prefix + "-" + Math.abs(new Random().nextInt());
+        File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
+        return diskstore.toPath();
     }
 }

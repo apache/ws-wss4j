@@ -22,20 +22,19 @@ package org.apache.wss4j.common.cache;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 
 /**
- * An abstract factory to return a ReplayCache instance. It returns an EHCacheReplayCacheFactory
- * if EH-Cache is available. Otherwise it returns a MemoryReplayCacheFactory.
+ * Some functionality to detect if EhCache is available or not.
  */
-public abstract class ReplayCacheFactory {
+public final class WSS4JCacheUtil {
 
     private static final org.slf4j.Logger LOG =
-        org.slf4j.LoggerFactory.getLogger(ReplayCacheFactory.class);
-    private static boolean ehCacheInstalled;
+        org.slf4j.LoggerFactory.getLogger(WSS4JCacheUtil.class);
+    private static final boolean EH_CACHE_INSTALLED;
 
     static {
+        boolean ehCacheInstalled = false;
         try {
             Class<?> cacheManagerClass = Class.forName("org.ehcache.CacheManager");
             if (cacheManagerClass != null) {
@@ -45,23 +44,18 @@ public abstract class ReplayCacheFactory {
             //ignore
             LOG.debug(e.getMessage());
         }
+        EH_CACHE_INSTALLED = ehCacheInstalled;
     }
 
-    public static synchronized boolean isEhCacheInstalled() {
-        return ehCacheInstalled;
+    private WSS4JCacheUtil() {
+        // complete
     }
 
-    public static ReplayCacheFactory newInstance() {
-        if (isEhCacheInstalled()) {
-            return new EHCacheReplayCacheFactory();
-        }
-
-        return new MemoryReplayCacheFactory();
+    public static boolean isEhCacheInstalled() {
+        return EH_CACHE_INSTALLED;
     }
 
-    public abstract ReplayCache newReplayCache(String key, Object configuration) throws WSSecurityException;
-
-    protected URL getConfigFileURL(Object o) {
+    public static URL getConfigFileURL(Object o) {
         if (o instanceof String) {
             try {
                 URL url = Loader.getResource((String)o);
@@ -78,5 +72,6 @@ public abstract class ReplayCacheFactory {
         }
         return null;
     }
+
 
 }

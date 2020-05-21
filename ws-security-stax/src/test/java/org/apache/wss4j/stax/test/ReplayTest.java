@@ -20,16 +20,18 @@ package org.apache.wss4j.stax.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -56,12 +58,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ReplayTest extends AbstractTestBase {
 
     private ReplayCache createCache(String key) throws WSSecurityException {
-        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         byte[] nonceValue;
         try {
             nonceValue = WSSConstants.generateBytes(10);
             String cacheKey = key + XMLUtils.encodeToString(nonceValue);
-            return replayCacheFactory.newReplayCache(cacheKey, null);
+
+            String diskKey = key + "-" + Math.abs(new Random().nextInt());
+            File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
+
+            return new EHCacheReplayCache(cacheKey, null, diskstore.toPath());
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

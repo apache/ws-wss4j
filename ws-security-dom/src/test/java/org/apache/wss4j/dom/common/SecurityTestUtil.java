@@ -19,9 +19,10 @@
 package org.apache.wss4j.dom.common;
 
 import java.io.File;
+import java.util.Random;
 
+import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
@@ -50,8 +51,9 @@ public final class SecurityTestUtil {
     }
 
     public static ReplayCache createCache(String key) throws WSSecurityException {
-        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         String cacheKey = key + XMLUtils.encodeToString(WSSecurityUtil.generateNonce(10));
-        return replayCacheFactory.newReplayCache(cacheKey, null);
+        String diskKey = key + "-" + Math.abs(new Random().nextInt());
+        File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
+        return new EHCacheReplayCache(cacheKey, null, diskstore.toPath());
     }
 }
