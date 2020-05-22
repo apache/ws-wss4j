@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -30,7 +30,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -45,11 +45,6 @@ public class SKISignatureTest {
         org.slf4j.LoggerFactory.getLogger(SKISignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public SKISignatureTest() throws Exception {
         WSSConfig.init();

@@ -28,7 +28,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -39,7 +39,7 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -71,11 +71,6 @@ public class EncryptionGCMTest {
     private Crypto crypto;
 
     private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public EncryptionGCMTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

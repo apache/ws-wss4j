@@ -27,11 +27,11 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -60,11 +60,6 @@ public class SignatureWSS651Test {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public SignatureWSS651Test() throws Exception {
         WSSConfig.init();

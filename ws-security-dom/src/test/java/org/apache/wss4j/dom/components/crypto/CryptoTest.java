@@ -26,7 +26,7 @@ import java.util.Properties;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomCrypto;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -36,7 +36,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -49,11 +49,6 @@ public class CryptoTest {
 
     public CryptoTest() {
         WSSConfig.init();
-    }
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Test

@@ -20,9 +20,9 @@
 package org.apache.wss4j.dom.misc;
 
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
@@ -87,11 +87,6 @@ public class SecurityHeaderTest {
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     /**
      * Test for processing multiple security headers with the same (null) actor

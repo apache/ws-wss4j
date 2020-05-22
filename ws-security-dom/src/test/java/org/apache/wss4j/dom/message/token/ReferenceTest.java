@@ -21,9 +21,9 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,11 +59,6 @@ public class ReferenceTest {
     private Reference ref;
     private Reference refEqual;
     private Reference refNotEqual;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public ReferenceTest() throws Exception{
         ref = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());

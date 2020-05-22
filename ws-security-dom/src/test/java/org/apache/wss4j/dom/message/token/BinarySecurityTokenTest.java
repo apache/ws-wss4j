@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -37,7 +37,7 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -54,11 +54,6 @@ public class BinarySecurityTokenTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenTest.class);
     private Crypto crypto;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public BinarySecurityTokenTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

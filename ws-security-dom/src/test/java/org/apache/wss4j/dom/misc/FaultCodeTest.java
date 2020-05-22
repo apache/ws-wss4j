@@ -37,7 +37,7 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -45,7 +45,7 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -60,11 +60,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class FaultCodeTest implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public FaultCodeTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

@@ -24,7 +24,7 @@ import org.apache.wss4j.dom.common.CustomAction;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.CustomProcessor;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -35,7 +35,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -54,11 +54,6 @@ public class CustomActionProcessorTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CustomActionProcessorTest.class);
     private Crypto crypto;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public CustomActionProcessorTest() throws Exception {
         WSSConfig.init();

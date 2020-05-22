@@ -23,7 +23,7 @@ import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcerFactory;
@@ -37,7 +37,7 @@ import org.apache.xml.security.binding.xmldsig11.NamedCurveType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -67,11 +67,6 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     public static void setUp() throws Exception {
         WSProviderConfig.init();
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
-    }
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString)

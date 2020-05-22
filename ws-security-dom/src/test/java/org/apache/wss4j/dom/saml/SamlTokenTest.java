@@ -56,7 +56,7 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SAMLElementCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -77,7 +77,7 @@ import org.apache.xml.security.keys.content.RetrievalMethod;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
@@ -105,11 +105,6 @@ public class SamlTokenTest {
         org.slf4j.LoggerFactory.getLogger(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private static final String IP_ADDRESS = "12.34.56.78"; //NOPMD
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public SamlTokenTest() {
         WSSConfig config = WSSConfig.getNewInstance();

@@ -20,8 +20,8 @@
 package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.junit.jupiter.api.AfterAll;
+
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,11 +54,6 @@ public class DerivedKeyTokenTest {
     private DerivedKeyToken token;
     private DerivedKeyToken tokenEqual;
     private DerivedKeyToken tokenNotEqual;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public DerivedKeyTokenTest() throws Exception {
         token = new DerivedKeyToken(createReferenceDocument(

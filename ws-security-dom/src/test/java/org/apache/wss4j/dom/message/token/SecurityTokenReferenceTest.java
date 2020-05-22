@@ -29,9 +29,9 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,11 +45,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class SecurityTokenReferenceTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityTokenReferenceTest.class);
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public SecurityTokenReferenceTest() {
         WSSConfig.init();

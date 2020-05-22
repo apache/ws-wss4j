@@ -21,9 +21,9 @@ package org.apache.wss4j.dom.handler;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,11 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * which applications can use if they want.
  */
 public class ResultsOrderTest {
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     /**
      */

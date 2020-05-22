@@ -28,8 +28,8 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.junit.jupiter.api.AfterAll;
+
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,11 +41,6 @@ import org.w3c.dom.NodeList;
  */
 public class TestMessageTransformer {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TestMessageTransformer.class);
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
         if (moveReferenceList) {

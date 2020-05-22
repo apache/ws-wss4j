@@ -34,20 +34,6 @@ public final class SecurityTestUtil {
         // complete
     }
 
-    public static void cleanup() {
-//        String tmpDir = System.getProperty("java.io.tmpdir");
-//        if (tmpDir != null) {
-//            File[] tmpFiles = new File(tmpDir).listFiles();
-//            if (tmpFiles != null) {
-//                for (File tmpFile : tmpFiles) {
-//                    if (tmpFile.exists() && tmpFile.getName().endsWith(".data")) {
-//                        tmpFile.delete();
-//                    }
-//                }
-//            }
-//        }
-    }
-
     public static ReplayCache createCache(String key) throws WSSecurityException {
         String diskKey = key + "-" + Math.abs(new Random().nextInt());
         File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);

@@ -29,10 +29,10 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -44,11 +44,6 @@ import org.w3c.dom.Document;
 public class UseReqSigCertTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UseReqSigCertTest.class);
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public UseReqSigCertTest() throws Exception {
         WSSConfig.init();

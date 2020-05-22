@@ -35,9 +35,9 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.Test;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
@@ -68,11 +68,6 @@ public class AssertionSigningTest {
     // Custom Signature Digest algorithm
     private final String customSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA256;
     private final DocumentBuilderFactory dbf;
-
-    @AfterAll
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
 
     public AssertionSigningTest() throws Exception {
         WSSConfig.init();
