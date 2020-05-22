@@ -19,45 +19,84 @@
 
 package org.apache.wss4j.common.cache;
 
-import java.io.IOException;
-import java.net.URL;
+import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.Loader;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.CachePersistenceException;
+import org.ehcache.PersistentCacheManager;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.xml.XmlConfiguration;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.EntryUnit;
+import org.ehcache.config.units.MemoryUnit;
 
 /**
- * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the
- * max TTL is 12 hours.
+ * An in-memory EHCache implementation of the ReplayCache interface, that overflows to disk.
+ * The default TTL is 60 minutes and the max TTL is 12 hours.
  */
 public class EHCacheReplayCache implements ReplayCache {
 
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(EHCacheReplayCache.class);
-    private static final String CACHE_TEMPLATE_NAME = "wss4jCache";
 
     private final Cache<String, EHCacheValue> cache;
     private final CacheManager cacheManager;
     private final String key;
+    private final Path diskstorePath;
+    private final boolean persistent;
 
-    public EHCacheReplayCache(String key, URL configFileURL, Path diskstorePath) throws WSSecurityException {
+    public EHCacheReplayCache(String key) throws WSSecurityException {
+        this(key, null);
+    }
+
+    public EHCacheReplayCache(String key, Path diskstorePath) throws WSSecurityException {
+        this(key, diskstorePath, 50, 10000, false);
+    }
+
+    public EHCacheReplayCache(String key, Path diskstorePath, long diskSize, long heapEntries, boolean persistent)
+            throws WSSecurityException {
         this.key = key;
+        this.diskstorePath = diskstorePath;
+        this.persistent = persistent;
+
+        // Do some sanity checking on the arguments
+        if (key == null || persistent && diskstorePath == null) {
+            throw new NullPointerException();
+        }
+        if (diskstorePath != null && (diskSize < 5 || diskSize > 10000)) {
+            throw new IllegalArgumentException("The diskSize parameter must be between 5 and 10000 (megabytes)");
+        }
+        if (heapEntries < 100) {
+            throw new IllegalArgumentException("The heapEntries parameter must be greater than 100 (entries)");
+        }
+
         try {
-            XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
-            CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
-                    xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_TEMPLATE_NAME, String.class, EHCacheValue.class);
-            CacheManagerBuilder builder = CacheManagerBuilder.newCacheManagerBuilder().withCache(key, configurationBuilder);
+            ResourcePoolsBuilder resourcePoolsBuilder = ResourcePoolsBuilder.newResourcePoolsBuilder()
+                    .heap(heapEntries, EntryUnit.ENTRIES);
             if (diskstorePath != null) {
-                builder = builder.with(CacheManagerBuilder.persistence(diskstorePath.toFile()));
+                resourcePoolsBuilder = resourcePoolsBuilder.disk(diskSize, MemoryUnit.MB, persistent);
             }
-            cacheManager = builder.build();
+
+            CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                            String.class, EHCacheValue.class, resourcePoolsBuilder)
+                            .withExpiry(new EHCacheExpiry());
+
+            if (diskstorePath != null) {
+                cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                        .with(CacheManagerBuilder.persistence(diskstorePath.toFile()))
+                        .withCache(key, configurationBuilder)
+                        .build();
+            } else {
+                cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                        .withCache(key, configurationBuilder)
+                        .build();
+            }
 
             cacheManager.init();
             cache = cacheManager.getCache(key, String.class, EHCacheValue.class);
@@ -65,25 +104,6 @@ public class EHCacheReplayCache implements ReplayCache {
             LOG.error("Error configuring EHCacheReplayCache", ex.getMessage());
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
         }
-    }
-
-    private URL getConfigFileURL(URL suppliedConfigFileURL) {
-        if (suppliedConfigFileURL == null) {
-            //using the default
-            String defaultConfigFile = "/wss4j-ehcache.xml";
-            URL configFileURL = null;
-            try {
-                configFileURL = Loader.getResource(defaultConfigFile);
-                if (configFileURL == null) {
-                    configFileURL = new URL(defaultConfigFile);
-                }
-                return configFileURL;
-            } catch (IOException e) {
-                // Do nothing
-                LOG.debug(e.getMessage());
-            }
-        }
-        return suppliedConfigFileURL;
     }
 
     /**
@@ -128,7 +148,25 @@ public class EHCacheReplayCache implements ReplayCache {
     public synchronized void close() {
         if (cacheManager.getStatus() == Status.AVAILABLE) {
             cacheManager.removeCache(key);
+
             cacheManager.close();
+
+            if (!persistent && cacheManager instanceof PersistentCacheManager) {
+                try {
+                    ((PersistentCacheManager) cacheManager).destroy();
+                } catch (CachePersistenceException e) {
+                    LOG.debug("Error in shutting down persistent cache", e);
+                }
+
+                // As we're not using a persistent disk store, just delete it - it should be empty after calling
+                // destroy above
+                if (diskstorePath != null) {
+                    File file = diskstorePath.toFile();
+                    if (file.exists() && file.canWrite()) {
+                        file.delete();
+                    }
+                }
+            }
         }
     }
 

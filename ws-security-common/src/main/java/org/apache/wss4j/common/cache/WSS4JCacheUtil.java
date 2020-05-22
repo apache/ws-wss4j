@@ -19,11 +19,6 @@
 
 package org.apache.wss4j.common.cache;
 
-import java.io.IOException;
-import java.net.URL;
-
-import org.apache.wss4j.common.util.Loader;
-
 /**
  * Some functionality to detect if EhCache is available or not.
  */
@@ -54,24 +49,5 @@ public final class WSS4JCacheUtil {
     public static boolean isEhCacheInstalled() {
         return EH_CACHE_INSTALLED;
     }
-
-    public static URL getConfigFileURL(Object o) {
-        if (o instanceof String) {
-            try {
-                URL url = Loader.getResource((String)o);
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                return url;
-            } catch (IOException e) {
-                // Do nothing
-                LOG.debug(e.getMessage());
-            }
-        } else if (o instanceof URL) {
-            return (URL)o;
-        }
-        return null;
-    }
-
 
 }

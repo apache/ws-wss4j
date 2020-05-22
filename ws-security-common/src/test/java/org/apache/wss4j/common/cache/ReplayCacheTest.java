@@ -21,13 +21,13 @@ package org.apache.wss4j.common.cache;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +52,16 @@ public class ReplayCacheTest {
 
     @Test
     public void testEhCacheReplayCache() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("abc"));
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", getDiskstorePath("abc"));
+
+        testReplayCacheInstance(replayCache);
+
+        replayCache.close();
+    }
+
+    @Test
+    public void testEhCacheReplayCacheNoPath() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("xyz");
 
         testReplayCacheInstance(replayCache);
 
@@ -61,9 +70,9 @@ public class ReplayCacheTest {
 
     @Test
     public void testEhCacheDifferentCaches() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null, getDiskstorePath("abc"));
+        ReplayCache replayCache = new EHCacheReplayCache("abc", getDiskstorePath("abc"));
 
-        ReplayCache replayCache2 = new EHCacheReplayCache("cba", (URL)null, getDiskstorePath("cba"));
+        ReplayCache replayCache2 = new EHCacheReplayCache("cba", getDiskstorePath("cba"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id);
@@ -75,8 +84,21 @@ public class ReplayCacheTest {
     }
 
     @Test
+    public void testOverflowToDisk() throws Exception {
+        ReplayCache replayCache = new EHCacheReplayCache("abc", getDiskstorePath("abc"));
+        
+        for (int i = 0; i < 10050; i++) {
+            String id = Integer.toString(i);
+            replayCache.add(id);
+            assertTrue(replayCache.contains(id));
+        }
+
+        replayCache.close();
+    }
+
+    @Test
     public void testEhCacheCloseCacheTwice() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("abc", (URL)null, getDiskstorePath("abc"));
+        ReplayCache replayCache = new EHCacheReplayCache("abc", getDiskstorePath("abc"));
         replayCache.close();
         replayCache.close();
     }
@@ -84,7 +106,7 @@ public class ReplayCacheTest {
     // No expiry specified so it falls back to the default
     @Test
     public void testEhCacheReplayCacheNoExpirySpecified() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id);
@@ -101,7 +123,7 @@ public class ReplayCacheTest {
     // The negative expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheReplayCacheNegativeExpiry() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id, Instant.now().minusSeconds(100L));
@@ -118,7 +140,7 @@ public class ReplayCacheTest {
     // The huge expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheReplayCacheHugeExpiry() throws Exception {
-        ReplayCache replayCache = new EHCacheReplayCache("xyz", (URL)null, getDiskstorePath("xyz"));
+        ReplayCache replayCache = new EHCacheReplayCache("xyz", getDiskstorePath("xyz"));
 
         String id = UUID.randomUUID().toString();
         replayCache.add(id, Instant.now().plus(14, ChronoUnit.HOURS));
@@ -130,6 +152,36 @@ public class ReplayCacheTest {
         assertEquals(id, ehCacheValue.getIdentifier());
 
         replayCache.close();
+    }
+
+    @Test
+    public void testNullKey() throws Exception {
+        Assertions.assertThrows(NullPointerException.class, () ->
+                new EHCacheReplayCache(null, getDiskstorePath("xyz")));
+    }
+
+    @Test
+    public void testPersistentAndDiskstoreNull() throws Exception {
+        Assertions.assertThrows(NullPointerException.class, () ->
+                new EHCacheReplayCache("abc", null, 10, 10000, true));
+    }
+
+    @Test
+    public void testZeroDiskSize() throws Exception {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new EHCacheReplayCache("abc", getDiskstorePath("abc"), 0, 10000, false));
+    }
+
+    @Test
+    public void testTooLargeDiskSize() throws Exception {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new EHCacheReplayCache("abc", getDiskstorePath("abc"), 10001, 10000, false));
+    }
+
+    @Test
+    public void testTooSmallHeapEntries() throws Exception {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new EHCacheReplayCache("abc", getDiskstorePath("abc"), 10, 10, false));
     }
 
     private void testReplayCacheInstance(ReplayCache replayCache) throws InterruptedException, IOException {

@@ -45,7 +45,6 @@ import org.apache.wss4j.stax.test.saml.SAML2CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.utils.XMLUtils;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -58,15 +57,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ReplayTest extends AbstractTestBase {
 
     private ReplayCache createCache(String key) throws WSSecurityException {
-        byte[] nonceValue;
         try {
-            nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + XMLUtils.encodeToString(nonceValue);
-
             String diskKey = key + "-" + Math.abs(new Random().nextInt());
             File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
 
-            return new EHCacheReplayCache(cacheKey, null, diskstore.toPath());
+            return new EHCacheReplayCache(key, diskstore.toPath());
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

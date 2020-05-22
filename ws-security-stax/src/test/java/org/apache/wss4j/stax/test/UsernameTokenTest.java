@@ -869,13 +869,10 @@ public class UsernameTokenTest extends AbstractTestBase {
     }
 
     private ReplayCache createCache(String key) throws WSSecurityException {
-        byte[] nonceValue;
         try {
-            nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + XMLUtils.encodeToString(nonceValue);
             String diskKey = key + "-" + Math.abs(new Random().nextInt());
             File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
-            return new EHCacheReplayCache(cacheKey, null, diskstore.toPath());
+            return new EHCacheReplayCache(key, diskstore.toPath());
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

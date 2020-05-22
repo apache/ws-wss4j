@@ -24,8 +24,6 @@ import java.util.Random;
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * A utility class for security tests
@@ -37,23 +35,22 @@ public final class SecurityTestUtil {
     }
 
     public static void cleanup() {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir != null) {
-            File[] tmpFiles = new File(tmpDir).listFiles();
-            if (tmpFiles != null) {
-                for (File tmpFile : tmpFiles) {
-                    if (tmpFile.exists() && tmpFile.getName().endsWith(".data")) {
-                        tmpFile.delete();
-                    }
-                }
-            }
-        }
+//        String tmpDir = System.getProperty("java.io.tmpdir");
+//        if (tmpDir != null) {
+//            File[] tmpFiles = new File(tmpDir).listFiles();
+//            if (tmpFiles != null) {
+//                for (File tmpFile : tmpFiles) {
+//                    if (tmpFile.exists() && tmpFile.getName().endsWith(".data")) {
+//                        tmpFile.delete();
+//                    }
+//                }
+//            }
+//        }
     }
 
     public static ReplayCache createCache(String key) throws WSSecurityException {
-        String cacheKey = key + XMLUtils.encodeToString(WSSecurityUtil.generateNonce(10));
         String diskKey = key + "-" + Math.abs(new Random().nextInt());
         File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
-        return new EHCacheReplayCache(cacheKey, null, diskstore.toPath());
+        return new EHCacheReplayCache(key, diskstore.toPath());
     }
 }
