@@ -63,6 +63,7 @@ are as follows:
  * ${PREFIX}.merlin.keystore.type - Type of keystore. Defaults to: java.security.KeyStore.getDefaultType())
  * ${PREFIX}.merlin.keystore.alias - The default keystore alias to use, if none is specified.
  * ${PREFIX}.merlin.keystore.private.password - The default password used to load the private key.
+ * *WSS4J 2.3.0/2.2.6* ${PREFIX}.merlin.keystore.private.caching - Whether to enable caching when loading private keys or not. The default is true for WSS4J 2.3.0 and false for WSS4J 2.2.6. There is a significant performance gain for PKCS12 keys when caching is enabled.
 
 ==== Merlin TrustStore properties
 
