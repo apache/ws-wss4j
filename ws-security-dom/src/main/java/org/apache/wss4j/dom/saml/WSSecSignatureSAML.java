@@ -23,7 +23,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.security.auth.Destroyable;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignContext;
@@ -534,14 +533,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
             signatureValue = sig.getSignatureValue().getValue();
 
-            // Clean the private key from memory
-            if (key instanceof Destroyable) {
-                try {
-                    ((Destroyable)key).destroy();
-                } catch (javax.security.auth.DestroyFailedException ex) {
-                    LOG.debug("Error destroying private key: {}", ex.getMessage());
-                }
-            }
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new WSSecurityException(
