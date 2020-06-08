@@ -55,8 +55,10 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.Callback;
@@ -101,6 +103,7 @@ public class Merlin extends CryptoBase {
     public static final String KEYSTORE_TYPE = "keystore.type";
     public static final String KEYSTORE_ALIAS = "keystore.alias";
     public static final String KEYSTORE_PRIVATE_PASSWORD = "keystore.private.password";
+    public static final String KEYSTORE_PRIVATE_KEY_CACHING = "keystore.private.caching";
 
     /*
      * TrustStore configuration types
@@ -129,6 +132,8 @@ public class Merlin extends CryptoBase {
     protected PasswordEncryptor passwordEncryptor;
 
     private boolean certProviderHandlesNameConstraints = false;
+    private boolean enablePrivateKeyCaching = true;
+    private Map<String, PrivateKey> privateKeyCache = new ConcurrentHashMap<>();
 
     public Merlin() {
         // default constructor
@@ -200,6 +205,7 @@ public class Merlin extends CryptoBase {
         if (cpNameConstraintsProp != null) {
             certProviderHandlesNameConstraints = Boolean.parseBoolean(cpNameConstraintsProp);
         }
+
         //
         // Load the KeyStore
         //
@@ -233,6 +239,11 @@ public class Merlin extends CryptoBase {
                 if (privatePasswd != null) {
                     privatePasswordSet = true;
                 }
+            }
+
+            String privateKeyCachingProp = properties.getProperty(prefix + KEYSTORE_PRIVATE_KEY_CACHING);
+            if (privateKeyCachingProp != null) {
+                enablePrivateKeyCaching = Boolean.parseBoolean(privateKeyCachingProp);
             }
         } else {
             LOG.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
@@ -704,6 +715,13 @@ public class Merlin extends CryptoBase {
                     pwd = decryptPassword(pwd, passwordEncryptor);
                 }
             }
+            if (enablePrivateKeyCaching) {
+                Key privateKey = privateKeyCache.get(identifier);
+                if (privateKey != null) {
+                    return (PrivateKey) privateKey;
+                }
+            }
+
             Key keyTmp = keystore.getKey(identifier, pwd == null
                                          ? new char[]{} : pwd.toCharArray());
             if (!(keyTmp instanceof PrivateKey)) {
@@ -712,6 +730,10 @@ public class Merlin extends CryptoBase {
                 LOG.error(msg + logMsg);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                               new Object[] {msg});
+            }
+
+            if (enablePrivateKeyCaching) {
+                privateKeyCache.put(identifier, (PrivateKey) keyTmp);
             }
             return (PrivateKey) keyTmp;
         } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
@@ -1518,5 +1540,19 @@ public class Merlin extends CryptoBase {
 
     public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
         this.passwordEncryptor = passwordEncryptor;
+    }
+
+    public void clearCache() {
+        if (enablePrivateKeyCaching) {
+            privateKeyCache.clear();
+        }
+    }
+
+    public boolean isEnablePrivateKeyCaching() {
+        return enablePrivateKeyCaching;
+    }
+
+    public void setEnablePrivateKeyCaching(boolean enablePrivateKeyCaching) {
+        this.enablePrivateKeyCaching = enablePrivateKeyCaching;
     }
 }
