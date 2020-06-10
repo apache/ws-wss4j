@@ -5,6 +5,47 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.3.0
+==============
+
+Bug
+
+    [WSS-634] - Nodes are not imported correctly when creating headers
+    [WSS-643] - NullPointerException in getCacheManager
+    [WSS-644] - Error when a SOAP-Fault is thrown with MTOM enabled
+    [WSS-648] - Performance problem with very big request
+    [WSS-651] - Incorrect signature if document has WSU_NS declared on SOAP Header or Envelope
+    [WSS-652] - MTOM Content-Id handling doesn't comply with RFC2392: .NET issues
+    [WSS-659] - SecurityContextToken validator set by wrong QName
+    [WSS-663] - Missing ECC key support
+    [WSS-670] - Expected signature algorithm is overwriten with default in case of DSA and EC Keys
+
+Improvement
+
+    [WSS-640] - Streaming Sender-Vouches validation does not work with SOAP 1.2
+    [WSS-641] - Add the ability to configure a different separator for certificate constraints
+    [WSS-650] - Exclude guava 19.0 dependency
+    [WSS-656] - Add the ability to specify a security Provider to use with Signature
+    [WSS-657] - Update OpenSAML Dependency to 3.4.x
+    [WSS-658] - Enable signature confirmation for signed SAML tokens
+    [WSS-661] - Change BouncyCastle provider registering
+    [WSS-662] - [OSGi] Support for SAAJ-RI 1.4.0
+    [WSS-666] - Support processing SignatureValue bytes stored in attachments
+    [WSS-667] - Support JDK14
+    [WSS-668] - Rename WSSConstants ENCRYPT actions
+    [WSS-669] - Rename ConfigurationConstants ENCRYPT actions
+    [WSS-673] - Using default Java Security and Merlin is very slow for PKCS12
+
+Task
+
+    [WSS-632] - Support EhCache 3+
+    [WSS-633] - Upgrade ErrorProne to support Java 11
+    [WSS-637] - Refactor ReplayCache interface to use an expiry Instant instead of a long TTL value
+    [WSS-649] - Remove Doctypes from the streaming schemas
+    [WSS-672] - Make sure to process all elements of the SAML Signature KeyInfo
+
+
+
 Release 2.2.5
 ==============
 
