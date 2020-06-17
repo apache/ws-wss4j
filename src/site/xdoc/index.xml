@@ -59,17 +59,27 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>June 2020</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.3.0.
+This is a major new release of WSS4J. Significant changes:
+</p>
+<ul>
+<li>Private key caching enabled which greatly speeds up private key retrieval for PKCS12 keys</li>
+<li>OpenSAML 3.4.x upgrade</li>
+<li>Santuario 2.2.x upgrade</li>
+<li>EhCache 3.x upgrade</li>
+<li>JDK 14 officially supported</li>
+</ul>
+<p>
+Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12343948">
+2.3.0 release notes</a> for more information.
+</p>
+</li>
+<li>
 <p><b>March 2020</b> - 
 The Apache WSS4J team are pleased to announce the release of version 2.2.5.
 Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12345960">
 2.2.5 release notes</a> for more information.
-</p>
-</li>
-<li>
-<p><b>July 2019</b> - 
-The Apache WSS4J team are pleased to announce the release of version 2.2.4.
-Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12345343">
-2.2.4 release notes</a> for more information.
 </p>
 </li>
 </ul>
