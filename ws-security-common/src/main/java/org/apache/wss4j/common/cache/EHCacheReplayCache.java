@@ -101,7 +101,7 @@ public class EHCacheReplayCache implements ReplayCache {
             cacheManager.init();
             cache = cacheManager.getCache(key, String.class, EHCacheValue.class);
         } catch (Exception ex) {
-            LOG.error("Error configuring EHCacheReplayCache", ex.getMessage());
+            LOG.error("Error configuring EHCacheReplayCache: {}", ex.getMessage());
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
         }
     }
