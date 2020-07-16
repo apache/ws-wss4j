@@ -48,6 +48,7 @@ import java.util.List;
 import javax.security.auth.callback.CallbackHandler;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -273,6 +274,15 @@ public class CertificateStoreTest {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
+    }
+
+    @Test
+    public void testAliasNotAllowed() throws Exception {
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        assertThrows(WSSecurityException.class, () -> {
+            receiverCrypto.getX509Certificates(cryptoType);
+        });
     }
 
     /**

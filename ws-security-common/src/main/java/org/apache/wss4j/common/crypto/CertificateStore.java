@@ -68,8 +68,7 @@ public class CertificateStore extends CryptoBase {
      * TYPE.THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 of the (root) cert
      * TYPE.SKI_BYTES - A certificate (chain) is located by the SKI bytes of the (root) cert
      * TYPE.SUBJECT_DN - A certificate (chain) is located by the Subject DN of the (root) cert
-     * TYPE.ALIAS - A certificate (chain) is located by an alias. In this case, it duplicates the
-     * TYPE.SUBJECT_DN functionality.
+     * Note that TYPE.ALIAS is not allowed, as it doesn't have any meaning with a CertificateStore
      */
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (cryptoType == null) {
@@ -87,10 +86,14 @@ public class CertificateStore extends CryptoBase {
         case SKI_BYTES:
             certs = getX509CertificatesSKI(cryptoType.getBytes());
             break;
-        case ALIAS:
         case SUBJECT_DN:
             certs = getX509CertificatesSubjectDN(cryptoType.getSubjectDN());
             break;
+        case ALIAS:
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "generic.EmptyMessage",
+                    new Object[] {"The alias CryptoType is not allowed for CertificateStore"}
+            );
         case ENDPOINT:
             break;
         }
