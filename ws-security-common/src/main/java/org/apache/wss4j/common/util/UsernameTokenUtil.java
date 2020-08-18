@@ -152,7 +152,11 @@ public final class UsernameTokenUtil {
     }
 
     public static String doPasswordDigest(byte[] nonce, String created, byte[] password) throws WSSecurityException {
-        String passwdDigest = null;
+        byte[] digestBytes = doRawPasswordDigest(nonce, created, password);
+        return org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes);
+    }
+
+    public static byte[] doRawPasswordDigest(byte[] nonce, String created, byte[] password) throws WSSecurityException {
         try {
             byte[] b1 = nonce != null ? nonce : new byte[0];
             byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
@@ -167,13 +171,11 @@ public final class UsernameTokenUtil {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
 
-            byte[] digestBytes = KeyUtils.generateDigest(b4);
-            passwdDigest = org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes);
+            return KeyUtils.generateDigest(b4);
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         }
-        return passwdDigest;
     }
 
     /**
