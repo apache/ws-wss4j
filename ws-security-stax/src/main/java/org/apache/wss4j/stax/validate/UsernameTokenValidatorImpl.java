@@ -18,6 +18,9 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import org.apache.wss4j.binding.wss10.AttributedString;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
@@ -179,8 +182,10 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
-        if (!passwordType.getValue().equals(passDigest)) {
+
+        byte[] passDigest = WSSUtils.doRawPasswordDigest(nonceVal, created, pwCb.getPassword());
+        byte[] decodedPassword = XMLUtils.decode(passwordType.getValue());
+        if (!MessageDigest.isEqual(decodedPassword, passDigest)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         passwordType.setValue(pwCb.getPassword());
@@ -208,7 +213,9 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        if (!passwordType.getValue().equals(pwCb.getPassword())) {
+        byte[] origPasswordBytes = pwCb.getPassword().getBytes(StandardCharsets.UTF_8);
+        byte[] passwordBytes = passwordType.getValue().getBytes(StandardCharsets.UTF_8);
+        if (!MessageDigest.isEqual(origPasswordBytes, passwordBytes)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         passwordType.setValue(pwCb.getPassword());

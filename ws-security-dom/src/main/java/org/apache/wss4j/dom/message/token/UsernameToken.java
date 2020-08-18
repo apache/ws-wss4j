@@ -565,7 +565,11 @@ public class UsernameToken {
     }
 
     public static String doPasswordDigest(String nonce, String created, byte[] password) {
-        String passwdDigest = null;
+        byte[] digestBytes = doRawPasswordDigest(nonce, created, password);
+        return digestBytes != null ? org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes) : null;
+    }
+
+    public static byte[] doRawPasswordDigest(String nonce, String created, byte[] password) {
         try {
             byte[] b1 = nonce != null ? org.apache.xml.security.utils.XMLUtils.decode(nonce) : new byte[0];
             byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
@@ -580,12 +584,11 @@ public class UsernameToken {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
 
-            byte[] digestBytes = KeyUtils.generateDigest(b4);
-            passwdDigest = org.apache.xml.security.utils.XMLUtils.encodeToString(digestBytes);
+            return KeyUtils.generateDigest(b4);
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);
         }
-        return passwdDigest;
+        return null;
     }
 
     public static String doPasswordDigest(String nonce, String created, String password) {

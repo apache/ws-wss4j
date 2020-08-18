@@ -114,6 +114,11 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     public static String doPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
+        byte[] digest = doRawPasswordDigest(nonce, created, password);
+        return XMLUtils.encodeToString(digest);
+    }
+
+    public static byte[] doRawPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
         try {
             byte[] b1 = nonce != null ? nonce : new byte[0];
             byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
@@ -131,7 +136,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             sha.reset();
             sha.update(b4);
-            return XMLUtils.encodeToString(sha.digest());
+            return sha.digest();
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         }

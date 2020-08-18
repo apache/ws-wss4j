@@ -20,6 +20,8 @@
 package org.apache.wss4j.dom.validate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -165,18 +167,22 @@ public class UsernameTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         if (usernameToken.isHashed()) {
-            String passDigest;
+            byte[] decodedPassword = XMLUtils.decode(password);
+            byte[] passDigest;
             if (passwordsAreEncoded) {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime,
+                passDigest = UsernameToken.doRawPasswordDigest(nonce, createdTime,
                                                             XMLUtils.decode(origPassword));
             } else {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
+                passDigest = UsernameToken.doRawPasswordDigest(nonce, createdTime,
+                        origPassword.getBytes(StandardCharsets.UTF_8));
             }
-            if (!passDigest.equals(password)) {
+            if (!MessageDigest.isEqual(decodedPassword, passDigest)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
         } else {
-            if (!origPassword.equals(password)) {
+            byte[] origPasswordBytes = origPassword.getBytes(StandardCharsets.UTF_8);
+            byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+            if (!MessageDigest.isEqual(origPasswordBytes, passwordBytes)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
         }
