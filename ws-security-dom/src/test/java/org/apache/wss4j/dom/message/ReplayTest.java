@@ -19,16 +19,17 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 
-import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
@@ -50,6 +51,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -66,8 +68,15 @@ public class ReplayTest {
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
+    @TempDir
+    Path tempDir;
+
     public ReplayTest() throws Exception {
         crypto = CryptoFactory.getInstance();
+    }
+
+    private ReplayCache createCache(String key) throws WSSecurityException {
+        return new EHCacheReplayCache(key, tempDir);
     }
 
     @Test
@@ -158,7 +167,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        ReplayCache replayCache = createCache("wss4j.timestamp.cache-");
         data.setTimestampReplayCache(replayCache);
 
         // Successfully verify timestamp
@@ -253,7 +262,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        ReplayCache replayCache = createCache("wss4j.timestamp.cache-");
         data.setTimestampReplayCache(replayCache);
 
         // Successfully verify timestamp
@@ -358,7 +367,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        ReplayCache replayCache = createCache("wss4j.timestamp.cache-");
         data.setTimestampReplayCache(replayCache);
 
         // Successfully verify timestamp
@@ -431,7 +440,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setCallbackHandler(new UsernamePasswordCallbackHandler());
         data.setWssConfig(wssConfig);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.nonce.cache-");
+        ReplayCache replayCache = createCache("wss4j.nonce.cache-");
         data.setNonceReplayCache(replayCache);
 
         // Successfully verify UsernameToken
@@ -492,7 +501,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.saml.one.time.use.cache-");
+        ReplayCache replayCache = createCache("wss4j.saml.one.time.use.cache-");
         data.setSamlOneTimeUseReplayCache(replayCache);
 
         // Successfully verify SAML Token
@@ -549,7 +558,7 @@ public class ReplayTest {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.saml.one.time.use.cache-");
+        ReplayCache replayCache = createCache("wss4j.saml.one.time.use.cache-");
         data.setSamlOneTimeUseReplayCache(replayCache);
 
         // Successfully verify SAML Token

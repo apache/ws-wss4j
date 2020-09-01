@@ -20,9 +20,9 @@ package org.apache.wss4j.stax.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -61,6 +60,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.utils.XMLUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
@@ -249,7 +249,7 @@ public class UsernameTokenTest extends AbstractTestBase {
     */
 
     @Test
-    public void testReusedNonce() throws Exception {
+    public void testReusedNonce(@TempDir Path tempDir) throws Exception {
 
         ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         String createdString = DateUtil.getDateTimeFormatter(true).format(created);
@@ -276,7 +276,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        ReplayCache replayCache = createCache("wss4j.nonce.cache-");
+        ReplayCache replayCache = createCache("wss4j.nonce.cache", tempDir);
         securityProperties.setNonceReplayCache(replayCache);
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
         XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
@@ -868,11 +868,9 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
     }
 
-    private ReplayCache createCache(String key) throws WSSecurityException {
+    private ReplayCache createCache(String key, Path tempDir) throws WSSecurityException {
         try {
-            String diskKey = key + "-" + Math.abs(new Random().nextInt());
-            File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
-            return new EHCacheReplayCache(key, diskstore.toPath());
+            return new EHCacheReplayCache(key, tempDir);
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

@@ -20,10 +20,9 @@ package org.apache.wss4j.stax.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Properties;
-import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -46,6 +45,7 @@ import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -56,12 +56,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class ReplayTest extends AbstractTestBase {
 
+    @TempDir
+    Path tempDir;
+
     private ReplayCache createCache(String key) throws WSSecurityException {
         try {
-            String diskKey = key + "-" + Math.abs(new Random().nextInt());
-            File diskstore = new File(System.getProperty("java.io.tmpdir"), diskKey);
-
-            return new EHCacheReplayCache(key, diskstore.toPath());
+            return new EHCacheReplayCache(key, tempDir);
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
