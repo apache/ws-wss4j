@@ -130,6 +130,8 @@ public class WSS4JConstants {
         "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
     public static final String RSA_SHA256 =
         "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    public static final String RSA_SHA512 =
+        "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
     public static final String SHA1 =
         "http://www.w3.org/2000/09/xmldsig#sha1";
     public static final String SHA256 =

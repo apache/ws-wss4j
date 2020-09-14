@@ -540,14 +540,35 @@ public class SignatureTest {
 
         Document signedDoc = builder.build(crypto);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString =
-                XMLUtils.prettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        LOG.info("After Signing IS....");
+        String outputString = XMLUtils.prettyDocumentToString(signedDoc);
+        LOG.debug(outputString);
+        assertTrue(outputString.contains(WSConstants.RSA_SHA256));
+
         verify(signedDoc);
+    }
+
+    @Test
+    public void testX509SignatureSha512() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setSignatureAlgorithm(WSConstants.RSA_SHA512);
+        builder.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        LOG.info("Before Signing IS....");
+
+        Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
+        Document signedDoc = builder.build(wssCrypto);
+
+        String outputString = XMLUtils.prettyDocumentToString(signedDoc);
+        LOG.debug(outputString);
+        assertTrue(outputString.contains(WSConstants.RSA_SHA512));
+
+        LOG.info("After Signing IS....");
+        secEngine.processSecurityHeader(doc, null, null, wssCrypto);
     }
 
     /**
