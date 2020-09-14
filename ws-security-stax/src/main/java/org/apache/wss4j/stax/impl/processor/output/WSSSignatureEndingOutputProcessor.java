@@ -50,8 +50,8 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
     public WSSSignatureEndingOutputProcessor(WSSSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(signatureOutputProcessor);
-        this.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
-        this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+        this.addAfterProcessor(WSSSignatureOutputProcessor.class);
+        this.addAfterProcessor(UsernameTokenOutputProcessor.class);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm, signatureId, xmlSecStartElement);
         this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         this.signedInfoProcessor.setAction(getAction());
-        this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class.getName());
+        this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class);
         this.signedInfoProcessor.init(outputProcessorChain);
         return this.signedInfoProcessor;
     }

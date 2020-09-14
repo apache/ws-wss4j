@@ -62,7 +62,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
     public SecurityHeaderReorderProcessor() throws XMLSecurityException {
         super();
         setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
-        addBeforeProcessor(FinalOutputProcessor.class.getName());
+        addBeforeProcessor(FinalOutputProcessor.class);
     }
 
     @Override

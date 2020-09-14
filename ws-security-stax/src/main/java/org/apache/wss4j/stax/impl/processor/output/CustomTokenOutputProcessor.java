@@ -45,8 +45,8 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
 
     public CustomTokenOutputProcessor() throws XMLSecurityException {
         super();
-        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-        addBeforeProcessor(EncryptedKeyOutputProcessor.class.getName());
+        addBeforeProcessor(WSSSignatureOutputProcessor.class);
+        addBeforeProcessor(EncryptedKeyOutputProcessor.class);
     }
 
     @Override
@@ -71,8 +71,8 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
                 new FinalUnknownTokenOutputProcessor(customToken);
             outputProcessor.setXMLSecurityProperties(getSecurityProperties());
             outputProcessor.setAction(getAction());
-            outputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-            outputProcessor.addBeforeProcessor(EncryptedKeyOutputProcessor.class.getName());
+            outputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
+            outputProcessor.addBeforeProcessor(EncryptedKeyOutputProcessor.class);
             outputProcessor.init(outputProcessorChain);
         } finally {
             outputProcessorChain.removeProcessor(this);
@@ -86,7 +86,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
 
         FinalUnknownTokenOutputProcessor(Element token) throws XMLSecurityException {
             super();
-            this.addAfterProcessor(CustomTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(CustomTokenOutputProcessor.class);
             this.token = token;
         }
 

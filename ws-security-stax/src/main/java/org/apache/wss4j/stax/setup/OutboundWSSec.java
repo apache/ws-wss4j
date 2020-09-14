@@ -619,7 +619,7 @@ public class OutboundWSSec {
 
                 if (encryptedKeyOutputProcessor == null) {
                     final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
                 }
 
@@ -689,7 +689,7 @@ public class OutboundWSSec {
 
                 if (encryptedKeyOutputProcessor == null) {
                     final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
                 }
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {

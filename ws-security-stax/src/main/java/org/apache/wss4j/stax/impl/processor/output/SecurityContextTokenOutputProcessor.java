@@ -113,17 +113,17 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
                 } else {
-                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
                 }
             } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
                 } else {
-                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class.getName());
-                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class);
+                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                 }
             }
 

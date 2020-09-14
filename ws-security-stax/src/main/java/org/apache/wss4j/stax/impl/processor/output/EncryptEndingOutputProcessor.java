@@ -43,8 +43,8 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
 
     public EncryptEndingOutputProcessor() throws XMLSecurityException {
         super();
-        this.addAfterProcessor(EncryptOutputProcessor.class.getName());
-        this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+        this.addAfterProcessor(EncryptOutputProcessor.class);
+        this.addAfterProcessor(UsernameTokenOutputProcessor.class);
     }
 
     @Override

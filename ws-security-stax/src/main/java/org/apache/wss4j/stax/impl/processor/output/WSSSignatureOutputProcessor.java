@@ -130,8 +130,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                             new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement);
                     internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     internalSignatureOutputProcessor.setAction(getAction());
-                    internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
-                    internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class.getName());
+                    internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class);
+                    internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class);
                     internalSignatureOutputProcessor.init(outputProcessorChain);
 
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
@@ -294,7 +294,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
         InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement)
             throws XMLSecurityException {
             super(signaturePartDef, xmlSecStartElement);
-            this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());
+            this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class);
         }
     }
 }

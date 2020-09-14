@@ -184,9 +184,9 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalDerivedKeyTokenOutputProcessor.setAction(getAction());
             if (wrappingSecurityToken.getProcessor() != null) {
-                finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
             } else {
-                finalDerivedKeyTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class.getName());
+                finalDerivedKeyTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class);
             }
             finalDerivedKeyTokenOutputProcessor.init(outputProcessorChain);
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);

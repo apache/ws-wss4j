@@ -113,43 +113,43 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.ENCRYPTION.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 } else if (sharedToken) {
-                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
 
                     //hint for the headerReordering processor where to place the EncryptedKey
                     if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
-                        finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                        finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
                     }
                     finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
 
                     ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                    referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor);
+                    referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor.getClass());
                     referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     referenceListOutputProcessor.setAction(getAction());
                     referenceListOutputProcessor.init(outputProcessorChain);
                 } else {
-                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 }
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
                 } else {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
                 }
                 finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
             } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor().getClass());
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 } else if (sharedToken) {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
 
                     //hint for the headerReordering processor where to place the EncryptedKey
                     if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY)
@@ -159,11 +159,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 } else {
-                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 }
                 ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor);
+                referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor.getClass());
                 referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                 referenceListOutputProcessor.setAction(getAction());
                 referenceListOutputProcessor.init(outputProcessorChain);
@@ -187,7 +187,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         FinalEncryptedKeyOutputProcessor(OutboundSecurityToken securityToken) throws XMLSecurityException {
             super();
-            this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class.getName());
+            this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class);
             this.securityToken = securityToken;
         }
 

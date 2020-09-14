@@ -311,9 +311,9 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 throws XMLSecurityException, XMLStreamException {
 
             super(encryptionPartDef, xmlSecStartElement, encoding);
-            this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());
-            this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
-            this.addAfterProcessor(EncryptOutputProcessor.class.getName());
+            this.addBeforeProcessor(EncryptEndingOutputProcessor.class);
+            this.addBeforeProcessor(InternalEncryptionOutputProcessor.class);
+            this.addAfterProcessor(EncryptOutputProcessor.class);
             this.securityToken = securityToken;
         }
 

@@ -48,9 +48,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
     public UsernameTokenOutputProcessor() throws XMLSecurityException {
         super();
-        addAfterProcessor(TimestampOutputProcessor.class.getName());
-        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-        addBeforeProcessor(EncryptOutputProcessor.class.getName());
+        addAfterProcessor(TimestampOutputProcessor.class);
+        addBeforeProcessor(WSSSignatureOutputProcessor.class);
+        addBeforeProcessor(EncryptOutputProcessor.class);
     }
 
     @Override
@@ -162,8 +162,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                                           int iterations, XMLSecurityConstants.Action action)
                 throws XMLSecurityException {
             super();
-            this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
-            this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(UsernameTokenOutputProcessor.class);
+            this.addAfterProcessor(UsernameTokenOutputProcessor.class);
             this.wsuId = wsuId;
             this.nonceValue = nonceValue;
             this.password = password;
