@@ -43,6 +43,7 @@ import org.opensaml.core.xml.io.UnmarshallerFactory;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.config.SAMLConfiguration;
+import org.opensaml.xmlsec.config.DecryptionParserPool;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
@@ -101,6 +102,10 @@ public final class OpenSAMLUtil {
 
                 try {
                     configureParserPool();
+
+                    // used by org.opensaml.saml.saml2.encryption.Decrypter
+                    configuration.register(DecryptionParserPool.class, new DecryptionParserPool(getParserPool()),
+                        ConfigurationService.DEFAULT_PARTITION_NAME);
                 } catch (Throwable t) {
                     LOG.warn("Unable to bootstrap the parser pool part of the opensaml library "
                              + "- some SAML operations may fail", t);
