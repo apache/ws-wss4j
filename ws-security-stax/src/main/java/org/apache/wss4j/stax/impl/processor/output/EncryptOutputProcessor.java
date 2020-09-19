@@ -81,7 +81,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         super.init(outputProcessorChain);
         EncryptEndingOutputProcessor encryptEndingOutputProcessor = new EncryptEndingOutputProcessor();
         encryptEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-        encryptEndingOutputProcessor.setAction(getAction());
+        encryptEndingOutputProcessor.setAction(getAction(), getActionOrder());
         encryptEndingOutputProcessor.init(outputProcessorChain);
     }
 
@@ -129,7 +129,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                                     securityToken
                             );
                     internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    internalEncryptionOutputProcessor.setAction(getAction());
+                    internalEncryptionOutputProcessor.setAction(getAction(), getActionOrder());
                     internalEncryptionOutputProcessor.init(outputProcessorChain);
 
                     setActiveInternalEncryptionOutputProcessor(internalEncryptionOutputProcessor);

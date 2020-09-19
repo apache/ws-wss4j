@@ -66,7 +66,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
         this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm, signatureId, xmlSecStartElement);
         this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
-        this.signedInfoProcessor.setAction(getAction());
+        this.signedInfoProcessor.setAction(getAction(), getActionOrder());
         this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class);
         this.signedInfoProcessor.init(outputProcessorChain);
         return this.signedInfoProcessor;

@@ -94,7 +94,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor =
                         new FinalBinarySecurityTokenOutputProcessor(securityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction(), getActionOrder());
                     finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
@@ -104,7 +104,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor =
                         new FinalBinarySecurityTokenOutputProcessor(securityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction(), getActionOrder());
                     finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
@@ -115,7 +115,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor =
                         new FinalBinarySecurityTokenOutputProcessor(securityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction(), getActionOrder());
                     finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
@@ -125,9 +125,8 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor =
                         new FinalBinarySecurityTokenOutputProcessor(securityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction(), getActionOrder());
                     finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
-                    finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }

@@ -8,3 +8,6 @@ target/
 velocity.log
 .pmdruleset.xml
 
+# IntelliJ
+/.idea/
+**/*.iml

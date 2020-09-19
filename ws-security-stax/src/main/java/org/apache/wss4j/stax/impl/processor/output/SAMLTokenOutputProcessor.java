@@ -70,6 +70,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
         super();
+        addBeforeProcessor(BinarySecurityTokenOutputProcessor.class);
         addBeforeProcessor(WSSSignatureOutputProcessor.class);
     }
 
@@ -137,6 +138,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches, includeSTR);
+                finalSAMLTokenOutputProcessor.setAction(getAction(), getActionOrder());
 
                 securityToken.setProcessor(finalSAMLTokenOutputProcessor);
 
@@ -207,7 +209,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalSAMLTokenOutputProcessor.setAction(action);
+            finalSAMLTokenOutputProcessor.setAction(action, getActionOrder());
             finalSAMLTokenOutputProcessor.init(outputProcessorChain);
 
             if (includeSTR) {
@@ -434,6 +436,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             super();
             this.addAfterProcessor(UsernameTokenOutputProcessor.class);
             this.addAfterProcessor(SAMLTokenOutputProcessor.class);
+            this.addBeforeProcessor(WSSSignatureOutputProcessor.class);
             this.samlAssertionWrapper = samlAssertionWrapper;
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.senderVouches = senderVouches;
