@@ -644,20 +644,20 @@ public abstract class WSHandler {
         AlgorithmSuite algorithmSuite = new AlgorithmSuite();
 
         String signatureAlgorithm = getString(WSHandlerConstants.SIG_ALGO, mc);
-        if (signatureAlgorithm != null && !"".equals(signatureAlgorithm)) {
+        if (signatureAlgorithm != null && signatureAlgorithm.length() != 0) {
             algorithmSuite.addSignatureMethod(signatureAlgorithm);
         }
         String signatureDigestAlgorithm = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
-        if (signatureDigestAlgorithm != null && !"".equals(signatureDigestAlgorithm)) {
+        if (signatureDigestAlgorithm != null && signatureDigestAlgorithm.length() != 0) {
             algorithmSuite.addDigestAlgorithm(signatureDigestAlgorithm);
         }
 
         String encrAlgorithm = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
-        if (encrAlgorithm != null && !"".equals(encrAlgorithm)) {
+        if (encrAlgorithm != null && encrAlgorithm.length() != 0) {
             algorithmSuite.addEncryptionMethod(encrAlgorithm);
         }
         String transportAlgorithm = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
-        if (transportAlgorithm != null && !"".equals(transportAlgorithm)) {
+        if (transportAlgorithm != null && transportAlgorithm.length() != 0) {
             algorithmSuite.addKeyWrapAlgorithm(transportAlgorithm);
         }
 

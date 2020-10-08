@@ -263,7 +263,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 } else {
                     ref.setURI("#" + tokenIdentifier);
                 }
-                if (customValueType != null && !"".equals(customValueType)) {
+                if (customValueType != null && customValueType.length() != 0) {
                     ref.setValueType(customValueType);
                 }
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customValueType)) {

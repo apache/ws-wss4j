@@ -86,7 +86,7 @@ public final class ConfigurationConverter {
             return;
         }
         actionToParse = actionToParse.trim();
-        if ("".equals(actionToParse)) {
+        if (actionToParse.length() == 0) {
             return;
         }
         String[] single = actionToParse.split("\\s");

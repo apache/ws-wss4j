@@ -242,7 +242,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     protected void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
-        if (encKeyId == null || "".equals(encKeyId)) {
+        if (encKeyId == null || encKeyId.length() == 0) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
@@ -380,7 +380,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     protected void createEncryptedKeyElement(Key key) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
-        if (encKeyId == null || "".equals(encKeyId)) {
+        if (encKeyId == null || encKeyId.length() == 0) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);

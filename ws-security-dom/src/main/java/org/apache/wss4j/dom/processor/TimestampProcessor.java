@@ -49,7 +49,7 @@ public class TimestampProcessor implements Processor {
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
         String tokenId = timestamp.getID();
-        if (!"".equals(tokenId)) {
+        if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
 

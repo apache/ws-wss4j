@@ -56,7 +56,7 @@ public class MemoryReplayCache implements ReplayCache {
      * @param expiry A custom expiry time for the identifier
      */
     public void add(String identifier, Instant expiry) {
-        if (identifier == null || "".equals(identifier)) {
+        if (identifier == null || identifier.length() == 0) {
             return;
         }
 
@@ -84,7 +84,7 @@ public class MemoryReplayCache implements ReplayCache {
     public boolean contains(String identifier) {
         processTokenExpiry();
 
-        if (identifier != null && !"".equals(identifier)) {
+        if (identifier != null && identifier.length() != 0) {
             return ids.contains(identifier);
         }
         return false;

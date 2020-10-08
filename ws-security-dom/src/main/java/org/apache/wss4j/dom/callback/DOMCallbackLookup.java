@@ -115,8 +115,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         //
         if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
             || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
-            || "".equals(valueType)
-            || valueType == null) {
+            || valueType == null || valueType.length() == 0) {
             foundElement =
                 XMLUtils.findSAMLAssertionElementById(
                     doc.getDocumentElement(), idToMatch

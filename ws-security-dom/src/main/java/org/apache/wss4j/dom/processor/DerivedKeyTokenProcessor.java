@@ -82,7 +82,7 @@ public class DerivedKeyTokenProcessor implements Processor {
             new WSSecurityEngineResult(WSConstants.DKT, null, keyBytes, null);
         data.getWsDocInfo().addTokenElement(elem);
         String tokenId = dkt.getID();
-        if (!"".equals(tokenId)) {
+        if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
         result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);

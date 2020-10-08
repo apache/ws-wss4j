@@ -250,7 +250,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
         result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
         String tokenId = elem.getAttributeNS(null, "Id");
-        if (!"".equals(tokenId)) {
+        if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
@@ -527,7 +527,7 @@ public class SignatureProcessor implements Processor {
             Reference siRef = (Reference)reference;
             String uri = siRef.getURI();
 
-            if (!"".equals(uri)) {
+            if (uri.length() != 0) {
                 Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
                 boolean attachment = false;

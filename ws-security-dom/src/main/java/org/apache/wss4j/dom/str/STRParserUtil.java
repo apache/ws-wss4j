@@ -136,7 +136,7 @@ public final class STRParserUtil {
             if (token instanceof X509Security && !X509Security.X509_V3_TYPE.equals(valueType)
                 || token instanceof PKIPathSecurity && !PKIPathSecurity.PKI_TYPE.equals(valueType)
                 || token instanceof KerberosSecurity
-                        && !(valueType == null || "".equals(valueType))
+                        && !(valueType == null || valueType.length() == 0)
                         && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3058);
             }
@@ -207,7 +207,7 @@ public final class STRParserUtil {
                 bspEnforcer.handleBSPRule(BSPRule.R6616);
             }
             String encoding = secRef.getKeyIdentifierEncodingType();
-            if (encoding != null && !"".equals(encoding)) {
+            if (encoding != null && encoding.length() != 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R6604);
             }
         }
@@ -224,7 +224,7 @@ public final class STRParserUtil {
         // Check the ValueType attribute of the Reference for SAML2
         if (samlAssertion.getSaml2() != null && secRef.containsReference()) {
             String valueType = secRef.getReference().getValueType();
-            if (valueType != null && !"".equals(valueType)) {
+            if (valueType != null && valueType.length() != 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R6614);
             }
         }

@@ -231,7 +231,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE);
                 }
 
-                if (!"".equals(created)) {
+                if (created != null && created.length() != 0) {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, created);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);

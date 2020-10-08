@@ -75,7 +75,7 @@ public class Timestamp {
                     && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (createdString == null) {
                         String valueType = currentChildElement.getAttributeNS(null, "ValueType");
-                        if (valueType != null && !"".equals(valueType)) {
+                        if (valueType != null && valueType.length() != 0) {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3225);
                         }
@@ -95,7 +95,7 @@ public class Timestamp {
                         bspEnforcer.handleBSPRule(BSPRule.R3224);
                     } else {
                         String valueType = currentChildElement.getAttributeNS(null, "ValueType");
-                        if (valueType != null && !"".equals(valueType)) {
+                        if (valueType != null && valueType.length() != 0) {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3226);
                         }

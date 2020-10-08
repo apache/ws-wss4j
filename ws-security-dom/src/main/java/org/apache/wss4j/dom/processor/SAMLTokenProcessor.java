@@ -123,7 +123,7 @@ public class SAMLTokenProcessor implements Processor {
             result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, samlAssertion);
         }
 
-        if (!"".equals(id)) {
+        if (id.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, id);
         }
 

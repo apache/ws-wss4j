@@ -121,7 +121,7 @@ public final class KeyUtils {
             // Assume AES as default, so initialize it
             //
             String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
-            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
+            if (keyAlgorithm == null || keyAlgorithm.length() == 0) {
                 keyAlgorithm = JCEMapper.translateURItoJCEID(algorithm);
             }
             KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);

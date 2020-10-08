@@ -488,7 +488,7 @@ public class DerivedKeyToken {
      */
     public String getAlgorithm() {
         String algo = element.getAttributeNS(ns, "Algorithm");
-        if ("".equals(algo)) {
+        if (algo.length() == 0) {
             return ConversationConstants.DerivationAlgorithm.P_SHA_1;
         } else {
             return algo;

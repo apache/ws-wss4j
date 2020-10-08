@@ -120,7 +120,7 @@ public class EHCacheReplayCache implements ReplayCache {
      * @param expiry A custom expiry time for the identifier. Can be null in which case, the default expiry is used.
      */
     public void add(String identifier, Instant expiry) {
-        if (identifier == null || "".equals(identifier)) {
+        if (identifier == null || identifier.length() == 0) {
             return;
         }
 

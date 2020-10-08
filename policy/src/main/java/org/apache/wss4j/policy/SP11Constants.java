@@ -329,7 +329,7 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public IncludeTokenType getInclusionFromAttributeValue(String value) throws IllegalArgumentException {
-        if (value == null || "".equals(value)) {
+        if (value == null || value.length() == 0) {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS;
         } else if (INCLUDE_ALWAYS.equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS;

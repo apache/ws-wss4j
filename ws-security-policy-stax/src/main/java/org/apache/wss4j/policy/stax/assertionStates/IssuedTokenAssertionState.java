@@ -215,7 +215,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                 String claimTypeUri = claimType.getAttributeNS(null, "Uri");
                 String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
 
-                if ("".equals(claimTypeOptional) || !Boolean.parseBoolean(claimTypeOptional)) {
+                if (claimTypeOptional.length() == 0 || !Boolean.parseBoolean(claimTypeOptional)) {
                     String errorMsg = findClaimInAssertion(samlTokenSecurityEvent.getSamlAssertionWrapper(), URI.create(claimTypeUri));
                     if (errorMsg != null) {
                         return errorMsg;

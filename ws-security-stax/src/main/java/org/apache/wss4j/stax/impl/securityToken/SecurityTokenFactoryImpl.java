@@ -441,7 +441,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             WSSecurityTokenConstants.TokenType samlTokenType = securityTokenProvider.getSecurityToken().getTokenType();
             if (WSSecurityTokenConstants.SAML_20_TOKEN.equals(samlTokenType)) {
                 String valueType = referenceType.getValueType();
-                if (valueType != null && !"".equals(valueType)) {
+                if (valueType != null && valueType.length() != 0) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6614);
                 }
                 if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {

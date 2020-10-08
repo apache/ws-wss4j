@@ -35,7 +35,7 @@ public final class PolicyUtils {
         String[] xPathElements = xPath.getXPath().split("/");
         for (int j = 0; j < xPathElements.length; j++) {
             String xPathElement = xPathElements[j];
-            if (xPathElement == null || "".equals(xPathElement)) {
+            if (xPathElement == null || xPathElement.length() == 0) {
                 continue;
             }
             String[] elementParts = xPathElement.split(":");

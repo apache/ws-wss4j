@@ -574,19 +574,19 @@ public class SecurityTokenReference {
 
             String valueType = getKeyIdentifierValueType();
             // ValueType cannot be null
-            if (valueType == null || "".equals(valueType)) {
+            if (valueType == null || valueType.length() == 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R3054);
             }
             String encodingType = getFirstElement().getAttributeNS(null, "EncodingType");
             // Encoding Type must be equal to Base64Binary if it's specified
-            if (!"".equals(encodingType) && !WSS4JConstants.BASE64_ENCODING.equals(encodingType)) {
+            if (encodingType.length() != 0 && !WSS4JConstants.BASE64_ENCODING.equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3071);
             }
             // Encoding type must be specified other than for a SAML Assertion
 
             if (!WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
                 && !WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
-                && "".equals(encodingType)) {
+                && encodingType.length() == 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R3070);
             }
         } else if ("Embedded".equals(child.getLocalName())) {

@@ -76,7 +76,7 @@ public class BinarySecurity {
                 "unhandledToken", new Object[] {el});
         }
         String encoding = getEncodingType();
-        if (encoding == null || "".equals(encoding)) {
+        if (encoding == null || encoding.length() == 0) {
             bspEnforcer.handleBSPRule(BSPRule.R3029);
         }
 
@@ -85,7 +85,7 @@ public class BinarySecurity {
         }
 
         String valueType = getValueType();
-        if (valueType == null || "".equals(valueType)) {
+        if (valueType == null || valueType.length() == 0) {
             bspEnforcer.handleBSPRule(BSPRule.R3031);
         }
     }

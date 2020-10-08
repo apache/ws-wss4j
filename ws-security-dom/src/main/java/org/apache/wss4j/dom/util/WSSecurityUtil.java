@@ -522,7 +522,7 @@ public final class WSSecurityUtil {
             return Collections.emptyList();
         }
         actionToParse = actionToParse.trim();
-        if ("".equals(actionToParse)) {
+        if (actionToParse.length() == 0) {
             return Collections.emptyList();
         }
 

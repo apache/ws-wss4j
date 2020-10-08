@@ -289,10 +289,10 @@ public final class XMLUtils {
                 Element se = (Element) startNode;
                 // Try the wsu:Id first
                 String attributeNS = se.getAttributeNS(WSU_NS, "Id");
-                if ("".equals(attributeNS) || !id.equals(attributeNS)) {
+                if (attributeNS.length() == 0 || !id.equals(attributeNS)) {
                     attributeNS = se.getAttributeNS(null, "Id");
                 }
-                if (!"".equals(attributeNS) && id.equals(attributeNS)) {
+                if (attributeNS.length() != 0 && id.equals(attributeNS)) {
                     if (!checkMultipleElements) {
                         return se;
                     } else if (foundElement == null) {

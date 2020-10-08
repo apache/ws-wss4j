@@ -283,7 +283,7 @@ public class WSDocInfo {
      */
     public boolean hasResult(Integer tag, String uri) {
         String id = XMLUtils.getIDFromReference(uri);
-        if (id == null || "".equals(uri)) {
+        if (id == null || uri.length() == 0) {
             return false;
         }
 

@@ -81,7 +81,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
                 Map<String, String> declaredNamespaces = new HashMap<>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 String filter = child.getAttributeNS(null, SPConstants.FILTER);
-                if (filter == null || "".equals(filter)) {
+                if (filter == null || filter.length() == 0) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }
                 xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V2, filter, declaredNamespaces));
@@ -93,7 +93,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
     protected String getXPathVersion(Element element) {
         String xPathVersion = element.getAttributeNS(null, SPConstants.XPATH_VERSION);
-        if (xPathVersion == null || "".equals(xPathVersion)) {
+        if (xPathVersion == null || xPathVersion.length() == 0) {
             xPathVersion = "1.0";
         }
         return xPathVersion;

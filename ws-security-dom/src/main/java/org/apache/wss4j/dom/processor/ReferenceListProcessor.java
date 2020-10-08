@@ -64,7 +64,7 @@ public class ReferenceListProcessor implements Processor {
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
         String tokenId = elem.getAttributeNS(null, "Id");
-        if (!"".equals(tokenId)) {
+        if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
         data.getWsDocInfo().addTokenElement(elem);

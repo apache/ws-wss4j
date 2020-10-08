@@ -62,7 +62,7 @@ public class SecurityContextTokenProcessor implements Processor {
             Credential returnedCredential = validator.validate(credential, data);
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             String tokenId = sct.getID();
-            if (!"".equals(tokenId)) {
+            if (tokenId.length() != 0) {
                 result.put(WSSecurityEngineResult.TAG_ID, tokenId);
             }
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());

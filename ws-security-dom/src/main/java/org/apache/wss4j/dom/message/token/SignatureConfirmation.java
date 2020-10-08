@@ -52,7 +52,7 @@ public class SignatureConfirmation {
         element = elem;
 
         String id = getID();
-        if (id == null || "".equals(id)) {
+        if (id == null || id.length() == 0) {
             bspEnforcer.handleBSPRule(BSPRule.R5441);
         }
 

@@ -54,7 +54,7 @@ public class BinarySecurityTokenProcessor implements Processor {
     ) throws WSSecurityException {
         // See if the token has been previously processed
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-        if (!"".equals(id)) {
+        if (id.length() != 0) {
             Element foundElement = data.getWsDocInfo().getTokenElement(id);
             if (elem.equals(foundElement)) {
                 WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
@@ -80,7 +80,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         data.getWsDocInfo().addTokenElement(elem);
-        if (!"".equals(id)) {
+        if (id.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, id);
         }
 

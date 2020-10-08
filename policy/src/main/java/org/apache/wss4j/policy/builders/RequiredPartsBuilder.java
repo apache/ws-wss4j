@@ -53,7 +53,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
             if (SPConstants.HEADER.equals(child.getLocalName())
                     && spVersion.getNamespace().equals(child.getNamespaceURI())) {
                 String headerName = child.getAttributeNS(null, SPConstants.NAME);
-                if ("".equals(headerName)) {
+                if (headerName.length() == 0) {
                     if (ignoreNameElement) {
                         headerName = null;
                     } else {
@@ -62,7 +62,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
                     }
                 }
                 String headerNamespace = child.getAttributeNS(null, SPConstants.NAMESPACE);
-                if (headerNamespace == null || "".equals(headerNamespace)) {
+                if (headerNamespace == null || headerNamespace.length() == 0) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }
                 headers.add(new Header(headerName, headerNamespace));

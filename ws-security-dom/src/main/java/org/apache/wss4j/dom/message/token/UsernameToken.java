@@ -200,7 +200,7 @@ public class UsernameToken {
 
         if (elementCreated != null) {
             String createdString = getCreated();
-            if (createdString != null && !"".equals(createdString)) {
+            if (createdString != null && createdString.length() != 0) {
                 try {
                     created = ZonedDateTime.parse(createdString).toInstant();
                 } catch (DateTimeParseException e) {
@@ -755,7 +755,7 @@ public class UsernameToken {
         if (passwordElements.size() == 1) {
             Element passwordChild = passwordElements.get(0);
             String type = passwordChild.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
-            if (type == null || "".equals(type)) {
+            if (type == null || type.length() == 0) {
                 LOG.debug("The Username Token password does not have a Type attribute");
                 bspEnforcer.handleBSPRule(BSPRule.R4201);
             }
@@ -785,7 +785,7 @@ public class UsernameToken {
             Element nonce = nonceElements.get(0);
             String encodingType = nonce.getAttributeNS(null, "EncodingType");
             // Encoding Type must be equal to Base64Binary
-            if (encodingType == null || "".equals(encodingType)) {
+            if (encodingType == null || encodingType.length() == 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R4220);
             } else if (!WSConstants.BASE64_ENCODING.equals(encodingType)) {
                 LOG.debug("The Username Token's nonce element has a bad encoding type");
