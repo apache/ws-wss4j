@@ -38,7 +38,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
     public TimestampOutputProcessor() throws XMLSecurityException {
         super();
-        addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+        addBeforeProcessor(UsernameTokenOutputProcessor.class.getName());
         addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
         addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
