@@ -256,7 +256,7 @@ public class SAMLTokenProcessor implements Processor {
         for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
             Reference reference = (Reference)refObject;
 
-            if ("".equals(reference.getURI())
+            if (reference.getURI() == null || reference.getURI().length() == 0
                 || reference.getURI().equals(samlAssertion.getId())
                 || reference.getURI().equals("#" + samlAssertion.getId())) {
                 WSDataRef ref = new WSDataRef();

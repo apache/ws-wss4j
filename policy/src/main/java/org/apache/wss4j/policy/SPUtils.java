@@ -159,7 +159,7 @@ public final class SPUtils {
 
     public static String getAttribute(Element element, QName attName) {
         Attr attr;
-        if (attName.getNamespaceURI() == null || "".equals(attName.getNamespaceURI())) {
+        if (attName.getNamespaceURI() == null || attName.getNamespaceURI().length() == 0) {
             attr = element.getAttributeNode(attName.getLocalPart());
         } else {
             attr = element.getAttributeNodeNS(attName.getNamespaceURI(), attName.getLocalPart());

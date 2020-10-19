@@ -162,9 +162,8 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                                 SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                                         inputProcessorChain.getSecurityContext().getSecurityTokenProvider(attributeValue);
-                                InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
                                 return this.securityToken = new SecurityTokenReferenceImpl(
-                                        securityToken,
+                                        securityTokenProvider.getSecurityToken(),
                                         xmlSecEventList,
                                         (WSInboundSecurityContext) inputProcessorChain.getSecurityContext(),
                                         securityTokenReferenceId,

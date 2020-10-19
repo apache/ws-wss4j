@@ -260,7 +260,7 @@ public class KerberosSecurity extends BinarySecurity {
         }
         LOG.debug("Successfully retrieved a service ticket");
 
-        if ("".equals(getValueType())) {
+        if (getValueType().length() == 0) {
             setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         }
     }

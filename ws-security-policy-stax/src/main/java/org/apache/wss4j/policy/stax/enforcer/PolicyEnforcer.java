@@ -188,12 +188,12 @@ public class PolicyEnforcer implements SecurityEventListener {
 
         while (operationPolicyIterator.hasNext()) {
             OperationPolicy operationPolicy = operationPolicyIterator.next();
-            if (operationPolicy.getOperationName() != null) {
-                if (soapOperationName.equals(operationPolicy.getOperationName())) {
+            QName operationName = operationPolicy.getOperationName();
+            if (operationName != null) {
+                if (soapOperationName.equals(operationName)) {
                     return operationPolicy;
-                } else if ("".equals(operationPolicy.getOperationName().getNamespaceURI())
-                    && soapOperationName.getLocalPart().equals(
-                        operationPolicy.getOperationName().getLocalPart())) {
+                } else if ((operationName.getNamespaceURI() == null || operationName.getNamespaceURI().length() == 0)
+                    && soapOperationName.getLocalPart().equals(operationName.getLocalPart())) {
                     noNamespaceOperation = operationPolicy;
                 }
             }

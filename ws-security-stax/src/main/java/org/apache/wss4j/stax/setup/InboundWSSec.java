@@ -105,7 +105,7 @@ public class InboundWSSec {
      * @param xmlStreamReader The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException
+     * @throws WSSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
@@ -127,7 +127,7 @@ public class InboundWSSec {
      * @param xmlStreamReader       The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException
+     * @throws WSSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents
@@ -151,7 +151,7 @@ public class InboundWSSec {
      * @param securityEventListener A SecurityEventListener to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException
+     * @throws WSSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
@@ -175,7 +175,7 @@ public class InboundWSSec {
      * @param securityEventListeners A list of SecurityEventListeners to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException
+     * @throws WSSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
