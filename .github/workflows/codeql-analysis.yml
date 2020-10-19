@@ -73,7 +73,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        mvn compile -DskipTests
+        mvn clean process-sources -Pnochecks
     #   make bootstrap
     #   make release
 
