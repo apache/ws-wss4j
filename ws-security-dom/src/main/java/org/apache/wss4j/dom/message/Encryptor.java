@@ -91,7 +91,7 @@ public class Encryptor {
         XMLCipher xmlCipher = null;
         try {
             if (encryptionSerializer != null) {
-                xmlCipher = XMLCipher.getInstance(encryptionAlgorithm, encryptionSerializer);
+                xmlCipher = XMLCipher.getInstance(encryptionSerializer, encryptionAlgorithm);
             } else {
                 xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
             }

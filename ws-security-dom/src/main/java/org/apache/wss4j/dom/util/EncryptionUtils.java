@@ -181,7 +181,7 @@ public final class EncryptionUtils {
         XMLCipher xmlCipher = null;
         try {
             if (encryptionSerializer != null) {
-                xmlCipher = XMLCipher.getInstance(symEncAlgo, encryptionSerializer);
+                xmlCipher = XMLCipher.getInstance(encryptionSerializer, symEncAlgo);
             } else {
                 xmlCipher = XMLCipher.getInstance(symEncAlgo);
             }
