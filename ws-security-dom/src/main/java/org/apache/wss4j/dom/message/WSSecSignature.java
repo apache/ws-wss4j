@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -389,10 +387,8 @@ public class WSSecSignature extends WSSecSignatureBase {
                     part.setId(strUri);
                 } else if ("KeyInfo".equals(part.getName()) && WSConstants.SIG_NS.equals(part.getNamespace())
                     && part.getElement() == null) {
-                    // Special code to sign the KeyInfo - we have to marshal the KeyInfo to a DOM Element
-                    // before the signing process
-                    Element keyInfoElement = getKeyInfoElement();
-                    part.setElement(keyInfoElement);
+                    // Special code to sign the KeyInfo
+                    part.setId(keyInfoUri);
                 }
             }
         }
@@ -734,26 +730,6 @@ public class WSSecSignature extends WSSecSignatureBase {
     }
 
     /**
-     * Return the computed KeyInfo value as a DOM Element
-     * Call this method after <code>prepare()</code>
-     */
-    public Element getKeyInfoElement() throws WSSecurityException {
-        Element parent = getDocument().createElement("temp");
-        DOMCryptoContext cryptoContext = new DOMCryptoContext() { };
-        cryptoContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
-        try {
-            keyInfo.marshal(new DOMStructure(parent), cryptoContext);
-        } catch (MarshalException ex) {
-            LOG.error(ex.getMessage(), ex);
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
-            );
-        }
-
-        return (Element)parent.getFirstChild();
-    }
-
-    /**
      * Get the id generated during <code>prepare()</code>.
      *
      * Returns the the value of wsu:Id attribute of the Signature element.
@@ -938,5 +914,9 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     public void setSignatureProvider(Provider signatureProvider) {
         this.signatureProvider = signatureProvider;
+    }
+
+    public String getKeyInfoUri() {
+        return keyInfoUri;
     }
 }

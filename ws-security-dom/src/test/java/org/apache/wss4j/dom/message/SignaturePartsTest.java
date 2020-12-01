@@ -556,7 +556,6 @@ public class SignaturePartsTest extends org.junit.Assert {
     }
 
     @Test
-    @org.junit.Ignore
     public void testSignedKeyInfo() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -583,38 +582,10 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         WSHandlerResult results = verify(signedDoc);
 
-        WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
-        assertFalse(actionResult.isEmpty());
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-
-        WSDataRef wsDataRef = refs.get(0);
-        String xpath = wsDataRef.getXpath();
-        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/ds:Signature/ds:KeyInfo", xpath);
-        assertEquals(WSConstants.RSA_SHA1, wsDataRef.getAlgorithm());
-        assertNotNull(wsDataRef.getDigestValue());
-        assertTrue(wsDataRef.getDigestValue().length > 0);
-        QName expectedQName = new QName(WSConstants.SIG_NS, "KeyInfo");
-        assertEquals(expectedQName, wsDataRef.getName());
-
-        assertEquals(WSConstants.SHA1, wsDataRef.getDigestAlgorithm());
-
-        String sigMethod = (String)actionResult.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
-        assertEquals(WSConstants.RSA_SHA1, sigMethod);
-
-        String c14nMethod =
-            (String)actionResult.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
-        assertEquals(WSConstants.C14N_EXCL_OMIT_COMMENTS, c14nMethod);
-
-        List<String> transformAlgorithms = wsDataRef.getTransformAlgorithms();
-        assertTrue(transformAlgorithms.size() == 1);
-        assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
+        verifySignedKeyInfoResults(results);
     }
 
     @Test
-    @org.junit.Ignore
     public void testSignedKeyInfoAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -651,6 +622,40 @@ public class SignaturePartsTest extends org.junit.Assert {
         List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         assertTrue(handler.checkResults(results.getResults(), receivedActions));
+
+        verifySignedKeyInfoResults(results);
+    }
+
+    private void verifySignedKeyInfoResults(WSHandlerResult results) {
+
+        WSSecurityEngineResult actionResult =
+                results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertNotNull(actionResult);
+        assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+                (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+
+        WSDataRef wsDataRef = refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertTrue(xpath.matches("/(soapenv|SOAP-ENV):Envelope/(soapenv|SOAP-ENV):Header/wsse:Security/ds:Signature/ds:KeyInfo"));
+        assertEquals(WSConstants.RSA_SHA1, wsDataRef.getAlgorithm());
+        assertNotNull(wsDataRef.getDigestValue());
+        assertTrue(wsDataRef.getDigestValue().length > 0);
+        QName expectedQName = new QName(WSConstants.SIG_NS, "KeyInfo");
+        assertEquals(expectedQName, wsDataRef.getName());
+
+        assertEquals(WSConstants.SHA1, wsDataRef.getDigestAlgorithm());
+
+        String sigMethod = (String)actionResult.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
+        assertEquals(WSConstants.RSA_SHA1, sigMethod);
+
+        String c14nMethod =
+                (String)actionResult.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
+        assertEquals(WSConstants.C14N_EXCL_OMIT_COMMENTS, c14nMethod);
+
+        List<String> transformAlgorithms = wsDataRef.getTransformAlgorithms();
+        assertTrue(transformAlgorithms.size() == 1);
+        assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
     }
 
     /**
