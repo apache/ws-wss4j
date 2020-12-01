@@ -138,7 +138,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             }
                             element = callbackLookup.getElement(idToSign, null, false);
                         }
-                        if (addInclusivePrefixes) {
+                        if (addInclusivePrefixes && element != null) {
                             List<String> prefixes = getInclusivePrefixes(element);
                             if (!prefixes.isEmpty()) {
                                 transformSpec = new ExcC14NParameterSpec(prefixes);
