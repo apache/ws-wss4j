@@ -108,7 +108,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                     new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier,
                                                                  ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace());
             finalSecurityContextTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalSecurityContextTokenOutputProcessor.setAction(getAction());
+            finalSecurityContextTokenOutputProcessor.setAction(getAction(), getActionOrder());
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);

@@ -70,7 +70,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
             FinalUnknownTokenOutputProcessor outputProcessor =
                 new FinalUnknownTokenOutputProcessor(customToken);
             outputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            outputProcessor.setAction(getAction());
+            outputProcessor.setAction(getAction(), getActionOrder());
             outputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
             outputProcessor.addBeforeProcessor(EncryptedKeyOutputProcessor.class);
             outputProcessor.init(outputProcessorChain);

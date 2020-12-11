@@ -70,7 +70,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
         super.init(outputProcessorChain);
         WSSSignatureEndingOutputProcessor signatureEndingOutputProcessor = new WSSSignatureEndingOutputProcessor(this);
         signatureEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-        signatureEndingOutputProcessor.setAction(getAction());
+        signatureEndingOutputProcessor.setAction(getAction(), getActionOrder());
         signatureEndingOutputProcessor.init(outputProcessorChain);
     }
 
@@ -129,7 +129,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     InternalSignatureOutputProcessor internalSignatureOutputProcessor =
                             new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement);
                     internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    internalSignatureOutputProcessor.setAction(getAction());
+                    internalSignatureOutputProcessor.setAction(getAction(), getActionOrder());
                     internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class);
                     internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class);
                     internalSignatureOutputProcessor.init(outputProcessorChain);

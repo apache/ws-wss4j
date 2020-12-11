@@ -48,7 +48,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
     public UsernameTokenOutputProcessor() throws XMLSecurityException {
         super();
-        addAfterProcessor(TimestampOutputProcessor.class);
         addBeforeProcessor(WSSSignatureOutputProcessor.class);
         addBeforeProcessor(EncryptOutputProcessor.class);
     }
@@ -137,8 +136,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             }
             final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor =
                 new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, createdStr, salt, derivedIterations, getAction());
+            getBeforeProcessors().forEach(finalUsernameTokenOutputProcessor::addBeforeProcessor);
             finalUsernameTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalUsernameTokenOutputProcessor.setAction(getAction());
+            finalUsernameTokenOutputProcessor.setAction(getAction(), getActionOrder());
             finalUsernameTokenOutputProcessor.init(outputProcessorChain);
 
         } finally {
@@ -162,7 +162,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                                           int iterations, XMLSecurityConstants.Action action)
                 throws XMLSecurityException {
             super();
-            this.addAfterProcessor(UsernameTokenOutputProcessor.class);
             this.addAfterProcessor(UsernameTokenOutputProcessor.class);
             this.wsuId = wsuId;
             this.nonceValue = nonceValue;

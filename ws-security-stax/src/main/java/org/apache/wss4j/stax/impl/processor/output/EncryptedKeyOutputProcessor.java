@@ -109,7 +109,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor =
                 new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalEncryptedKeyOutputProcessor.setAction(getAction());
+            finalEncryptedKeyOutputProcessor.setAction(getAction(), getActionOrder());
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.ENCRYPTION.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
@@ -122,7 +122,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
                         finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class);
-                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
+                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE, getActionOrder());
                     }
                     finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -130,7 +130,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
                     referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor.getClass());
                     referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                    referenceListOutputProcessor.setAction(getAction());
+                    referenceListOutputProcessor.setAction(getAction(), getActionOrder());
                     referenceListOutputProcessor.init(outputProcessorChain);
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class);
@@ -154,7 +154,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     //hint for the headerReordering processor where to place the EncryptedKey
                     if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPTION_WITH_DERIVED_KEY)
                         < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
-                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY, getActionOrder());
                     }
                     finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
                     finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -165,7 +165,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
                 referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor.getClass());
                 referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                referenceListOutputProcessor.setAction(getAction());
+                referenceListOutputProcessor.setAction(getAction(), getActionOrder());
                 referenceListOutputProcessor.init(outputProcessorChain);
             } else {
                 finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -187,7 +187,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         FinalEncryptedKeyOutputProcessor(OutboundSecurityToken securityToken) throws XMLSecurityException {
             super();
-            this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class);
+            this.addAfterProcessor(EncryptedKeyOutputProcessor.class);
             this.securityToken = securityToken;
         }
 
