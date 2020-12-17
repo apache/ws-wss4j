@@ -5,6 +5,24 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.2.6
+==============
+
+Bug
+
+    [WSS-670] - Expected signature algorithm is overwriten with default in case of DSA and EC Keys
+    [WSS-677] - Comparison in validate class is vulnerable to timing side channels
+
+Improvement
+
+    [WSS-673] - Using default Java Security and Merlin is very slow for PKCS12
+    [WSS-679] - Fix regression in signing KeyInfos
+
+Task
+
+    [WSS-672] - Make sure to process all elements of the SAML Signature KeyInfo
+
+
 Release 2.2.5
 ==============
 
