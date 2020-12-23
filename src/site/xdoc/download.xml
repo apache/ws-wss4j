@@ -35,22 +35,22 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current stable release is Apache WSS4J 2.3.0:
+The current stable release is Apache WSS4J 2.3.1:
 </p>
 <p>
-<a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.3.0/wss4j-2.3.0-source-release.zip">wss4j-2.3.0-source-release.zip</a>
-(<a href="https://downloads.apache.org/ws/wss4j/2.3.0/wss4j-2.3.0-source-release.zip.asc">PGP</a>)
-(<a href="https://downloads.apache.org/ws/wss4j/2.3.0/wss4j-2.3.0-source-release.zip.sha512">SHA-512</a>)
+<a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.3.1/wss4j-2.3.1-source-release.zip">wss4j-2.3.1-source-release.zip</a>
+(<a href="https://downloads.apache.org/ws/wss4j/2.3.1/wss4j-2.3.1-source-release.zip.asc">PGP</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.3.1/wss4j-2.3.1-source-release.zip.sha512">SHA-512</a>)
 </p>
 </li>
 <li>
 <p>
-The current release on the older 2.2.x-fixes branch  is Apache WSS4J 2.2.5:
+The current release on the older 2.2.x-fixes branch  is Apache WSS4J 2.2.6:
 </p>
 <p>
-<a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.2.5/wss4j-2.2.5-source-release.zip">wss4j-2.2.5-source-release.zip</a>
-(<a href="https://downloads.apache.org/ws/wss4j/2.2.5/wss4j-2.2.5-source-release.zip.asc">PGP</a>)
-(<a href="https://downloads.apache.org/ws/wss4j/2.2.5/wss4j-2.2.5-source-release.zip.sha512">SHA-512</a>)
+<a href="https://www.apache.org/dyn/closer.lua/ws/wss4j/2.2.6/wss4j-2.2.6-source-release.zip">wss4j-2.2.6-source-release.zip</a>
+(<a href="https://downloads.apache.org/ws/wss4j/2.2.6/wss4j-2.2.6-source-release.zip.asc">PGP</a>)
+(<a href="https://downloads.apache.org/ws/wss4j/2.2.6/wss4j-2.2.6-source-release.zip.sha512">SHA-512</a>)
 </p>
 </li>
 </ul>
