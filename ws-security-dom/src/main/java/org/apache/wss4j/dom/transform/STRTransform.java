@@ -37,6 +37,7 @@ import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -214,7 +215,7 @@ public class STRTransform extends TransformService {
             //
             if (os != null) {
                 canon.canonicalizeSubtree(dereferencedToken, "#default", true, os);
-                return null;
+                return new ApacheNodeSetData(new XMLSignatureInput((byte[])null));
             }
 
             try (ByteArrayOutputStream writer = new ByteArrayOutputStream()) {
