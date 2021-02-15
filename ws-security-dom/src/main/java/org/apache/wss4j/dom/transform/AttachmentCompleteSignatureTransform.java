@@ -23,10 +23,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.xml.security.signature.XMLSignatureInput;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.OctetStreamData;
@@ -83,7 +85,7 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
                         ),
                         attachmentUri, mimeType);
             }
-            return null;
+            return new ApacheNodeSetData(new XMLSignatureInput((byte[])null));
         } catch (IOException e) {
             throw new TransformException(e);
         }
