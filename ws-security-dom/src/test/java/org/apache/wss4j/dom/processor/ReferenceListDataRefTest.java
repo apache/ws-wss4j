@@ -136,7 +136,7 @@ public class ReferenceListDataRefTest {
     /**
      * Verifies the soap envelope <p/>
      *
-     * @param envelope
+     * @param doc
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
@@ -162,8 +162,7 @@ public class ReferenceListDataRefTest {
 
             //We want check only the DATA_REF_URIS
             if (dataRefs != null && !dataRefs.isEmpty()) {
-                for (int j = 0; j < dataRefs.size(); j++) {
-                    Object obj = dataRefs.get(i);
+                for (Object obj : dataRefs) {
 
                     // ReferenceList Processor must Return a WSDataRef objects
                     assertTrue(obj instanceof WSDataRef);

@@ -206,9 +206,7 @@ public class EncryptionGCMTest {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator();
-            ipos.hasNext();) {
-            final WSSecurityEngineResult result = ipos.next();
+        for (WSSecurityEngineResult result : results.getResults()) {
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
             if ((action & WSConstants.ENCR) != 0) {
@@ -216,9 +214,7 @@ public class EncryptionGCMTest {
                     (List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);
                 encrypted = true;
-                for (java.util.Iterator<WSDataRef> jpos = refs.iterator(); jpos.hasNext();) {
-                    final WSDataRef ref = jpos.next();
-                    assertNotNull(ref);
+                for (WSDataRef ref : refs) {
                     assertNotNull(ref.getName());
                     assertEquals(
                         expectedEncryptedElement,

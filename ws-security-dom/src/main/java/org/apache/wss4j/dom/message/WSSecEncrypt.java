@@ -273,8 +273,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     public void addAttachmentEncryptedDataElements() {
         if (attachmentEncryptedDataElements != null) {
-            for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
-                Element encryptedData = attachmentEncryptedDataElements.get(i);
+            for (Element encryptedData : attachmentEncryptedDataElements) {
                 Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
                 WSSecurityUtil.prependChildElement(secHeaderElement, encryptedData);
             }

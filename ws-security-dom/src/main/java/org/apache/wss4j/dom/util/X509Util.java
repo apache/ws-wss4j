@@ -152,8 +152,8 @@ public final class X509Util {
         KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
         List<?> list = keyInfo.getContent();
 
-        for (int i = 0; i < list.size(); i++) {
-            XMLStructure xmlStructure = (XMLStructure) list.get(i);
+        for (Object obj : list) {
+            XMLStructure xmlStructure = (XMLStructure) obj;
             if (xmlStructure instanceof KeyValue) {
                 return (KeyValue)xmlStructure;
             }

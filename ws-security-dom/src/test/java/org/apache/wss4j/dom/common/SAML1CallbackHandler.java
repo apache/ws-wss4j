@@ -56,22 +56,22 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof SAMLCallback) {
-                SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(Version.SAML_11);
-                callback.setIssuer(issuer);
+        for (Callback callback : callbacks) {
+            if (callback instanceof SAMLCallback) {
+                SAMLCallback samlCallback = (SAMLCallback) callback;
+                samlCallback.setSamlVersion(Version.SAML_11);
+                samlCallback.setIssuer(issuer);
                 if (conditions != null) {
-                    callback.setConditions(conditions);
+                    samlCallback.setConditions(conditions);
                 }
-                callback.setIssuerCrypto(getIssuerCrypto());
-                callback.setIssuerKeyName(getIssuerName());
-                callback.setIssuerKeyPassword(getIssuerPassword());
+                samlCallback.setIssuerCrypto(getIssuerCrypto());
+                samlCallback.setIssuerKeyName(getIssuerName());
+                samlCallback.setIssuerKeyPassword(getIssuerPassword());
 
                 if (getAssertionAdviceElement() != null) {
                     AdviceBean advice = new AdviceBean();
                     advice.getAssertions().add(getAssertionAdviceElement());
-                    callback.setAdvice(advice);
+                    samlCallback.setAdvice(advice);
                 }
 
                 SubjectBean subjectBean =
@@ -89,10 +89,10 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                         throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
                     }
                 }
-                createAndSetStatement(subjectBean, callback);
-                callback.setSignAssertion(signAssertion);
+                createAndSetStatement(subjectBean, samlCallback);
+                samlCallback.setSignAssertion(signAssertion);
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

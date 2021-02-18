@@ -734,7 +734,9 @@ public class EncryptionTest {
     /**
      * Verifies the soap envelope <p/>
      *
-     * @param envelope
+     * @param doc
+     * @param decCrypto
+     * @param handler
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
@@ -755,7 +757,9 @@ public class EncryptionTest {
      * Verifies the soap envelope
      * <p/>
      *
-     * @param envelope
+     * @param doc
+     * @param handler
+     * @param expectedEncryptedElement
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
@@ -778,9 +782,7 @@ public class EncryptionTest {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator();
-            ipos.hasNext();) {
-            final WSSecurityEngineResult result = ipos.next();
+        for (WSSecurityEngineResult result : results.getResults()) {
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
             if ((action & WSConstants.ENCR) != 0) {
@@ -788,9 +790,7 @@ public class EncryptionTest {
                     (java.util.List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);
                 encrypted = true;
-                for (java.util.Iterator<WSDataRef> jpos = refs.iterator(); jpos.hasNext();) {
-                    final WSDataRef ref = jpos.next();
-                    assertNotNull(ref);
+                for (WSDataRef ref : refs) {
                     assertNotNull(ref.getName());
                     assertEquals(
                         expectedEncryptedElement,

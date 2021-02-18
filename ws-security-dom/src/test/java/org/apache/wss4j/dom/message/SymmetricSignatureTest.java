@@ -269,9 +269,9 @@ public class SymmetricSignatureTest implements CallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callback;
                 /*
                  * here call a function/method to lookup the password for
                  * the given identifier (e.g. a user name or keystore alias)
@@ -281,7 +281,7 @@ public class SymmetricSignatureTest implements CallbackHandler {
                 pc.setPassword("security");
                 pc.setKey(keyData);
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

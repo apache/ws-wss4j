@@ -125,9 +125,9 @@ public class SignatureUTAliasTest implements CallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callback;
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                         && "alice".equals(pc.getIdentifier())) {
                     pc.setPassword("verySecret");
@@ -138,7 +138,7 @@ public class SignatureUTAliasTest implements CallbackHandler {
                     throw new IOException("Authentication failed");
                 }
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

@@ -88,8 +88,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     public void addAttachmentEncryptedDataElements() {
         if (attachmentEncryptedDataElements != null) {
-            for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
-                Element encryptedData = attachmentEncryptedDataElements.get(i);
+            for (Element encryptedData : attachmentEncryptedDataElements) {
                 Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
                 WSSecurityUtil.prependChildElement(securityHeaderElement, encryptedData);
             }

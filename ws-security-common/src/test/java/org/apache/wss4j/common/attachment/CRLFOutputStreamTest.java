@@ -112,8 +112,7 @@ public class CRLFOutputStreamTest {
 
     private String createEscapedString(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            byte aByte = bytes[i];
+        for (byte aByte : bytes) {
             if (aByte == '\r') {
                 stringBuilder.append("\\r");
             } else if (aByte == '\n') {

@@ -67,13 +67,13 @@ public class SAML1CallbackHandler extends org.apache.wss4j.dom.common.SAML1Callb
 
         super.handle(callbacks);
 
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof SAMLCallback) {
-                SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setIssuerKeyName(issuerKeyName);
-                callback.setIssuerKeyPassword(issuerKeyPassword);
-                callback.setIssuerCrypto(issuerCrypto);
-                callback.setSignAssertion(signAssertion);
+        for (Callback callback : callbacks) {
+            if (callback instanceof SAMLCallback) {
+                SAMLCallback samlCallback = (SAMLCallback) callback;
+                samlCallback.setIssuerKeyName(issuerKeyName);
+                samlCallback.setIssuerKeyPassword(issuerKeyPassword);
+                samlCallback.setIssuerCrypto(issuerCrypto);
+                samlCallback.setSignAssertion(signAssertion);
             }
         }
     }

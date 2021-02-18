@@ -59,10 +59,10 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof AttachmentRequestCallback) {
+        for (Callback callback : callbacks) {
+            if (callback instanceof AttachmentRequestCallback) {
                 AttachmentRequestCallback attachmentRequestCallback =
-                    (AttachmentRequestCallback) callbacks[i];
+                    (AttachmentRequestCallback) callback;
 
                 List<Attachment> attachments =
                     getAttachmentsToAdd(attachmentRequestCallback.getAttachmentId());
@@ -71,14 +71,14 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 }
 
                 attachmentRequestCallback.setAttachments(attachments);
-            } else if (callbacks[i] instanceof AttachmentResultCallback) {
+            } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback =
-                    (AttachmentResultCallback) callbacks[i];
+                    (AttachmentResultCallback) callback;
                 responseAttachments.add(attachmentResultCallback.getAttachment());
                 attachmentMap.put(attachmentResultCallback.getAttachment().getId(),
                                   attachmentResultCallback.getAttachment());
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

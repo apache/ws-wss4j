@@ -52,8 +52,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
     }
 
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            Callback callback = callbacks[i];
+        for (Callback callback : callbacks) {
             if (handleCallback(callback)) {
                 continue;
             } else if (callback instanceof NameCallback) {
@@ -62,9 +61,9 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                 PasswordCallback pwCallback = (PasswordCallback) callback;
                 pwCallback.setPassword(password.toCharArray());
             } else if (!invokePasswordCallback(callback)) {
-                LOG.info("Unsupported callback type " + callbacks[i].getClass().getName());
-                throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type "
-                    + callbacks[i].getClass().getName());
+                LOG.info("Unsupported callback type " + callback.getClass().getName());
+                throw new UnsupportedCallbackException(callback, "Unsupported callback type "
+                    + callback.getClass().getName());
             }
         }
     }

@@ -83,7 +83,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      * The value under this tag is of type
      * org.apache.wss4j.dom.message.token.SignatureConfirmation.
      */
-    public static final java.lang.String TAG_SIGNATURE_CONFIRMATION = "signature-confirmation";
+    public static final String TAG_SIGNATURE_CONFIRMATION = "signature-confirmation";
 
     /**
      * Tag denoting the BinarySecurityToken found, if applicable.

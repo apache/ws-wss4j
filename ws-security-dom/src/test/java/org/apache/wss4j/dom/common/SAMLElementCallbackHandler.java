@@ -46,19 +46,19 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof SAMLCallback) {
-                SAMLCallback callback = (SAMLCallback) callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof SAMLCallback) {
+                SAMLCallback samlCallback = (SAMLCallback) callback;
                 Element assertionElement;
                 try {
                     assertionElement = getSAMLAssertion();
                 } catch (Exception e) {
                     throw new IOException(e.getMessage());
                 }
-                callback.setAssertionElement(assertionElement);
+                samlCallback.setAssertionElement(assertionElement);
 
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

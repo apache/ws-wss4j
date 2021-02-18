@@ -421,17 +421,17 @@ public class SamlNegativeTest {
 
         public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                if (callbacks[i] instanceof SAMLCallback) {
-                    SAMLCallback callback = (SAMLCallback) callbacks[i];
+            for (Callback callback : callbacks) {
+                if (callback instanceof SAMLCallback) {
+                    SAMLCallback samlCallback = (SAMLCallback) callback;
                     SubjectBean subjectBean =
                         new SubjectBean(
                             subjectName, subjectQualifier, confirmationMethod
                         );
-                    createAndSetStatement(subjectBean, callback);
-                    callback.setSamlVersion(Version.SAML_11);
+                    createAndSetStatement(subjectBean, samlCallback);
+                    samlCallback.setSamlVersion(Version.SAML_11);
                 } else {
-                    throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                    throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
                 }
             }
         }

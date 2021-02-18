@@ -1181,7 +1181,8 @@ public class UsernameTokenTest implements CallbackHandler {
     /**
      * Verifies the soap envelope
      *
-     * @param env soap envelope
+     * @param doc
+     * @param allowUsernameTokenDerivedKeys
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
@@ -1199,9 +1200,9 @@ public class UsernameTokenTest implements CallbackHandler {
      */
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callback;
                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
                     if ("emptyuser".equals(pc.getIdentifier())) {
                         pc.setPassword("");
@@ -1213,7 +1214,7 @@ public class UsernameTokenTest implements CallbackHandler {
                     }
                 }
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

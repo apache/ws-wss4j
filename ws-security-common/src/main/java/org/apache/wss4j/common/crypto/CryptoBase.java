@@ -32,7 +32,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -290,8 +289,8 @@ public abstract class CryptoBase implements Crypto {
         List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;
-        for (Iterator<?> iterator = l.iterator(); iterator.hasNext();) {
-            certs[i++] = (X509Certificate) iterator.next();
+        for (Object cert : l) {
+            certs[i++] = (X509Certificate) cert;
         }
         return certs;
     }

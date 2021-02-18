@@ -473,8 +473,7 @@ public final class AttachmentUtils {
             stringBuilder.append((char) ch);
         }
 
-        for (int i = 0; i < headerLines.size(); i++) {
-            String s = headerLines.get(i);
+        for (String s : headerLines) {
             int idx = s.indexOf(':');
             if (idx == -1) {
                 throw new WSSecurityException(

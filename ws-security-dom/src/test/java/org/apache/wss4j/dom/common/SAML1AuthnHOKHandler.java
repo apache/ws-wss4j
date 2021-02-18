@@ -57,10 +57,10 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
 
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof SAMLCallback) {
-                SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(Version.SAML_11);
+        for (Callback callback : callbacks) {
+            if (callback instanceof SAMLCallback) {
+                SAMLCallback samlCallback = (SAMLCallback) callback;
+                samlCallback.setSamlVersion(Version.SAML_11);
                 SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY
@@ -71,9 +71,9 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationMethod("Password");
-                callback.setAuthenticationStatementData(Collections.singletonList(authBean));
+                samlCallback.setAuthenticationStatementData(Collections.singletonList(authBean));
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

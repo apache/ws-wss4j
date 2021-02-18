@@ -103,9 +103,7 @@ public class Encryptor {
 
         List<String> encDataRef = new ArrayList<>();
         WSEncryptionPart attachmentEncryptionPart = null;
-        for (int part = 0; part < references.size(); part++) {
-            WSEncryptionPart encPart = references.get(part);
-
+        for (WSEncryptionPart encPart : references) {
             if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
                 attachmentEncryptionPart = encPart;
                 continue;

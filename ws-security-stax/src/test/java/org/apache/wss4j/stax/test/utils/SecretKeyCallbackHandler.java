@@ -43,9 +43,9 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
     @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callback;
                 if (pc.getUsage() == WSPasswordCallback.SECRET_KEY
                     || pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN) {
                     byte[] secret = this.secrets.get(pc.getIdentifier());
@@ -56,7 +56,7 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
                     break;
                 }
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

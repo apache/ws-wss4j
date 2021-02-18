@@ -140,7 +140,7 @@ public class EncryptedKeyDataRefTest {
     /**
      * Verifies the soap envelope <p/>
      *
-     * @param envelope
+     * @param doc
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
@@ -152,8 +152,7 @@ public class EncryptedKeyDataRefTest {
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         boolean found = false;
 
-        for (int i = 0; i < wsResults.getResults().size(); i++) {
-            WSSecurityEngineResult wsSecEngineResult = wsResults.getResults().get(i);
+        for (WSSecurityEngineResult wsSecEngineResult : wsResults.getResults()) {
             int action = (Integer)
                     wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION);
 
@@ -166,8 +165,7 @@ public class EncryptedKeyDataRefTest {
 
             //We want check only the DATA_REF_URIS
             if (dataRefs != null && !dataRefs.isEmpty()) {
-                for (int j = 0; j < dataRefs.size(); j++) {
-                    Object obj = dataRefs.get(i);
+                for (Object obj : dataRefs) {
 
                     // ReferenceList Processor must Return a WSDataRef objects
                     assertTrue(obj instanceof WSDataRef);

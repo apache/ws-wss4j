@@ -1228,8 +1228,8 @@ public abstract class WSHandler {
         WSEncryptionPart encPart = null;
         String[] rawParts = tmpS.split(";");
 
-        for (int i = 0; i < rawParts.length; i++) {
-            String[] partDef = rawParts[i].split("}");
+        for (String rawPart : rawParts) {
+            String[] partDef = rawPart.split("}");
 
             if (partDef.length == 1) {
                 LOG.debug("single partDef: '{}'", partDef[0]);
