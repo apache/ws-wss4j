@@ -1182,7 +1182,7 @@ public class UsernameTokenTest implements CallbackHandler {
      * Verifies the soap envelope
      *
      * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();

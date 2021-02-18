@@ -216,7 +216,7 @@ public class FaultCodeTest implements CallbackHandler {
      * Verifies the soap envelope.
      *
      * @param doc soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);

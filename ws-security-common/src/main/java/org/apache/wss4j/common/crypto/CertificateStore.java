@@ -338,7 +338,7 @@ public class CertificateStore extends CryptoBase {
         try {
             X500Principal issuerRDN = new X500Principal(issuer);
             issuerName = createBCX509Name(issuerRDN.getName());
-        } catch (java.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             issuerName = createBCX509Name(issuer);
         }
 
@@ -433,7 +433,7 @@ public class CertificateStore extends CryptoBase {
         try {
             X500Principal subjectRDN = new X500Principal(subjectDN);
             subject = createBCX509Name(subjectRDN.getName());
-        } catch (java.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
 

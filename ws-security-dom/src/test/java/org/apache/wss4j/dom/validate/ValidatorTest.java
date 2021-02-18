@@ -281,7 +281,7 @@ public class ValidatorTest {
      *
      * @param env soap envelope
      * @param wssConfig
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig, CallbackHandler cb, Crypto crypto

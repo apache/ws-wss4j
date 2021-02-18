@@ -67,7 +67,7 @@ public class EncryptionCRLTest {
     /**
      * Setup method
      *
-     * @throws java.lang.Exception Thrown when there is a problem in setup
+     * @throws Exception Thrown when there is a problem in setup
      */
     @BeforeEach
     public void setUp() throws Exception {
@@ -78,7 +78,7 @@ public class EncryptionCRLTest {
      * Test that encrypts without certificate revocation check
      * so it should pass
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      */
     @Test
     public void testEncryptionWithOutRevocationCheck() throws Exception {
@@ -118,7 +118,7 @@ public class EncryptionCRLTest {
      * Test that encrypts with certificate revocation check
      * so it should fail
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      * TODO Re-enable once CRL issue fixed
      */
     @Test

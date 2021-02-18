@@ -1186,7 +1186,7 @@ public class AttachmentTest {
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
      *
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, CallbackHandler attachmentCallbackHandler) throws Exception {
         RequestData requestData = new RequestData();

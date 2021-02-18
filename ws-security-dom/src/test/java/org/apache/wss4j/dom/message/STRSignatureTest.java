@@ -56,7 +56,7 @@ public class STRSignatureTest {
      * body (SOAP Body) and uses the STRTransform to sign the embedded certificate
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureDirectSTR() throws Exception {
@@ -161,7 +161,7 @@ public class STRSignatureTest {
      * to identify it.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureISSTR() throws Exception {
@@ -213,7 +213,7 @@ public class STRSignatureTest {
      * to identify it.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureSKISTR() throws Exception {
@@ -263,7 +263,7 @@ public class STRSignatureTest {
      * Verifies the soap envelope
      *
      * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, null, crypto);

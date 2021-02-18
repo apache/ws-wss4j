@@ -57,7 +57,7 @@ public class SKISignatureTest {
      * uses the Direct version, that is it embeds the certificate in the message.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureDSA_SKI() throws Exception {
@@ -101,7 +101,7 @@ public class SKISignatureTest {
      * detect the algo and set the signature algo accordingly.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureDSA_Autodetect() throws Exception {
@@ -135,7 +135,7 @@ public class SKISignatureTest {
      * detect the algo and set the signature algo accordingly.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureRSA_Autodetect() throws Exception {
@@ -166,7 +166,7 @@ public class SKISignatureTest {
      * Verifies the soap envelope
      *
      * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);

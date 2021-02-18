@@ -640,7 +640,7 @@ public class ModifiedRequestTest {
      * <p/>
      *
      * @param doc soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);

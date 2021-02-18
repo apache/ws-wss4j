@@ -117,7 +117,7 @@ public abstract class CryptoFactory {
             || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
             try {
                 return new Merlin(properties, classLoader, passwordEncryptor);
-            } catch (java.lang.Exception e) {
+            } catch (Exception e) {
                 LOG.debug("Unable to instantiate Merlin", e);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                               new Object[] {"Cannot create Crypto class " + cryptoClassName});
@@ -212,7 +212,7 @@ public abstract class CryptoFactory {
                 c = cryptoClass.getConstructor(classes);
                 return c.newInstance(map, loader, null);
             }
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
@@ -246,7 +246,7 @@ public abstract class CryptoFactory {
                 c = cryptoClass.getConstructor(classes);
                 return c.newInstance(map, loader, null);
             }
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }

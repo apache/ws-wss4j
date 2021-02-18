@@ -89,7 +89,7 @@ public class SignatureTest {
      * The test uses the Issuer Serial key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureIS() throws Exception {
@@ -159,7 +159,7 @@ public class SignatureTest {
      * Test that signs (twice) and verifies a WS-Security envelope.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testDoubleX509SignatureIS() throws Exception {
@@ -179,7 +179,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testIssuerSerialSignature() throws Exception {
@@ -206,7 +206,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testSignatureInclusiveC14N() throws Exception {
@@ -248,7 +248,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testSignatureInclusivePrefixes() throws Exception {
@@ -276,7 +276,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testBSTSignature() throws Exception {
@@ -312,7 +312,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testBSTPKIPathSignature() throws Exception {
@@ -343,7 +343,7 @@ public class SignatureTest {
      * Test that signs and verifies a WS-Security envelope
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509Signature() throws Exception {
@@ -383,7 +383,7 @@ public class SignatureTest {
      * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureThumb() throws Exception {
@@ -455,7 +455,7 @@ public class SignatureTest {
      * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testDoubleX509SignatureThumb() throws Exception {
@@ -478,7 +478,7 @@ public class SignatureTest {
      * Timestamp has a default (WSU) namespace inserted. The signature validation should still
      * pass due to c14n (see WSS-181).
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testValidModifiedSignature() throws Exception {
@@ -523,7 +523,7 @@ public class SignatureTest {
      * Sign using a different digest algorithm (SHA-256).
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureSha256() throws Exception {
@@ -756,7 +756,7 @@ public class SignatureTest {
      * The test uses the Issuer Serial key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     * @throws Exception Thrown when there is any problem in signing or verification
      */
     @Test
     public void testX509SignatureDefaultPassword() throws Exception {
@@ -1073,7 +1073,7 @@ public class SignatureTest {
      * This method verifies all the signature generated.
      *
      * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
+     * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);

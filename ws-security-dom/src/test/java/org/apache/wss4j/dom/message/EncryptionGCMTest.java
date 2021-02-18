@@ -79,7 +79,7 @@ public class EncryptionGCMTest {
     /**
      * Setup method
      *
-     * @throws java.lang.Exception Thrown when there is a problem in setup
+     * @throws Exception Thrown when there is a problem in setup
      */
     @BeforeEach
     public void setUp() throws Exception {

@@ -91,7 +91,7 @@ public class EncryptionTest {
     /**
      * Setup method
      *
-     * @throws java.lang.Exception Thrown when there is a problem in setup
+     * @throws Exception Thrown when there is a problem in setup
      */
     @BeforeEach
     public void setUp() throws Exception {
@@ -318,7 +318,7 @@ public class EncryptionTest {
      * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      */
     @Test
     public void testX509EncryptionThumb() throws Exception {
@@ -361,7 +361,7 @@ public class EncryptionTest {
      * The test uses the EncryptedKeySHA1 key identifier type.
      * <p/>
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      */
     @Test
     public void testX509EncryptionSHA1() throws Exception {
@@ -395,7 +395,7 @@ public class EncryptionTest {
      * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a
      * generated session key which is then encrypted using a public key.
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      */
     @Test
     public void testEncryptionSHA1Symmetric() throws Exception {
@@ -431,7 +431,7 @@ public class EncryptionTest {
      * generated session key which is then encrypted using a public key. The request is generated
      * using WSHandler, instead of coding it.
      *
-     * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
+     * @throws Exception Thrown when there is any problem in encryption or decryption
      */
     @Test
     public void testEncryptionSHA1SymmetricBytesHandler() throws Exception {
