@@ -168,7 +168,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
 
-    private void createDOMMessageAndVerifyStAX(
+    private void createDOMMessageAndVerifyStAX( //NOPMD PMD wrongly detects that this method is never called
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -773,7 +773,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.X509Token,
@@ -890,7 +890,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.AlgorithmSuite,
@@ -1025,7 +1025,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
@@ -1102,7 +1102,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
@@ -1179,7 +1179,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
@@ -1272,7 +1272,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there
@@ -1349,7 +1349,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
@@ -1426,7 +1426,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
@@ -1503,7 +1503,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
@@ -1593,7 +1593,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl(key.getEncoded()));
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl(key.getEncoded()));
             Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //no encrypted content
@@ -1645,7 +1645,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             Document document = doInboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
 
             //header element must still be there

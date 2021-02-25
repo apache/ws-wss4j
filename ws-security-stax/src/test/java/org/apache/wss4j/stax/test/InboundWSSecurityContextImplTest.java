@@ -86,8 +86,7 @@ public class InboundWSSecurityContextImplTest {
 
         assertEquals(securityEventList.size(), 11);
 
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
+        for (SecurityEvent securityEvent : securityEventList) {
             if (securityEvent instanceof HttpsTokenSecurityEvent) {
                 HttpsTokenSecurityEvent tokenSecurityEvent = (HttpsTokenSecurityEvent) securityEvent;
                 assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
@@ -216,8 +215,7 @@ public class InboundWSSecurityContextImplTest {
         boolean usernameTokenOccured = false;
         assertEquals(securityEventList.size(), 34);
         int x509TokenIndex = 0;
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
+        for (SecurityEvent securityEvent : securityEventList) {
             if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 0) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
@@ -521,8 +519,7 @@ public class InboundWSSecurityContextImplTest {
 
         assertEquals(securityEventList.size(), 24);
 
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
+        for (SecurityEvent securityEvent : securityEventList) {
             if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);

@@ -675,7 +675,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -756,7 +756,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.BST_EMBEDDED);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -810,7 +810,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -892,7 +892,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -973,7 +973,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -1055,7 +1055,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.setIncludeSignatureToken(true);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -1107,7 +1107,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER);
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
             securityProperties.setCallbackHandler(
-                    new org.apache.wss4j.stax.test.CallbackHandlerImpl(key.getEncoded()){
+                    new CallbackHandlerImpl(key.getEncoded()){
                         @Override
                         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
@@ -1193,7 +1193,7 @@ public class SignatureTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl(key.getEncoded()));
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl(key.getEncoded()));
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -1363,8 +1363,7 @@ public class SignatureTest extends AbstractTestBase {
             List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {

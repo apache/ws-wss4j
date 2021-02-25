@@ -744,7 +744,7 @@ public class SamlConditionsTest {
         createAndVerifyMessage(callbackHandler, true);
     }
 
-    private void createAndVerifyMessage(
+    private void createAndVerifyMessage(    //NOPMD - It incorrectly thinks this method isn't called
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
         SAMLCallback samlCallback = new SAMLCallback();

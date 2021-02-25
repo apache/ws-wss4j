@@ -150,8 +150,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-        for (int i = 0; i < securityEvents.size(); i++) {
-            SecurityEvent securityEvent = securityEvents.get(i);
+        for (SecurityEvent securityEvent : securityEvents) {
             if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                 encryptedPartSecurityEvents.add(securityEvent);
             } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
@@ -313,8 +312,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-        for (int i = 0; i < securityEvents.size(); i++) {
-            SecurityEvent securityEvent = securityEvents.get(i);
+        for (SecurityEvent securityEvent : securityEvents) {
             if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                 encryptedPartSecurityEvents.add(securityEvent);
             } else if (securityEvent.getCorrelationID().equals(encryptedElementCorrelationID)) {
@@ -448,8 +446,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-        for (int i = 0; i < securityEvents.size(); i++) {
-            SecurityEvent securityEvent = securityEvents.get(i);
+        for (SecurityEvent securityEvent : securityEvents) {
             if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                 encryptedPartSecurityEvents.add(securityEvent);
             } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
@@ -624,8 +621,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-        for (int i = 0; i < securityEvents.size(); i++) {
-            SecurityEvent securityEvent = securityEvents.get(i);
+        for (SecurityEvent securityEvent : securityEvents) {
             if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                 encryptedPartSecurityEvents.add(securityEvent);
             } else if (securityEvent.getCorrelationID().equals(encryptedElementCorrelationID)) {
@@ -683,7 +679,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {

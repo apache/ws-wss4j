@@ -742,7 +742,7 @@ public class XOPAttachmentTest {
      *
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc, CallbackHandler attachmentCallbackHandler) throws Exception {
+    private WSHandlerResult verify(Document doc, CallbackHandler attachmentCallbackHandler) throws Exception { //NOPMD
         RequestData requestData = new RequestData();
         requestData.setAttachmentCallbackHandler(attachmentCallbackHandler);
         requestData.setSigVerCrypto(crypto);

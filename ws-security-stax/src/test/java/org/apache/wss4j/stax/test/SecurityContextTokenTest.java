@@ -197,8 +197,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                     encryptedPartSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
@@ -279,8 +278,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
                     encryptedPartSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
@@ -415,8 +413,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -505,8 +502,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -675,8 +671,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -776,8 +771,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -901,8 +895,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -1001,8 +994,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
@@ -1099,8 +1091,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
-            for (int i = 0; i < securityEvents.size(); i++) {
-                SecurityEvent securityEvent = securityEvents.get(i);
+            for (SecurityEvent securityEvent : securityEvents) {
                 if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
                     signedElementSecurityEvents.add(securityEvent);
                 } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {

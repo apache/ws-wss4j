@@ -581,8 +581,7 @@ public class TimestampTest extends AbstractTestBase {
                     nodesToRemove.add(node);
                 }
             }
-            for (int i = 0; i < nodesToRemove.size(); i++) {
-                Node node = nodesToRemove.get(i);
+            for (Node node : nodesToRemove) {
                 node.getParentNode().removeChild(node);
             }
 

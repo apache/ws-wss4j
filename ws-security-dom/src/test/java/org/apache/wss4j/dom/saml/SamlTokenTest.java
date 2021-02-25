@@ -1413,7 +1413,7 @@ public class SamlTokenTest {
         cipher.doFinal(document, elementToEncrypt, content);
     }
 
-    private WSHandlerResult createAndVerifyMessage(
+    private WSHandlerResult createAndVerifyMessage( //NOPMD - It incorrectly thinks this method isn't called
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
         SAMLCallback samlCallback = new SAMLCallback();
