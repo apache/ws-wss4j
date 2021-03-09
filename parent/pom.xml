@@ -49,7 +49,7 @@
         <xz.version>1.8</xz.version>
         <xmlsec.version>2.3.0-SNAPSHOT</xmlsec.version>
         <xmlunit.version>2.8.2</xmlunit.version>
-        
+        <joda.version>2.10.10</joda.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
         <wss4j.osgi.symbolic.name>${project.groupId}.${project.artifactId}</wss4j.osgi.symbolic.name>
