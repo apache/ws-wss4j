@@ -19,8 +19,7 @@
 
 package org.apache.wss4j.common.saml.bean;
 
-import org.joda.time.DateTime;
-
+import java.time.Instant;
 
 /**
  * Class AuthenticationStatementBean represents the raw data required to create
@@ -28,8 +27,8 @@ import org.joda.time.DateTime;
  */
 public class AuthenticationStatementBean {
     private SubjectBean subject;
-    private DateTime sessionNotOnOrAfter;
-    private DateTime authenticationInstant;
+    private Instant sessionNotOnOrAfter;
+    private Instant authenticationInstant;
     private String authenticationMethod;
     private SubjectLocalityBean subjectLocality;
     private String sessionIndex;
@@ -51,8 +50,8 @@ public class AuthenticationStatementBean {
     public AuthenticationStatementBean(
         SubjectBean subject,
         String authenticationMethod,
-        DateTime authenticationInstant,
-        DateTime sessionNotOnOrAfter
+        Instant authenticationInstant,
+        Instant sessionNotOnOrAfter
     ) {
         this.subject = subject;
         this.authenticationMethod = authenticationMethod;
@@ -96,7 +95,7 @@ public class AuthenticationStatementBean {
      * Get the authentication instant
      * @return the authentication instant
      */
-    public DateTime getAuthenticationInstant() {
+    public Instant getAuthenticationInstant() {
         return authenticationInstant;
     }
 
@@ -104,7 +103,7 @@ public class AuthenticationStatementBean {
      * Set the authentication instant
      * @param authenticationInstant the authentication instant
      */
-    public void setAuthenticationInstant(DateTime authenticationInstant) {
+    public void setAuthenticationInstant(Instant authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
     }
 
@@ -112,7 +111,7 @@ public class AuthenticationStatementBean {
      * Get the sessionNotOnOrAfter
      * @return the sessionNotOnOrAfter
      */
-    public DateTime getSessionNotOnOrAfter() {
+    public Instant getSessionNotOnOrAfter() {
         return sessionNotOnOrAfter;
     }
 
@@ -120,7 +119,7 @@ public class AuthenticationStatementBean {
      * Set the sessionNotOnOrAfter
      * @param sessionNotOnOrAfter the sessionNotOnOrAfter
      */
-    public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
+    public void setSessionNotOnOrAfter(Instant sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
 

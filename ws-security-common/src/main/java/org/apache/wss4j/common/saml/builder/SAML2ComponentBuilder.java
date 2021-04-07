@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.saml.builder;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +43,6 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -169,7 +170,7 @@ public final class SAML2ComponentBuilder {
             assertionBuilder.buildObject(Assertion.DEFAULT_ELEMENT_NAME, Assertion.TYPE_NAME);
         assertion.setID(IDGenerator.generateID("_"));
         assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssueInstant(new DateTime());
+        assertion.setIssueInstant(Instant.now());
         return assertion;
     }
 
@@ -214,15 +215,15 @@ public final class SAML2ComponentBuilder {
         Conditions conditions = conditionsBuilder.buildObject();
 
         if (conditionsBean == null) {
-            DateTime newNotBefore = new DateTime();
+            Instant newNotBefore = Instant.now();
             conditions.setNotBefore(newNotBefore);
-            conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
+            conditions.setNotOnOrAfter(newNotBefore.plus(Duration.ofMinutes(5)));
             return conditions;
         }
 
         long tokenPeriodSeconds = conditionsBean.getTokenPeriodSeconds();
-        DateTime notBefore = conditionsBean.getNotBefore();
-        DateTime notAfter = conditionsBean.getNotAfter();
+        Instant notBefore = conditionsBean.getNotBefore();
+        Instant notAfter = conditionsBean.getNotAfter();
 
         if (notBefore != null && notAfter != null) {
             if (notBefore.isAfter(notAfter)) {
@@ -233,14 +234,12 @@ public final class SAML2ComponentBuilder {
             conditions.setNotBefore(notBefore);
             conditions.setNotOnOrAfter(notAfter);
         } else {
-            DateTime newNotBefore = new DateTime();
+            Instant newNotBefore = Instant.now();
             conditions.setNotBefore(newNotBefore);
             if (tokenPeriodSeconds <= 0) {
                 tokenPeriodSeconds = 5L * 60L;
             }
-            DateTime notOnOrAfter =
-                new DateTime(newNotBefore.getMillis() + tokenPeriodSeconds * 1000L);
-
+            Instant notOnOrAfter = newNotBefore.plusSeconds(tokenPeriodSeconds);
             conditions.setNotOnOrAfter(notOnOrAfter);
         }
 
@@ -473,13 +472,13 @@ public final class SAML2ComponentBuilder {
         if (authBeans != null && !authBeans.isEmpty()) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthnStatement authnStatement = authnStatementBuilder.buildObject();
-                DateTime authInstant = statementBean.getAuthenticationInstant();
+                Instant authInstant = statementBean.getAuthenticationInstant();
                 if (authInstant == null) {
-                    authInstant = new DateTime();
+                    authInstant = Instant.now();
                 }
                 authnStatement.setAuthnInstant(authInstant);
 
-                DateTime sessionNotOnOrAfter = statementBean.getSessionNotOnOrAfter();
+                Instant sessionNotOnOrAfter = statementBean.getSessionNotOnOrAfter();
                 if (sessionNotOnOrAfter != null) {
                     authnStatement.setSessionNotOnOrAfter(sessionNotOnOrAfter);
                 }

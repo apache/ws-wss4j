@@ -22,8 +22,6 @@ package org.apache.wss4j.common.saml.bean;
 import java.time.Instant;
 import java.util.Date;
 
-import org.joda.time.DateTime;
-
 /**
  * Class DelegateBean represents a SAML 2.0 Delegate object. Only NameIDs are supported for now, not
  * BaseID or EncryptedIDs.
@@ -32,21 +30,17 @@ import org.joda.time.DateTime;
  * http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-delegation-cs-01.pdf
  */
 public class DelegateBean {
-    private DateTime delegationInstant;
+    private Instant delegationInstant;
     private String confirmationMethod;
     private NameIDBean nameIDBean;
 
-    public DateTime getDelegationInstant() {
+    public Instant getDelegationInstant() {
         return delegationInstant;
     }
 
-    public void setDelegationInstant(DateTime delegationInstant) {
-        this.delegationInstant = delegationInstant;
-    }
-    
     public void setDelegationInstant(Instant delegationInstant) {
         if (delegationInstant != null) {
-            this.delegationInstant = new DateTime(Date.from(delegationInstant));
+            this.delegationInstant = Date.from(delegationInstant).toInstant();
         } else {
             this.delegationInstant = null;
         }

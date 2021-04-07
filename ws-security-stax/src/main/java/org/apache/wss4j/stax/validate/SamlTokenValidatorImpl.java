@@ -32,7 +32,6 @@ import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
@@ -259,10 +258,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                     new Object[] {"A replay attack has been detected"});
             }
 
-            DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+            Instant expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
             if (expires != null) {
-                Instant zonedExpires = Instant.ofEpochMilli(expires.getMillis());
-                replayCache.add(identifier, zonedExpires);
+                replayCache.add(identifier, expires);
             } else {
                 replayCache.add(identifier);
             }

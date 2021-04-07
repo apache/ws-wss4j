@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.shibboleth.utilities.java.support.xml.DOMTypeSupport;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
@@ -48,9 +51,7 @@ import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
-import org.opensaml.saml.config.SAMLConfigurationSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -79,9 +80,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
+            Instant notBefore = Instant.now();
             conditions.setNotBefore(notBefore);
-            DateTime notAfter = notBefore.plusMinutes(20);
+            Instant notAfter = notBefore.plus(Duration.ofMinutes(20));
             conditions.setNotAfter(notAfter);
             callbackHandler.setConditions(conditions);
 
@@ -104,8 +105,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             assertEquals(nodeList.getLength(), 1);
-            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
-            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), DOMTypeSupport.instantToString(notBefore));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), DOMTypeSupport.instantToString(notAfter));
         }
 
         //done signature; now test sig-verification:
@@ -131,9 +132,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
+            Instant notBefore = Instant.now();
             conditions.setNotBefore(notBefore);
-            DateTime notAfter = notBefore.plusMinutes(20);
+            Instant notAfter = notBefore.plus(Duration.ofMinutes(20));
             conditions.setNotAfter(notAfter);
             callbackHandler.setConditions(conditions);
 
@@ -151,8 +152,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             assertEquals(nodeList.getLength(), 1);
-            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
-            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), DOMTypeSupport.instantToString(notBefore));
+            assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), DOMTypeSupport.instantToString(notAfter));
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -184,9 +185,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
-            conditions.setNotBefore(notBefore.minusMinutes(5));
-            conditions.setNotAfter(notBefore.minusMinutes(3));
+            Instant notBefore = Instant.now();
+            conditions.setNotBefore(notBefore.minus(Duration.ofMinutes(5)));
+            conditions.setNotAfter(notBefore.minus(Duration.ofMinutes(3)));
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -225,9 +226,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
-            conditions.setNotAfter(notBefore.minusMinutes(60));
-            conditions.setNotBefore(notBefore.minusMinutes(70));
+            Instant notBefore = Instant.now();
+            conditions.setNotAfter(notBefore.minus(Duration.ofMinutes(60)));
+            conditions.setNotBefore(notBefore.minus(Duration.ofMinutes(70)));
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -266,9 +267,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
-            conditions.setNotAfter(new DateTime().plusMinutes(70));
-            conditions.setNotBefore(notBefore.plusMinutes(60));
+            Instant notBefore = Instant.now();
+            conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(70)));
+            conditions.setNotBefore(notBefore.plus(Duration.ofMinutes(60)));
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -311,9 +312,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
-            conditions.setNotBefore(notBefore.plusMinutes(2));
-            conditions.setNotAfter(notBefore.plusMinutes(5));
+            Instant notBefore = Instant.now();
+            conditions.setNotBefore(notBefore.plus(Duration.ofMinutes(2)));
+            conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(5)));
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -355,9 +356,9 @@ public class SamlConditionsTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
-            DateTime notBefore = new DateTime();
+            Instant notBefore = Instant.now();
             conditions.setNotBefore(notBefore.plusSeconds(30));
-            conditions.setNotAfter(notBefore.plusMinutes(5));
+            conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(5)));
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");

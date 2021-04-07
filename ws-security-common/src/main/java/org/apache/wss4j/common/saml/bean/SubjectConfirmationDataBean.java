@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
 /**
  * Class SubjectConfirmationDataBean represents a SAML (2) SubjectConfirmationData. Please note that
  * KeyInfo functionality is in SubjectBean for backwards compatibility reasons.
@@ -34,8 +32,8 @@ public class SubjectConfirmationDataBean {
     private String recipient;
     private String address;
     private String inResponseTo;
-    private DateTime notBefore;
-    private DateTime notAfter;
+    private Instant notBefore;
+    private Instant notAfter;
     private List<Object> any;
 
     /**
@@ -96,18 +94,10 @@ public class SubjectConfirmationDataBean {
      * Get the NotBefore time of the SubjectConfirmationDataBean
      * @return the NotBefore time of the SubjectConfirmationDataBean
      */
-    public DateTime getNotBefore() {
+    public Instant getNotBefore() {
         return notBefore;
     }
 
-    /**
-     * Set the NotBefore time of the SubjectConfirmationDataBean
-     * @param notBefore the NotBefore time of the SubjectConfirmationDataBean
-     */
-    public void setNotBefore(DateTime notBefore) {
-        this.notBefore = notBefore;
-    }
-    
     /**
      * Set the notBefore instance
      *
@@ -115,7 +105,7 @@ public class SubjectConfirmationDataBean {
      */
     public void setNotBefore(Instant notBefore) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore));
+            this.notBefore = Date.from(notBefore).toInstant();
         } else {
             this.notBefore = null;
         }
@@ -125,18 +115,10 @@ public class SubjectConfirmationDataBean {
      * Get the NotOnOrAfter time of the SubjectConfirmationDataBean
      * @return the NotOnOrAfter time of the SubjectConfirmationDataBean
      */
-    public DateTime getNotAfter() {
+    public Instant getNotAfter() {
         return notAfter;
     }
 
-    /**
-     * Set the NotOnOrAfter time of the SubjectConfirmationDataBean
-     * @param notAfter the NotOnOrAfter time of the SubjectConfirmationDataBean
-     */
-    public void setNotAfter(DateTime notAfter) {
-        this.notAfter = notAfter;
-    }
-    
     /**
      * Set the notAfter instance
      *
@@ -144,7 +126,7 @@ public class SubjectConfirmationDataBean {
      */
     public void setNotAfter(Instant notAfter) {
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter));
+            this.notAfter = Date.from(notAfter).toInstant();
         } else {
             this.notAfter = null;
         }

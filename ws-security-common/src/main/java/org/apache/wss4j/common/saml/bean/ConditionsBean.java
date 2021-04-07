@@ -23,16 +23,13 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.DateTime;
-
-
 /**
  * Class ConditionsBean represents a SAML Conditions object (can be used to create
  * both SAML v1.1 and v2.0 statements)
  */
 public class ConditionsBean {
-    private DateTime notBefore;
-    private DateTime notAfter;
+    private Instant notBefore;
+    private Instant notAfter;
     private long tokenPeriodSeconds;
     private List<AudienceRestrictionBean> audienceRestrictions;
     private boolean oneTimeUse;
@@ -52,28 +49,14 @@ public class ConditionsBean {
      * @param notAfter The notAfter instance
      */
     public ConditionsBean(
-        DateTime notBefore,
-        DateTime notAfter
-    ) {
-        this.notBefore = notBefore;
-        this.notAfter = notAfter;
-    }
-
-    /**
-     * Constructor ConditionsBean creates a new ConditionsBean instance.
-     *
-     * @param notBefore The notBefore instance
-     * @param notAfter The notAfter instance
-     */
-    public ConditionsBean(
         Instant notBefore,
         Instant notAfter
     ) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore));
+            this.notBefore = Date.from(notBefore).toInstant();
         }
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter));
+            this.notAfter = Date.from(notAfter).toInstant();
         }
     }
 
@@ -93,17 +76,8 @@ public class ConditionsBean {
      *
      * @return the notBefore instance
      */
-    public DateTime getNotBefore() {
+    public Instant getNotBefore() {
         return notBefore;
-    }
-
-    /**
-     * Set the notBefore instance
-     *
-     * @param notBefore the notBefore instance to set
-     */
-    public void setNotBefore(DateTime notBefore) {
-        this.notBefore = notBefore;
     }
 
     /**
@@ -113,7 +87,7 @@ public class ConditionsBean {
      */
     public void setNotBefore(Instant notBefore) {
         if (notBefore != null) {
-            this.notBefore = new DateTime(Date.from(notBefore));
+            this.notBefore = Date.from(notBefore).toInstant();
         } else {
             this.notBefore = null;
         }
@@ -124,17 +98,8 @@ public class ConditionsBean {
      *
      * @return the notAfter instance
      */
-    public DateTime getNotAfter() {
+    public Instant getNotAfter() {
         return notAfter;
-    }
-
-    /**
-     * Set the notAfter instance
-     *
-     * @param notAfter the notAfter instance to set
-     */
-    public void setNotAfter(DateTime notAfter) {
-        this.notAfter = notAfter;
     }
 
     /**
@@ -144,7 +109,7 @@ public class ConditionsBean {
      */
     public void setNotAfter(Instant notAfter) {
         if (notAfter != null) {
-            this.notAfter = new DateTime(Date.from(notAfter));
+            this.notAfter = Date.from(notAfter).toInstant();
         } else {
             this.notAfter = null;
         }

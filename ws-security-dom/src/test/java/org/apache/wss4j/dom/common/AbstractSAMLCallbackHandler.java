@@ -36,7 +36,6 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -47,6 +46,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,8 +73,8 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectNameIDFormat;
     protected String subjectLocalityIpAddress;
     protected String subjectLocalityDnsAddress;
-    protected DateTime sessionNotOnOrAfter;
-    protected DateTime authenticationInstant;
+    protected Instant sessionNotOnOrAfter;
+    protected Instant authenticationInstant;
     protected String resource;
     protected List<Object> customAttributeValues;
     protected ConditionsBean conditions;
@@ -119,7 +119,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         confirmationMethod = confMethod;
     }
 
-    public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
+    public void setSessionNotOnOrAfter(Instant sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
 
@@ -164,11 +164,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.customAttributeValues = customAttributeValues;
     }
 
-    public DateTime getAuthenticationInstant() {
+    public Instant getAuthenticationInstant() {
         return authenticationInstant;
     }
 
-    public void setAuthenticationInstant(DateTime authenticationInstant) {
+    public void setAuthenticationInstant(Instant authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
     }
 

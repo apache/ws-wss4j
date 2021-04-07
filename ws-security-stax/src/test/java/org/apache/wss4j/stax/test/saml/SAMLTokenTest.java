@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +73,6 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
@@ -762,9 +763,9 @@ public class SAMLTokenTest extends AbstractTestBase {
             SAMLObjectBuilder<Conditions> conditionsV2Builder =
                     (SAMLObjectBuilder<Conditions>) builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
             Conditions conditions = conditionsV2Builder.buildObject();
-            DateTime newNotBefore = new DateTime();
+            Instant newNotBefore = Instant.now();
             conditions.setNotBefore(newNotBefore);
-            conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
+            conditions.setNotOnOrAfter(newNotBefore.plus(Duration.ofMinutes(5)));
 
             XMLObjectBuilder<XSAny> xsAnyBuilder =
                 (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);

@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +50,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.joda.time.DateTime;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -83,9 +84,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
+        Instant notBefore = Instant.now();
         conditions.setNotBefore(notBefore);
-        conditions.setNotAfter(notBefore.plusMinutes(20));
+        conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(20)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, true);
@@ -102,9 +103,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
-        conditions.setNotBefore(notBefore.minusMinutes(5));
-        conditions.setNotAfter(notBefore.minusMinutes(3));
+        Instant notBefore = Instant.now();
+        conditions.setNotBefore(notBefore.minus(Duration.ofMinutes(5)));
+        conditions.setNotAfter(notBefore.minus(Duration.ofMinutes(3)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, false);
@@ -117,9 +118,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
-        conditions.setNotAfter(notBefore.minusMinutes(60));
-        conditions.setNotBefore(notBefore.minusMinutes(70));
+        Instant notBefore = Instant.now();
+        conditions.setNotAfter(notBefore.minus(Duration.ofMinutes(60)));
+        conditions.setNotBefore(notBefore.minus(Duration.ofMinutes(70)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, false);
@@ -132,9 +133,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
-        conditions.setNotAfter(new DateTime().plusMinutes(70));
-        conditions.setNotBefore(notBefore.plusMinutes(60));
+        Instant notBefore = Instant.now();
+        conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(70)));
+        conditions.setNotBefore(notBefore.plus(Duration.ofMinutes(60)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, false);
@@ -150,8 +151,8 @@ public class SamlConditionsTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DateTime issueInstant = new DateTime();
-        issueInstant = issueInstant.plusMinutes(60);
+        Instant issueInstant = Instant.now();
+        issueInstant = issueInstant.plus(Duration.ofMinutes(60));
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -187,8 +188,8 @@ public class SamlConditionsTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DateTime issueInstant = new DateTime();
-        issueInstant = issueInstant.minusMinutes(31);
+        Instant issueInstant = Instant.now();
+        issueInstant = issueInstant.minus(Duration.ofMinutes(31));
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
         samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
 
@@ -225,7 +226,7 @@ public class SamlConditionsTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DateTime issueInstant = new DateTime().minusSeconds(5);
+        Instant issueInstant = Instant.now().minusSeconds(5);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
         samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
 
@@ -258,11 +259,11 @@ public class SamlConditionsTest {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         ConditionsBean conditions = new ConditionsBean();
-        conditions.setNotBefore(new DateTime());
-        conditions.setNotAfter(new DateTime().plusMinutes(35));
+        Instant issueInstant = Instant.now();
+        conditions.setNotBefore(issueInstant);
+        conditions.setNotAfter(issueInstant.plus(Duration.ofMinutes(35)));
 
-        DateTime issueInstant = new DateTime();
-        issueInstant = issueInstant.minusMinutes(31);
+        issueInstant = issueInstant.minus(Duration.ofMinutes(31));
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -293,8 +294,8 @@ public class SamlConditionsTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DateTime issueInstant = new DateTime();
-        issueInstant = issueInstant.minusMinutes(31);
+        Instant issueInstant = Instant.now();
+        issueInstant = issueInstant.minus(Duration.ofMinutes(31));
         samlAssertion.getSaml1().setIssueInstant(issueInstant);
         samlAssertion.getSaml1().getConditions().setNotOnOrAfter(null);
 
@@ -332,9 +333,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
-        conditions.setNotBefore(notBefore.plusMinutes(2));
-        conditions.setNotAfter(notBefore.plusMinutes(5));
+        Instant notBefore = Instant.now();
+        conditions.setNotBefore(notBefore.plus(Duration.ofMinutes(2)));
+        conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(5)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, false);
@@ -351,9 +352,9 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
+        Instant notBefore = Instant.now();
         conditions.setNotBefore(notBefore.plusSeconds(30));
-        conditions.setNotAfter(notBefore.plusMinutes(5));
+        conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(5)));
         callbackHandler.setConditions(conditions);
 
         createAndVerifyMessage(callbackHandler, true);
@@ -724,12 +725,12 @@ public class SamlConditionsTest {
         callbackHandler.setIssuer("www.example.com");
 
         ConditionsBean conditions = new ConditionsBean();
-        DateTime notBefore = new DateTime();
+        Instant notBefore = Instant.now();
         conditions.setNotBefore(notBefore);
-        conditions.setNotAfter(notBefore.plusMinutes(20));
+        conditions.setNotAfter(notBefore.plus(Duration.ofMinutes(20)));
 
         DelegateBean delegate = new DelegateBean();
-        delegate.setDelegationInstant(DateTime.now());
+        delegate.setDelegationInstant(Instant.now());
         delegate.setConfirmationMethod(SAML2Constants.CONF_BEARER);
 
         NameIDBean nameID = new NameIDBean();

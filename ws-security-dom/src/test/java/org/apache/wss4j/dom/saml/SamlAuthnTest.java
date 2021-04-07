@@ -19,6 +19,9 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -38,7 +41,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.joda.time.DateTime;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -86,7 +88,7 @@ public class SamlAuthnTest {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
+        callbackHandler.setAuthenticationInstant(Instant.now().plus(Duration.ofMinutes(70)));
 
         createAndVerifyMessage(callbackHandler, false);
     }
@@ -97,7 +99,7 @@ public class SamlAuthnTest {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
+        callbackHandler.setAuthenticationInstant(Instant.now().plus(Duration.ofMinutes(70)));
 
         createAndVerifyMessage(callbackHandler, false);
     }
@@ -108,7 +110,7 @@ public class SamlAuthnTest {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setSessionNotOnOrAfter(new DateTime().minusMinutes(70));
+        callbackHandler.setSessionNotOnOrAfter(Instant.now().minus(Duration.ofMinutes(70)));
 
         createAndVerifyMessage(callbackHandler, false);
     }
@@ -193,7 +195,7 @@ public class SamlAuthnTest {
      * Verifies the soap envelope
      * <p/>
      *
-     * @param envelope
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {

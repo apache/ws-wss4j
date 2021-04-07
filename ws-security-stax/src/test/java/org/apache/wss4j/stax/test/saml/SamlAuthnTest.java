@@ -21,6 +21,8 @@ package org.apache.wss4j.stax.test.saml;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -38,7 +40,6 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -85,7 +86,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
+        callbackHandler.setAuthenticationInstant(Instant.now().plus(Duration.ofMinutes(70)));
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
@@ -98,7 +99,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
+        callbackHandler.setAuthenticationInstant(Instant.now().plus(Duration.ofMinutes(70)));
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
@@ -111,7 +112,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setSessionNotOnOrAfter(new DateTime().minusMinutes(70));
+        callbackHandler.setSessionNotOnOrAfter(Instant.now().minus(Duration.ofMinutes(70)));
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }

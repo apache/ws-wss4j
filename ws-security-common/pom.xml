@@ -30,7 +30,6 @@
     
     <properties>
         <wss4j.osgi.import>
-            org.joda.time*;version="[1.6,3)",
             net.shibboleth*;resolution:=optional,
             com.sun.security.jgss*;resolution:=optional
         </wss4j.osgi.import>
@@ -122,7 +121,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.velocity</groupId>
-                    <artifactId>velocity</artifactId>
+                    <artifactId>velocity-engine-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
@@ -139,6 +142,10 @@
                 <exclusion>
                     <groupId>org.cryptacular</groupId>
                     <artifactId>cryptacular</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

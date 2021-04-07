@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +78,6 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.RetrievalMethod;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.joda.time.DateTime;
 
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.XMLObjectBuilder;
@@ -458,7 +459,7 @@ public class SamlTokenTest {
     public void testSAML2SessionNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        callbackHandler.setSessionNotOnOrAfter(new DateTime().plusHours(1));
+        callbackHandler.setSessionNotOnOrAfter(Instant.now().plus(Duration.ofHours(1)));
         callbackHandler.setIssuer("www.example.com");
 
         SAMLCallback samlCallback = new SAMLCallback();
@@ -592,9 +593,9 @@ public class SamlTokenTest {
         SAMLObjectBuilder<Conditions> conditionsV2Builder =
                 (SAMLObjectBuilder<Conditions>)builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
         Conditions conditions = conditionsV2Builder.buildObject();
-        DateTime newNotBefore = new DateTime();
+        Instant newNotBefore = Instant.now();
         conditions.setNotBefore(newNotBefore);
-        conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
+        conditions.setNotOnOrAfter(newNotBefore.plus(Duration.ofMinutes(5)));
 
         XMLObjectBuilder<XSAny> xsAnyBuilder =
             (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
@@ -681,7 +682,7 @@ public class SamlTokenTest {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
-        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
 
@@ -1451,7 +1452,7 @@ public class SamlTokenTest {
      * Verifies the soap envelope
      * <p/>
      *
-     * @param envelope
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {

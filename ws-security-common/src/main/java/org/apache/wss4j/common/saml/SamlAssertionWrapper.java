@@ -36,7 +36,6 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.InetAddressUtils;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.XMLUtils;
-import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.common.SAMLObjectContentReference;
@@ -260,33 +259,19 @@ public class SamlAssertionWrapper {
     }
 
     public Instant getNotBefore() {
-        DateTime validFrom = null;
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-            validFrom = getSaml2().getConditions().getNotBefore();
+            return getSaml2().getConditions().getNotBefore();
         } else {
-            validFrom = getSaml1().getConditions().getNotBefore();
+            return getSaml1().getConditions().getNotBefore();
         }
-
-        // Now convert to a Java Instant Object
-        if (validFrom != null) {
-            return validFrom.toDate().toInstant();
-        }
-        return null;
     }
 
     public Instant getNotOnOrAfter() {
-        DateTime validTill = null;
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-            validTill = getSaml2().getConditions().getNotOnOrAfter();
+            return getSaml2().getConditions().getNotOnOrAfter();
         } else {
-            validTill = getSaml1().getConditions().getNotOnOrAfter();
+            return getSaml1().getConditions().getNotOnOrAfter();
         }
-
-        // Now convert to a Java Instant Object
-        if (validTill != null) {
-            return validTill.toDate().toInstant();
-        }
-        return null;
     }
 
     /**
@@ -805,8 +790,8 @@ public class SamlAssertionWrapper {
      * Check the Conditions of the Assertion.
      */
     public void checkConditions(int futureTTL) throws WSSecurityException {
-        DateTime validFrom = null;
-        DateTime validTill = null;
+        Instant validFrom = null;
+        Instant validTill = null;
 
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getConditions() != null) {
@@ -819,7 +804,7 @@ public class SamlAssertionWrapper {
         }
 
         if (validFrom != null) {
-            DateTime currentTime = new DateTime();
+            Instant currentTime = Instant.now();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (validFrom.isAfter(currentTime)) {
                 LOG.warn("SAML Token condition (Not Before) not met");
@@ -827,7 +812,7 @@ public class SamlAssertionWrapper {
             }
         }
 
-        if (validTill != null && validTill.isBeforeNow()) {
+        if (validTill != null && validTill.isBefore(Instant.now())) {
             LOG.warn("SAML Token condition (Not On Or After) not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
@@ -837,8 +822,8 @@ public class SamlAssertionWrapper {
      * Check the IssueInstant value of the Assertion.
      */
     public void checkIssueInstant(int futureTTL, int ttl) throws WSSecurityException {
-        DateTime issueInstant = null;
-        DateTime validTill = null;
+        Instant issueInstant = null;
+        Instant validTill = null;
 
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getConditions() != null) {
@@ -852,7 +837,7 @@ public class SamlAssertionWrapper {
 
         // Check the IssueInstant is not in the future, subject to the future TTL
         if (issueInstant != null) {
-            DateTime currentTime = new DateTime().plusSeconds(futureTTL);
+            Instant currentTime = Instant.now().plusSeconds(futureTTL);
             if (issueInstant.isAfter(currentTime)) {
                 LOG.warn("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -860,7 +845,7 @@ public class SamlAssertionWrapper {
 
             // If there is no NotOnOrAfter, then impose a TTL on the IssueInstant.
             if (validTill == null) {
-                currentTime = new DateTime().minusSeconds(ttl);
+                currentTime = currentTime.minusSeconds(ttl);
 
                 if (issueInstant.isBefore(currentTime)) {
                     LOG.warn("SAML Token IssueInstant not met. The assertion was created too long ago.");
@@ -940,8 +925,8 @@ public class SamlAssertionWrapper {
             List<AuthnStatement> authnStatements = getSaml2().getAuthnStatements();
 
             for (AuthnStatement authnStatement : authnStatements) {
-                DateTime authnInstant = authnStatement.getAuthnInstant();
-                DateTime sessionNotOnOrAfter = authnStatement.getSessionNotOnOrAfter();
+                Instant authnInstant = authnStatement.getAuthnInstant();
+                Instant sessionNotOnOrAfter = authnStatement.getSessionNotOnOrAfter();
                 String subjectLocalityAddress = null;
 
                 if (authnStatement.getSubjectLocality() != null
@@ -958,7 +943,7 @@ public class SamlAssertionWrapper {
                 getSaml1().getAuthenticationStatements();
 
             for (AuthenticationStatement authnStatement : authnStatements) {
-                DateTime authnInstant = authnStatement.getAuthenticationInstant();
+                Instant authnInstant = authnStatement.getAuthenticationInstant();
                 String subjectLocalityAddress = null;
 
                 if (authnStatement.getSubjectLocality() != null
@@ -973,11 +958,11 @@ public class SamlAssertionWrapper {
     }
 
     private void validateAuthnStatement(
-        DateTime authnInstant, DateTime sessionNotOnOrAfter, String subjectLocalityAddress,
+        Instant authnInstant, Instant sessionNotOnOrAfter, String subjectLocalityAddress,
         int futureTTL
     ) throws WSSecurityException {
         // AuthnInstant in the future
-        DateTime currentTime = new DateTime();
+        Instant currentTime = Instant.now();
         currentTime = currentTime.plusSeconds(futureTTL);
         if (authnInstant.isAfter(currentTime)) {
             LOG.warn("SAML Token AuthnInstant not met");
@@ -985,7 +970,7 @@ public class SamlAssertionWrapper {
         }
 
         // Stale SessionNotOnOrAfter
-        if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBeforeNow()) {
+        if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBefore(Instant.now())) {
             LOG.warn("SAML Token SessionNotOnOrAfter not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
