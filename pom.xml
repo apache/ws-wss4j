@@ -105,7 +105,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <targetJdk>1.8</targetJdk>
+        <targetJdk>11</targetJdk>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>6.1.2</maven-owasp-plugin-version>
     </properties>
@@ -138,7 +138,8 @@
                     <linkXRef>false</linkXRef>
                     <verbose>true</verbose>
                     <includeTests>true</includeTests>
-                    <targetJdk>${targetJdk}</targetJdk>
+                    <!-- TODO <targetJdk>${targetJdk}</targetJdk>-->
+                    <targetJdk>1.8</targetJdk>
                     <excludeRoots>
                         <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                     </excludeRoots>
@@ -367,54 +368,6 @@
                 <checkstyle.skip>true</checkstyle.skip>
             </properties>
         </profile>
-        <profile>
-            <id>jdk18</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <additionalJOptions>
-                                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                                </additionalJOptions>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <fork>true</fork>
-                                <compilerArgs combine.children="append">
-                                    <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/9+181-r4173-1/javac-9+181-r4173-1.jar</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <version>2.22.2</version>
-                            <configuration>
-                                <reportFormat>brief</reportFormat>
-                                <useFile>false</useFile>
-                                <childDelegation>false</childDelegation>
-                                <includes>
-                                    <include>**/*Test.java</include>
-                                </includes>
-                                <argLine>-Xmx2000m</argLine>
-                                <systemPropertyVariables>
-                                    <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
-                                </systemPropertyVariables>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-         </profile>
          <profile>
             <id>jdk19-plus</id>
             <activation>
@@ -469,39 +422,6 @@
              </dependencies>
          </profile>
 
-         <profile>
-            <id>ibm</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <version>2.22.1</version>
-                            <inherited>true</inherited>
-                            <configuration>
-                               <reportFormat>brief</reportFormat>
-                               <useFile>false</useFile>
-                               <childDelegation>false</childDelegation>
-                               <includes>
-                                   <include>**/*Test.java</include>
-                               </includes>
-                               <systemPropertyVariables>
-                                   <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
-<org.apache.xml.security.cipher.gcm.useIvParameterSpec>true</org.apache.xml.security.cipher.gcm.useIvParameterSpec>
-                               </systemPropertyVariables>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
         <profile>
             <id>activate-buildtools-in-module</id>
             <activation>
