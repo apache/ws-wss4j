@@ -30,7 +30,7 @@
     
     <properties>
         <wss4j.osgi.import>
-            org.joda.time*;version="[1.6,3)",
+            org.joda.time*;version="[2.9,3)",
             net.shibboleth*;resolution:=optional
         </wss4j.osgi.import>
         <!--
@@ -135,7 +135,23 @@
                     <groupId>org.cryptacular</groupId>
                     <artifactId>cryptacular</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.cryptacular</groupId>
+            <artifactId>cryptacular</artifactId>
+            <version>${cryptacular.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.cryptacular</groupId>
