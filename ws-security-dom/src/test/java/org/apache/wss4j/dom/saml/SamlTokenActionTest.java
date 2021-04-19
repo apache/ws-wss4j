@@ -193,6 +193,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         }
 
         WSHandlerResult results = verify(doc, callbackHandler);
+        assertEquals(2, results.getActionResults().keySet().size());
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
 
