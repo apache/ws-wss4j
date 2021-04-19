@@ -49,6 +49,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -193,6 +194,7 @@ public class SamlTokenActionTest {
         }
 
         WSHandlerResult results = verify(doc, callbackHandler);
+        assertEquals(2, results.getActionResults().keySet().size());
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
 
