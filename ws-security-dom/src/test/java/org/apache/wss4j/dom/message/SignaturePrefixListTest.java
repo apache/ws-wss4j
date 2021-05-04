@@ -104,7 +104,7 @@ public class SignaturePrefixListTest {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("16c73ab6-b892-458f-abf5-2f875f74882e");
         XMLValidateContext context = new DOMValidateContext(crypto.getX509Certificates(cryptoType)[0].getPublicKey(), receivedSignature);
-        XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
         XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
 
         ExcC14NParameterSpec spec = (ExcC14NParameterSpec)xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
