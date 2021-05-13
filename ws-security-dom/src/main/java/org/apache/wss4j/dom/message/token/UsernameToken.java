@@ -70,6 +70,7 @@ public class UsernameToken {
     private Element elementCreated;
     private Element elementSalt;
     private Element elementIteration;
+    private int iteration = DEFAULT_ITERATION;
     private String passwordType;
     private boolean hashed = true;
     private boolean passwordsAreEncoded;
@@ -131,36 +132,37 @@ public class UsernameToken {
                 new Object[] {"Username is missing"}
             );
         }
-
         checkBSPCompliance(bspEnforcer);
-
         hashed = false;
-        if (elementSalt != null) {
+        if (elementSalt != null && (elementPassword != null || elementIteration == null)) {
             //
             // If the UsernameToken is to be used for key derivation, the (1.1)
             // spec says that it cannot contain a password, and it must contain
             // an Iteration element
             //
-            if (elementPassword != null || elementIteration == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                    "badUsernameToken",
-                    new Object[] {"Password is missing"}
-                );
-            }
-            return;
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
+                "badUsernameToken",
+                new Object[] {"Password is missing"}
+            );
         }
 
         // Guard against a malicious user sending a bogus iteration value
         if (elementIteration != null) {
             String iter = XMLUtils.getElementText(elementIteration);
             if (iter != null) {
-                int iterInt = Integer.parseInt(iter);
-                if (iterInt < 0 || iterInt > 10000) {
+                try {
+                    iteration = Integer.parseInt(iter);
+                    if (iteration < 0 || iteration > 10000) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
+                            "badUsernameToken",
+                            new Object[] {"Iteration is missing"}
+                        );
+                    }
+                } catch (NumberFormatException ex) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "badUsernameToken",
-                        new Object[] {"Iteration is missing"}
+                            WSSecurityException.ErrorCode.FAILURE, ex, "decoding.general"
                     );
                 }
             }
@@ -352,6 +354,7 @@ public class UsernameToken {
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
+        this.iteration = iteration;
     }
 
     /**
@@ -446,11 +449,7 @@ public class UsernameToken {
      *         is returned.
      */
     public int getIteration() {
-        String iter = XMLUtils.getElementText(elementIteration);
-        if (iter != null) {
-            return Integer.parseInt(iter);
-        }
-        return DEFAULT_ITERATION;
+        return iteration;
     }
 
     /**
@@ -596,8 +595,14 @@ public class UsernameToken {
             bspEnforcer.handleBSPRule(BSPRule.R4218);
         } else {
             String iter = XMLUtils.getElementText(elementIteration);
-            if (iter == null || Integer.parseInt(iter) < 1000) {
-                bspEnforcer.handleBSPRule(BSPRule.R4218);
+            try {
+                if (iter == null || Integer.parseInt(iter) < 1000) {
+                    bspEnforcer.handleBSPRule(BSPRule.R4218);
+                }
+            } catch (NumberFormatException ex) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, ex, "decoding.general"
+                );
             }
         }
 

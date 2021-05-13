@@ -67,6 +67,9 @@ public class DerivedKeyToken {
     private Element elementLength;
     private Element elementLabel;
     private Element elementNonce;
+    private int length = 32;
+    private int offset = 0;
+    private int generation = -1;
 
     private String ns;
 
@@ -149,6 +152,45 @@ public class DerivedKeyToken {
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.NONCE_LN, ns
             );
+
+        if (elementLength != null) {
+            Text text = getFirstNode(elementLength);
+            if (text != null) {
+                try {
+                    length = Integer.parseInt(text.getData());
+                } catch (NumberFormatException ex) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, ex, "decoding.general"
+                    );
+                }
+            }
+        }
+
+        if (elementOffset != null) {
+            Text text = getFirstNode(elementOffset);
+            if (text != null) {
+                try {
+                    offset = Integer.parseInt(text.getData());
+                } catch (NumberFormatException ex) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, ex, "decoding.general"
+                    );
+                }
+            }
+        }
+
+        if (elementGeneration != null) {
+            Text text = getFirstNode(elementGeneration);
+            if (text != null) {
+                try {
+                    generation = Integer.parseInt(text.getData());
+                } catch (NumberFormatException ex) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, ex, "decoding.general"
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -297,16 +339,11 @@ public class DerivedKeyToken {
             element.getOwnerDocument().createTextNode(Long.toString(length))
         );
         element.appendChild(elementLength);
+        this.length = length;
     }
 
     public int getLength() {
-        if (elementLength != null) {
-            Text text = getFirstNode(elementLength);
-            if (text != null) {
-                return Integer.parseInt(text.getData());
-            }
-        }
-        return 32;
+        return length;
     }
 
     /**
@@ -328,17 +365,11 @@ public class DerivedKeyToken {
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "offsetError");
         }
-
+        this.offset = offset;
     }
 
     public int getOffset() {
-        if (elementOffset != null) {
-            Text text = getFirstNode(elementOffset);
-            if (text != null) {
-                return Integer.parseInt(text.getData());
-            }
-        }
-        return 0;
+        return offset;
     }
 
     /**
@@ -360,16 +391,11 @@ public class DerivedKeyToken {
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "offsetError");
         }
+        this.generation = generation;
     }
 
     public int getGeneration() {
-        if (elementGeneration != null) {
-            Text text = getFirstNode(elementGeneration);
-            if (text != null) {
-                return Integer.parseInt(text.getData());
-            }
-        }
-        return -1;
+        return generation;
     }
 
     /**
