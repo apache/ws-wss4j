@@ -843,6 +843,8 @@ public class SignatureTest {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
+
+        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
     @Test
@@ -880,6 +882,8 @@ public class SignatureTest {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
+
+        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
     @Test

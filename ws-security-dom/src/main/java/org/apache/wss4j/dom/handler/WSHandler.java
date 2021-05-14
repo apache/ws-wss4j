@@ -20,15 +20,7 @@
 package org.apache.wss4j.dom.handler;
 
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -218,11 +210,21 @@ public abstract class WSHandler {
 
         if (signingAction != null) {
             actionsToPerform = new ArrayList<>(actions);
-            Collections.copy(actionsToPerform, actions);
 
-            int signatureIndex = actions.indexOf(signingAction);
-            actionsToPerform.remove(signingAction);
-            actionsToPerform.add(signingAction);
+            // Find TimestampAction
+            int timestampIndex = -1;
+            for (int i = 0; i < actionsToPerform.size(); i++) {
+                if (actionsToPerform.get(i).getAction() == WSConstants.TS) {
+                    timestampIndex = i;
+                    break;
+                }
+            }
+
+            int signatureIndex = actionsToPerform.indexOf(signingAction);
+            if (timestampIndex >= 0) {
+                actionsToPerform.set(signatureIndex, actionsToPerform.get(timestampIndex));
+                actionsToPerform.set(timestampIndex, signingAction);
+            }
             reqData.setAppendSignatureAfterTimestamp(true);
             reqData.setOriginalSignatureActionPosition(signatureIndex);
         }
