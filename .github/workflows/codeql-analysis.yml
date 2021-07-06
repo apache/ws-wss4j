@@ -14,8 +14,6 @@ on:
   #schedule:
     #- cron: '0 8 * * 5'
 
-permissions: read-all
-
 jobs:
   analyze:
     name: Analyze
