@@ -21,6 +21,7 @@ package org.apache.wss4j.common.token;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.DnCommaDelimiter;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,7 +70,7 @@ public final class DOMX509IssuerSerial {
         if (serialNumber == null) {
             throw new NullPointerException("The serialNumber cannot be null");
         }
-        this.issuer = new X500Principal(issuer).getName();
+        this.issuer = new DnCommaDelimiter().delimitRdnWithDoubleComma(new X500Principal(issuer).getName());
         this.serialNumber = serialNumber;
 
         element =
