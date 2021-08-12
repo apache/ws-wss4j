@@ -36,10 +36,9 @@ public class DnCommaDelimiter {
      */
     public String delimitRdnWithDoubleComma(String rfs2253String) {
         StringBuilder commaDNBuilder = new StringBuilder();
-        List<Rdn> rdns;
         try {
             LdapName ldapname = new LdapName(rfs2253String);
-            rdns = ldapname.getRdns();
+            List<Rdn> rdns = ldapname.getRdns();
 
             for (int i = rdns.size() - 1; i >= 0; i--) {
                 Rdn rdn = rdns.get(i);

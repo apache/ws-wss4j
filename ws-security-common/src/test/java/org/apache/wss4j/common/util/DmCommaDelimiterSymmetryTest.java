@@ -46,21 +46,21 @@ public class DmCommaDelimiterSymmetryTest {
     private DnCommaDelimiter subject = new DnCommaDelimiter();
 
     @Test
-    public void testThatACommaDelimitedDnStringAndABackSlashExcapedDnProducesTheSameX509PrincipalUsingDefaultTruststore()
+    public void testThatACommaDelimitedDnStringAndABackSlashEscapedDnProducesTheSameX509PrincipalUsingDefaultTruststore()
             throws KeyStoreException, InvalidAlgorithmParameterException, CertificateException, NoSuchAlgorithmException, IOException {
         KeyStore keystore = loadDefaultKeyStore();
-        assertAllCATransformsArequivalen(keystore);
+        assertAllCaTransformsAreEquivalent(keystore);
     }
 
     @Test
-    public void testThatACommaDelimitedDnStringAndABackSlashExcapedDnProducesTheSameX509Principal()
+    public void testThatACommaDelimitedDnStringAndABackSlashEscapedDnProducesTheSameX509Principal()
             throws KeyStoreException, InvalidAlgorithmParameterException, CertificateException, NoSuchAlgorithmException, IOException {
         KeyStore keystore = loadKeyStore("keys/cacerts-openjdk.jks", "changeit");
 
-        assertAllCATransformsArequivalen(keystore);
+        assertAllCaTransformsAreEquivalent(keystore);
     }
 
-    private void assertAllCATransformsArequivalen(KeyStore keystore) throws KeyStoreException, InvalidAlgorithmParameterException {
+    private void assertAllCaTransformsAreEquivalent(KeyStore keystore) throws KeyStoreException, InvalidAlgorithmParameterException {
         PKIXParameters params = new PKIXParameters(keystore);
         for (TrustAnchor ta : params.getTrustAnchors()) {
             X509Certificate cert = ta.getTrustedCert();
