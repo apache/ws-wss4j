@@ -43,13 +43,13 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
     private final StandardPBEStringEncryptor passwordEncryptor;
     private CallbackHandler callbackHandler;
 
-    public JasyptPasswordEncryptor(String masterPassword) {
-        this(masterPassword, DEFAULT_ALGORITHM);
+    public JasyptPasswordEncryptor(String password) {
+        this(password, DEFAULT_ALGORITHM);
     }
 
-    public JasyptPasswordEncryptor(String masterPassword, String algorithm) {
+    public JasyptPasswordEncryptor(String password, String algorithm) {
         passwordEncryptor = new StandardPBEStringEncryptor();
-        passwordEncryptor.setPassword(masterPassword);
+        passwordEncryptor.setPassword(password);
         passwordEncryptor.setAlgorithm(algorithm);
     }
 
@@ -75,7 +75,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
             try {
                 callbackHandler.handle(new Callback[]{pwCb});
             } catch (IOException | UnsupportedCallbackException e) {
-                LOG.debug("Error in getting master password: ", e);
+                LOG.debug("Error in getting password: ", e);
             }
             if (pwCb.getPassword() != null) {
                 passwordEncryptor.setPassword(pwCb.getPassword());
@@ -96,7 +96,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
             try {
                 callbackHandler.handle(new Callback[]{pwCb});
             } catch (IOException | UnsupportedCallbackException e) {
-                LOG.debug("Error in getting master password: ", e);
+                LOG.debug("Error in getting password: ", e);
             }
             if (pwCb.getPassword() != null) {
                 passwordEncryptor.setPassword(pwCb.getPassword());
