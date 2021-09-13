@@ -527,8 +527,12 @@ public abstract class WSHandler {
 
         String iterations = getString(WSHandlerConstants.DERIVED_KEY_ITERATIONS, mc);
         if (iterations != null) {
-            int iIterations = Integer.parseInt(iterations);
-            reqData.setDerivedKeyIterations(iIterations);
+            try {
+                int iIterations = Integer.parseInt(iterations);
+                reqData.setDerivedKeyIterations(iIterations);
+            } catch (NumberFormatException e) {
+                LOG.warn("Error in configuring a derived key iteration count: " + e.getMessage());
+            }
         }
     }
 
