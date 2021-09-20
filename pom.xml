@@ -100,7 +100,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>23</version>
+        <version>24</version>
     </parent>
 
     <properties>
@@ -108,6 +108,7 @@
         <targetJdk>1.8</targetJdk>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>6.1.2</maven-owasp-plugin-version>
+        <project.build.outputTimestamp>1</project.build.outputTimestamp>
     </properties>
 
     <modules>
