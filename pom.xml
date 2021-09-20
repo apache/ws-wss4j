@@ -319,6 +319,9 @@
                     </executions>
                     <configuration>
                         <attach>true</attach>
+                        <additionalJOptions>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                        </additionalJOptions>
                     </configuration>
                 </plugin>
                 <plugin>
