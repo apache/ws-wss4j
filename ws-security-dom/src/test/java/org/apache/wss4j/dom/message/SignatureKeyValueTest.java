@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.util.Collections;
 
 import org.apache.wss4j.common.principal.PublicKeyPrincipal;
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.w3c.dom.Document;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -29,7 +30,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.common.SOAPUtil;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;

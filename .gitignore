@@ -4,7 +4,10 @@
 .project
 .ruleset
 .settings/
+.idea
 target/
 velocity.log
 .pmdruleset.xml
+*.bat
+*.log
 

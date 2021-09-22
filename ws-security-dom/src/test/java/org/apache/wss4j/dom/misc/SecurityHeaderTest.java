@@ -19,8 +19,7 @@
 
 package org.apache.wss4j.dom.misc;
 
-import org.apache.wss4j.dom.common.SOAPUtil;
-
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 
 import org.junit.jupiter.api.Test;
