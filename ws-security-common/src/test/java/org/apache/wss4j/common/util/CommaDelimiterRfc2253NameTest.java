@@ -48,19 +48,19 @@ class CommaDelimiterRfc2253NameTest {
 
 	@Test
 	void whenMultipleAttributesArePresentThenSpaceIsPlacedAfterComma() {
-		String actual = new CommaDelimiterRfc2253Name().delimitRdnWithDoubleComma("CN=EOIR,OU=Some Unit,DC=Another place");
+		String actual = new CommaDelimiterRfc2253Name().execute("CN=EOIR,OU=Some Unit,DC=Another place");
 		assertEquals("CN=EOIR, OU=Some Unit, DC=Another place",actual);
 	}
 	@Test
 	void whenRdnContainsACommaThenTheRdnIsSurroundedByDoubleQuotes() {
-		String actual = new CommaDelimiterRfc2253Name().delimitRdnWithDoubleComma(TYPICAL_CA);
+		String actual = new CommaDelimiterRfc2253Name().execute(TYPICAL_CA);
 		assertEquals(QUOTES_TYPICAL_CA,actual);
 	}
 
 	@Test
 	void whenRdnIsInvalidThenExpectException() {
 		Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			subject.delimitRdnWithDoubleComma("invalid");
+			subject.execute("invalid");
 		});
 	}
 
@@ -127,7 +127,7 @@ class CommaDelimiterRfc2253NameTest {
 		// accurately reflects change usage.
 
 		X500Principal expected = new X500Principal(dnString);
-		X500Principal recreatedX509principal = new X500Principal(subject.delimitRdnWithDoubleComma(dnString));
+		X500Principal recreatedX509principal = new X500Principal(subject.execute(dnString));
 		assertEquals(expected, recreatedX509principal);
 	}
 

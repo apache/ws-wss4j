@@ -26,26 +26,25 @@ import java.util.List;
 
 /**
  * Convert a RFC 2253 String using \ to escape unicode characters into one that is compatible
- * with Microsoft's WFC and Java.<p>
+ * with Microsoft's WFC and Java.<p><br>
  *
  * <strong>Detail:</strong>
- * Converts a string in RFC2253 format and replaces escaped characters with a string quoted representation.
- * It also places a space before the next RDN. <p>
+ * Converts a string in RFC2253 format and replaces \ escaped characters with a string quoted representation.
+ * It also places a space before the next RDN. <p> <br>
  * There are two alternate ways an RFC 2253 RDN can escape unicode characters, either with '\'
- * or by using quotes. Java seems to recognize both formats but WFC only seems to recognize quotes.
- * In most cases this format should will work for both MS & Java stacks.
+ * or by using quotes. Java seems to recognize both formats but Microsoft's WFC only seems to recognize quotes.
  * Since implementations may escape any characters and string is already in valid format no knowledge is
  * required of escapable characters.
  */
 public class CommaDelimiterRfc2253Name {
 
     /**
-     *
+     * Return rfs2253String that delimits using quotes
      *
      * @param rfs2253String a string in rfc 2253 format using a \ as delimiter.
      * @return Rdn in quoted form if required.
      */
-    public String delimitRdnWithDoubleComma(String rfs2253String) {
+    public String execute(String rfs2253String) {
         StringBuilder commaDNBuilder = new StringBuilder();
         try {
             LdapName ldapname = new LdapName(rfs2253String);

@@ -78,7 +78,7 @@ public final class DOMX509IssuerSerial {
             throw new NullPointerException("The serialNumber cannot be null");
         }
         if (isCommaDelimited) {
-            this.issuer = new CommaDelimiterRfc2253Name().delimitRdnWithDoubleComma(new X500Principal(issuer).getName());
+            this.issuer = new CommaDelimiterRfc2253Name().execute(new X500Principal(issuer).getName());
         } else {
             this.issuer = new X500Principal(issuer).getName();
         }

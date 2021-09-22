@@ -87,6 +87,8 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      * </li>
      * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL}
      * </li>
+     * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL_QUOTE_FORMAT}
+     * </li>
      * <li><code>X509KeyIdentifier</code> for {@link WSConstants#X509_KEY_IDENTIFIER}
      * </li>
      * <li><code>SKIKeyIdentifier</code> for {@link WSConstants#SKI_KEY_IDENTIFIER}
@@ -103,6 +105,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
     static {
         keyIdentifier.put("DirectReference", WSConstants.BST_DIRECT_REFERENCE);
         keyIdentifier.put("IssuerSerial", WSConstants.ISSUER_SERIAL);
+        keyIdentifier.put("IssuerSerialQuoteFormat", WSConstants.ISSUER_SERIAL_QUOTE_FORMAT);
         keyIdentifier.put("X509KeyIdentifier", WSConstants.X509_KEY_IDENTIFIER);
         keyIdentifier.put("SKIKeyIdentifier", WSConstants.SKI_KEY_IDENTIFIER);
         keyIdentifier.put("Thumbprint", WSConstants.THUMBPRINT_IDENTIFIER);
