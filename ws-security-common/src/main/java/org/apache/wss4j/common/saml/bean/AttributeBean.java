@@ -72,7 +72,7 @@ public class AttributeBean {
     /**
      * Method getNameFormat returns the nameFormat of this SamlAttribute object
      *
-     * @return he nameFormat of this SamlAttribute object
+     * @return the nameFormat of this SamlAttribute object
      */
     public String getNameFormat() {
         return nameFormat;

@@ -59,6 +59,13 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>September 2021</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 2.3.3
+and 2.2.7. The main changes for these releases are updates to fix CVE issues
+in a few dependencies. 
+</p>
+</li>
+<li>
 <p><b>December 2020</b> - 
 The Apache WSS4J team are pleased to announce the release of versions 2.3.1
 and 2.2.6. Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12348399">2.3.1 release notes</a> and <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12347804">
