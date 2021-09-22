@@ -357,7 +357,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             keyInfo.addUnknownElement(secToken.getElement());
-        } else if (!encryptSymmKey && (keyIdentifierType == WSConstants.ISSUER_SERIAL || keyIdentifierType == WSConstants.ISSUER_SERIAL_QUOTE_FORMAT)) {
+        } else if (!encryptSymmKey && (keyIdentifierType == WSConstants.ISSUER_SERIAL
+                || keyIdentifierType == WSConstants.ISSUER_SERIAL_QUOTE_FORMAT)) {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             if (addWSUNamespace) {
                 secToken.addWSUNamespace();
