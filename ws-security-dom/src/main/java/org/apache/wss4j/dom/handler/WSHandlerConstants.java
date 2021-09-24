@@ -117,6 +117,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      * Get the key identifier type corresponding to the parameter. This is intended for internal
      * use only. Valid values for "parameter" are:
      *  - "IssuerSerial"
+     *  - "IssuerSerialQuoteFormat"
      *  - "DirectReference"
      *  - "X509KeyIdentifier"
      *  - "Thumbprint"
