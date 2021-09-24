@@ -5,6 +5,7 @@
 .ruleset
 .settings/
 .idea
+*.iml
 target/
 velocity.log
 .pmdruleset.xml
