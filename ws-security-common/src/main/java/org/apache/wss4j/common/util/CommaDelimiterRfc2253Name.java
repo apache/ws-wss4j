@@ -39,15 +39,19 @@ import java.util.List;
 public class CommaDelimiterRfc2253Name {
 
     /**
-     * Return rfs2253String that delimits using quotes
+     * Return rfc2253String that delimits using quotes.<p>
      *
-     * @param rfs2253String a string in rfc 2253 format using a \ as delimiter.
+     *
+     * @param rfc2253String a string in rfc 2253 format using a \ as delimiter.
      * @return Rdn in quoted form if required.
+     * @throws  IllegalArgumentException if an error occurred parsing the rfc2256 string.
+     * However, since its assumed that a valid RFC 2253 string, X500Principal.getName(),
+     * is passed its unlikely that this exception would ever be thrown.
      */
-    public String execute(String rfs2253String) {
+    public String execute(String rfc2253String) {
         StringBuilder commaDNBuilder = new StringBuilder();
         try {
-            LdapName ldapname = new LdapName(rfs2253String);
+            LdapName ldapname = new LdapName(rfc2253String);
             List<Rdn> rdns = ldapname.getRdns();
 
             for (int i = rdns.size() - 1; i >= 0; i--) {
@@ -66,7 +70,7 @@ public class CommaDelimiterRfc2253Name {
                 }
             }
         } catch (InvalidNameException e) {
-            throw new IllegalArgumentException(" The distinguished name cannot be parsed : " + rfs2253String);
+            throw new IllegalArgumentException(" The distinguished name cannot be parsed : " + rfc2253String);
         }
         return commaDNBuilder.toString();
     }
