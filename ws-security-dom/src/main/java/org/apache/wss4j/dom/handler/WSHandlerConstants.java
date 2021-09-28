@@ -87,7 +87,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      * </li>
      * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL}
      * </li>
-     * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL_QUOTE_FORMAT}
+     * <li><code>IssuerSerialQuoteFormat</code> for {@link WSConstants#ISSUER_SERIAL_QUOTE_FORMAT}
      * </li>
      * <li><code>X509KeyIdentifier</code> for {@link WSConstants#X509_KEY_IDENTIFIER}
      * </li>

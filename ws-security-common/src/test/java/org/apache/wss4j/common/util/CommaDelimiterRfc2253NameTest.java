@@ -26,7 +26,6 @@ import javax.security.auth.x500.X500Principal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -94,18 +93,6 @@ class CommaDelimiterRfc2253NameTest {
 	public void testThatACommaDelimitedDnStringAndABackSlashEscapedDnProducesTheSameX509PrincipalUsingDefaultTruststore()
 			throws KeyStoreException, InvalidAlgorithmParameterException, CertificateException, NoSuchAlgorithmException, IOException {
 		KeyStore keystore = loadDefaultKeyStore();
-		assertAllCaTransformsAreEquivalent(keystore);
-	}
-
-	@Test
-	public void testThatACommaDelimitedDnStringAndABackSlashEscapedDnProducesTheSameX509Principal()
-			throws KeyStoreException, InvalidAlgorithmParameterException, CertificateException, NoSuchAlgorithmException, IOException {
-		KeyStore keystore = loadKeyStore("keys/cacerts-openjdk.jks", "changeit");
-
-		assertAllCaTransformsAreEquivalent(keystore);
-	}
-
-	private void assertAllCaTransformsAreEquivalent(KeyStore keystore) throws KeyStoreException, InvalidAlgorithmParameterException {
 		PKIXParameters params = new PKIXParameters(keystore);
 		for (TrustAnchor ta : params.getTrustAnchors()) {
 			X509Certificate cert = ta.getTrustedCert();
@@ -129,13 +116,6 @@ class CommaDelimiterRfc2253NameTest {
 		X500Principal expected = new X500Principal(dnString);
 		X500Principal recreatedX509principal = new X500Principal(subject.execute(dnString));
 		assertEquals(expected, recreatedX509principal);
-	}
-
-	private KeyStore loadKeyStore(String path, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-		InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
-		keystore.load(in, password.toCharArray());
-		return keystore;
 	}
 
 	private KeyStore loadDefaultKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {

@@ -202,10 +202,8 @@ public final class WSConstants extends WSS4JConstants {
      * receiver. This reduces the amount of data being sent. The encryption
      * method uses the public key associated with this certificate to encrypt
      * the symmetric key used to encrypt data. 
-     * The name format will
-     * delimit unicode characters with a '\' which is not compatible with Microsoft's WCF stack.
-     * To send issuer name with format that is compatible with WCF and Java use
-     *  {@link #ISSUER_SERIAL_QUOTE_FORMAT}
+     * The name format will delimit unicode characters with a '\' which is not compatible with Microsoft's WCF stack.
+     * To send issuer name with format that is compatible with WCF and Java use {@link #ISSUER_SERIAL_QUOTE_FORMAT}
      * <p/>
      * Please refer to WS Security specification X509 1.1 profile, chapter 3.3.3
      */
@@ -221,7 +219,7 @@ public final class WSConstants extends WSS4JConstants {
      * The encryption method uses the public key associated with this certificate
      * to encrypt the symmetric key used to encrypt data. The certificate is
      * converted into a <code>KeyIdentifier</code> token and sent to the receiver.
-     * Thus the complete certificate data is transfered to receiver.
+     * Thus the complete certificate data is transferred to receiver.
      * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead
      * of sending the whole certificate.
      * <p/>
@@ -327,18 +325,16 @@ public final class WSConstants extends WSS4JConstants {
     /**
      *Sets the {@link org.apache.wss4j.dom.message.WSSecSignature#build(Crypto)}
      * or the {@link org.apache.wss4j.dom.message.WSSecEncrypt#build(Crypto, SecretKey)}
-     * method to send the issuer name and the serial number of a certificate to
-     *the receiver.
+     * method to send the issuer name and the serial number of a certificate to the receiver.
      *<p/>
      * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
      * and the serial number of the signing certificate are sent to the
      * receiver. This reduces the amount of data being sent. The encryption
      * method uses the public key associated with this certificate to encrypt
      * the symmetric key used to encrypt data.
-     * The issuer name format will use a quote delimited Rfc 2253 format if necessary which is
-     * recognized by the Microsoft's WCF stack.
+     * The issuer name format will use a quote delimited Rfc 2253 format if necessary which is recognized by the Microsoft's WCF stack.
      * It also places a space before each subsequent RDN also required for WCF interoperability.
-     * This format is know to be correctly interpreted by Java also.
+     * In addition, this format is know to be correctly interpreted by Java.
      *<p/>
      *Please refer to WS Security specification X509 1.1 profile, chapter 3.3.3
      * <p/>
