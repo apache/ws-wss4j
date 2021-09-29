@@ -52,6 +52,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -70,7 +71,6 @@ import org.apache.wss4j.stax.setup.ConfigurationConverter;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.OutboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
-import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;

@@ -48,6 +48,7 @@ import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -67,7 +68,6 @@ import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.OutboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
-import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
