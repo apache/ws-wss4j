@@ -21,8 +21,8 @@ package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
 
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.common.SOAPUtil;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;

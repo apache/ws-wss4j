@@ -21,6 +21,7 @@ package org.apache.wss4j.common.token;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.CommaDelimiterRfc2253Name;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -63,13 +64,24 @@ public final class DOMX509IssuerSerial {
      * Constructor.
      */
     public DOMX509IssuerSerial(Document doc, String issuer, BigInteger serialNumber) {
+        this(doc,issuer,serialNumber,false);
+    }
+
+    /**
+     * Constructor.
+     */
+    public DOMX509IssuerSerial(Document doc, String issuer, BigInteger serialNumber, boolean isCommaDelimited) {
         if (issuer == null) {
             throw new NullPointerException("The issuerName cannot be null");
         }
         if (serialNumber == null) {
             throw new NullPointerException("The serialNumber cannot be null");
         }
-        this.issuer = new X500Principal(issuer).getName();
+        if (isCommaDelimited) {
+            this.issuer = new CommaDelimiterRfc2253Name().execute(new X500Principal(issuer).getName());
+        } else {
+            this.issuer = new X500Principal(issuer).getName();
+        }
         this.serialNumber = serialNumber;
 
         element =

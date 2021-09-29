@@ -401,14 +401,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     secRef.setKeyIdentifierThumb(cert);
                     break;
 
-                case WSConstants.ISSUER_SERIAL:
-                    final String issuer = cert.getIssuerDN().getName();
-                    final java.math.BigInteger serialNumber = cert.getSerialNumber();
-                    final DOMX509IssuerSerial domIssuerSerial =
-                            new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
-                    final DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
-                    secRef.setUnknownElement(domX509Data.getElement());
-                    break;
+                    case WSConstants.ISSUER_SERIAL:
+                        addIssuerSerial(cert, secRef, false);
+                        break;
+                    case WSConstants.ISSUER_SERIAL_QUOTE_FORMAT:
+                        addIssuerSerial(cert, secRef, true);
+                        break;
 
                 default:
                     throw new WSSecurityException(
@@ -445,6 +443,15 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         marshalKeyInfo(getWsDocInfo());
+    }
+
+    private void addIssuerSerial(X509Certificate cert, SecurityTokenReference secRef, boolean isQuoteDelimited) {
+        final String issuer = cert.getIssuerDN().getName();
+        final java.math.BigInteger serialNumber = cert.getSerialNumber();
+        final DOMX509IssuerSerial domIssuerSerial =
+                new DOMX509IssuerSerial(getDocument(), issuer, serialNumber, isQuoteDelimited);
+        final DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
+        secRef.setUnknownElement(domX509Data.getElement());
     }
 
     /**

@@ -282,18 +282,11 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.ISSUER_SERIAL:
-                String issuer = remoteCert.getIssuerX500Principal().getName();
-                java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
-                DOMX509IssuerSerial domIssuerSerial =
-                    new DOMX509IssuerSerial(
-                        getDocument(), issuer, serialNumber
-                    );
-                DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
-                secToken.setUnknownElement(domX509Data.getElement());
+                addIssuerSerial(remoteCert, secToken, false);
+                break;
 
-                if (includeEncryptionToken) {
-                    addBST(remoteCert);
-                }
+            case WSConstants.ISSUER_SERIAL_QUOTE_FORMAT:
+                addIssuerSerial(remoteCert, secToken,true);
                 break;
 
             case WSConstants.BST_DIRECT_REFERENCE:
@@ -369,6 +362,20 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(keyInfoElement);
         }
 
+    }
+
+    private void addIssuerSerial(X509Certificate remoteCert, SecurityTokenReference secToken, boolean isCommaDelimited)
+            throws WSSecurityException {
+        String issuer = remoteCert.getIssuerX500Principal().getName();
+        java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
+        DOMX509IssuerSerial domIssuerSerial =
+                new DOMX509IssuerSerial(getDocument(), issuer, serialNumber, isCommaDelimited);
+        DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
+        secToken.setUnknownElement(domX509Data.getElement());
+
+        if (includeEncryptionToken) {
+            addBST(remoteCert);
+        }
     }
 
     /**

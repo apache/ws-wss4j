@@ -568,6 +568,7 @@ public abstract class WSHandler {
             }
             int tmp = id;
             if (!(tmp == WSConstants.ISSUER_SERIAL
+                    || tmp == WSConstants.ISSUER_SERIAL_QUOTE_FORMAT
                     || tmp == WSConstants.BST_DIRECT_REFERENCE
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
@@ -697,6 +698,7 @@ public abstract class WSHandler {
             int tmp = id;
             actionToken.setKeyIdentifierId(tmp);
             if (!(tmp == WSConstants.ISSUER_SERIAL
+                    || tmp == WSConstants.ISSUER_SERIAL_QUOTE_FORMAT
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
                     || tmp == WSConstants.BST_DIRECT_REFERENCE

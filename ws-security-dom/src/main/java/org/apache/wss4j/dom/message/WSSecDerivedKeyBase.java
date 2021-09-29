@@ -341,6 +341,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     private X509Certificate[] getSigningCerts() throws WSSecurityException {
         X509Certificate[] certs = null;
         if (keyIdentifierType == WSConstants.ISSUER_SERIAL
+            || keyIdentifierType == WSConstants.ISSUER_SERIAL_QUOTE_FORMAT
             || keyIdentifierType == WSConstants.X509_KEY_IDENTIFIER
             || keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER
             || keyIdentifierType == WSConstants.THUMBPRINT_IDENTIFIER) {
