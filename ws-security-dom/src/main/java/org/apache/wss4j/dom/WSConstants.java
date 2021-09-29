@@ -191,9 +191,9 @@ public final class WSConstants extends WSS4JConstants {
 
     /**
      * Sets the {@link
-     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
-     * } or the {@link
-     * org.apache.wss4j.dom.message.WSSecEncrypt#build(Document, Crypto, WSSecHeader)
+     *org.apache.wss4j.dom.message.WSSecSignature#build(Crypto)
+     *} or the {@link
+     *org.apache.wss4j.dom.message.WSSecEncrypt#build(Crypto, SecretKey)
      * } method to send the issuer name and the serial number of a certificate to
      * the receiver.
      * <p/>
@@ -201,7 +201,9 @@ public final class WSConstants extends WSS4JConstants {
      * and the serial number of the signing certificate are sent to the
      * receiver. This reduces the amount of data being sent. The encryption
      * method uses the public key associated with this certificate to encrypt
-     * the symmetric key used to encrypt data.
+     * the symmetric key used to encrypt data. 
+     * The name format will delimit unicode characters with a '\' which is not compatible with Microsoft's WCF stack.
+     * To send issuer name with format that is compatible with WCF and Java use {@link #ISSUER_SERIAL_QUOTE_FORMAT}
      * <p/>
      * Please refer to WS Security specification X509 1.1 profile, chapter 3.3.3
      */
@@ -217,7 +219,7 @@ public final class WSConstants extends WSS4JConstants {
      * The encryption method uses the public key associated with this certificate
      * to encrypt the symmetric key used to encrypt data. The certificate is
      * converted into a <code>KeyIdentifier</code> token and sent to the receiver.
-     * Thus the complete certificate data is transfered to receiver.
+     * Thus the complete certificate data is transferred to receiver.
      * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead
      * of sending the whole certificate.
      * <p/>
@@ -319,9 +321,29 @@ public final class WSConstants extends WSS4JConstants {
      */
     public static final int ENDPOINT_KEY_IDENTIFIER = 14;
 
+
+    /**
+     *Sets the {@link org.apache.wss4j.dom.message.WSSecSignature#build(Crypto)}
+     * or the {@link org.apache.wss4j.dom.message.WSSecEncrypt#build(Crypto, SecretKey)}
+     * method to send the issuer name and the serial number of a certificate to the receiver.
+     *<p/>
+     * In contrast to {@link #BST_DIRECT_REFERENCE} only the issuer name
+     * and the serial number of the signing certificate are sent to the
+     * receiver. This reduces the amount of data being sent. The encryption
+     * method uses the public key associated with this certificate to encrypt
+     * the symmetric key used to encrypt data.
+     * The issuer name format will use a quote delimited Rfc 2253 format if necessary which is recognized by the Microsoft's WCF stack.
+     * It also places a space before each subsequent RDN also required for WCF interoperability.
+     * In addition, this format is know to be correctly interpreted by Java.
+     *<p/>
+     *Please refer to WS Security specification X509 1.1 profile, chapter 3.3.3
+     * <p/>
+     */
+    public static final int ISSUER_SERIAL_QUOTE_FORMAT = 15;
+
     /*
-     * The following values are bits that can be combined to for a set.
-     * Be careful when selecting new values.
+     * The following values are bits that can be combined to form a set.
+     * Be careful when adding new constants.
      */
     public static final int NO_SECURITY = 0;
     public static final int UT = 0x1; // perform UsernameToken

@@ -27,9 +27,9 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.crypto.MerlinAKI;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.common.SOAPUtil;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;

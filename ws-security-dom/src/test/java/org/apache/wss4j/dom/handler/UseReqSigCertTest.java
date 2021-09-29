@@ -24,11 +24,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;

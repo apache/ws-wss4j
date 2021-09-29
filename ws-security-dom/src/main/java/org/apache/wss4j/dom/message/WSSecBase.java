@@ -108,6 +108,7 @@ public class WSSecBase {
      *
      * @param keyIdType
      * @see WSConstants#ISSUER_SERIAL
+     * @see WSConstants#ISSUER_SERIAL_QUOTE_FORMAT
      * @see WSConstants#BST_DIRECT_REFERENCE
      * @see WSConstants#X509_KEY_IDENTIFIER
      * @see WSConstants#THUMBPRINT_IDENTIFIER
@@ -123,6 +124,7 @@ public class WSSecBase {
      *
      * @return The <code>keyIdentifyerType</code>.
      * @see WSConstants#ISSUER_SERIAL
+     * @see WSConstants#ISSUER_SERIAL_QUOTE_FORMAT
      * @see WSConstants#BST_DIRECT_REFERENCE
      * @see WSConstants#X509_KEY_IDENTIFIER
      * @see WSConstants#SKI_KEY_IDENTIFIER

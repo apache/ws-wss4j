@@ -217,20 +217,15 @@ public class WSSecSignature extends WSSecSignatureBase {
                 secRef.setReference(ref);
                 break;
 
-            case WSConstants.ISSUER_SERIAL:
-                String issuer = certs[0].getIssuerX500Principal().getName();
-                java.math.BigInteger serialNumber = certs[0].getSerialNumber();
-                DOMX509IssuerSerial domIssuerSerial =
-                    new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
-                DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
-                secRef.setUnknownElement(domX509Data.getElement());
+                case WSConstants.ISSUER_SERIAL:
+                    addIssuerSerial(certs,false);
+                    break;
 
-                if (includeSignatureToken) {
-                    addBST(certs);
-                }
-                break;
+                case WSConstants.ISSUER_SERIAL_QUOTE_FORMAT:
+                    addIssuerSerial(certs,true);
+                    break;
 
-            case WSConstants.X509_KEY_IDENTIFIER:
+                case WSConstants.X509_KEY_IDENTIFIER:
                 secRef.setKeyIdentifier(certs[0]);
                 break;
 
@@ -341,6 +336,20 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             marshalKeyInfo(wsDocInfo);
+        }
+    }
+
+    private void addIssuerSerial(X509Certificate[] certs,boolean isCommaDelimited) throws WSSecurityException {
+        String issuer = certs[0].getIssuerX500Principal().getName();
+        java.math.BigInteger serialNumber = certs[0].getSerialNumber();
+
+        DOMX509IssuerSerial domIssuerSerial
+                = new DOMX509IssuerSerial(getDocument(), issuer, serialNumber, isCommaDelimited);
+        DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
+        secRef.setUnknownElement(domX509Data.getElement());
+
+        if (includeSignatureToken) {
+            addBST(certs);
         }
     }
 
