@@ -25,7 +25,7 @@ public class AttachmentCompleteSignatureTransformProvider extends Provider {
     private static final long serialVersionUID = -9148982936620100249L;
 
     public AttachmentCompleteSignatureTransformProvider() {
-        super("AttachmentCompleteSignatureTransform", "2.3", "Attachment Complete Signature Transform Provider");
+        super("AttachmentCompleteSignatureTransform", "2.5", "Attachment Complete Signature Transform Provider");
         put(
                 "TransformService." + AttachmentCompleteSignatureTransform.TRANSFORM_URI,
                 "org.apache.wss4j.dom.transform.AttachmentCompleteSignatureTransform"

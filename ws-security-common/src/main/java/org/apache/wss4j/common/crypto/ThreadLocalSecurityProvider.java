@@ -51,7 +51,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
     }
 
     private ThreadLocalSecurityProvider() {
-        super(NAME, "1.00", "ThreadLocal Security Provider");
+        super(NAME, "2.5", "ThreadLocal Security Provider");
     }
 
     public static void setProvider(Provider p) {
