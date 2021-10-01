@@ -193,7 +193,7 @@ public final class SAML1ComponentBuilder {
             confirmationMethodStr = SAML1Constants.CONF_SENDER_VOUCHES;
         }
 
-        confirmationMethod.setConfirmationMethod(confirmationMethodStr);
+        confirmationMethod.setURI(confirmationMethodStr);
         subjectConfirmation.getConfirmationMethods().add(confirmationMethod);
         if (subjectBean.getKeyInfo() != null) {
             KeyInfo keyInfo = createKeyInfo(subjectBean.getKeyInfo());
@@ -328,7 +328,7 @@ public final class SAML1ComponentBuilder {
             for (String ref : adviceBean.getIdReferences()) {
                 AssertionIDReference assertionIdReference =
                     assertionIDReferenceBuilder.buildObject();
-                assertionIdReference.setReference(ref);
+                assertionIdReference.setValue(ref);
                 advice.getAssertionIDReferences().add(assertionIdReference);
             }
         }
@@ -369,7 +369,7 @@ public final class SAML1ComponentBuilder {
 
         for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
             Audience audience = audienceV1Builder.buildObject();
-            audience.setUri(audienceURI);
+            audience.setURI(audienceURI);
             audienceRestriction.getAudiences().add(audience);
         }
         return audienceRestriction;
@@ -598,7 +598,7 @@ public final class SAML1ComponentBuilder {
 
         Action actionElement = actionElementV1Builder.buildObject();
         actionElement.setNamespace(actionBean.getActionNamespace());
-        actionElement.setContents(actionBean.getContents());
+        actionElement.setValue(actionBean.getContents());
 
         return actionElement;
     }

@@ -294,7 +294,7 @@ public final class SAML2ComponentBuilder {
 
             for (String ref : adviceBean.getIdReferences()) {
                 AssertionIDRef assertionIdRef = assertionIDRefBuilder.buildObject();
-                assertionIdRef.setAssertionID(ref);
+                assertionIdRef.setValue(ref);
                 advice.getAssertionIDReferences().add(assertionIdRef);
             }
         }
@@ -307,7 +307,7 @@ public final class SAML2ComponentBuilder {
 
             for (String ref : adviceBean.getUriReferences()) {
                 AssertionURIRef assertionURIRef = assertionURIRefBuilder.buildObject();
-                assertionURIRef.setAssertionURI(ref);
+                assertionURIRef.setURI(ref);
                 advice.getAssertionURIReferences().add(assertionURIRef);
             }
         }
@@ -348,7 +348,7 @@ public final class SAML2ComponentBuilder {
 
         for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
             Audience audience = audienceBuilder.buildObject();
-            audience.setAudienceURI(audienceURI);
+            audience.setURI(audienceURI);
             audienceRestriction.getAudiences().add(audience);
         }
         return audienceRestriction;
@@ -432,7 +432,7 @@ public final class SAML2ComponentBuilder {
             }
             for (String audienceURI : proxyRestrictionBean.getAudienceURIs()) {
                 Audience audience = audienceBuilder.buildObject();
-                audience.setAudienceURI(audienceURI);
+                audience.setURI(audienceURI);
                 proxyRestriction.getAudiences().add(audience);
             }
         }
@@ -488,7 +488,7 @@ public final class SAML2ComponentBuilder {
                 }
 
                 AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.buildObject();
-                authnContextClassRef.setAuthnContextClassRef(
+                authnContextClassRef.setURI(
                     transformAuthenticationMethod(statementBean.getAuthenticationMethod())
                 );
                 AuthnContext authnContext = authnContextBuilder.buildObject();
@@ -864,7 +864,7 @@ public final class SAML2ComponentBuilder {
         if (actionBean.getActionNamespace() == null) {
             actionElement.setNamespace("urn:oasis:names:tc:SAML:1.0:action:rwedc-negation");
         }
-        actionElement.setAction(actionBean.getContents());
+        actionElement.setValue(actionBean.getContents());
 
         return actionElement;
     }

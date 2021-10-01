@@ -393,12 +393,12 @@ public class SamlAssertionWrapper {
                         XMLObject data = confirmation.getSubjectConfirmationData();
                         if (data instanceof ConfirmationMethod) {
                             ConfirmationMethod method = (ConfirmationMethod) data;
-                            methods.add(method.getConfirmationMethod());
+                            methods.add(method.getURI());
                         }
                         List<ConfirmationMethod> confirmationMethods =
                             confirmation.getConfirmationMethods();
                         for (ConfirmationMethod confirmationMethod : confirmationMethods) {
-                            methods.add(confirmationMethod.getConfirmationMethod());
+                            methods.add(confirmationMethod.getURI());
                         }
                     }
                 }
@@ -876,7 +876,7 @@ public class SamlAssertionWrapper {
                         List<org.opensaml.saml.saml2.core.Audience> audiences =
                             audienceRestriction.getAudiences();
                         for (org.opensaml.saml.saml2.core.Audience audience : audiences) {
-                            String audienceURI = audience.getAudienceURI();
+                            String audienceURI = audience.getURI();
                             if (audienceRestrictions.contains(audienceURI)) {
                                 foundAddress = true;
                                 break;
@@ -900,7 +900,7 @@ public class SamlAssertionWrapper {
                         List<org.opensaml.saml.saml1.core.Audience> audiences =
                             audienceRestriction.getAudiences();
                         for (org.opensaml.saml.saml1.core.Audience audience : audiences) {
-                            String audienceURI = audience.getUri();
+                            String audienceURI = audience.getURI();
                             if (audienceRestrictions.contains(audienceURI)) {
                                 foundAddress = true;
                                 break;
