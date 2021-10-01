@@ -248,7 +248,7 @@ public final class WSProviderConfig {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(
                         "The provider " + provider.getName() + " - "
-                         + provider.getVersion() + " was added at position: " + ret
+                         + provider.getVersionStr() + " was added at position: " + ret
                     );
                 }
                 return provider.getName();
