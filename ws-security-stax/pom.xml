@@ -32,6 +32,7 @@
     <properties>
         <wss4j.module.name>org.apache.wss4j.stax</wss4j.module.name>
         <wss4j.osgi.import>javax.xml.bind*;version=!</wss4j.osgi.import>
+        <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
     </properties>
 
     <dependencies>
@@ -102,6 +103,12 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
     <build>

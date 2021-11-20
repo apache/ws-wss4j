@@ -21,7 +21,7 @@ package org.apache.wss4j.common.util;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
+import jakarta.xml.soap.MessageFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -73,9 +73,9 @@ public class SOAPUtil {
 
 
     /**
-     * Convert an SOAP Envelope as a String to a javax.xml.soap.SOAPPart.
+     * Convert an SOAP Envelope as a String to a jakarta.xml.soap.SOAPPart.
      */
-    public static javax.xml.soap.SOAPPart toSAAJSOAPPart(String xml) throws Exception {
+    public static jakarta.xml.soap.SOAPPart toSAAJSOAPPart(String xml) throws Exception {
         try (InputStream in = new ByteArrayInputStream(xml.getBytes())) {
             return saajFactory.createMessage(null, in).getSOAPPart();
         }

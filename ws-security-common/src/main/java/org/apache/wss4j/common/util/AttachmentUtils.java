@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.mail.internet.MimeUtility;
+import jakarta.mail.internet.MimeUtility;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;

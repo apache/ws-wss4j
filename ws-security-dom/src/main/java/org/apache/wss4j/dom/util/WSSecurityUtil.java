@@ -668,7 +668,7 @@ public final class WSSecurityUtil {
     }
 
     /**
-     * Register the javax.xml.soap.Node with new Cloned Dom Node with java9
+     * Register the jakarta.xml.soap.Node with new Cloned Dom Node with java9
      * @param doc The SOAPDocumentImpl
      * @param clonedElement The cloned Element
      * @return new clonedElement which already associated with the SAAJ Node
@@ -677,7 +677,7 @@ public final class WSSecurityUtil {
     public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
         clonedElement = (Element)clonedElement.cloneNode(true);
         if (isSAAJ14) {
-            // here we need register the javax.xml.soap.Node with new instance
+            // here we need register the jakarta.xml.soap.Node with new instance
             clonedElement = (Element)doc.importNode(clonedElement, true);
             clonedElement = (Element)getDomElement(clonedElement);
         }

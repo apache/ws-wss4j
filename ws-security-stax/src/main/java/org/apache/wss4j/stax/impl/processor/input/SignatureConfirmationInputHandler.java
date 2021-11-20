@@ -29,7 +29,7 @@ import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import java.util.Deque;
 
 /**

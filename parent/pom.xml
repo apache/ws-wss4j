@@ -47,7 +47,7 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
         <xz.version>1.9</xz.version>
-        <xmlsec.version>2.3.0</xmlsec.version>
+        <xmlsec.version>3.0.0-SNAPSHOT</xmlsec.version>
         <xmlunit.version>2.8.2</xmlunit.version>
         
         <!-- OSGi related properties -->

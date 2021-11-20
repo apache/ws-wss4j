@@ -21,7 +21,7 @@ package org.apache.wss4j.stax.impl.processor.input;
 import java.util.Deque;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
