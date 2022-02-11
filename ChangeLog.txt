@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.4.1
+==============
+
+Bug
+    [WSS-692] - Timestamp of content in jar-files are invalid.
+
+Release 2.4.0
+==============
+
+Bug
+    [WSS-678] - OpenSAML Decrypter initialization failed
+
+Improvement
+    [WSS-679] - Fix regression in signing KeyInfos
+
 Release 2.3.2
 ==============
 
