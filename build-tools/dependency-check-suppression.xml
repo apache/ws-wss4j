@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='https://www.owasp.org/index.php/OWASP_Dependency_Check_Suppression'
+        xsi:schemaLocation='https://www.owasp.org/index.php/OWASP_Dependency_Check_Suppression suppression.xsd'>
+<!--
+    <suppress>
+        <notes><![CDATA[
+        This suppresses a specific cve for any dependency in any directory that has the specified sha1 checksum.
+        ]]></notes>
+        <sha1>384FAA82E193D4E4B0546059CA09572654BC3970</sha1>
+        <cve>CVE-2013-1337</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        This suppresses all CVE entries that have a score below CVSS 5.
+        ]]></notes>
+        <cvssBelow>5</cvssBelow>
+    </suppress>
+-->
+</suppressions>
