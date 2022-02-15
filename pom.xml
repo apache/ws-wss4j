@@ -108,8 +108,8 @@
         <targetJdk>1.8</targetJdk>
         <maven.compiler.target>1.8</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
-        <maven-owasp-plugin-version>6.1.2</maven-owasp-plugin-version>
-        <project.build.outputTimestamp>2022-02-11T12:05:02Z</project.build.outputTimestamp>
+        <maven-owasp-plugin-version>6.5.3</maven-owasp-plugin-version>
+        <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
     </properties>
 
     <modules>
