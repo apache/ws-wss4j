@@ -59,6 +59,17 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>February 2022</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.4.1. It
+fixes an issue with the timestamp in the WSS4J jars being invalid.
+</p>
+</li>
+<li>
+<p><b>November 2021</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.4.0. This release contains relatively few changes, but picks up a new major version of Apache Santuario - XML Security for Java (2.3.0)
+</p>
+</li>
+<li>
 <p><b>September 2021</b> - 
 The Apache WSS4J team are pleased to announce the release of versions 2.3.3
 and 2.2.7. The main changes for these releases are updates to fix CVE issues
