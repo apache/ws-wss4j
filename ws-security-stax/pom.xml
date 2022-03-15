@@ -110,6 +110,11 @@
             <version>${jaxb-runtime.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
