@@ -41,6 +41,7 @@
                         </DynamicImport-Package>
        -->
        <wss4j.module.name>org.apache.wss4j.common</wss4j.module.name>
+        <jakarta.mail.version>2.0.0</jakarta.mail.version>
     </properties>
     
     <build>
@@ -91,6 +92,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakarta.mail.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
