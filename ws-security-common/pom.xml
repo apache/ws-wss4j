@@ -23,7 +23,7 @@
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j-parent</artifactId>
         <relativePath>../parent/pom.xml</relativePath>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>wss4j-ws-security-common</artifactId>
     <name>Apache WSS4J WS-Security Common</name>
