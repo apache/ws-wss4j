@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMLTooling xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ds11="http://www.w3.org/2009/xmldsig11#" xmlns="http://www.opensaml.org/xmltooling-config">
+    
+    <ObjectProviders>
+
+        <!-- X509Certificate -->
+        <ObjectProvider qualifiedName="ds:X509Certificate">
+            <BuilderClass className="org.opensaml.xmlsec.signature.impl.X509CertificateBuilder"/>
+            <MarshallingClass className="org.opensaml.core.xml.schema.impl.XSBase64BinaryMarshaller"/>
+            <UnmarshallingClass className="org.apache.wss4j.common.saml.WSS4JXSBase64BinaryUnmarshaller"/>
+        </ObjectProvider>
+
+    </ObjectProviders>
+    
+</XMLTooling>
