@@ -23,7 +23,7 @@ import java.util.Deque;
 import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType;

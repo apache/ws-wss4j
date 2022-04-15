@@ -56,6 +56,7 @@ public final class OpenSAMLBootstrap {
         "/saml2-channel-binding-config.xml",
         "/saml-ec-gss-config.xml",
         "/signature-config.xml",
+        "/wss4j-signature-config.xml",  // Override the default Base64 Binary Unmarshaller for X.509 Certificates
         "/encryption-config.xml",
         "/xacml20-context-config.xml",
         "/xacml20-policy-config.xml",

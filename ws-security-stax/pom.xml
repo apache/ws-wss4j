@@ -24,7 +24,7 @@
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j-parent</artifactId>
         <relativePath>../parent/pom.xml</relativePath>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>wss4j-ws-security-stax</artifactId>
     <name>Apache WSS4J Streaming WS-Security</name>
@@ -32,6 +32,7 @@
     <properties>
         <wss4j.module.name>org.apache.wss4j.stax</wss4j.module.name>
         <wss4j.osgi.import>javax.xml.bind*;version=!</wss4j.osgi.import>
+        <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
     </properties>
 
     <dependencies>
@@ -101,6 +102,17 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

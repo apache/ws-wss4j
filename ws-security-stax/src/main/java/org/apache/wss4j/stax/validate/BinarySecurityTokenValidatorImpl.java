@@ -20,7 +20,7 @@ package org.apache.wss4j.stax.validate;
 
 import java.util.Base64;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;

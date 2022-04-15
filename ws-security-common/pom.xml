@@ -23,7 +23,7 @@
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j-parent</artifactId>
         <relativePath>../parent/pom.xml</relativePath>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>wss4j-ws-security-common</artifactId>
     <name>Apache WSS4J WS-Security Common</name>
@@ -41,6 +41,7 @@
                         </DynamicImport-Package>
        -->
        <wss4j.module.name>org.apache.wss4j.common</wss4j.module.name>
+        <jakarta.mail.version>2.0.0</jakarta.mail.version>
     </properties>
     
     <build>
@@ -91,6 +92,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakarta.mail.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -223,11 +230,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.javamail</groupId>
-            <artifactId>geronimo-javamail_1.4_mail</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
@@ -240,6 +242,11 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

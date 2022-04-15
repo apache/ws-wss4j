@@ -30,16 +30,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAnyAttribute;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlID;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.w3c.dom.Element;
@@ -50,15 +50,15 @@ import org.w3c.dom.Element;
  * 		Actual content model is non-deterministic, hence wildcard. The following shows intended content model:
  *
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="http://java.sun.com/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" minOccurs="1" ref="wsc:Identifier"/&gt;
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="https://jakarta.ee/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" minOccurs="1" ref="wsc:Identifier"/&gt;
  * </pre>
  *
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="http://java.sun.com/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" minOccurs="0" ref="wsc:Instance"/&gt;
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="https://jakarta.ee/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" minOccurs="0" ref="wsc:Instance"/&gt;
  * </pre>
  *
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:any xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="http://java.sun.com/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/&gt;
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xs:any xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p416641_="https://jakarta.ee/xml/ns/jaxb" xmlns:p454050_="http://jaxb2-commons.dev.java.net/basic/inheritance" xmlns:wsc="http://schemas.xmlsoap.org/ws/2005/02/sc" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/&gt;
  * </pre>
  *
  *
