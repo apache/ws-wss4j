@@ -481,4 +481,23 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>A_maven.central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>B_shibboleth</id>
+            <name>OpenSAML</name>
+            <url>https://build.shibboleth.net/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
 </project>
