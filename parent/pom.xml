@@ -35,7 +35,7 @@
         <bcprov.version>1.70</bcprov.version>
         <commons.compress.version>1.21</commons.compress.version>
         <cryptacular.version>1.2.4</cryptacular.version>
-        <ehcache.version>3.9.6</ehcache.version>
+        <ehcache.version>3.10.0</ehcache.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jasypt.version>1.9.3</jasypt.version>
         <junit.version>5.8.1</junit.version>
@@ -123,6 +123,16 @@
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>${ehcache.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jasypt</groupId>
