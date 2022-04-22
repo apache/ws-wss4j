@@ -123,6 +123,7 @@
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>${ehcache.version}</version>
+                <classifier>jakarta</classifier>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml.bind</groupId>
