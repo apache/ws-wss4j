@@ -97,6 +97,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+            <classifier>jakarta</classifier>
             <scope>runtime</scope>
         </dependency>
         <dependency>
