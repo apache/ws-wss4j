@@ -211,6 +211,7 @@
             <artifactId>ehcache</artifactId>
             <scope>compile</scope>
             <optional>true</optional>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
