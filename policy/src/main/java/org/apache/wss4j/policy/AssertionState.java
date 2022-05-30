@@ -31,7 +31,7 @@ public class AssertionState {
     private boolean asserted;
     private boolean logged;
     private Assertion assertion;
-    private StringBuilder errorMessage = new StringBuilder();
+    private StringBuilder errorMessage = new StringBuilder();   //NOPMD
 
     public AssertionState(Assertion assertion, boolean initialAssertionState) {
         this.assertion = assertion;

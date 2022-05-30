@@ -221,7 +221,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private String symmetricSignature = SPConstants.HMAC_SHA1;
         private String asymmetricSignature = SPConstants.RSA_SHA1;
 
-        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap,
+        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, //NOPMD
                                   String asymmetricKeyWrap, String encryptionKeyDerivation,
                                   String signatureKeyDerivation, int encryptionDerivedKeyLength,
                                   int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
@@ -233,7 +233,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                  minimumAsymmetricKeyLength, maximumAsymmetricKeyLength);
         }
 
-        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap,
+        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, //NOPMD
                                   String asymmetricKeyWrap, String encryptionKeyDerivation,
                                   String signatureKeyDerivation, String symmetricSignature,
                                   String asymmetricSignature, int encryptionDerivedKeyLength,
@@ -336,16 +336,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 return false;
             }
 
-            if (encryptionDerivedKeyLength != that.encryptionDerivedKeyLength
+            return !(encryptionDerivedKeyLength != that.encryptionDerivedKeyLength
                 || signatureDerivedKeyLength != that.signatureDerivedKeyLength
                 || minimumSymmetricKeyLength != that.minimumSymmetricKeyLength
                 || maximumSymmetricKeyLength != that.maximumSymmetricKeyLength
                 || minimumAsymmetricKeyLength != that.minimumAsymmetricKeyLength
-                || maximumAsymmetricKeyLength != that.maximumAsymmetricKeyLength) {
-                return false;
-            }
-
-            return true;
+                || maximumAsymmetricKeyLength != that.maximumAsymmetricKeyLength);
         }
 
         @Override

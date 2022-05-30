@@ -19,9 +19,6 @@
 
 package org.apache.wss4j.common.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * The abstraction this class provides is a push down stack of variable
  * length frames of prefix to namespace mappings.  Used for keeping track
@@ -103,20 +100,6 @@ public class NSStack {
         if (traceEnabled) {
             LOG.trace("NSPop (" + stack.length + ")");
         }
-    }
-
-    /**
-     * Return a copy of the current frame.  Returns null if none are present.
-     */
-    public List<Mapping> cloneFrame() {
-        if (stack[top] == null) {
-            return null;
-        }
-        List<Mapping> clone = new ArrayList<>();
-        for (Mapping map = topOfFrame(); map != null; map = next()) {
-            clone.add(map);
-        }
-        return clone;
     }
 
     /**
