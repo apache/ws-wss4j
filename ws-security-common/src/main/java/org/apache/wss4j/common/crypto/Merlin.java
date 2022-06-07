@@ -556,10 +556,10 @@ public class Merlin extends CryptoBase {
      */
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (cryptoType == null) {
-            return null;
+            return new X509Certificate[0];
         }
         CryptoType.TYPE type = cryptoType.getType();
-        X509Certificate[] certs = null;
+        X509Certificate[] certs = new X509Certificate[0];
         switch (type) {
         case ISSUER_SERIAL:
             certs = getX509Certificates(cryptoType.getIssuer(), cryptoType.getSerial());
@@ -772,7 +772,7 @@ public class Merlin extends CryptoBase {
             // If a certificate has been found, the certificates must be compared
             // to ensure against phony DNs (compare encoded form including signature)
             //
-            if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
+            if (foundCerts != null && foundCerts.length > 0 && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
                 try {
                     certs[0].checkValidity();
                 } catch (CertificateExpiredException | CertificateNotYetValidException e) {
@@ -984,7 +984,7 @@ public class Merlin extends CryptoBase {
         }
 
         if (certs == null || certs.length == 0) {
-            return null;
+            return new X509Certificate[0];
         }
 
         return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
@@ -1072,7 +1072,7 @@ public class Merlin extends CryptoBase {
         }
 
         if (certs == null || certs.length == 0) {
-            return null;
+            return new X509Certificate[0];
         }
 
         return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
@@ -1153,7 +1153,7 @@ public class Merlin extends CryptoBase {
         }
 
         if (certs == null || certs.length == 0) {
-            return null;
+            return new X509Certificate[0];
         }
 
         return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
@@ -1228,7 +1228,7 @@ public class Merlin extends CryptoBase {
         }
 
         if (certs == null || certs.isEmpty()) {
-            return null;
+            return new X509Certificate[0];
         }
 
         // We just choose the first entry
@@ -1261,7 +1261,7 @@ public class Merlin extends CryptoBase {
      */
     private X509Certificate[] getX509Certificates(String identifier) throws WSSecurityException {
         if (identifier == null) {
-            return null;
+            return new X509Certificate[0];
         }
         Certificate[] certs = null;
         try {
@@ -1289,7 +1289,7 @@ public class Merlin extends CryptoBase {
             }
 
             if (certs == null) {
-                return null;
+                return new X509Certificate[0];
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "keystore");

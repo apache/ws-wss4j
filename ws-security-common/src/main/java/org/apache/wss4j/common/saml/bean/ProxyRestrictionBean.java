@@ -89,11 +89,7 @@ public class ProxyRestrictionBean {
             return false;
         }
 
-        if (!audienceURIs.equals(that.audienceURIs)) {
-            return false;
-        }
-
-        return true;
+        return audienceURIs.equals(that.audienceURIs);
     }
 
     /**

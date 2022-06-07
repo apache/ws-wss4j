@@ -62,10 +62,7 @@ public final class DOMX509Data {
      * Return true if this X509Data element contains a X509IssuerSerial element
      */
     public boolean containsIssuerSerial() {
-        if (x509IssuerSerial == null) {
-            return false;
-        }
-        return true;
+        return x509IssuerSerial != null;
     }
 
     /**

@@ -187,7 +187,7 @@ public class SignatureSTRParser implements STRParser {
             parserResult.setSecretKey(secretKey);
         } else {
             X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
-            if (foundCerts == null) {
+            if (foundCerts == null || foundCerts.length == 0) {
                 // The reference may be to a BST in the security header rather than in the keystore
                 if (SecurityTokenReference.SKI_URI.equals(valueType)) {
                     byte[] skiBytes = secRef.getSKIBytes();
@@ -196,7 +196,7 @@ public class SignatureSTRParser implements STRParser {
                     for (WSSecurityEngineResult bstResult : resultsList) {
                         X509Certificate[] certs =
                             (X509Certificate[])bstResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-                        if (certs != null
+                        if (certs != null && certs.length > 0
                             && Arrays.equals(skiBytes, crypto.getSKIBytesFromCert(certs[0]))) {
                             parserResult.setPrincipal((Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL));
                             foundCerts = certs;
@@ -210,7 +210,7 @@ public class SignatureSTRParser implements STRParser {
                     for (WSSecurityEngineResult bstResult : resultsList) {
                         X509Certificate[] certs =
                             (X509Certificate[])bstResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-                        if (certs != null) {
+                        if (certs != null && certs.length > 0) {
                             try {
                                 byte[] digest = KeyUtils.generateDigest(certs[0].getEncoded());
                                 if (Arrays.equals(org.apache.xml.security.utils.XMLUtils.decode(kiValue), digest)) {
@@ -227,7 +227,7 @@ public class SignatureSTRParser implements STRParser {
                     }
                 }
             }
-            if (foundCerts != null) {
+            if (foundCerts != null && foundCerts.length > 0) {
                 parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
             }
         }
@@ -309,7 +309,7 @@ public class SignatureSTRParser implements STRParser {
                 );
             }
             X509Certificate[] foundCerts = keyInfo.getCerts();
-            if (foundCerts != null) {
+            if (foundCerts != null && foundCerts.length > 0) {
                 parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
             }
             parserResult.setSecretKey(keyInfo.getSecret());

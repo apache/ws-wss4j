@@ -563,11 +563,11 @@ public final class AttachmentUtils {
             Cipher cipher, boolean complete, Attachment attachment,
             Map<String, String> headers) throws WSSecurityException {
 
-        final InputStream attachmentInputStream;
+        final InputStream attachmentInputStream;    //NOPMD
 
         if (complete) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.US_ASCII);
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.US_ASCII)) {
 
                 Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
                 while (iterator.hasNext()) {
@@ -606,7 +606,7 @@ public final class AttachmentUtils {
         }
 
         final ByteArrayInputStream ivInputStream = new ByteArrayInputStream(cipher.getIV());
-        final CipherInputStream cipherInputStream = new CipherInputStream(attachmentInputStream, cipher);
+        final CipherInputStream cipherInputStream = new CipherInputStream(attachmentInputStream, cipher);   //NOPMD
 
         return new MultiInputStream(ivInputStream, cipherInputStream);
     }
@@ -636,9 +636,9 @@ public final class AttachmentUtils {
                 );
             }
             Attachment attachment = attachments.get(0);
-            InputStream inputStream = attachment.getSourceStream();
-
-            return JavaUtils.getBytesFromStream(inputStream);
+            try (InputStream inputStream = attachment.getSourceStream()) {
+                return JavaUtils.getBytesFromStream(inputStream);
+            }
         } catch (UnsupportedCallbackException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }

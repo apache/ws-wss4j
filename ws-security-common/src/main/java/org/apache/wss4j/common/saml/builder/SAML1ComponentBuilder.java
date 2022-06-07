@@ -232,6 +232,7 @@ public final class SAML1ComponentBuilder {
                         break;
                     case X509_ISSUER_SERIAL:
                         kiFactory.setEmitX509IssuerSerial(true);
+                        break;
                 }
                 return kiFactory.newInstance().generate(keyInfoCredential);
 

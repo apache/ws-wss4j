@@ -413,12 +413,9 @@ public class SamlAssertionWrapper {
      * @return the signed (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isSigned() {
-        if (samlObject instanceof SignableSAMLObject
+        return samlObject instanceof SignableSAMLObject
             && (((SignableSAMLObject)samlObject).isSigned()
-                || ((SignableSAMLObject)samlObject).getSignature() != null)) {
-            return true;
-        }
-        return false;
+                || ((SignableSAMLObject)samlObject).getSignature() != null);
     }
 
     /**
@@ -754,7 +751,7 @@ public class SamlAssertionWrapper {
         if (sig != null) {
             return getSignatureValue(sig);
         }
-        return null;
+        return new byte[0];
     }
 
     private byte[] getSignatureValue(Signature signature) throws WSSecurityException {
@@ -772,7 +769,7 @@ public class SamlAssertionWrapper {
             }
         }
 
-        return null;
+        return new byte[0];
     }
 
     public Signature getSignature() throws WSSecurityException {

@@ -174,7 +174,7 @@ public final class WSProviderConfig {
                 AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
                     public Boolean run() throws Exception {
                         Field f = XMLUtils.class.getDeclaredField("ignoreLineBreaks");
-                        f.setAccessible(true);
+                        f.setAccessible(true);  //NOPMD
                         f.set(null, Boolean.TRUE);
                         return false;
                     }

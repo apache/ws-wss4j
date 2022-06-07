@@ -487,7 +487,6 @@ public class KerberosTest {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        try {
         Document encryptedDoc = builder.build(null, secretKey);
 
         if (LOG.isDebugEnabled()) {
@@ -516,9 +515,6 @@ public class KerberosTest {
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof KerberosPrincipal);
         assertTrue(principal.getName().contains("alice"));
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
     }
 
     /**

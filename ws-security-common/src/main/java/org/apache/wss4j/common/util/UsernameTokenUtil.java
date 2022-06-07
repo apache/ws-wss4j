@@ -120,7 +120,7 @@ public final class UsernameTokenUtil {
             saltValue = generateNonce(16);
         } catch (WSSecurityException ex) {
             LOG.debug(ex.getMessage(), ex);
-            return null;
+            return new byte[0];
         }
         if (useForMac) {
             saltValue[0] = 0x01;

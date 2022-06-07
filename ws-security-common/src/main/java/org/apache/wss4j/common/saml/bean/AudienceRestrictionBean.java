@@ -83,11 +83,7 @@ public class AudienceRestrictionBean {
 
         AudienceRestrictionBean that = (AudienceRestrictionBean) o;
 
-        if (!audienceURIs.equals(that.audienceURIs)) {
-            return false;
-        }
-
-        return true;
+        return audienceURIs.equals(that.audienceURIs);
     }
 
     /**

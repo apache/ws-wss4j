@@ -393,7 +393,7 @@ public abstract class CryptoBase implements Crypto {
     protected byte[] getNameConstraints(final X509Certificate cert) throws WSSecurityException {
         byte[] bytes = cert.getExtensionValue(NAME_CONSTRAINTS_OID);
         if (bytes == null || bytes.length <= 0) {
-            return null;
+            return new byte[0];
         }
 
         switch (bytes[0]) {

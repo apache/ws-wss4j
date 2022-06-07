@@ -39,7 +39,7 @@ public final class BouncyCastleUtils {
                 AuthorityKeyIdentifier.getInstance(octets);
             return authorityKeyIdentifier.getKeyIdentifier();
         }
-        return null;
+        return new byte[0];
     }
 
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
@@ -51,7 +51,7 @@ public final class BouncyCastleUtils {
                 SubjectKeyIdentifier.getInstance(subjectOctets);
             return subjectKeyIdentifier.getKeyIdentifier();
         }
-        return null;
+        return new byte[0];
     }
 
 }

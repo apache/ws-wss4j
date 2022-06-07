@@ -132,7 +132,7 @@ public class SamlTokenTest {
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertNotNull(receivedSamlAssertion);
         assertFalse(receivedSamlAssertion.isSigned());
-        assertNull(receivedSamlAssertion.getSignatureValue());
+        assertTrue(receivedSamlAssertion.getSignatureValue().length == 0);
     }
 
     /**
@@ -154,7 +154,7 @@ public class SamlTokenTest {
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertNotNull(receivedSamlAssertion);
         assertFalse(receivedSamlAssertion.isSigned());
-        assertNull(receivedSamlAssertion.getSignatureValue());
+        assertTrue(receivedSamlAssertion.getSignatureValue().length == 0);
     }
 
     /**

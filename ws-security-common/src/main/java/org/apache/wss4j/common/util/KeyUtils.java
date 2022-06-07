@@ -209,7 +209,7 @@ public final class KeyUtils {
                         new Object[]{"No such algorithm: \"" + RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING + "\""});
                 }
             } else {
-                if (e instanceof NoSuchAlgorithmException) {
+                if (e instanceof NoSuchAlgorithmException) {    //NOPMD
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
                         new Object[]{"No such algorithm: \"" + keyAlgorithm + "\""});

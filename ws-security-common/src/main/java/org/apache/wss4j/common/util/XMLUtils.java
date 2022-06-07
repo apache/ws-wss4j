@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -402,7 +403,7 @@ public final class XMLUtils {
         // lookup
         //
         if (startNode == null) {
-            return null;
+            return Collections.emptyList();
         }
         Node startParent = startNode.getParentNode();
         Node processedNode = null;

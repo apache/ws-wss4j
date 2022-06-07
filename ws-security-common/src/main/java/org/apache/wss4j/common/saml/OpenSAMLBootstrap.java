@@ -90,7 +90,7 @@ public final class OpenSAMLBootstrap {
             for (String config : XML_CONFIGS) {
                 if (includeXacml || !config.contains("xacml")) {
                     //most are found in the Configuration.class classloader
-                    InputStream ins = Configuration.class.getResourceAsStream(config);
+                    InputStream ins = Configuration.class.getResourceAsStream(config);  //NOPMD
                     if (ins == null) {
                         //some are from us
                         ins = OpenSAMLBootstrap.class.getResourceAsStream(config);
