@@ -384,11 +384,7 @@ public abstract class WSHandler {
             }
         }
 
-        if (ai != size) {
-            return false;
-        }
-
-        return true;
+        return ai == size;
     }
 
     protected boolean checkReceiverResultsAnyOrder(
@@ -418,11 +414,7 @@ public abstract class WSHandler {
             }
         }
 
-        if (!recordedActions.isEmpty()) {
-            return false;
-        }
-
-        return true;
+        return recordedActions.isEmpty();
     }
 
     @SuppressWarnings("unchecked")
@@ -1226,6 +1218,7 @@ public abstract class WSHandler {
             break;
         default:
             reason = WSPasswordCallback.UNKNOWN;
+            break;
         }
         return new WSPasswordCallback(username, reason);
     }

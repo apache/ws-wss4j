@@ -148,10 +148,7 @@ public class SignatureConfirmation {
         }
         SignatureConfirmation signatureConfirmation = (SignatureConfirmation)object;
         byte[] sigValue = signatureConfirmation.getSignatureValue();
-        if (!Arrays.equals(sigValue, getSignatureValue())) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(sigValue, getSignatureValue());
     }
 
 }

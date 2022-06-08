@@ -438,7 +438,7 @@ public class UsernameToken {
         if (salt != null) {
             return org.apache.xml.security.utils.XMLUtils.decode(salt);
         }
-        return null;
+        return new byte[0];
     }
 
     /**
@@ -624,10 +624,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public boolean isDerivedKey() throws WSSecurityException {
-        if (elementSalt != null && elementIteration != null) {
-            return true;
-        }
-        return false;
+        return elementSalt != null && elementIteration != null;
     }
 
     /**
@@ -685,7 +682,7 @@ public class UsernameToken {
         }
         try {
             byte[] salt = getSalt();
-            if (salt != null) {
+            if (salt != null && salt.length > 0) {
                 result = 31 * result + Arrays.hashCode(salt);
             }
         } catch (WSSecurityException ex) {
@@ -726,10 +723,7 @@ public class UsernameToken {
             LOG.debug(ex.getMessage(), ex);
         }
         int iteration = usernameToken.getIteration();
-        if (iteration != getIteration()) {
-            return false;
-        }
-        return true;
+        return iteration == getIteration();
     }
 
     private boolean compare(String item1, String item2) {

@@ -113,7 +113,7 @@ public class WSSecUsernameToken extends WSSecBase {
      */
     public byte[] getDerivedKey(byte[] saltValue) throws WSSecurityException {
         if (ut == null || !useDerivedKey) {
-            return null;
+            return new byte[0];
         }
         if (passwordsAreEncoded) {
             return UsernameTokenUtil.generateDerivedKey(org.apache.xml.security.utils.XMLUtils.decode(password),

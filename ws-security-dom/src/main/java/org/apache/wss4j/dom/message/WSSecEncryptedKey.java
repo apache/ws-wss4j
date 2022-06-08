@@ -754,10 +754,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     public boolean isCertSet() {
-        if (useThisCert == null) {
-            return false;
-        }
-        return true;
+        return useThisCert != null;
     }
 
     public void setCustomEKTokenValueType(String customEKTokenValueType) {

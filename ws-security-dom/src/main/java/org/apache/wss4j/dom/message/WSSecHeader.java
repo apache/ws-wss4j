@@ -135,10 +135,7 @@ public class WSSecHeader {
                 );
         }
 
-        if (securityHeader == null || securityHeader.getFirstChild() == null) {
-            return true;
-        }
-        return false;
+        return securityHeader == null || securityHeader.getFirstChild() == null;
     }
 
     /**

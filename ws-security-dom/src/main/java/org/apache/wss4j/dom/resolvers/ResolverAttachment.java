@@ -49,10 +49,7 @@ public class ResolverAttachment extends ResourceResolverSpi {
         if (context.uriToResolve == null) {
             return false;
         }
-        if (context.uriToResolve.startsWith("cid:")) {
-            return true;
-        }
-        return false;
+        return context.uriToResolve.startsWith("cid:");
     }
 
 }

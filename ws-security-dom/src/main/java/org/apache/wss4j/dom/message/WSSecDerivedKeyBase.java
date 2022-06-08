@@ -231,7 +231,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
 
             X509Certificate[] certs = getSigningCerts();
 
-            switch (keyIdentifierType) {
+                switch (keyIdentifierType) {
 
             case WSConstants.X509_KEY_IDENTIFIER:
                 secRef.setKeyIdentifier(certs[0]);
@@ -285,6 +285,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 }
 
                 secRef.setReference(ref);
+                break;
             }
 
             dkt.setSecurityTokenReference(secRef);
