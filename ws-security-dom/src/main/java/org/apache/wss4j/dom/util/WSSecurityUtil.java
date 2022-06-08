@@ -433,7 +433,6 @@ public final class WSSecurityUtil {
                         header = prependChildElement(envelope, header);
 
                     } catch (Exception e) {
-                        e.printStackTrace();
                         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
 
