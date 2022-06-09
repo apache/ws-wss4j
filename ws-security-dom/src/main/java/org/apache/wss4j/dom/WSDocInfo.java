@@ -252,11 +252,7 @@ public class WSDocInfo {
      */
     public WSSecurityEngineResult getResult(String uri) {
         String id = XMLUtils.getIDFromReference(uri);
-        if (id == null) {
-            return null;
-        }
-
-        if (!results.isEmpty()) {
+        if (id != null && !results.isEmpty()) {
             for (WSSecurityEngineResult result : results) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (id.equals(cId)) {
@@ -264,7 +260,7 @@ public class WSDocInfo {
                 }
             }
         }
-        return null;
+        return null;    //NOPMD
     }
 
     /**

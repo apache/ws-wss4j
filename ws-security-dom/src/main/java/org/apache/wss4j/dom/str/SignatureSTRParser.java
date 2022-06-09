@@ -129,7 +129,7 @@ public class SignatureSTRParser implements STRParser {
         String valueType = secRef.getKeyIdentifierValueType();
         byte[] secretKey = STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                                WSPasswordCallback.SECRET_KEY, data);
-        if (secretKey == null) {
+        if (secretKey == null || secretKey.length == 0) {
             SamlAssertionWrapper samlAssertion =
                 STRParserUtil.getAssertionFromKeyIdentifier(
                     secRef, secRef.getElement(), data
@@ -167,7 +167,7 @@ public class SignatureSTRParser implements STRParser {
             byte[] secretKey =
                 STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                     WSPasswordCallback.SECRET_KEY, data);
-            if (secretKey == null) {
+            if (secretKey == null || secretKey.length == 0) {
                 byte[] keyBytes = secRef.getSKIBytes();
                 List<WSSecurityEngineResult> resultsList =
                     data.getWsDocInfo().getResultsByTag(WSConstants.BST);
@@ -343,7 +343,7 @@ public class SignatureSTRParser implements STRParser {
                                                                    data);
             Principal principal = new CustomTokenPrincipal(uri);
 
-            if (secretKey == null) {
+            if (secretKey == null || secretKey.length == 0) {
                 Element token =
                     STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
                                                   uri, reference.getValueType());

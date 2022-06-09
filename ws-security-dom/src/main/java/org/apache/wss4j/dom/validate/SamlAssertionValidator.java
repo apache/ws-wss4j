@@ -252,7 +252,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             && data.getSamlOneTimeUseReplayCache() != null) {
             String identifier = samlAssertion.getId();
 
-            ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();
+            ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();  //NOPMD
             if (replayCache.contains(identifier)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,

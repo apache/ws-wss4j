@@ -23,6 +23,7 @@ import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
@@ -246,7 +247,7 @@ public class SAMLTokenProcessor implements Processor {
         Element token, SamlAssertionWrapper samlAssertion, XMLSignature xmlSignature
     ) {
         if (xmlSignature == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<WSDataRef> protectedRefs = new ArrayList<>();

@@ -283,7 +283,7 @@ public final class STRParserUtil {
                 "noPassword", new Object[] {uri});
         }
 
-        return null;
+        return new byte[0];
     }
 
     public static Element getTokenElement(

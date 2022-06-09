@@ -163,7 +163,7 @@ public class EncryptedKeyProcessor implements Processor {
                 referenceType = parserResult.getCertificatesReferenceType();
             } else {
                 certs = getCertificatesFromX509Data(keyInfoChildElement, data);
-                if (certs == null) {
+                if (certs == null || certs.length == 0) {
                     XMLSignatureFactory signatureFactory;
                     if (provider == null) {
                         // Try to install the Santuario Provider - fall back to the JDK provider if this does
@@ -261,7 +261,7 @@ public class EncryptedKeyProcessor implements Processor {
         RequestData data, X509Certificate[] certs, PublicKey publicKey
     ) throws WSSecurityException {
         try {
-            if (certs != null) {
+            if (certs != null && certs.length > 0) {
                 return data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             }
             return data.getDecCrypto().getPrivateKey(publicKey, data.getCallbackHandler());
@@ -329,7 +329,7 @@ public class EncryptedKeyProcessor implements Processor {
 
                 PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
                 byte[] pSourceBytes = EncryptionUtils.getPSource(encryptedKeyElement);
-                if (pSourceBytes != null) {
+                if (pSourceBytes != null && pSourceBytes.length > 0) {
                     pSource = new PSource.PSpecified(pSourceBytes);
                 }
 
@@ -471,7 +471,7 @@ public class EncryptedKeyProcessor implements Processor {
                     return data.getDecCrypto().getX509Certificates(cryptoType);
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
                     byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
-                    if (token == null) {
+                    if (token == null || token.length == 0) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData",
                                                       new Object[] {"0"});
                     }
@@ -489,7 +489,7 @@ public class EncryptedKeyProcessor implements Processor {
             }
         }
 
-        return null;
+        return new X509Certificate[0];
     }
 
     private Element getFirstElement(Element element) {
@@ -515,7 +515,7 @@ public class EncryptedKeyProcessor implements Processor {
         // to W3C XML-Enc this key is used to decrypt _any_ references contained in
         // the reference list
         if (refList == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<WSDataRef> dataRefs = new ArrayList<>();

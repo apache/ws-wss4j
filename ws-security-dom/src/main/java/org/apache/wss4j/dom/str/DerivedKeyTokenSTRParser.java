@@ -137,7 +137,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             // Now use the callback and get it
             byte[] secretKey =
                 STRParserUtil.getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
-            if (secretKey == null) {
+            if (secretKey == null || secretKey.length == 0) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
                     new Object[] {uri});
@@ -151,7 +151,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                         secRef.getKeyIdentifierValue(), keyIdentifierValueType,
                         WSPasswordCallback.SECRET_KEY, data
                     );
-                if (secretKey == null) {
+                if (secretKey == null || secretKey.length == 0) {
                     byte[] keyBytes = secRef.getSKIBytes();
                     List<WSSecurityEngineResult> resultsList =
                         data.getWsDocInfo().getResultsByTag(WSConstants.BST);
@@ -183,7 +183,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                             secRef.getKeyIdentifierValue(), keyIdentifierValueType,
                             WSPasswordCallback.SECRET_KEY, data
                        );
-                    if (secretKey == null) {
+                    if (secretKey == null || secretKey.length == 0) {
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
                             new Object[] {uri});

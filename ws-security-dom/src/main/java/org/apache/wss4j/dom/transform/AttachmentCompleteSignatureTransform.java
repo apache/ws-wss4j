@@ -72,7 +72,7 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
         try {
             OutputStream outputStream = os;
             if (outputStream == null) {
-                outputStream = new ByteArrayOutputStream();
+                outputStream = new ByteArrayOutputStream(); //NOPMD
             }
             AttachmentUtils.canonizeMimeHeaders(os, attachment.getHeaders());
             processAttachment(context, os, attachmentUri, attachment);

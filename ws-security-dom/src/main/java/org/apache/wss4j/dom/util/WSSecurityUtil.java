@@ -237,11 +237,7 @@ public final class WSSecurityUtil {
             return true;
         }
 
-        if (hActor != null && actor != null && hActor.equalsIgnoreCase(actor)) {
-            return true;
-        }
-
-        return false;
+        return hActor != null && actor != null && hActor.equalsIgnoreCase(actor);
     }
 
     /**

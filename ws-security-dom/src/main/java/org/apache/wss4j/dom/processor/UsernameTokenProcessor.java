@@ -145,7 +145,7 @@ public class UsernameTokenProcessor implements Processor {
         }
 
         // Test for replay attacks
-        ReplayCache replayCache = data.getNonceReplayCache();
+        ReplayCache replayCache = data.getNonceReplayCache();   //NOPMD
         if (replayCache != null && ut.getNonce() != null) {
             if (replayCache.contains(ut.getNonce())) {
                 throw new WSSecurityException(

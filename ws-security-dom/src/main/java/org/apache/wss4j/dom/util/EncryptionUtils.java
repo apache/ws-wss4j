@@ -322,7 +322,7 @@ public final class EncryptionUtils {
                     JCEMapper.translateURItoJCEID(encAlgo);
             final Cipher cipher = Cipher.getInstance(jceAlgorithm);
 
-            InputStream attachmentInputStream =
+            InputStream attachmentInputStream = //NOPMD
                     AttachmentUtils.setupAttachmentDecryptionStream(
                             encAlgo, cipher, symmetricKey, attachment.getSourceStream());
 
@@ -385,7 +385,7 @@ public final class EncryptionUtils {
                 JCEMapper.translateURItoJCEID(symEncAlgo);
         final Cipher cipher = Cipher.getInstance(jceAlgorithm);
 
-        InputStream attachmentInputStream =
+        InputStream attachmentInputStream = //NOPMD
                 AttachmentUtils.setupAttachmentDecryptionStream(
                         symEncAlgo, cipher, symmetricKey, attachment.getSourceStream());
 
@@ -426,7 +426,7 @@ public final class EncryptionUtils {
         // Don't add more than 20 prefixes
         int prefixAddedCount = 0;
         while (parent.getParentNode() != null && prefixAddedCount < 20
-            && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
+            && Node.DOCUMENT_NODE != parent.getParentNode().getNodeType()) {
             parent = parent.getParentNode();
             NamedNodeMap attributes = parent.getAttributes();
             int length = attributes.getLength();
@@ -435,7 +435,7 @@ public final class EncryptionUtils {
                 String attrDef = "xmlns:" + attribute.getLocalName();
                 if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI()) && !prefix.toString().contains(attrDef)) {
                     attrDef += "=\"" + attribute.getNodeValue() + "\"";
-                    prefix.append(" " + attrDef);
+                    prefix.append(' ').append(attrDef);
                     prefixAddedCount++;
                 }
                 if (prefixAddedCount >= 20) {
@@ -537,7 +537,7 @@ public final class EncryptionUtils {
                 return getDecodedBase64EncodedData(pSourceElement);
             }
         }
-        return null;
+        return new byte[0];
     }
 
     /**
@@ -550,7 +550,7 @@ public final class EncryptionUtils {
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
         String text = XMLUtils.getElementText(element);
         if (text == null) {
-            return null;
+            return new byte[0];
         }
         return org.apache.xml.security.utils.XMLUtils.decode(text);
     }

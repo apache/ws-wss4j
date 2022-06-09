@@ -182,7 +182,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             byte[] secretKey =
                 STRParserUtil.getSecretKeyFromToken(uri, reference.getValueType(),
                                                     WSPasswordCallback.SECRET_KEY, data);
-            if (secretKey == null) {
+            if (secretKey == null || secretKey.length == 0) {
                 Element token =
                     STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
                                                   uri, reference.getValueType());
@@ -209,7 +209,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 byte[] secretKey =
                     STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                         WSPasswordCallback.SECRET_KEY, data);
-                if (secretKey == null) {
+                if (secretKey == null || secretKey.length == 0) {
                     SamlAssertionWrapper samlAssertion =
                         STRParserUtil.getAssertionFromKeyIdentifier(
                             secRef, strElement, data
@@ -221,7 +221,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 byte[] secretKey =
                     STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                         WSPasswordCallback.SECRET_KEY, data);
-                if (secretKey == null) {
+                if (secretKey == null || secretKey.length == 0) {
                     byte[] keyBytes = secRef.getSKIBytes();
                     List<WSSecurityEngineResult> resultsList =
                         wsDocInfo.getResultsByTag(WSConstants.BST);
@@ -250,7 +250,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                         secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(),
                         WSPasswordCallback.SECRET_KEY, data
                     );
-                if (secretKey == null) {
+                if (secretKey == null || secretKey.length == 0) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
                         new Object[] {uri});
