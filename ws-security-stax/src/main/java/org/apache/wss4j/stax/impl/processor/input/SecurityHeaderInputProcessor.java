@@ -85,7 +85,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             subInputProcessorChain.reset();
             xmlSecEvent = subInputProcessorChain.processHeaderEvent();
 
-            switch (xmlSecEvent.getEventType()) {
+            switch (xmlSecEvent.getEventType()) {   //NOPMD
                 case XMLStreamConstants.START_ELEMENT:
                     XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
                     int documentLevel = xmlSecStartElement.getDocumentLevel();

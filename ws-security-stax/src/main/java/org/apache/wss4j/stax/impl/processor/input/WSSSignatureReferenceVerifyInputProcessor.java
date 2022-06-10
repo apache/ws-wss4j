@@ -124,7 +124,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
             final Attachment attachment = attachments.get(0);
 
-            InputStream attachmentInputStream = attachment.getSourceStream();
+            InputStream attachmentInputStream = attachment.getSourceStream();   //NOPMD
             if (!attachmentInputStream.markSupported()) {
                 attachmentInputStream = new BufferedInputStream(attachmentInputStream);
             }
@@ -134,30 +134,27 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             try {
                 DigestOutputStream digestOutputStream =
                         createMessageDigestOutputStream(referenceType, inputProcessorChain.getSecurityContext());
-                UnsyncBufferedOutputStream bufferedDigestOutputStream =
-                        new UnsyncBufferedOutputStream(digestOutputStream);
+                try (UnsyncBufferedOutputStream bufferedDigestOutputStream =
+                        new UnsyncBufferedOutputStream(digestOutputStream)) {
+                    if (referenceType.getTransforms() != null) {
+                        Transformer transformer =
+                                buildTransformerChain(referenceType, bufferedDigestOutputStream, inputProcessorChain, null);
+                        if (!(transformer instanceof AttachmentContentSignatureTransform)) {
+                            throw new WSSecurityException(
+                                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                                    "empty",
+                                    new Object[]{"First transform must be Attachment[Content|Complete]SignatureTransform"}
+                            );
+                        }
+                        Map<String, Object> transformerProperties = new HashMap<>(2);
+                        transformerProperties.put(
+                                AttachmentContentSignatureTransform.ATTACHMENT, attachment);
+                        transformer.setProperties(transformerProperties);
 
-                if (referenceType.getTransforms() != null) {
-                    Transformer transformer =
-                            buildTransformerChain(referenceType, bufferedDigestOutputStream, inputProcessorChain, null);
-                    if (!(transformer instanceof AttachmentContentSignatureTransform)) {
-                        throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.INVALID_SECURITY,
-                                "empty",
-                                new Object[] {"First transform must be Attachment[Content|Complete]SignatureTransform"}
-                        );
+                        transformer.transform(attachmentInputStream);
+                    } else {
+                        XMLSecurityUtils.copy(attachmentInputStream, bufferedDigestOutputStream);
                     }
-                    Map<String, Object> transformerProperties = new HashMap<>(2);
-                    transformerProperties.put(
-                            AttachmentContentSignatureTransform.ATTACHMENT, attachment);
-                    transformer.setProperties(transformerProperties);
-
-                    transformer.transform(attachmentInputStream);
-
-                    bufferedDigestOutputStream.close();
-                } else {
-                    XMLSecurityUtils.copy(attachmentInputStream, bufferedDigestOutputStream);
-                    bufferedDigestOutputStream.close();
                 }
                 compareDigest(digestOutputStream.getDigestValue(), referenceType);
 
@@ -310,7 +307,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
         TimestampSecurityEvent timestampSecurityEvent =
                 inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
-        ReplayCache replayCache =
+        ReplayCache replayCache =   //NOPMD
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
         if (timestampSecurityEvent != null && replayCache != null) {
             final String cacheKey =

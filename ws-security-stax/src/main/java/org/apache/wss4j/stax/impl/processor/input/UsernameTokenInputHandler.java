@@ -76,7 +76,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         Instant created = verifyCreated(wssSecurityProperties, usernameTokenType);
 
-        ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();
+        ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();  //NOPMD
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         if (encodedNonce != null && replayCache != null) {

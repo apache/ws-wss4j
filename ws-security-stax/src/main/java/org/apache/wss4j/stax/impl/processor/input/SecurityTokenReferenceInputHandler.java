@@ -128,7 +128,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         public XMLSecEvent processEvent(final InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
-            switch (xmlSecEvent.getEventType()) {
+            switch (xmlSecEvent.getEventType()) {   //NOPMD
                 case XMLStreamConstants.START_ELEMENT:
                     XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
                     Attribute attribute = xmlSecStartElement.getAttributeByName(this.attribute);

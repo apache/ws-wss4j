@@ -334,7 +334,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureWSSCrypto != null) {
             return signatureWSSCrypto.getCryptoProperties();
         }
-        return null;
+        return null;    //NOPMD
     }
 
     public void setSignatureCryptoProperties(Properties cryptoProperties) {
@@ -409,7 +409,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureVerificationWSSCrypto != null) {
             return signatureVerificationWSSCrypto.getCryptoProperties();
         }
-        return null;
+        return null;    //NOPMD
     }
 
     public void setSignatureVerificationCryptoProperties(Properties cryptoProperties) {
@@ -488,7 +488,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (decryptionWSSCrypto != null) {
             return decryptionWSSCrypto.getCryptoProperties();
         }
-        return null;
+        return null;    //NOPMD
     }
 
     public void setDecryptionCryptoProperties(Properties cryptoProperties) {
@@ -582,7 +582,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (encryptionWSSCrypto != null) {
             return encryptionWSSCrypto.getCryptoProperties();
         }
-        return null;
+        return null;    //NOPMD
     }
 
     public void setEncryptionCryptoProperties(Properties cryptoProperties) {

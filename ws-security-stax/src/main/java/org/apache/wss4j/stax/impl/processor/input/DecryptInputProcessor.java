@@ -200,7 +200,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             //1.) if an attachment is encrypted and signed the order is preserved
             //2.) the attachments are processed after the SOAP-Document which allows us to stream everything
             attachmentReferences.add(
-                    new DeferredAttachment(encryptedDataType, cipher, inboundSecurityToken)
+                    new DeferredAttachment(encryptedDataType, cipher, inboundSecurityToken) //NOPMD
             );
         }
     }
@@ -354,7 +354,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             final Key symmetricKey =
                 inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, encryptedDataType.getId());
 
-            InputStream attachmentInputStream =
+            InputStream attachmentInputStream = //NOPMD
                 AttachmentUtils.setupAttachmentDecryptionStream(encAlgo, cipher, symmetricKey, attachment.getSourceStream());
 
             Attachment resultAttachment = new Attachment();

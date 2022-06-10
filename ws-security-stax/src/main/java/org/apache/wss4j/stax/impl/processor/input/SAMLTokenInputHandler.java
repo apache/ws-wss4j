@@ -232,23 +232,22 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         while (xmlSecEventIterator.hasNext()) {
             XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
             idx++;
-            switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT:
-                    QName elementName = xmlSecEvent.asStartElement().getName();
-                    if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
-                        List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
-                        if (elementPath.size() >= 4) {
-                            int lastIndex = elementPath.size() - 2;
-                            if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart())
+            if (XMLStreamConstants.START_ELEMENT == xmlSecEvent.getEventType()) {
+                QName elementName = xmlSecEvent.asStartElement().getName();
+                if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
+                    List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
+                    if (elementPath.size() >= 4) {
+                        int lastIndex = elementPath.size() - 2;
+                        if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart())
                                 && "SubjectConfirmation".equals(elementPath.get(lastIndex - 1).getLocalPart())
                                 && "Subject".equals(elementPath.get(lastIndex - 2).getLocalPart())) {
-                                return idx;
-                            } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart())
+                            return idx;
+                        } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart())
                                 && "Subject".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
-                                return idx;
-                            }
+                            return idx;
                         }
                     }
+                }
             }
         }
         return idx;
@@ -260,19 +259,18 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         while (xmlSecEventIterator.hasNext()) {
             XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
             idx++;
-            switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT:
-                    QName elementName = xmlSecEvent.asStartElement().getName();
-                    if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
-                        List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
-                        if (elementPath.size() >= 4) {
-                            int lastIndex = elementPath.size() - 2;
-                            if ("Signature".equals(elementPath.get(lastIndex).getLocalPart())
+            if (XMLStreamConstants.START_ELEMENT == xmlSecEvent.getEventType()) {
+                QName elementName = xmlSecEvent.asStartElement().getName();
+                if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
+                    List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
+                    if (elementPath.size() >= 4) {
+                        int lastIndex = elementPath.size() - 2;
+                        if ("Signature".equals(elementPath.get(lastIndex).getLocalPart())
                                 && "Assertion".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
-                                return idx;
-                            }
+                            return idx;
                         }
                     }
+                }
             }
         }
         return idx;
@@ -308,7 +306,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             loop:
             while (xmlSecEventIterator.hasNext()) {
                 xmlSecEvent = xmlSecEventIterator.next();
-                switch (xmlSecEvent.getEventType()) {
+                switch (xmlSecEvent.getEventType()) {   //NOPMD
                     case XMLStreamConstants.END_ELEMENT:
                         if (xmlSecEvent.asEndElement().getName().equals(elementName)) {
                             break loop;
