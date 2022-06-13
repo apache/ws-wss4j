@@ -576,19 +576,19 @@ public final class ConfigurationConverter {
             }
         }
 
-        ReplayCache nonceCache =
+        ReplayCache nonceCache =    //NOPMD
             (ReplayCache)config.get(ConfigurationConstants.NONCE_CACHE_INSTANCE);
         if (nonceCache != null) {
             properties.setNonceReplayCache(nonceCache);
         }
 
-        ReplayCache timestampCache =
+        ReplayCache timestampCache = //NOPMD
             (ReplayCache)config.get(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE);
         if (timestampCache != null) {
             properties.setTimestampReplayCache(timestampCache);
         }
 
-        ReplayCache samlOneTimeUseCache =
+        ReplayCache samlOneTimeUseCache = //NOPMD
             (ReplayCache)config.get(ConfigurationConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE);
         if (samlOneTimeUseCache != null) {
             properties.setSamlOneTimeUseReplayCache(samlOneTimeUseCache);

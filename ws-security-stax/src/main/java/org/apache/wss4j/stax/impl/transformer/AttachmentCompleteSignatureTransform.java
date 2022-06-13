@@ -35,10 +35,10 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
     public void transform(InputStream inputStream) throws XMLStreamException {
         InputStream is = inputStream;
         try {
-            OutputStream outputStream = getOutputStream();
+            OutputStream outputStream = getOutputStream();  //NOPMD
             if (outputStream == null) {
                 outputStream = new ByteArrayOutputStream();
-                is = new MultiInputStream(
+                is = new MultiInputStream(//NOPMD
                         new ByteArrayInputStream(
                                 ((ByteArrayOutputStream) outputStream).toByteArray()),
                         inputStream

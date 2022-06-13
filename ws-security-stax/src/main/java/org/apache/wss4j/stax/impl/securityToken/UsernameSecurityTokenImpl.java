@@ -52,7 +52,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
     private Subject subject;
     private Principal principal;
 
-    public UsernameSecurityTokenImpl(WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType,
+    public UsernameSecurityTokenImpl(WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType,  //NOPMD
                                      String username, String password, String createdTime, byte[] nonce,
                                      byte[] salt, Long iteration,
                                      WSInboundSecurityContext wsInboundSecurityContext, String id,

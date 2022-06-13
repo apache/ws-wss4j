@@ -198,8 +198,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         signaturePartDef.setDigestAlgo(getSecurityProperties().getSignatureDigestAlgorithm());
                     }
 
-                    DigestOutputStream digestOutputStream = createMessageDigestOutputStream(signaturePartDef.getDigestAlgo());
-                    InputStream inputStream = attachment.getSourceStream();
+                    DigestOutputStream digestOutputStream = createMessageDigestOutputStream(signaturePartDef.getDigestAlgo());  //NOPMD
+                    InputStream inputStream = attachment.getSourceStream(); //NOPMD
                     if (!inputStream.markSupported()) {
                         inputStream = new BufferedInputStream(inputStream);
                     }

@@ -99,7 +99,7 @@ public class AttachmentContentSignatureTransform extends TransformIdentity {
             canon.transform(inputStream);
 
         } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
-            CRLFOutputStream crlfOutputStream = new CRLFOutputStream(getOutputStream());
+            CRLFOutputStream crlfOutputStream = new CRLFOutputStream(getOutputStream());    //NOPMD
             try {
                 setOutputStream(crlfOutputStream);
             } catch (XMLSecurityException e) {

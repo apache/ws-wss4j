@@ -20,7 +20,7 @@ package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
-public abstract class WSSecurityEventConstants extends SecurityEventConstants {
+public abstract class WSSecurityEventConstants extends SecurityEventConstants { //NOPMD
 
     public static final Event NO_SECURITY = new Event("NoSecurity");
     public static final Event OPERATION = new Event("Operation");

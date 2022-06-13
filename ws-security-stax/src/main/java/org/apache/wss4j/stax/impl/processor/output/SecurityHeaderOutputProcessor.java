@@ -54,7 +54,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
         boolean eventHandled = false;
 
-        switch (xmlSecEvent.getEventType()) {
+        switch (xmlSecEvent.getEventType()) {   //NOPMD
             case XMLStreamConstants.START_ELEMENT:
                 XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
                 final String soapMessageVersion = WSSUtils.getSOAPMessageVersionNamespace(xmlSecStartElement);

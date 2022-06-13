@@ -135,7 +135,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
             createStartElementAndOutputAsEvent(outputProcessorChain, elementName, namespaces, attributes);
             Node firstChild = element.getFirstChild();
             while (firstChild != null) {
-                switch (firstChild.getNodeType()) {
+                switch (firstChild.getNodeType()) { //NOPMD
                     case Node.ELEMENT_NODE:
                         outputToken((Element) firstChild, outputProcessorChain);
                         break;
