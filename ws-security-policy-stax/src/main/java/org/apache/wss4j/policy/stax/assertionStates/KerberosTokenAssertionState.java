@@ -96,7 +96,7 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
             }
         }
         if (kerberosToken.getApReqTokenType() != null) {
-            switch (kerberosToken.getApReqTokenType()) {
+            switch (kerberosToken.getApReqTokenType()) {    //NOPMD
                 case WssKerberosV5ApReqToken11:
                     if (!kerberosTokenSecurityEvent.isKerberosV5ApReqToken11()) {
                         setErrorMessage("Policy enforces " + kerberosToken.getApReqTokenType());

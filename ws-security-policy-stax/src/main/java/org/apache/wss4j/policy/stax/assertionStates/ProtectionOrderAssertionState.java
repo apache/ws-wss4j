@@ -60,7 +60,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
             String namespace = getAssertion().getName().getNamespaceURI();
             AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder =
                 ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
-            switch (protectionOrder) {
+            switch (protectionOrder) {  //NOPMD
             case SignBeforeEncrypting:
                 policyAsserter.assertPolicy(new QName(namespace, SPConstants.SIGN_BEFORE_ENCRYPTING));
                 break;
@@ -131,7 +131,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                                      List<XMLSecurityConstants.ContentType> contentTypes, List<QName> elementPath) {
         String namespace = getAssertion().getName().getNamespaceURI();
 
-        switch (protectionOrder) {
+        switch (protectionOrder) {  //NOPMD
             case SignBeforeEncrypting:
                 int lastSignature = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.SIGNATURE);
                 int firstEncryption = contentTypes.indexOf(XMLSecurityConstants.ContentType.ENCRYPTION);

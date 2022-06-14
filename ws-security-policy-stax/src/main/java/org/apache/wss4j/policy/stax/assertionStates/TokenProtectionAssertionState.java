@@ -289,11 +289,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 }
             }
         }
-        if (signedSupportingTokens.size() > signedElements.size()) {
-            return false;
-        }
-
-        return true;
+        return signedSupportingTokens.size() <= signedElements.size();
     }
 
     private SecurityToken getEffectiveSignatureToken(SecurityToken securityToken) throws XMLSecurityException {

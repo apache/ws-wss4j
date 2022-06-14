@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.7</version>
+                <version>3.16.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>${buildtools.dir}/wss4j-pmd-ruleset.xml</ruleset>
@@ -139,7 +139,7 @@
                     <failOnViolation>true</failOnViolation>
                     <linkXRef>false</linkXRef>
                     <verbose>true</verbose>
-                    <includeTests>true</includeTests>
+                    <includeTests>false</includeTests>
                     <!-- TODO <targetJdk>${targetJdk}</targetJdk>-->
                     <targetJdk>1.8</targetJdk>
                     <excludeRoots>

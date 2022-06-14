@@ -246,14 +246,10 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         if (asserted) {
             setAsserted(true);
         }
-        if (!asserted && (tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)
-                || tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION))) {
-            //return false if not asserted for the main signature and encryption tokens
-            return false;
-        } else {
-            //always return true for supporting tokens.
-            return true;
-        }
+        //return false if not asserted for the main signature and encryption tokens
+        //always return true for supporting tokens.
+        return !(!asserted && (tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)
+                || tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION)));
     }
 
     public abstract boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,

@@ -85,7 +85,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
 
         String namespace = getAssertion().getName().getNamespaceURI();
         if (usernameToken.getPasswordType() != null) {
-            switch (usernameToken.getPasswordType()) {
+            switch (usernameToken.getPasswordType()) {  //NOPMD
                 case NoPassword:
                     if (usernameTokenSecurityEvent.getUsernameTokenPasswordType()
                         != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
@@ -141,7 +141,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
         }
 
         if (usernameToken.getUsernameTokenType() != null) {
-            switch (usernameToken.getUsernameTokenType()) {
+            switch (usernameToken.getUsernameTokenType()) { //NOPMD
                 case WssUsernameToken10:
                     if (usernameTokenSecurityEvent.getUsernameTokenProfile() != null
                         && usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
