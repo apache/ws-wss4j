@@ -222,7 +222,7 @@ public class Merlin extends CryptoBase {
             keyStoreLocation = keyStoreLocation.trim();
 
             try (InputStream is = loadInputStream(loader, keyStoreLocation)) {
-                String passwd = properties.getProperty(prefix + KEYSTORE_PASSWORD, "security");
+                String passwd = properties.getProperty(prefix + KEYSTORE_PASSWORD);
                 if (passwd != null) {
                     passwd = passwd.trim();
                     passwd = decryptPassword(passwd, passwordEncryptor);
@@ -272,7 +272,7 @@ public class Merlin extends CryptoBase {
             trustStoreLocation = trustStoreLocation.trim();
 
             try (InputStream is = loadInputStream(loader, trustStoreLocation)) {
-                String passwd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
+                String passwd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD);
                 if (passwd != null) {
                     passwd = passwd.trim();
                     passwd = decryptPassword(passwd, passwordEncryptor);
