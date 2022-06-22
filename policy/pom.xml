@@ -54,6 +54,12 @@
             <artifactId>xmlunit-matchers</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+            <version>${woodstox.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
