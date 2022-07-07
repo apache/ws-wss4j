@@ -131,13 +131,13 @@ public final class UsernameTokenUtil {
     }
 
     /**
-     * Generate a nonce of the given length using the SHA1PRNG algorithm. The SecureRandom
+     * Generate a nonce of the given length using a secure random algorithm. The SecureRandom
      * instance that backs this method is cached for efficiency.
      *
      * @return a nonce of the given length
      * @throws WSSecurityException
      */
-    private static byte[] generateNonce(int length) throws WSSecurityException {
+    public static byte[] generateNonce(int length) throws WSSecurityException {
         try {
             return XMLSecurityConstants.generateBytes(length);
         } catch (Exception ex) {

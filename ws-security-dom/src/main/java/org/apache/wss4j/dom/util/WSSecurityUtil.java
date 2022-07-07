@@ -32,7 +32,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -625,23 +624,6 @@ public final class WSSecurityUtil {
             }
         }
         return actions;
-    }
-
-    /**
-     * Generate a nonce of the given length using the SHA1PRNG algorithm. The SecureRandom
-     * instance that backs this method is cached for efficiency.
-     *
-     * @return a nonce of the given length
-     * @throws WSSecurityException
-     */
-    public static byte[] generateNonce(int length) throws WSSecurityException {
-        try {
-            return XMLSecurityConstants.generateBytes(length);
-        } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
-                    "empty", new Object[] {"Error in generating nonce of length " + length}
-            );
-        }
     }
 
     public static void inlineAttachments(List<Element> includeElements,

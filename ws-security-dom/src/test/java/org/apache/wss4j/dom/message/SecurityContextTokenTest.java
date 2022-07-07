@@ -38,6 +38,8 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -104,7 +106,9 @@ public class SecurityContextTokenTest {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -154,7 +158,9 @@ public class SecurityContextTokenTest {
             sctBuilder.setWscVersion(ConversationConstants.VERSION_05_12);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -203,7 +209,9 @@ public class SecurityContextTokenTest {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -241,7 +249,9 @@ public class SecurityContextTokenTest {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -284,7 +294,9 @@ public class SecurityContextTokenTest {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
@@ -332,7 +344,9 @@ public class SecurityContextTokenTest {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(crypto);
 
-            byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+            Random random = new Random();
+            byte[] tempSecret = new byte[16];
+            random.nextBytes(tempSecret);
 
             // Store the secret
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);

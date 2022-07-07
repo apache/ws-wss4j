@@ -288,7 +288,7 @@ public class UsernameToken {
         }
         byte[] nonceValue = null;
         try {
-            nonceValue = WSSecurityUtil.generateNonce(16);
+            nonceValue = UsernameTokenUtil.generateNonce(16);
         } catch (WSSecurityException ex) {
             LOG.debug(ex.getMessage(), ex);
             return;

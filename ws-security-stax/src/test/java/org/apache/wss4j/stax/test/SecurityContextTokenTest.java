@@ -47,7 +47,6 @@ import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSecurityContextToken;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
@@ -63,6 +62,7 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.wss4j.stax.validate.SecurityContextTokenValidator;
 import org.apache.wss4j.stax.validate.SecurityContextTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
@@ -131,7 +131,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTDKTEncryptInbound(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -217,7 +217,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTDKTEncryptInboundAction(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -342,7 +342,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTSignInbound(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -436,7 +436,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTSignInboundAction(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -525,7 +525,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTSignAbsoluteInbound(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -573,7 +573,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTSignEncrypt(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -697,7 +697,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTSignEncryptAction(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -797,7 +797,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTEncryptSign(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -921,7 +921,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTKDKTEncryptSignAction(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1021,7 +1021,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTSign(int version) throws Exception {
 
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1113,7 +1113,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @ParameterizedTest
     @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
     public void testSCTCustomValidator(int version) throws Exception {
-        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        byte[] tempSecret = XMLSecurityConstants.generateBytes(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
