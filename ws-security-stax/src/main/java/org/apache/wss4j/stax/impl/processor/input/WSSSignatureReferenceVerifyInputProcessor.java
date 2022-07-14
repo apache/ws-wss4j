@@ -300,7 +300,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     protected InternalSignatureReferenceVerifier getSignatureReferenceVerifier(
             XMLSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
             ReferenceType referenceType, XMLSecStartElement startElement) throws XMLSecurityException {
-        return new InternalSignatureReferenceVerifier((WSSSecurityProperties) securityProperties,
+        return new WSS4JInternalSignatureReferenceVerifier((WSSSecurityProperties) securityProperties,
                 inputProcessorChain, referenceType, startElement);
     }
 
@@ -434,9 +434,10 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         return parentTransformer;
     }
 
-    class InternalSignatureReferenceVerifier extends AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier {
+    class WSS4JInternalSignatureReferenceVerifier
+            extends AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier {
 
-        InternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
+        WSS4JInternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
                                            ReferenceType referenceType, XMLSecStartElement startElement) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElement);
             this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());

@@ -25,20 +25,21 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.ResourceResolver;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer;
 
-public class ResolverXPointer extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer {
+public class WSS4JResolverXPointer extends ResolverXPointer {
 
-    public ResolverXPointer() {
+    public WSS4JResolverXPointer() {
         super();
     }
 
-    public ResolverXPointer(String uri) {
+    public WSS4JResolverXPointer(String uri) {
         super(uri);
     }
 
     @Override
     public ResourceResolver newInstance(String uri, String baseURI) {
-        return new ResolverXPointer(uri);
+        return new WSS4JResolverXPointer(uri);
     }
 
     @Override

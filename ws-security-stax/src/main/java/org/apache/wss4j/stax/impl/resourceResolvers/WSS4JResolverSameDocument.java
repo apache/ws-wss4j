@@ -22,23 +22,24 @@ import org.apache.xml.security.stax.ext.ResourceResolver;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
-public class ResolverSameDocument extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument {
+public class WSS4JResolverSameDocument extends ResolverSameDocument {
 
-    public ResolverSameDocument() {
+    public WSS4JResolverSameDocument() {
         super();
     }
 
-    public ResolverSameDocument(String uri) {
+    public WSS4JResolverSameDocument(String uri) {
         super(uri);
     }
 
     @Override
     public ResourceResolver newInstance(String uri, String baseURI) {
-        return new ResolverSameDocument(uri);
+        return new WSS4JResolverSameDocument(uri);
     }
 
     @Override
