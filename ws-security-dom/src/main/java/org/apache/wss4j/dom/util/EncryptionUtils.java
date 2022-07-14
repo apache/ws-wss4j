@@ -48,7 +48,6 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -361,7 +360,7 @@ public final class EncryptionUtils {
        SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
        String xopURI, Element encData
    ) throws WSSecurityException, IOException, UnsupportedCallbackException, NoSuchAlgorithmException,
-        NoSuchPaddingException, ParserConfigurationException, XMLParserException {
+        NoSuchPaddingException, XMLParserException {
 
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -402,6 +401,8 @@ public final class EncryptionUtils {
                 String fixedElementStr = setParentPrefixes(encData, new String(bytes));
                 document = org.apache.xml.security.utils.XMLUtils.read(
                     new ByteArrayInputStream(fixedElementStr.getBytes()), true);
+            } else {
+                throw ex;
             }
         }
 
