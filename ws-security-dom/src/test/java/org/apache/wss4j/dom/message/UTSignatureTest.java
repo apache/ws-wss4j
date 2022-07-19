@@ -77,7 +77,7 @@ public class UTSignatureTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 
@@ -129,7 +129,7 @@ public class UTSignatureTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 

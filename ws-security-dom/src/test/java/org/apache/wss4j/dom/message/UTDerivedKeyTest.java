@@ -81,7 +81,7 @@ public class UTDerivedKeyTest {
         usernameToken.setName("bob");
 
         byte[] salt = UsernameTokenUtil.generateSalt(false);
-        usernameToken.addSalt(doc, salt, false);
+        usernameToken.addSalt(doc, salt);
         assertTrue(salt.length == 16);
         assertTrue(salt[0] == 0x02);
         byte[] utSalt = usernameToken.getSalt();
@@ -140,7 +140,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 
@@ -194,7 +194,7 @@ public class UTDerivedKeyTest {
         builder.setPasswordsAreEncoded(true);
         byte[] bytes = MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8));
         builder.setUserInfo("bob", org.apache.xml.security.utils.XMLUtils.encodeToString(bytes));
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 
@@ -245,7 +245,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 
@@ -298,7 +298,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 
@@ -348,7 +348,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 
@@ -400,7 +400,7 @@ public class UTDerivedKeyTest {
         builder.setPasswordsAreEncoded(true);
         byte[] bytes = MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8));
         builder.setUserInfo("bob", org.apache.xml.security.utils.XMLUtils.encodeToString(bytes));
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 
@@ -459,7 +459,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 
@@ -510,7 +510,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
-        builder.addDerivedKey(true, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(true);
         builder.prepare(salt);
 
@@ -611,7 +611,7 @@ public class UTDerivedKeyTest {
         usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
 
         byte[] salt = UsernameTokenUtil.generateSalt(false);
-        usernameToken.addSalt(doc, salt, false);
+        usernameToken.addSalt(doc, salt);
         byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 1000);
 
         //
@@ -662,7 +662,7 @@ public class UTDerivedKeyTest {
 
         usernameToken.addIteration(doc, 500);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
-        usernameToken.addSalt(doc, salt, false);
+        usernameToken.addSalt(doc, salt);
         byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 500);
 
         //
@@ -720,7 +720,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 
@@ -784,7 +784,7 @@ public class UTDerivedKeyTest {
 
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
-        builder.addDerivedKey(false, 1000);
+        builder.addDerivedKey(1000);
         byte[] salt = UsernameTokenUtil.generateSalt(false);
         builder.prepare(salt);
 

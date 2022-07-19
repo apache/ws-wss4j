@@ -44,7 +44,6 @@ public class WSSecUsernameToken extends WSSecBase {
     private boolean nonce;
     private boolean created;
     private boolean useDerivedKey;
-    private boolean useMac;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
     private boolean passwordsAreEncoded;
     private boolean precisionInMilliSeconds = true;
@@ -88,13 +87,11 @@ public class WSSecUsernameToken extends WSSecBase {
 
     /**
      * Add a derived key to the UsernameToken
-     * @param useMac whether the derived key is to be used for a MAC or not
      * @param iteration The number of iterations to use in deriving a key
      */
-    public void addDerivedKey(boolean useMac, int iteration) {
+    public void addDerivedKey(int iteration) {
         passwordType = null;
         useDerivedKey = true;
-        this.useMac = useMac;
         if (iteration > 0) {
             this.iteration = iteration;
         }
@@ -171,7 +168,7 @@ public class WSSecUsernameToken extends WSSecBase {
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         ut.setName(user);
         if (useDerivedKey) {
-            ut.addSalt(getDocument(), saltValue, useMac);
+            ut.addSalt(getDocument(), saltValue);
             ut.addIteration(getDocument(), iteration);
         } else {
             ut.setPassword(password);

@@ -332,7 +332,7 @@ public class UsernameToken {
      * @param mac If <code>true</code> then an optionally generated value is
      *            usable for a MAC
      */
-    public void addSalt(Document doc, byte[] saltValue, boolean mac) {
+    public void addSalt(Document doc, byte[] saltValue) {
         elementSalt =
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
