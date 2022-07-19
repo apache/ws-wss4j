@@ -112,7 +112,7 @@ public class SignatureWSS651Test {
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
      *
-     * @param env soap envelope
+     * @param doc soap document
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {

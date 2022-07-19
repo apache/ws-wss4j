@@ -329,8 +329,6 @@ public class UsernameToken {
      *
      * @param doc The Document for the UsernameToken
      * @param saltValue The salt to add.
-     * @param mac If <code>true</code> then an optionally generated value is
-     *            usable for a MAC
      */
     public void addSalt(Document doc, byte[] saltValue) {
         elementSalt =

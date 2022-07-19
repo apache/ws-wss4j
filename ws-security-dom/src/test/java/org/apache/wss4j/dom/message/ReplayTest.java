@@ -578,7 +578,7 @@ public class ReplayTest {
     /**
      * Verifies the soap envelope
      *
-     * @param env soap envelope
+     * @param doc soap document
      * @param wssConfig
      * @throws Exception Thrown when there is a problem in verification
      */

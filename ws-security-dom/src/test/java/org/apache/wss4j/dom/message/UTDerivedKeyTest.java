@@ -842,7 +842,7 @@ public class UTDerivedKeyTest {
     /**
      * Verifies the soap envelope.
      *
-     * @param env soap envelope
+     * @param doc soap document
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
