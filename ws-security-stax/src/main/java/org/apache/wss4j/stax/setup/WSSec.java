@@ -135,7 +135,7 @@ public class WSSec {
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties,
             boolean initiator) throws WSSecurityException {
-        return getInboundWSSec(securityProperties, false, false);
+        return getInboundWSSec(securityProperties, initiator, false);
     }
 
     /**
