@@ -281,8 +281,7 @@ public class EncryptedKeyProcessor implements Processor {
         String algorithmURI = null;
         if (uri != null) {
             Element ee =
-                EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(),
-                                                         wsDocInfo, uri);
+                EncryptionUtils.findEncryptedDataElement(wsDocInfo, uri);
             algorithmURI = X509Util.getEncAlgo(ee);
         }
         return X509Util.getSecretKey(keyInfoChildElement, algorithmURI, data.getCallbackHandler());
@@ -381,8 +380,7 @@ public class EncryptedKeyProcessor implements Processor {
 
             if (uri != null) {
                 Element ee =
-                    EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(),
-                                                                    wsDocInfo, uri);
+                    EncryptionUtils.findEncryptedDataElement(wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                 size = KeyUtils.getKeyLength(algorithmURI);
@@ -550,7 +548,7 @@ public class EncryptedKeyProcessor implements Processor {
         // Find the encrypted data element referenced by dataRefURI
         //
         Element encryptedDataElement =
-            EncryptionUtils.findEncryptedDataElement(doc, docInfo, dataRefURI);
+            EncryptionUtils.findEncryptedDataElement(docInfo, dataRefURI);
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults =
                 docInfo.getResultsByTag(WSConstants.SIGN);

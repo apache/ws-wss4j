@@ -288,11 +288,10 @@ public final class WSSecurityUtil {
      *
      * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
      * @param callbackLookup The CallbackLookup object used to find Elements
-     * @param doc The owning document
      * @return the DOM Element in the SOAP Envelope that is found
      */
     public static List<Element> findElements(
-        WSEncryptionPart part, CallbackLookup callbackLookup, Document doc
+        WSEncryptionPart part, CallbackLookup callbackLookup
     ) throws WSSecurityException {
         // See if the DOM Element is stored in the WSEncryptionPart first
         if (part.getElement() != null) {

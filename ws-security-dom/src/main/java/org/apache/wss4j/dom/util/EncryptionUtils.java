@@ -65,7 +65,6 @@ public final class EncryptionUtils {
      * Look up the encrypted data. First try Id="someURI". If no such Id then try
      * wsu:Id="someURI".
      *
-     * @param doc The document in which to find EncryptedData
      * @param wsDocInfo The WSDocInfo object to use
      * @param dataRefURI The URI of EncryptedData
      * @return The EncryptedData element
@@ -74,7 +73,6 @@ public final class EncryptionUtils {
      */
     public static Element
     findEncryptedDataElement(
-        Document doc,
         WSDocInfo wsDocInfo,
         String dataRefURI
     ) throws WSSecurityException {

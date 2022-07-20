@@ -1002,7 +1002,7 @@ public abstract class WSHandler {
         String propFilename,
         RequestData reqData
     ) throws WSSecurityException {
-        ClassLoader classLoader = this.getClassLoader(reqData.getMsgContext());
+        ClassLoader classLoader = this.getClassLoader();
         Properties properties = CryptoFactory.getProperties(propFilename, classLoader);
         return
             CryptoFactory.getInstance(
@@ -1034,7 +1034,7 @@ public abstract class WSHandler {
         if (cbHandler == null) {
             String callback = getString(callbackHandlerClass, mc);
             if (callback != null) {
-                cbHandler = loadCallbackHandler(callback, requestData);
+                cbHandler = loadCallbackHandler(callback);
             }
         }
         return cbHandler;
@@ -1059,20 +1059,18 @@ public abstract class WSHandler {
     /**
      * Load a CallbackHandler instance.
      * @param callbackHandlerClass The class name of the CallbackHandler instance
-     * @param requestData The RequestData which supplies the message context
      * @return a CallbackHandler instance
      * @throws WSSecurityException
      */
     private CallbackHandler loadCallbackHandler(
-        String callbackHandlerClass,
-        RequestData requestData
+        String callbackHandlerClass
     ) throws WSSecurityException {
 
         Class<? extends CallbackHandler> cbClass = null;
         CallbackHandler cbHandler = null;
         try {
             cbClass =
-                Loader.loadClass(getClassLoader(requestData.getMsgContext()),
+                Loader.loadClass(getClassLoader(),
                                  callbackHandlerClass,
                                  CallbackHandler.class);
         } catch (ClassNotFoundException e) {
@@ -1450,10 +1448,9 @@ public abstract class WSHandler {
 
     /**
      * Returns the classloader to be used for loading the callback class
-     * @param msgCtx The MessageContext
      * @return class loader
      */
-    public ClassLoader getClassLoader(Object msgCtx) {
+    public ClassLoader getClassLoader() {
         try {
             return Loader.getTCL();
         } catch (Exception ex) {

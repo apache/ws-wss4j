@@ -98,8 +98,7 @@ public final class STRParserUtil {
             }
             token =
                 findUnprocessedTokenElement(
-                    strElement.getOwnerDocument(), request.getWsDocInfo(), request.getCallbackHandler(),
-                    keyIdentifierValue, type
+                    strElement.getOwnerDocument(), request.getWsDocInfo(), keyIdentifierValue, type
                 );
 
             if (token == null || !"Assertion".equals(token.getLocalName())) {
@@ -302,7 +301,7 @@ public final class STRParserUtil {
         Element tokElement =
             findProcessedTokenElement(doc, docInfo, cb, uri, valueType);
         if (tokElement == null) {
-            tokElement = findUnprocessedTokenElement(doc, docInfo, cb, uri, valueType);
+            tokElement = findUnprocessedTokenElement(doc, docInfo, uri, valueType);
         }
 
         if (tokElement == null) {
@@ -318,7 +317,6 @@ public final class STRParserUtil {
      * the element, rather than trying to access previous results to find the element
      * @param doc Parent Document
      * @param docInfo WSDocInfo instance
-     * @param cb CallbackHandler instance
      * @param uri URI of the element
      * @param type Type of the element
      * @return A DOM element
@@ -327,7 +325,6 @@ public final class STRParserUtil {
     public static Element findUnprocessedTokenElement(
         Document doc,
         WSDocInfo docInfo,
-        CallbackHandler cb,
         String uri,
         String type
     ) throws WSSecurityException {

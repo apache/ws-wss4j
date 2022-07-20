@@ -116,7 +116,7 @@ public class Encryptor {
                 callbackLookup = new DOMCallbackLookup(doc);
             }
             List<Element> elementsToEncrypt =
-                WSSecurityUtil.findElements(encPart, callbackLookup, doc);
+                WSSecurityUtil.findElements(encPart, callbackLookup);
             if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
                 if (!encPart.isRequired()) {
                     continue;
