@@ -110,8 +110,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
 
             SAMLKeyInfo keyInfo =
-                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
-                        data.getSigVerCrypto(), data.getCallbackHandler());
+                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto());
             // TODO Handle malformed SAML tokens where they don't have the
             // secret in them
             byte[] secretKey = keyInfo.getSecret();

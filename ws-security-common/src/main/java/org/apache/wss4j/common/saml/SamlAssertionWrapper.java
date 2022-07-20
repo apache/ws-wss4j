@@ -25,8 +25,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -670,20 +668,17 @@ public class SamlAssertionWrapper {
      */
     public void parseSubject(
         SAMLKeyInfoProcessor keyInfoProcessor,
-        Crypto sigCrypto,
-        CallbackHandler callbackHandler
+        Crypto sigCrypto
     ) throws WSSecurityException {
         if (samlVersion == SAMLVersion.VERSION_11) {
             subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor,
-                    sigCrypto, callbackHandler
+                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor, sigCrypto
                 );
         } else if (samlVersion == SAMLVersion.VERSION_20) {
             subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor,
-                    sigCrypto, callbackHandler
+                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor, sigCrypto
                 );
         }
     }

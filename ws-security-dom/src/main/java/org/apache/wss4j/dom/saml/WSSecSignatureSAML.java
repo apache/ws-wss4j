@@ -243,8 +243,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 actionToken.setCrypto(userCrypto);
                 SAMLKeyInfo samlKeyInfo =
                     SAMLUtil.getCredentialFromSubject(
-                            samlAssertion, new WSSSAMLKeyInfoProcessor(data),
-                            userCrypto, data.getCallbackHandler()
+                            samlAssertion, new WSSSAMLKeyInfoProcessor(data), userCrypto
                     );
                 if (samlKeyInfo != null) {
                     publicKey = samlKeyInfo.getPublicKey();

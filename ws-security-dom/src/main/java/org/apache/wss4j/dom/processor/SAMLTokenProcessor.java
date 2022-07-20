@@ -159,8 +159,7 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         // Parse the subject if it exists
         samlAssertion.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(),
-            data.getCallbackHandler()
+            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
         );
 
         // Now delegate the rest of the verification to the Validator

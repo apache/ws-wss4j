@@ -76,16 +76,15 @@ public final class SAMLUtil {
     public static SAMLKeyInfo getCredentialFromSubject(
         SamlAssertionWrapper samlAssertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
-        Crypto sigCrypto,
-        CallbackHandler callbackHandler
+        Crypto sigCrypto
     ) throws WSSecurityException {
         if (samlAssertion.getSaml1() != null) {
             return getCredentialFromSubject(
-                samlAssertion.getSaml1(), keyInfoProcessor, sigCrypto, callbackHandler
+                samlAssertion.getSaml1(), keyInfoProcessor, sigCrypto
             );
         } else if (samlAssertion.getSaml2() != null) {
             return getCredentialFromSubject(
-                samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler
+                samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto
             );
         }
 
@@ -99,15 +98,13 @@ public final class SAMLUtil {
      * @param assertion The SAML 1.1 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
      * @param sigCrypto A Crypto instance
-     * @param callbackHandler A CallbackHandler instance
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml.saml1.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
-        Crypto sigCrypto,
-        CallbackHandler callbackHandler
+        Crypto sigCrypto
     ) throws WSSecurityException {
         for (org.opensaml.saml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
@@ -146,15 +143,13 @@ public final class SAMLUtil {
      * @param assertion The SAML 2 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
      * @param sigCrypto A Crypto instance
-     * @param callbackHandler A CallbackHandler instance
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml.saml2.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
-        Crypto sigCrypto,
-        CallbackHandler callbackHandler
+        Crypto sigCrypto
     ) throws WSSecurityException {
         org.opensaml.saml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject != null) {

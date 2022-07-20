@@ -94,8 +94,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
 
                 subjectKeyInfo =
                     SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null,
-                                                      securityProperties.getSignatureVerificationCrypto(),
-                                                      securityProperties.getCallbackHandler());
+                                                      securityProperties.getSignatureVerificationCrypto());
             } else {
                 // Possibly an Encrypted Assertion...we just need the key here
                 this.samlAssertionWrapper = null;
