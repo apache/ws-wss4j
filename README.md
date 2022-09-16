@@ -1,6 +1,6 @@
 [![Build Status](https://builds.apache.org/view/S-Z/view/WS/job/wss4j-master/badge/icon?subject=Build)](https://builds.apache.org/view/S-Z/view/WS/job/wss4j-master/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/ws-wss4j)](https://lgtm.com/projects/g/apache/ws-wss4j/alerts/)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/apache/ws-wss4j/badge)](https://api.securityscorecards.dev/projects/github.com/apache/ws-wss4j)
 
 Apache WSS4J
 ======================
