@@ -47,7 +47,6 @@
         <slf4j.version>2.0.1</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <woodstox.version>6.3.1</woodstox.version>
-        <xalan.version>2.7.2</xalan.version>
         <xz.version>1.9</xz.version>
         <xmlsec.version>3.0.1</xmlsec.version>
         <xmlunit.version>2.9.0</xmlunit.version>
@@ -101,16 +100,6 @@
                 <groupId>jakarta.mail</groupId>
                 <artifactId>jakarta.mail-api</artifactId>
                 <version>${jakarta.mail.api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>${xalan.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>serializer</artifactId>
-                <version>${xalan.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
