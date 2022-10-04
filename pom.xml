@@ -299,6 +299,7 @@
                     </executions>
                     <configuration>
                         <attach>true</attach>
+                        <sourcepath>src/main/java</sourcepath>
                         <additionalJOptions>
                             <additionalJOption>-Xdoclint:none</additionalJOption>
                         </additionalJOptions>
