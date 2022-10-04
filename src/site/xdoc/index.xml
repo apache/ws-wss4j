@@ -59,6 +59,21 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>October 2022</b> - 
+The Apache WSS4J team are pleased to announce the release of version 3.0.0.
+This is a major new release of WSS4J. Significant changes:
+</p>
+<ul>
+<li>Moved from javax to jakarta namespace</li>
+<li>OpenSAML 4.x upgrade</li>
+<li>Santuario 3.0.x upgrade</li>
+</ul>
+<p>
+Please see the <a href="https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310063&amp;version=12350043">
+3.0.0 release notes</a> for more information.
+</p>
+</li>
+<li>
 <p><b>February 2022</b> - 
 The Apache WSS4J team are pleased to announce the release of version 2.4.1. It
 fixes an issue with the timestamp in the WSS4J jars being invalid.
