@@ -377,7 +377,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-plugin</artifactId>
-                            <version>2.22.2</version>
+                            <version>3.0.0-M7</version>
                             <configuration>
                                 <reportFormat>brief</reportFormat>
                                 <useFile>false</useFile>
@@ -385,7 +385,7 @@
                                 <includes>
                                     <include>**/*Test.java</include>
                                 </includes>
-                                <argLine>-Xmx2000m --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+                                <argLine>--add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
                                 <systemPropertyVariables>
                                     <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
                                 </systemPropertyVariables>
