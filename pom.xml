@@ -388,6 +388,7 @@
                                 <argLine>--add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
                                 <systemPropertyVariables>
                                     <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
+                                    <org.apache.xml.security.securerandom.algorithm>SHA1PRNG</org.apache.xml.security.securerandom.algorithm>
                                 </systemPropertyVariables>
                             </configuration>
                         </plugin>
