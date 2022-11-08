@@ -214,7 +214,7 @@ public final class WSProviderConfig {
         if (currentProvider == null) {
             try {
                 Class<? extends Provider> clazz = Loader.loadClass(className, false, Provider.class);
-                Provider provider = clazz.newInstance();
+                Provider provider = clazz.getDeclaredConstructor().newInstance();
                 return addJceProvider(name, provider);
             } catch (Throwable t) {
                 if (LOG.isDebugEnabled()) {
@@ -282,7 +282,7 @@ public final class WSProviderConfig {
         if (currentProvider == null) {
             try {
                 Class<? extends Provider> clazz = Loader.loadClass(className, false, Provider.class);
-                Provider provider = clazz.newInstance();
+                Provider provider = clazz.getDeclaredConstructor().newInstance();
 
                 int ret = Security.addProvider(provider);
                 LOG.debug(

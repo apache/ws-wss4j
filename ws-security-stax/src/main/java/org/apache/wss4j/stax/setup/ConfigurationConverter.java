@@ -368,7 +368,7 @@ public final class ConfigurationConverter {
             );
         }
         try {
-            cbHandler = cbClass.newInstance();
+            cbHandler = cbClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                     "empty",
