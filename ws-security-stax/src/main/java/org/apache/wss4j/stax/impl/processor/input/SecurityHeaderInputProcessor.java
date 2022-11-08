@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -214,9 +215,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             return;
         }
         try {
-            XMLSecurityHeaderHandler xmlSecurityHeaderHandler = clazz.newInstance();
+            XMLSecurityHeaderHandler xmlSecurityHeaderHandler = clazz.getDeclaredConstructor().newInstance();
             xmlSecurityHeaderHandler.handle(inputProcessorChain, securityProperties, eventQueue, index);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         } catch (WSSecurityException e) {
             throw e;
