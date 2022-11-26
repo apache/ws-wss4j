@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.17.0</version>
+                <version>3.19.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>${buildtools.dir}/wss4j-pmd-ruleset.xml</ruleset>
@@ -309,7 +309,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.10.0</version>
+                    <version>3.12.1</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.asciidoctor</groupId>
@@ -388,6 +388,7 @@
                                 <argLine>--add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
                                 <systemPropertyVariables>
                                     <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
+                                    <org.apache.xml.security.securerandom.algorithm>SHA1PRNG</org.apache.xml.security.securerandom.algorithm>
                                 </systemPropertyVariables>
                             </configuration>
                         </plugin>
@@ -458,7 +459,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.5</version>
+                <version>3.3.0</version>
             </plugin>
             <plugin>
                 <groupId>org.owasp</groupId>
