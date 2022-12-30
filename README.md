@@ -1,3 +1,4 @@
+TEST
 [![Build Status](https://builds.apache.org/job/webservices/job/Apache%20WSS4J%20-%20master%20JDK11/badge/icon?subject=Build)](https://builds.apache.org/job/webservices/job/Apache%20WSS4J%20-%20master%20JDK11/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.wss4j/wss4j)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/apache/ws-wss4j/badge)](https://api.securityscorecards.dev/projects/github.com/apache/ws-wss4j)
