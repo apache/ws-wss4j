@@ -44,7 +44,7 @@ jobs:
         fetch-depth: 2
 
     - name: Cache local Maven repository
-      uses: actions/cache@5ca27f25cb3a0babe750cad7e4fddd3e55f29e9a #v2.1.1
+      uses: actions/cache@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
