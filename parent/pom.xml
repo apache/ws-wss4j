@@ -41,7 +41,7 @@
         <jasypt.version>1.9.3</jasypt.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
         <junit.version>5.9.2</junit.version>
-        <kerby.version>2.0.2</kerby.version>
+        <kerby.version>2.0.3</kerby.version>
         <neethi.version>3.2.0</neethi.version>
         <opensaml.version>4.2.0</opensaml.version>
         <slf4j.version>2.0.6</slf4j.version>
