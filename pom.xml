@@ -109,7 +109,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>8.2.1</maven-owasp-plugin-version>
-        <project.build.outputTimestamp>2022-10-04T10:59:15Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2022-10-04T11:02:58Z</project.build.outputTimestamp>
     </properties>
 
     <modules>
@@ -322,7 +322,7 @@
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
                     <version>${maven-owasp-plugin-version}</version>
-                 </plugin>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -418,7 +418,6 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>${maven-owasp-plugin-version}</version>
                         <configuration>
                             <failBuildOnCVSS>6</failBuildOnCVSS>
                             <skipProvidedScope>true</skipProvidedScope>
@@ -472,7 +471,6 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>${maven-owasp-plugin-version}</version>
             </plugin>
         </plugins>
     </reporting>
