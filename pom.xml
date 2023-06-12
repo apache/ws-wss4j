@@ -332,14 +332,6 @@
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
                     <version>${maven-owasp-plugin-version}</version>
-                    <executions>
-                        <execution>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -531,6 +523,22 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <failBuildOnCVSS>6</failBuildOnCVSS>
+                            <skipProvidedScope>true</skipProvidedScope>
+                            <skipRuntimeScope>true</skipRuntimeScope>
+                            <suppressionFiles>
+                                <suppressionFile>${buildtools.dir}/dependency-check-suppression.xml</suppressionFile>
+                            </suppressionFiles>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -568,7 +576,6 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>${maven-owasp-plugin-version}</version>
             </plugin>
         </plugins>
     </reporting>
