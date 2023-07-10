@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +88,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     public WSSecEncrypt(Document doc) {
         super(doc);
+    }
+
+    public WSSecEncrypt(Document doc, Provider provider) {
+        super(doc, provider);
     }
 
     /**
