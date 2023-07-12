@@ -22,7 +22,7 @@
 
     <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j</artifactId>
-    <version>2.4.2-SNAPSHOT</version>
+    <version>2.4.2</version>
     <packaging>pom</packaging>
     <name>Apache WSS4J</name>
     <description>
@@ -81,7 +81,7 @@
         <connection>scm:git:https://gitbox.apache.org/repos/asf/ws-wss4j.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/ws-wss4j.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf?p=ws-wss4j.git;a=summary</url>
-      <tag>HEAD</tag>
+      <tag>wss4j-2.4.2</tag>
   </scm>
     <organization>
         <name>The Apache Software Foundation</name>
@@ -109,7 +109,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>6.5.3</maven-owasp-plugin-version>
-        <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-07-12T14:41:02Z</project.build.outputTimestamp>
     </properties>
 
     <modules>
