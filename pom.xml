@@ -274,7 +274,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <goals>
@@ -284,6 +284,10 @@
                     </executions>
                     <configuration>
                         <attach>true</attach>
+                        <sourcepath>src/main/java</sourcepath>
+                        <additionalJOptions>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                        </additionalJOptions>
                         <notimestamp>true</notimestamp>
                     </configuration>
                 </plugin>
