@@ -5,6 +5,18 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.4.2
+==============
+
+Bug
+
+    [WSS-699] - org.apache.wss4j.dom.transform.STRTransform not compliant with Oracle spec
+
+Improvement
+
+    [WSS-693] - Check for CVE/CVSS scores and fail build is severity is over a threshold
+    [WSS-700] - WSSecEncrypt cannot set Security Provider
+
 Release 2.4.1
 ==============
 
