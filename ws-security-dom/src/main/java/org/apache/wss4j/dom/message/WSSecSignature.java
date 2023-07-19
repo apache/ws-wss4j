@@ -111,8 +111,12 @@ public class WSSecSignature extends WSSecSignatureBase {
     private Provider signatureProvider;
 
     public WSSecSignature(WSSecHeader securityHeader) {
+        this(securityHeader, null);
+    }
+
+    public WSSecSignature(WSSecHeader securityHeader, Provider provider) {
         super(securityHeader);
-        init(null);
+        init(provider);
     }
 
     public WSSecSignature(Document doc) {
