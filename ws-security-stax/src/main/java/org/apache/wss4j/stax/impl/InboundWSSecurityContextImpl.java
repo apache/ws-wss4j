@@ -646,7 +646,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         this.soap12 = soap12;
     }
 
-    private static class MessageTokens {
+    private static final class MessageTokens {
         List<TokenSecurityEvent<? extends InboundSecurityToken>> messageSignatureTokens = Collections.emptyList();
         List<TokenSecurityEvent<? extends InboundSecurityToken>> messageEncryptionTokens = Collections.emptyList();
         List<TokenSecurityEvent<? extends InboundSecurityToken>> supportingTokens = Collections.emptyList();

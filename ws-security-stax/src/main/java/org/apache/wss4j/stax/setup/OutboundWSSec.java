@@ -766,7 +766,7 @@ public class OutboundWSSec {
         return configuredAction;
     }
 
-    private static class ConfiguredAction {
+    private static final class ConfiguredAction {
         boolean signatureAction = false;
         boolean encryptionAction = false;
         boolean signedSAML = false;
