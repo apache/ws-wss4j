@@ -19,6 +19,7 @@
 package org.apache.wss4j.dom.resolvers;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureByteInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverContext;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
@@ -32,7 +33,7 @@ public class ResolverAttachment extends ResourceResolverSpi {
 
     @Override
     public XMLSignatureInput engineResolveURI(ResourceResolverContext context) throws ResourceResolverException {
-        XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(EMPTY_BYTE_ARRAY);
+        XMLSignatureInput xmlSignatureInput = new XMLSignatureByteInput(EMPTY_BYTE_ARRAY);
         xmlSignatureInput.setSourceURI(context.uriToResolve);
         return xmlSignatureInput;
     }

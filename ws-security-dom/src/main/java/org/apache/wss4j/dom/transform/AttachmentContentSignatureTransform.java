@@ -31,6 +31,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.parser.XMLParserException;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureStreamInput;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -199,7 +200,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                  */
                 Canonicalizer canon = Canonicalizer.getInstance(WSConstants.C14N_EXCL_OMIT_COMMENTS);
 
-                XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(inputStream);
+                XMLSignatureInput xmlSignatureInput = new XMLSignatureStreamInput(inputStream); //NOPMD
                 canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet(), outputStream);
 
             } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
