@@ -503,17 +503,6 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>C_shibboleth</id>
-            <name>OpenSAML-SNAPSHOTs</name>
-            <url>https://build.shibboleth.net/nexus/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
 </project>
