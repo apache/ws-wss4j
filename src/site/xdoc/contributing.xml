@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<document>
+<body>
+<section name="Contributing to Apache WSS4J&#8482;">
+<p>
+As an open-source project, contributions of any kind are very welcome to Apache WSS4J.
+</p>
+
+<subsection name="Reporting bugs">
+<p>
+To report a bug or request a new feature, please file a <a href="issue-management.html">JIRA</a> ticket. If you do not have an account for the Apache
+JIRA instance, then you will need to request one first via the <a href="mailing-lists.html">mailing lists</a>. Before filing a JIRA ticket, please discuss 
+the issue on the dev or user mailing list to make sure that the issue is valid.
+Please also search for the open issues in the project, or issues that are fixed
+but not yet released, to make sure the issue hasn't been reported before.
+</p>
+</subsection>
+
+<subsection name="Contributing Code">
+<p>
+Code contributions should be done as pull requests on the Apache WSS4J <a href="https://github.com/apache/ws-wss4j">GitHub repo</a>. Before contributing any
+code, please run "mvn clean install" in the root directory and ensure that
+all the CheckStyle and PMD checks pass, as well as all of the unit tests. 
+Ideally any bug fix and new feature should have unit tests submitted as part
+of the pull request.
+</p>
+</subsection>
+
+</section>            
+</body>
+</document>

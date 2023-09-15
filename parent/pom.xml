@@ -17,13 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
     <artifactId>wss4j-parent</artifactId>
     <packaging>pom</packaging>
@@ -32,24 +32,24 @@
     <url>https://ws.apache.org/wss4j/</url>
 
     <properties>
-        <bcprov.version>1.70</bcprov.version>
-        <commons.compress.version>1.21</commons.compress.version>
-        <cryptacular.version>1.2.5</cryptacular.version>
-        <ehcache.version>3.10.1</ehcache.version>
+        <bcprov.version>1.76</bcprov.version>
+        <commons.compress.version>1.24.0</commons.compress.version>
+        <cryptacular.version>1.2.6</cryptacular.version>
+        <ehcache.version>3.10.8</ehcache.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <jakarta.mail.api.version>2.1.0</jakarta.mail.api.version>
+        <jakarta.mail.api.version>2.1.2</jakarta.mail.api.version>
         <jasypt.version>1.9.3</jasypt.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
-        <junit.version>5.9.1</junit.version>
-        <kerby.version>2.0.2</kerby.version>
+        <junit.version>5.10.0</junit.version>
+        <kerby.version>2.0.3</kerby.version>
         <neethi.version>3.2.0</neethi.version>
         <opensaml.version>5.0.0</opensaml.version>
-        <slf4j.version>2.0.1</slf4j.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
-        <woodstox.version>6.4.0</woodstox.version>
+        <woodstox.version>6.5.1</woodstox.version>
         <xz.version>1.9</xz.version>
-        <xmlsec.version>3.0.1</xmlsec.version>
-        <xmlunit.version>2.9.0</xmlunit.version>
+        <xmlsec.version>3.0.2</xmlsec.version>
+        <xmlunit.version>2.9.1</xmlunit.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
         <wss4j.osgi.symbolic.name>${project.groupId}.${project.artifactId}</wss4j.osgi.symbolic.name>
@@ -73,12 +73,12 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
             </dependency>
             <dependency>
@@ -242,7 +242,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <archive>
                             <manifestFile>${wss4j.manifest.location}</manifestFile>

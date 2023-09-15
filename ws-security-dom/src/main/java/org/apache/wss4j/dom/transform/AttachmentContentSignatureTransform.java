@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.dom.transform;
 
-import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
@@ -237,7 +236,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                         ),
                         attachmentUri, mimeType);
             }
-            return new ApacheNodeSetData(new XMLSignatureInput((byte[])null));
+            return null;
         } catch (IOException | InvalidCanonicalizerException | CanonicalizationException
             | XMLParserException e) {
             throw new TransformException(e);

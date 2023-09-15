@@ -18,3 +18,13 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "org.apache.maven.plugins:maven-source-plugin"
+        versions:
+          # MSOURCES-137
+          - "3.3.0"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
