@@ -105,8 +105,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <targetJdk>11</targetJdk>
-        <maven.compiler.target>11</maven.compiler.target>
+        <targetJdk>17</targetJdk>
+        <maven.compiler.target>17</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>8.4.0</maven-owasp-plugin-version>
         <project.build.outputTimestamp>2023-07-12T11:16:09Z</project.build.outputTimestamp>
