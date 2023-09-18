@@ -46,6 +46,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureStreamInput;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -159,8 +160,8 @@ public class STRTransform extends TransformService {
                 }
             } else {
                 try {
-                    XMLSignatureInput xmlSignatureInput =
-                        new XMLSignatureInput(((OctetStreamData)data).getOctetStream());
+                    XMLSignatureInput xmlSignatureInput = //NOPMD
+                        new XMLSignatureStreamInput(((OctetStreamData)data).getOctetStream());
                     str = (Element)xmlSignatureInput.getSubNode();
                 } catch (Exception ex) {
                     throw new TransformException(ex);
