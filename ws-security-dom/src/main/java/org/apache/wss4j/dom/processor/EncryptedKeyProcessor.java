@@ -505,7 +505,7 @@ public class EncryptedKeyProcessor implements Processor {
     /**
      * Decrypt all data references
      */
-    private List<WSDataRef> decryptDataRefs(Element refList, WSDocInfo docInfo,
+    protected List<WSDataRef> decryptDataRefs(Element refList, WSDocInfo docInfo,
                                             byte[] decryptedBytes, RequestData data
     ) throws WSSecurityException {
         //
@@ -536,7 +536,7 @@ public class EncryptedKeyProcessor implements Processor {
     /**
      * Decrypt an EncryptedData element referenced by dataRefURI
      */
-    private WSDataRef decryptDataRef(
+    protected WSDataRef decryptDataRef(
         Document doc,
         String dataRefURI,
         WSDocInfo docInfo,

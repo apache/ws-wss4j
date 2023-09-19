@@ -59,6 +59,11 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>July 2023</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 3.0.1, 2.4.2 and 2.3.4. These releases contain a fix for a bug with STR Transform and contain dependency updates.
+</p>
+</li>
+<li>
 <p><b>October 2022</b> - 
 The Apache WSS4J team are pleased to announce the release of version 3.0.0.
 This is a major new release of WSS4J. Significant changes:

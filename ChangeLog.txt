@@ -5,6 +5,33 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 3.0.1
+==============
+
+Bug
+
+    [WSS-699] - org.apache.wss4j.dom.transform.STRTransform not compliant with Oracle spec
+
+Improvement
+    [WSS-700] - WSSecEncrypt cannot set Security Provider
+
+Release 3.0.0
+==============
+
+New Feature
+     [WSS-694] - Move wss4j to native jakarta namespace
+
+Improvement
+    [WSS-695] - Unmarshalling failure with OpenSAML 4
+
+Wish
+    [WSS-684] - Support OpenSaml 4
+
+Task
+
+    [WSS-687] - Upgrade OpenSAML to v4.1.x
+    [WSS-696] - Upgrade ehcache to 3.10.0 with jakarta classfier
+
 Release 2.4.1
 ==============
 

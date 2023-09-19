@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.dom.transform;
 
-import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
@@ -32,6 +31,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.parser.XMLParserException;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.signature.XMLSignatureStreamInput;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -200,7 +200,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                  */
                 Canonicalizer canon = Canonicalizer.getInstance(WSConstants.C14N_EXCL_OMIT_COMMENTS);
 
-                XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(inputStream);
+                XMLSignatureInput xmlSignatureInput = new XMLSignatureStreamInput(inputStream); //NOPMD
                 canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet(), outputStream);
 
             } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
@@ -237,7 +237,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                         ),
                         attachmentUri, mimeType);
             }
-            return new ApacheNodeSetData(new XMLSignatureInput((byte[])null));
+            return null;
         } catch (IOException | InvalidCanonicalizerException | CanonicalizationException
             | XMLParserException e) {
             throw new TransformException(e);
