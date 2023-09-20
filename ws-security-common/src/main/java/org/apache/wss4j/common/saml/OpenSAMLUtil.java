@@ -21,8 +21,8 @@ package org.apache.wss4j.common.saml;
 
 import javax.xml.namespace.QName;
 
-import net.shibboleth.utilities.java.support.xml.BasicParserPool;
-import net.shibboleth.utilities.java.support.xml.ParserPool;
+import net.shibboleth.shared.xml.impl.BasicParserPool;
+import net.shibboleth.shared.xml.ParserPool;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;

@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.shibboleth.utilities.java.support.xml.DOMTypeSupport;
+import net.shibboleth.shared.xml.DOMTypeSupport;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
