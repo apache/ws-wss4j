@@ -133,7 +133,9 @@ public class SamlNegativeTest {
         Element envelope = signedDoc.getDocumentElement();
         NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
         Element assertionElement = (Element)list.item(0);
-        assertionElement.setAttributeNS(null, "MinorVersion", "5");
+        list = assertionElement.getElementsByTagNameNS(WSConstants.SAML2_NS, "Issuer");
+        Element issuer = (Element)list.item(0);
+        issuer.setTextContent("www.example2.com");
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
