@@ -19,35 +19,13 @@
 
 package org.apache.wss4j.dom.processor;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.derivedKey.ConcatKDF;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -68,6 +46,29 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import javax.crypto.Cipher;
+import javax.crypto.KeyAgreement;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.*;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
@@ -131,8 +132,11 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
 
+        Element keyInfoChildElement = getKeyInfoChildElement(elem, data);
+        boolean isDHKeyWrap = isDiffieHellmanKeyWrap(keyInfoChildElement);
+
         // Check BSP Compliance
-        checkBSPCompliance(elem, encryptedKeyTransportMethod, data.getBSPEnforcer());
+        checkBSPCompliance(elem, encryptedKeyTransportMethod, isDHKeyWrap, data.getBSPEnforcer());
 
         //
         // Now lookup CipherValue.
@@ -142,55 +146,35 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
         }
 
-        Element keyInfoChildElement = getKeyInfoChildElement(elem, data);
+        Element refList =
+                XMLUtils.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
 
+        // Get the key bytes from CipherValue directly or via an attachment
+        String xopUri = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
+        byte[] encryptedEphemeralKey;
+        if (xopUri != null && xopUri.startsWith("cid:")) {
+            encryptedEphemeralKey = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
+        } else {
+            encryptedEphemeralKey = EncryptionUtils.getDecodedBase64EncodedData(xencCipherValue);
+        }
+
+        PublicKey originatorPublicKey = null;
+        PublicKey publicKey = null;
         X509Certificate[] certs = null;
         STRParser.REFERENCE_TYPE referenceType = null;
-        PublicKey publicKey = null;
         boolean symmetricKeyWrap = isSymmetricKeyWrap(encryptedKeyTransportMethod);
-        if (!symmetricKeyWrap) {
-            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName())
-                && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
-                STRParserParameters parameters = new STRParserParameters();
-                parameters.setData(data);
-                parameters.setStrElement(keyInfoChildElement);
-
-                STRParser strParser = new EncryptedKeySTRParser();
-                STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-
-                certs = parserResult.getCertificates();
-                publicKey = parserResult.getPublicKey();
-                referenceType = parserResult.getCertificatesReferenceType();
-            } else {
-                certs = getCertificatesFromX509Data(keyInfoChildElement, data);
-                if (certs == null || certs.length == 0) {
-                    XMLSignatureFactory signatureFactory;
-                    if (provider == null) {
-                        // Try to install the Santuario Provider - fall back to the JDK provider if this does
-                        // not work
-                        try {
-                            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                        } catch (NoSuchProviderException ex) {
-                            signatureFactory = XMLSignatureFactory.getInstance("DOM");
-                        }
-                    } else {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
-                    }
-
-                    publicKey = X509Util.parseKeyValue((Element)keyInfoChildElement.getParentNode(),
-                                                       signatureFactory);
-                }
-            }
-
-            if (publicKey == null && (certs == null || certs.length < 1 || certs[0] == null)) {
-                throw new WSSecurityException(
-                                          WSSecurityException.ErrorCode.FAILURE,
-                                          "noCertsFound",
-                                          new Object[] {"decryption (KeyId)"});
-            }
-            if (certs != null && certs.length > 0) {
-                publicKey = certs[0].getPublicKey();
-            }
+        if (isDHKeyWrap) {
+            // get originator key value
+            originatorPublicKey = getDHOriginatorPublicKey(keyInfoChildElement, data);
+            // get recipient key value
+            CertificateResult certificateResult = getDHReceiverPublicKey(keyInfoChildElement, data);
+            certs = certificateResult.getCerts();
+            publicKey = certificateResult.getPublicKey();
+        } else if (!symmetricKeyWrap) {
+            CertificateResult certificateResult = getPublicKey(keyInfoChildElement, data);
+            certs = certificateResult.getCerts();
+            publicKey = certificateResult.getPublicKey();
+            referenceType = certificateResult.getCertificatesReferenceType();
         }
 
         // Check for compliance against the defined AlgorithmSuite
@@ -206,20 +190,15 @@ public class EncryptedKeyProcessor implements Processor {
             );
         }
 
-        byte[] encryptedEphemeralKey = null;
-        byte[] decryptedBytes = null;
-        Element refList =
-            XMLUtils.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
+        byte[] decryptedBytes;
+        if (isDHKeyWrap) {
+            PrivateKey privateKey = getPrivateKey(data, certs, publicKey);
+            Element keyDerivationMethodElement = XMLUtils.getDirectChildElement(
+                    keyInfoChildElement, WSS4JConstants.KEY_DERIVATION_METHOD_LN, WSConstants.ENC11_NS);
 
-        // Get the key bytes from CipherValue directly or via an attachment
-        String xopUri = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
-        if (xopUri != null && xopUri.startsWith("cid:")) {
-            encryptedEphemeralKey = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
-        } else {
-            encryptedEphemeralKey = EncryptionUtils.getDecodedBase64EncodedData(xencCipherValue);
-        }
-
-        if (symmetricKeyWrap) {
+            decryptedBytes = getUnwrapDHKey(data, keyDerivationMethodElement, privateKey, originatorPublicKey,
+                    encryptedKeyTransportMethod, encryptedEphemeralKey);
+        } else if (symmetricKeyWrap) {
             decryptedBytes = getSymmetricDecryptedBytes(data, data.getWsDocInfo(), keyInfoChildElement, refList);
         } else {
             PrivateKey privateKey = getPrivateKey(data, certs, publicKey);
@@ -257,6 +236,121 @@ public class EncryptedKeyProcessor implements Processor {
         return Collections.singletonList(result);
     }
 
+    public PublicKey getDHOriginatorPublicKey(Element keyInfoChildElement, RequestData data) throws WSSecurityException {
+
+        // get sender key value
+        Element originatorKeyInfoElement =
+                XMLUtils.getDirectChildElement(
+                        keyInfoChildElement, WSS4JConstants.ORIGINATOR_KEY_INFO_LN, WSConstants.ENC_NS
+                );
+        Element originatorKeyValueElement =
+                XMLUtils.getDirectChildElement(
+                        originatorKeyInfoElement, WSS4JConstants.KEYVALUE_LN, WSConstants.SIG_NS
+                );
+
+
+        Element originatorPublicKeyElement;
+        if (originatorKeyValueElement == null) {
+            originatorPublicKeyElement =
+                    XMLUtils.getDirectChildElement(
+                            originatorKeyInfoElement, WSS4JConstants.DER_ENCODED_KEY_VALUE_LN, WSConstants.SIG11_NS
+                    );
+            byte[] pkBuff = Base64.getDecoder().decode(XMLUtils.getElementText(originatorPublicKeyElement));
+            PublicKey originatorPublicKey = parsePublicKey(pkBuff, "EC");
+            if (originatorPublicKey == null) {
+                originatorPublicKey = parsePublicKey(pkBuff, "XDH");
+            }
+            if (originatorPublicKey == null) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "Unknown Originator Key Type");
+            }
+            return originatorPublicKey;
+        } else {
+            originatorKeyInfoElement.removeChild(originatorKeyValueElement);
+            Element keyInfoElement =
+                    originatorKeyValueElement.getOwnerDocument().createElementNS(
+                            WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN);
+            keyInfoElement.appendChild(originatorKeyValueElement);
+            CertificateResult result = getPublicKey(originatorKeyValueElement, data);
+            return result.getPublicKey();
+        }
+    }
+
+    public PublicKey parsePublicKey(byte[] derEncodedPK, String algorithm) {
+        try {
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(derEncodedPK);
+            KeyFactory factory = KeyFactory.getInstance(algorithm);
+            return factory.generatePublic(keySpec);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            LOG.debug("Error parsing public key", e);
+        }
+        return null;
+    }
+
+    private CertificateResult getDHReceiverPublicKey(Element keyInfoChildElement, RequestData data)
+            throws WSSecurityException {
+        // get receiver key value
+        Element recipientKeyInfo =
+                XMLUtils.getDirectChildElement(
+                        keyInfoChildElement, WSConstants.RECIPIENT_KEY_INFO_LN, WSConstants.ENC_NS
+                );
+        Element recipientKeyValue =
+                XMLUtils.getDirectChildElement(
+                        recipientKeyInfo, WSConstants.KEYVALUE_LN, WSConstants.SIG_NS
+                );
+        Element keyInfoElement = getOnlyChildElement(recipientKeyValue, data);
+        return getPublicKey(keyInfoElement, data);
+    }
+
+    /**
+     * Resolve the KeyInfoType child element to locate the public key (with the X509Certificate chain if given )
+     * to use to decrypt the EncryptedKey.
+     *
+     * @param keyValueElement The element to get the child element from
+     * @param data            The RequestData context
+     * @return The CertificateResult object containing the public key and optionally X509Certificate chain
+     * @throws WSSecurityException an error occurred when trying to resolve the key info
+     */
+    private CertificateResult getPublicKey(Element keyValueElement, RequestData data) throws WSSecurityException {
+        CertificateResult.Builder builder = CertificateResult.Builder.create();
+
+        if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyValueElement.getLocalName())
+                && WSConstants.WSSE_NS.equals(keyValueElement.getNamespaceURI())) {
+            STRParserParameters parameters = new STRParserParameters();
+            parameters.setData(data);
+            parameters.setStrElement(keyValueElement);
+
+            STRParser strParser = new EncryptedKeySTRParser();
+            STRParserResult result = strParser.parseSecurityTokenReference(parameters);
+            builder.certificates(result.getCertificates());
+            builder.publicKey(result.getPublicKey());
+            builder.certificatesReferenceType(result.getCertificatesReferenceType());
+        } else {
+            X509Certificate[] certs = getCertificatesFromX509Data(keyValueElement, data);
+            builder.certificates(certs);
+            if (certs == null || certs.length == 0) {
+                XMLSignatureFactory signatureFactory;
+                if (provider == null) {
+                    // Try to install the Santuario Provider - fall back to the JDK provider if this does
+                    // not work
+                    try {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                    } catch (NoSuchProviderException ex) {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                    }
+                } else {
+                    signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
+                }
+
+                PublicKey publicKey = X509Util.parseKeyValue((Element) keyValueElement.getParentNode(),
+                        signatureFactory);
+                builder.publicKey(publicKey);
+            }
+        }
+        return builder.build();
+    }
+
     private PrivateKey getPrivateKey(
         RequestData data, X509Certificate[] certs, PublicKey publicKey
     ) throws WSSecurityException {
@@ -267,6 +361,93 @@ public class EncryptedKeyProcessor implements Processor {
             return data.getDecCrypto().getPrivateKey(publicKey, data.getCallbackHandler());
         } catch (WSSecurityException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+        }
+    }
+
+
+    /**
+     * Method uses Diffie-Hellman algorithm (ECDH or XDH) to generate a shared secret key. The shared secret key is used to
+     * derive encrypted key to decrypt the EncryptedKey value using wrapped EAS.
+     *
+     * @param data                        The RequestData context
+     * @param receiverPK                  The receiver's private key
+     * @param originatorPublicKey         The originator's public key
+     * @param encryptedKeyTransportMethod The encryption algorithm used to encrypt the EncryptedKey value
+     * @param encryptedEphemeralKey       The EncryptedKey value
+     * @return The decrypted EncryptedKey value
+     * @throws WSSecurityException an error occurred when trying to decrypt the EncryptedKey value
+     */
+    private byte[] getUnwrapDHKey(RequestData data, Element keyDerivationMethodElement, PrivateKey receiverPK,
+                                  PublicKey originatorPublicKey, String encryptedKeyTransportMethod, byte[] encryptedEphemeralKey)
+            throws WSSecurityException {
+
+        try {
+            String keyAgreementAlg = receiverPK.getAlgorithm().equalsIgnoreCase("EC") ? "ECDH" : "XDH";
+            String cryptoProvider = data.getDecCrypto().getCryptoProvider();
+            KeyAgreement keyAgreement = cryptoProvider != null
+                    ? KeyAgreement.getInstance(keyAgreementAlg, cryptoProvider) : KeyAgreement.getInstance(keyAgreementAlg);
+            keyAgreement.init(receiverPK);
+            keyAgreement.doPhase(originatorPublicKey, true);
+            final byte[] exchangedSharedSecretKey = keyAgreement.generateSecret();
+            final byte[] derivedKek = deriveKeyEncryptionKey(exchangedSharedSecretKey, keyDerivationMethodElement,
+                    encryptedKeyTransportMethod);
+
+            Cipher unwrapCipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod, cryptoProvider);
+            SecretKey unwrapSecretKey = new SecretKeySpec(derivedKek, "AES");
+            unwrapCipher.init(Cipher.UNWRAP_MODE, unwrapSecretKey);
+            final Key aes = unwrapCipher.unwrap(encryptedEphemeralKey, "AES", Cipher.SECRET_KEY);
+            return aes.getEncoded();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e);
+        } catch (InvalidKeyException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+        }
+    }
+
+    public byte[] deriveKeyEncryptionKey(byte[] sharedSecret, Element keyDerivationMethodElement, String keyWrapAlgorithm)
+            throws WSSecurityException {
+        int iKeySize = getKeyByteSizeFromKeyWrapAlgorithm(keyWrapAlgorithm);
+        String keyDerivationMethod = keyDerivationMethodElement.getAttributeNS(null, "Algorithm");
+        if (!WSS4JConstants.KDF_CONCAT.equals(keyDerivationMethod)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unknownAlgorithm",
+                    new Object[]{keyWrapAlgorithm});
+        }
+        Element concatKDFParams = XMLUtils.getDirectChildElement(keyDerivationMethodElement,
+                WSS4JConstants.CONCAT_KDF_PARAMS_LN, WSS4JConstants.ENC11_NS);
+        if (concatKDFParams == null) {
+            LOG.debug("Missing ConcatKDFParams for key derivation with algorithm [{}]", keyDerivationMethod);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation");
+        }
+        // get parameters
+        String digestAlgorithm = EncryptionUtils.getAlgorithmFromChildDigestMethod(concatKDFParams);
+        if (digestAlgorithm == null) {
+            LOG.debug("Missing ConcatKDFParams Digest algorithm for key derivation with algorithm [{}]", keyDerivationMethod);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation");
+        }
+        String algorithmID = concatKDFParams.getAttributeNS(null, WSS4JConstants.ATTR_ALGORITHM_ID);
+        String partyUInfo = concatKDFParams.getAttributeNS(null, WSS4JConstants.ATTR_PARTY_UINFO);
+        String partyVInfo = concatKDFParams.getAttributeNS(null, WSS4JConstants.ATTR_PARTY_VINFO);
+        String suppPubInfo = concatKDFParams.getAttributeNS(null, WSS4JConstants.ATTR_SUPP_PUBINFO);
+        String suppPrivInfo = concatKDFParams.getAttributeNS(null, WSS4JConstants.ATTR_SUPP_PRIVINFO);
+
+        ConcatKDF concatKDF = new ConcatKDF(digestAlgorithm);
+        return concatKDF.createKey(sharedSecret, algorithmID, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo, iKeySize);
+    }
+
+    public int getKeyByteSizeFromKeyWrapAlgorithm(String keyWrapAlgorithm) throws WSSecurityException {
+        switch (keyWrapAlgorithm) {
+            case XMLCipher.AES_128_KeyWrap:
+                return 128 / 8;
+            case XMLCipher.AES_192_KeyWrap:
+                return 192 / 8;
+            case XMLCipher.AES_256_KeyWrap:
+                return 256 / 8;
+            default:
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM,
+                        "unknownAlgorithm",
+                        new Object[]{keyWrapAlgorithm}
+                );
         }
     }
 
@@ -369,6 +550,28 @@ public class EncryptedKeyProcessor implements Processor {
     }
 
     /**
+     * if keInfo element contains AgreementMethod element then check it is supported EC Diffie-Hellman key agreement algorithm
+     *
+     * @param keyInfoChildElement The KeyInfo child element
+     * @return true if AgreementMethod element is present and DH algorithm supported and false if AgreementMethod element is not present
+     * @throws WSSecurityException if AgreementMethod element is present but DH algorithm is not supported
+     */
+    private boolean isDiffieHellmanKeyWrap(Element keyInfoChildElement) throws WSSecurityException {
+        if (WSS4JConstants.AGREEMENT_METHOD_LN.equals(keyInfoChildElement.getLocalName())
+                && WSConstants.ENC_NS.equals(keyInfoChildElement.getNamespaceURI())) {
+            String algorithmURI = keyInfoChildElement.getAttributeNS(null, "Algorithm");
+            // Only ECDH_ES is supported for AgreementMethod
+            if (!WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(algorithmURI)) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM,
+                        "unknownAlgorithm", new Object[]{algorithmURI});
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
      */
@@ -423,31 +626,34 @@ public class EncryptedKeyProcessor implements Processor {
         Element keyInfo =
             XMLUtils.getDirectChildElement(xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS);
         if (keyInfo != null) {
-            Element strElement = null;
-
-            int result = 0;
-            Node node = keyInfo.getFirstChild();
-            while (node != null) {
-                if (Node.ELEMENT_NODE == node.getNodeType()) {
-                    result++;
-                    strElement = (Element)node;
-                }
-                node = node.getNextSibling();
-            }
-            if (result != 1) {
-                data.getBSPEnforcer().handleBSPRule(BSPRule.R5424);
-            }
-
-            if (strElement == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
-                );
-            }
-
-            return strElement;
+            return getOnlyChildElement(keyInfo, data);
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         }
+    }
+
+    private Element getOnlyChildElement(Element parent, RequestData data) throws WSSecurityException {
+        Element strElement = null;
+
+        int result = 0;
+        Node node = parent.getFirstChild();
+        while (node != null) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                result++;
+                strElement = (Element) node;
+            }
+            node = node.getNextSibling();
+        }
+        if (result != 1) {
+            data.getBSPEnforcer().handleBSPRule(BSPRule.R5424);
+        }
+
+        if (strElement == null) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
+            );
+        }
+        return strElement;
     }
 
     private X509Certificate[] getCertificatesFromX509Data(
@@ -605,7 +811,10 @@ public class EncryptedKeyProcessor implements Processor {
      * @throws WSSecurityException
      */
     private void checkBSPCompliance(
-        Element elem, String encAlgo, BSPEnforcer bspEnforcer
+            Element elem,
+            String encAlgo,
+            boolean useKeyWrap,
+            BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         String attribute = elem.getAttributeNS(null, "Type");
         if (attribute != null && attribute.length() != 0) {
@@ -624,11 +833,28 @@ public class EncryptedKeyProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5602);
         }
 
-        // EncryptionAlgorithm must be RSA15, or RSAOEP.
+        // EncryptionAlgorithm must be RSA15,RSAOEP, KW-AES128", KW-AES256 or KEYWRAP_TRIPLEDES".
         if (!(WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
-            || WSConstants.KEYTRANSPORT_RSAOAEP.equals(encAlgo)
-            || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encAlgo))) {
-            bspEnforcer.handleBSPRule(BSPRule.R5621);
+                || WSConstants.KEYTRANSPORT_RSAOAEP.equals(encAlgo)
+                || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encAlgo)
+                || WSConstants.KEYWRAP_AES128.equals(encAlgo)
+                || WSConstants.KEYWRAP_AES256.equals(encAlgo)
+                || WSConstants.KEYWRAP_TRIPLEDES.equals(encAlgo))) {
+            bspEnforcer.handleBSPRule(BSPRule.R5626);
+        }
+        if (useKeyWrap) {
+            if (!(WSConstants.KEYWRAP_AES128.equals(encAlgo)
+                    || WSConstants.KEYWRAP_AES256.equals(encAlgo)
+                    || WSConstants.KEYWRAP_TRIPLEDES.equals(encAlgo))) {
+                bspEnforcer.handleBSPRule(BSPRule.R5625);
+            }
+        } else {
+            // EncryptionAlgorithm must be RSA15, or RSAOEP.
+            if (!(WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
+                    || WSConstants.KEYTRANSPORT_RSAOAEP.equals(encAlgo)
+                    || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encAlgo))) {
+                bspEnforcer.handleBSPRule(BSPRule.R5621);
+            }
         }
     }
 

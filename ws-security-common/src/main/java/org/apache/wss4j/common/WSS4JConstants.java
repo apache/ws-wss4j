@@ -54,6 +54,7 @@ public class WSS4JConstants {
         "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1";
 
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
+    public static final String SIG11_NS = "http://www.w3.org/2009/xmldsig11#";
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
     public static final String ENC11_NS = "http://www.w3.org/2009/xmlenc11#";
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
@@ -108,6 +109,20 @@ public class WSS4JConstants {
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
     public static final String KEYTRANSPORT_RSAOAEP_XENC11 =
         "http://www.w3.org/2009/xmlenc11#rsa-oaep";
+    public static final String KEYWRAP_AES128 =
+        "http://www.w3.org/2001/04/xmlenc#kw-aes128";
+    public static final String KEYWRAP_AES192 =
+        "http://www.w3.org/2001/04/xmlenc#kw-aes192";
+    public static final String KEYWRAP_AES256 =
+        "http://www.w3.org/2001/04/xmlenc#kw-aes256";
+    public static final String KEYWRAP_TRIPLEDES =
+            "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
+
+    public static final String  KDF_CONCAT =
+        "http://www.w3.org/2009/xmlenc11#ConcatKDF";
+    public static final String AGREEMENT_METHOD_ECDH_ES =
+        "http://www.w3.org/2009/xmlenc11#ECDH-ES";
+
     public static final String TRIPLE_DES =
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
     public static final String AES_128 =
@@ -221,6 +236,22 @@ public class WSS4JConstants {
     public static final String KEYINFO_LN = "KeyInfo";
     public static final String KEYVALUE_LN = "KeyValue";
     public static final String TOKEN_TYPE = "TokenType";
+    public static final String AGREEMENT_METHOD_LN = "AgreementMethod";
+    public static final String KEY_DERIVATION_METHOD_LN = "KeyDerivationMethod";
+    public static final String CONCAT_KDF_PARAMS_LN = "ConcatKDFParams";
+    public static final String ORIGINATOR_KEY_INFO_LN = "OriginatorKeyInfo";
+    public static final String RECIPIENT_KEY_INFO_LN = "RecipientKeyInfo";
+    public static final String ECKEY_VALUE_LN = "ECKeyValue";
+    public static final String DER_ENCODED_KEY_VALUE_LN = "DEREncodedKeyValue";
+    public static final String PUBLIC_KEY_LN = "PublicKey";
+    public static final String NAMED_CURVE_LN = "NamedCurve";
+    public static final String ATTR_ALGORITHM = "Algorithm";
+    public static final String ATTR_URI = "URI";
+    public static final String ATTR_ALGORITHM_ID = "AlgorithmID";
+    public static final String ATTR_PARTY_UINFO = "PartyUInfo";
+    public static final String ATTR_PARTY_VINFO = "PartyVInfo";
+    public static final String ATTR_SUPP_PUBINFO = "SuppPubInfo";
+    public static final String ATTR_SUPP_PRIVINFO = "SuppPrivInfo";
 
     public static final String ELEM_ENVELOPE = "Envelope";
     public static final String ELEM_HEADER = "Header";

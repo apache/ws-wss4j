@@ -39,6 +39,8 @@ public final class AlgoFactory {
         if (ConversationConstants.DerivationAlgorithm.P_SHA_1_2005_12.equals(algorithm)
             || ConversationConstants.DerivationAlgorithm.P_SHA_1.equals(algorithm)) {
             return new P_SHA1();
+        } else if (ConversationConstants.DerivationAlgorithm.CONCAT_KDF.equals(algorithm)) {
+            return new ConcatKDF();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "unknownAlgorithm", new Object[] {algorithm});

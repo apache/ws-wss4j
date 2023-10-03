@@ -500,11 +500,17 @@ public final class EncryptionUtils {
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
         if (tmpE != null) {
-            Element digestElement =
-                XMLUtils.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
-            if (digestElement != null) {
-                return digestElement.getAttributeNS(null, "Algorithm");
-            }
+            return getAlgorithmFromChildDigestMethod(tmpE);
+        }
+        return null;
+    }
+
+    public static String getAlgorithmFromChildDigestMethod(Element parentElement) {
+
+        Element digestElement =
+            XMLUtils.getDirectChildElement(parentElement, "DigestMethod", WSConstants.SIG_NS);
+        if (digestElement != null) {
+            return digestElement.getAttributeNS(null, "Algorithm");
         }
         return null;
     }

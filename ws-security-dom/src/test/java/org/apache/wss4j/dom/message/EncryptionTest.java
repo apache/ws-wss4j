@@ -19,6 +19,9 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +31,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -54,8 +58,11 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -232,6 +239,60 @@ public class EncryptionTest {
         REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
+    }
+
+    /**
+     * Test that encrypt and decrypt a WS-Security envelope.
+     * This test uses the ECDSA-ES algorithm to (wrap) the symmetric key.
+     * <p/>
+     *
+     * @throws Exception Thrown when there is any problem in signing or verification
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"X25519", "X448","secp256r1","secp384r1","secp521r1"})
+    public void testEncryptionDecryptionECDSA_ES(String certAlias) throws Exception {
+        try {
+            // add BC just to read the key from pkcs12 keystore with JDK16+ BC is not needed
+            Security.addProvider(new BouncyCastleProvider());
+            Crypto encCrypto = CryptoFactory.getInstance("wss-xdh.properties");
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+            builder.setUserInfo(certAlias);
+            builder.setKeyEncAlgo(WSConstants.KEYWRAP_AES128);
+            builder.setKeyAgreementMethod(WSConstants.AGREEMENT_METHOD_ECDH_ES);
+            builder.setDigestAlgorithm(WSS4JConstants.SHA256);
+            builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+
+            LOG.info("Before Encryption ...");
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+            SecretKey symmetricKey = keyGen.generateKey();
+
+            Document encryptedDoc = builder.build(encCrypto, symmetricKey);
+            LOG.info("After Encryption ....");
+
+            String outputString =
+                    XMLUtils.prettyDocumentToString(encryptedDoc);
+            Files.write(Paths.get("target", "encrypted-"+certAlias+".xml"), outputString.getBytes());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Encrypted message:");
+                LOG.debug(outputString);
+            }
+            assertFalse(outputString.contains("counter_port_type"));
+
+            WSSecurityEngine newEngine = new WSSecurityEngine();
+            WSHandlerResult results =
+                    newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, encCrypto);
+
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.ENCR).get(0);
+            assertNotNull(actionResult);
+        } finally {
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        }
     }
 
     @Test
