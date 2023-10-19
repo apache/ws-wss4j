@@ -43,6 +43,11 @@ public class KeystoreCallbackHandler implements CallbackHandler {
         users.put("wss40rev", "security");
         users.put("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         users.put("regexp", "security");
+        users.put("x448", "security");
+        users.put("x25519", "security");
+        users.put("secp256r1", "security");
+        users.put("secp384r1", "security");
+        users.put("secp521r1", "security");
     }
 
     public void handle(Callback[] callbacks)

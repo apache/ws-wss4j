@@ -47,7 +47,7 @@
         <slf4j.version>1.7.36</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xz.version>1.9</xz.version>
-        <xmlsec.version>2.3.3</xmlsec.version>
+        <xmlsec.version>2.3.4-SNAPSHOT</xmlsec.version>
         <xmlunit.version>2.8.2</xmlunit.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
@@ -97,6 +97,11 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
                 <version>${junit.version}</version>
             </dependency>
             <dependency>
