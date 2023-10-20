@@ -668,6 +668,11 @@ public abstract class WSHandler {
             algorithmSuite.addKeyWrapAlgorithm(transportAlgorithm);
         }
 
+        String keyAgreementMethodAlgorithm = getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
+        if (keyAgreementMethodAlgorithm != null && keyAgreementMethodAlgorithm.length() != 0) {
+            algorithmSuite.addKeyAgreementMethodAlgorithm(transportAlgorithm);
+        }
+
         reqData.setAlgorithmSuite(algorithmSuite);
     }
 
@@ -716,6 +721,10 @@ public abstract class WSHandler {
         String encKeyTransport =
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         actionToken.setKeyTransportAlgorithm(encKeyTransport);
+
+        String encKeyAgreementMethod =
+                getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
+        actionToken.setKeyAgreementMethodAlgorithm(encKeyAgreementMethod);
 
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);

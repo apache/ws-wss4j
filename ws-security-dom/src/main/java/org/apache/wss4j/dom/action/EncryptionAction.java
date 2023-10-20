@@ -64,6 +64,9 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getKeyTransportAlgorithm() != null) {
             wsEncrypt.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
         }
+        if (encryptionToken.getKeyAgreementMethodAlgorithm() != null) {
+            wsEncrypt.setKeyAgreementMethod(encryptionToken.getKeyAgreementMethodAlgorithm());
+        }
         if (encryptionToken.getDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
         }

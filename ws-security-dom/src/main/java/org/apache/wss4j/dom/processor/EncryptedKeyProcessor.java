@@ -175,6 +175,11 @@ public class EncryptedKeyProcessor implements Processor {
             algorithmSuiteValidator.checkEncryptionKeyWrapAlgorithm(
                 encryptedKeyTransportMethod
             );
+            if (agreementMethod != null) {
+                algorithmSuiteValidator.checkKeyAgreementMethodAlgorithm(
+                  agreementMethod.getAlgorithm()
+                );
+            }
         }
 
         byte[] encryptedEphemeralKey = null;
