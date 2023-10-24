@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.3-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
