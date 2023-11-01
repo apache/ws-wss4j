@@ -59,6 +59,11 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>November 2023</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 3.0.2 and 2.4.3. These releases contain an upgrade to XML Security to pick up a recent CVE fix.
+</p>
+</li>
+<li>
 <p><b>July 2023</b> - 
 The Apache WSS4J team are pleased to announce the release of versions 3.0.1, 2.4.2 and 2.3.4. These releases contain a fix for a bug with STR Transform and contain dependency updates.
 </p>
