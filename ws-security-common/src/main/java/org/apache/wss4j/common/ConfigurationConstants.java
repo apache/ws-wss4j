@@ -738,6 +738,21 @@ public class ConfigurationConstants {
     public static final String ENC_KEY_TRANSPORT = "encryptionKeyTransportAlgorithm";
 
     /**
+     * Defines the Agreement method algorithm to derive encryption key.
+     * The default algorithm is:
+     * "http://www.w3.org/2009/xmlenc11#ECDH-ES"
+     *
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     *      call.setProperty(ConfigurationConstants.ENC_KEY_AGREEMENT_METHOD,
+     *          WSConstants.AGREEMENT_METHOD_ECDH_ES);
+     * </pre>
+     *
+     */
+    public static final String ENC_KEY_AGREEMENT_METHOD = "encryptionKeyAgreementMethod";
+
+    /**
      * Parameter to define which parts of the request shall be encrypted.
      * <p/>
      * The value of this parameter is a list of semi-colon separated

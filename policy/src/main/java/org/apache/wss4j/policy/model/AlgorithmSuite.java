@@ -220,6 +220,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private String encryptionDigest;
         private String symmetricSignature = SPConstants.HMAC_SHA1;
         private String asymmetricSignature = SPConstants.RSA_SHA1;
+        private String encryptionKeyAgreementMethod;
 
         public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, //NOPMD
                                   String asymmetricKeyWrap, String encryptionKeyDerivation,
@@ -268,6 +269,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.symmetricSignature = algorithmSuiteType.symmetricSignature;
             this.asymmetricSignature = algorithmSuiteType.asymmetricSignature;
             this.encryptionDerivedKeyLength = algorithmSuiteType.encryptionDerivedKeyLength;
+            this.encryptionKeyAgreementMethod = algorithmSuiteType.encryptionKeyAgreementMethod;
             this.signatureDerivedKeyLength = algorithmSuiteType.signatureDerivedKeyLength;
             this.minimumSymmetricKeyLength = algorithmSuiteType.minimumSymmetricKeyLength;
             this.maximumSymmetricKeyLength = algorithmSuiteType.maximumSymmetricKeyLength;
@@ -309,6 +311,10 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             }
             if (encryptionKeyDerivation != null && !encryptionKeyDerivation.equals(that.encryptionKeyDerivation)
                 || encryptionKeyDerivation == null && that.encryptionKeyDerivation != null) {
+                return false;
+            }
+            if (encryptionKeyAgreementMethod != null && !encryptionKeyAgreementMethod.equals(that.encryptionKeyAgreementMethod)
+                    || encryptionKeyAgreementMethod == null && that.encryptionKeyAgreementMethod != null) {
                 return false;
             }
             if (signatureKeyDerivation != null && !signatureKeyDerivation.equals(that.signatureKeyDerivation)
@@ -365,6 +371,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             if (encryptionKeyDerivation != null) {
                 result = 31 * result + encryptionKeyDerivation.hashCode();
             }
+            if (encryptionKeyAgreementMethod != null) {
+                result = 31 * result + encryptionKeyAgreementMethod.hashCode();
+            }
             if (signatureKeyDerivation != null) {
                 result = 31 * result + signatureKeyDerivation.hashCode();
             }
@@ -417,6 +426,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
 
         public String getEncryptionKeyDerivation() {
             return encryptionKeyDerivation;
+        }
+
+        public void setEncryptionKeyAgreementMethod(String encryptionKeyAgreementMethod) {
+            this.encryptionKeyAgreementMethod = encryptionKeyAgreementMethod;
+        }
+
+        public String getEncryptionKeyAgreementMethod() {
+            return encryptionKeyAgreementMethod;
         }
 
         public String getSignatureKeyDerivation() {

@@ -138,6 +138,19 @@ public class AlgorithmSuiteValidator {
         }
     }
 
+    public void checkKeyAgreementMethodAlgorithm(
+            String keyAgreementMethodAlgorithm
+    ) throws WSSecurityException {
+        Set<String> keyAgreementMethodAlgorithms = algorithmSuite.getKeyAgreementMethodAlgorithms();
+        if (!keyAgreementMethodAlgorithms.isEmpty()
+                && !keyAgreementMethodAlgorithms.contains(keyAgreementMethodAlgorithm)) {
+            LOG.warn(
+                    "The Key agreement method does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
     public void checkSymmetricEncryptionAlgorithm(
         String symmetricAlgorithm
     ) throws WSSecurityException {

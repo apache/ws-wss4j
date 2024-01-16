@@ -647,17 +647,22 @@ public abstract class WSHandler {
             algorithmSuite.addSignatureMethod(signatureAlgorithm);
         }
         String signatureDigestAlgorithm = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
-        if (signatureDigestAlgorithm != null && signatureDigestAlgorithm.length() != 0) {
+        if (signatureDigestAlgorithm != null && !signatureDigestAlgorithm.isEmpty()) {
             algorithmSuite.addDigestAlgorithm(signatureDigestAlgorithm);
         }
 
         String encrAlgorithm = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
-        if (encrAlgorithm != null && encrAlgorithm.length() != 0) {
+        if (encrAlgorithm != null && !encrAlgorithm.isEmpty()) {
             algorithmSuite.addEncryptionMethod(encrAlgorithm);
         }
         String transportAlgorithm = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
-        if (transportAlgorithm != null && transportAlgorithm.length() != 0) {
+        if (transportAlgorithm != null && !transportAlgorithm.isEmpty()) {
             algorithmSuite.addKeyWrapAlgorithm(transportAlgorithm);
+        }
+
+        String keyAgreementMethodAlgorithm = getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
+        if (keyAgreementMethodAlgorithm != null && !keyAgreementMethodAlgorithm.isEmpty()) {
+            algorithmSuite.addKeyAgreementMethodAlgorithm(transportAlgorithm);
         }
 
         reqData.setAlgorithmSuite(algorithmSuite);
@@ -708,6 +713,10 @@ public abstract class WSHandler {
         String encKeyTransport =
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         actionToken.setKeyTransportAlgorithm(encKeyTransport);
+
+        String encKeyAgreementMethod =
+                getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
+        actionToken.setKeyAgreementMethodAlgorithm(encKeyAgreementMethod);
 
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);

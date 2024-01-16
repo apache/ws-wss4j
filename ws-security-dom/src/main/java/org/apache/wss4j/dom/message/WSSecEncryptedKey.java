@@ -19,20 +19,12 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchProviderException;
-import java.security.Provider;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.X509Certificate;
-import java.security.spec.MGF1ParameterSpec;
-
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -53,7 +45,12 @@ import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipherUtil;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
+import org.apache.xml.security.encryption.params.KeyAgreementParameters;
+import org.apache.xml.security.encryption.params.KeyDerivationParameters;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.XMLUtils;
@@ -79,6 +76,13 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Algorithm used to encrypt the ephemeral key
      */
     private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOAEP;
+
+    /**
+     * Key agreement method algorithm used to encrypt the transport key.
+     * Example for ECDH-ES: http://www.w3.org/2009/xmlenc11#ECDH-ES
+     *
+     */
+    private String keyAgreementMethod;
 
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -209,8 +213,18 @@ public class WSSecEncryptedKey extends WSSecBase {
                 remoteCert = certs[0];
             }
 
-            createEncryptedKeyElement(remoteCert, crypto);
-            byte[] encryptedEphemeralKey = encryptSymmetricKey(remoteCert.getPublicKey(), symmetricKey);
+            Key kek;
+            KeyAgreementParameters dhSpec = null;
+            if (WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(keyAgreementMethod)) {
+                // generate ephemeral keys the key must match receivers keys
+                dhSpec = buildKeyAgreementParameter(remoteCert.getPublicKey());
+                kek = generateEncryptionKey(dhSpec);
+            } else {
+                kek = remoteCert.getPublicKey();
+            }
+
+            createEncryptedKeyElement(remoteCert, crypto, dhSpec);
+            byte[] encryptedEphemeralKey = encryptSymmetricKey(kek, symmetricKey);
             addCipherValueElement(encryptedEphemeralKey);
         }
     }
@@ -240,9 +254,10 @@ public class WSSecEncryptedKey extends WSSecBase {
      *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
      *  4) Create the CipherValue element structure and insert the encrypted session key
      */
-    protected void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto) throws WSSecurityException {
+    protected void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto, KeyAgreementParameters dhSpec)
+            throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
-        if (encKeyId == null || encKeyId.length() == 0) {
+        if (encKeyId == null || encKeyId.isEmpty()) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
@@ -358,7 +373,20 @@ public class WSSecEncryptedKey extends WSSecBase {
             keyInfoElement.setAttributeNS(
                 WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
-            keyInfoElement.appendChild(secToken.getElement());
+            if (WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(keyAgreementMethod)) {
+                try {
+                    AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
+                    agreementMethod.getRecipientKeyInfo().addUnknownElement(secToken.getElement());
+                    Element agreementMethodElement = agreementMethod.getElement();
+                    keyInfoElement.appendChild(agreementMethodElement);
+                } catch (XMLSecurityException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
+                            new Object[] {keyIdentifierType});
+                }
+
+            } else {
+                keyInfoElement.appendChild(secToken.getElement());
+            }
             encryptedKeyElement.appendChild(keyInfoElement);
         }
 
@@ -387,7 +415,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     protected void createEncryptedKeyElement(Key key) throws WSSecurityException {
         encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
-        if (encKeyId == null || encKeyId.length() == 0) {
+        if (encKeyId == null || encKeyId.isEmpty()) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
@@ -505,35 +533,61 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
     }
 
-    protected byte[] encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted)
+    /**
+     * Method builds the KeyAgreementParameterSpec for the ECDH-ES Key Agreement Method using
+     * the recipient's public key and preconfigured values: keyEncAlgo, digestAlgo and keyAgreementMethod
+     *
+     * @param recipientPublicKey the recipient's public key
+     * @return KeyAgreementParameterSpec the {@link java.security.spec.AlgorithmParameterSpec} for generating the
+     * key for encrypting transport key and generating XML elements.
+     *
+     * @throws WSSecurityException if the KeyAgreementParameterSpec cannot be created
+     */
+    public KeyAgreementParameters buildKeyAgreementParameter(PublicKey recipientPublicKey)
+            throws  WSSecurityException {
+        KeyAgreementParameters dhSpec;
+        try {
+
+            int keyBitLength  = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(keyEncAlgo);
+            KeyDerivationParameters kdf = XMLCipherUtil.constructConcatKeyDerivationParameter(keyBitLength, digestAlgo);
+            KeyPair dhKeyPair = org.apache.xml.security.utils.KeyUtils.generateEphemeralDHKeyPair(recipientPublicKey, null);
+            dhSpec = XMLCipherUtil.constructAgreementParameters(keyAgreementMethod,
+                    KeyAgreementParameters.ActorType.ORIGINATOR, kdf, null, recipientPublicKey);
+            dhSpec.setOriginatorKeyPair(dhKeyPair);
+        } catch (XMLEncryptionException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+            );
+        }
+        return dhSpec;
+    }
+
+    /**
+     * Method generates the key for encrypting the transport key using the KeyAgreementParameterSpec
+     *
+     * @param keyAgreementParameter the {@link KeyAgreementParameters} for generating the secret key
+     * @return SecretKey the secret key for encrypting the transport key
+     * @throws WSSecurityException if the secret key cannot be generated
+     */
+    public SecretKey generateEncryptionKey(KeyAgreementParameters keyAgreementParameter) throws WSSecurityException {
+        try {
+            // derive the key for encryption of the transport key
+            return org.apache.xml.security.utils.KeyUtils.aesWrapKeyWithDHGeneratedKey(keyAgreementParameter);
+        } catch (XMLEncryptionException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+            );
+        }
+    }
+
+    protected byte[] encryptSymmetricKey(Key encryptingKey, SecretKey keyToBeEncrypted)
         throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(keyEncAlgo)
                     || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
-                String jceDigestAlgorithm = "SHA-1";
-                if (digestAlgo != null) {
-                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
-                }
-
-                MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
-                    if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
-                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-256");
-                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-384");
-                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgo)) {
-                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-512");
-                    }
-                }
-
-                oaepParameterSpec =
-                    new OAEPParameterSpec(
-                        jceDigestAlgorithm, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT
-                    );
+                oaepParameterSpec = XMLCipherUtil.constructOAEPParameters(keyEncAlgo, digestAlgo, mgfAlgo, null);
             }
             if (oaepParameterSpec == null) {
                 cipher.init(Cipher.WRAP_MODE, encryptingKey);
@@ -730,6 +784,14 @@ public class WSSecEncryptedKey extends WSSecBase {
 
     public String getKeyEncAlgo() {
         return keyEncAlgo;
+    }
+
+    public String getKeyAgreementMethod() {
+        return keyAgreementMethod;
+    }
+
+    public void setKeyAgreementMethod(String keyAgreementMethod) {
+        this.keyAgreementMethod = keyAgreementMethod;
     }
 
     /**
