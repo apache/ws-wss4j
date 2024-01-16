@@ -907,16 +907,17 @@ public class WSSecSignature extends WSSecSignatureBase {
     }
 
     /**
-     * The method returns EdDSA signature algorithm for public key type (Ed25519 or Ed448).
+     * The method returns EdDSA signature algorithm URI for public key type (Ed25519 or Ed448).
      *
      * @param publicKey the public key to get the algorithm from
-     * @return the siganture algorithm (ED25519 or ED448) for the EdDSA public key
+     * @return the signature algorithm URI (ED25519 or ED448) for the EdDSA public key
      * @throws WSSecurityException if the algorithm cannot be determined
      */
-    public String getSigAlgorithmForEdDSAKey(PublicKey publicKey) throws WSSecurityException {
+    private static String getSigAlgorithmForEdDSAKey(PublicKey publicKey) throws WSSecurityException {
 
         if (!"x.509".equalsIgnoreCase(publicKey.getFormat())) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unknownAlgorithm", new Object[]{"Unknown cert format!"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unknownAlgorithm",
+                    new Object[]{"Unknown cert format!"});
         }
 
         DERDecoder decoder = new DERDecoder(publicKey.getEncoded());
