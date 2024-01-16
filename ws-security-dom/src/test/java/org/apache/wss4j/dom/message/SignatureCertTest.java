@@ -36,16 +36,17 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
+import javax.security.auth.x500.X500Principal;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This is a test for WSS-40. Essentially it just tests that a message is signed using a
@@ -81,11 +82,18 @@ public class SignatureCertTest {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
     private Crypto cryptoCA;
+    private boolean isJDK16up;
 
     public SignatureCertTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
         cryptoCA = CryptoFactory.getInstance("wss40CA.properties");
+        try {
+            int javaVersion = Integer.getInteger("java.specification.version", 0);
+            isJDK16up = javaVersion >= 16;
+        } catch (NumberFormatException ex) {
+            LOG.warn("Error in retrieving the java version: [{}]", ex.getMessage());
+        }
     }
 
     /**
@@ -337,6 +345,103 @@ public class SignatureCertTest {
             fail("Failure expected on an expired cert");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+    }
+
+    /**
+     * The Ed25519 KeyValue test.
+     */
+    @Test
+    public void testED25519SignatureDirectReference() throws Exception {
+        try {
+            // not needed after JDK 16
+            if (!isJDK16up) {
+                Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+            }
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            Crypto ed_crypto = CryptoFactory.getInstance("wss-eddsa.properties");
+
+            WSSecSignature builder = new WSSecSignature(secHeader);
+            builder.setUserInfo("ed25519", "security");
+            builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+            Document signedDoc = builder.build(ed_crypto);
+            // test the algorithm attribute
+            String outputString =
+                    XMLUtils.prettyDocumentToString(signedDoc);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(outputString);
+            }
+
+            assertTrue(outputString.contains("Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519\""));
+
+            final WSHandlerResult results = verify(signedDoc, ed_crypto);
+
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.SIGN).get(0);
+            assertNotNull(actionResult);
+
+            java.security.Principal principal =
+                    (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            assertTrue(principal instanceof X500Principal);
+            X500Principal x500Principal = (X500Principal) principal;
+            assertEquals(new X500Principal("CN=ED25519,O=EDELIVERY,C=EU"), x500Principal);
+
+        } finally {
+            if (!isJDK16up) {
+                Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+            }
+        }
+    }
+
+    /**
+     * Successful ECKeyValue test.
+     */
+    @Test
+    public void testED448KeyValue() throws Exception {
+        try {
+            // not needed after JDK 16
+            if (!isJDK16up) {
+                Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+            }
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            Crypto ed_crypto = CryptoFactory.getInstance("wss-eddsa.properties");
+
+            WSSecSignature builder = new WSSecSignature(secHeader);
+            builder.setUserInfo("ed448", "security");
+            builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+            Document signedDoc = builder.build(ed_crypto);
+
+            String outputString =
+                    XMLUtils.prettyDocumentToString(signedDoc);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(outputString);
+            }
+
+            assertTrue(outputString.contains("Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448\""));
+
+            final WSHandlerResult results = verify(signedDoc, ed_crypto);
+
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.SIGN).get(0);
+            assertNotNull(actionResult);
+
+            java.security.Principal principal =
+                    (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+            assertTrue(principal instanceof X500Principal);
+            X500Principal x500Principal = (X500Principal) principal;
+            assertEquals(new X500Principal("CN=ED448, O=EDELIVERY, C=EU"), x500Principal);
+        } finally {
+            if (!isJDK16up) {
+                Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+            }
         }
     }
 

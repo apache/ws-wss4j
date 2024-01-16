@@ -158,6 +158,11 @@ public class WSS4JConstants {
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
     public static final String ECDSA_SHA512 =
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";
+    // see RFC 9231 for these algorithm definitions
+    public static final String ED25519 =
+            "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519";
+    public static final String ED448 =
+            "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448";
 
     public static final String MGF_SHA1 = "http://www.w3.org/2009/xmlenc11#mgf1sha1";
     public static final String MGF_SHA224 = "http://www.w3.org/2009/xmlenc11#mgf1sha224";
