@@ -117,3 +117,62 @@ openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem
 
 =====
 
+wss-eddsa:
+
+NOTE: Use the keytool from JDK 16 and above, where support for Ed25519, Ed448 keys and eddsa signature were supported.
+
+keytool -genkeypair -keystore wss-eddsa.p12 -alias ed25519 -keyalg ED25519 -sigalg ED25519 \
+        -storepass security -keypass security \
+        -dname "CN=ed25519,OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU"  \
+        -validity 3650
+
+keytool -genkeypair -keystore wss-eddsa.p12 -alias ed448 -keyalg ED448 -sigalg ED448 \
+        -storepass security -keypass security \
+        -dname "CN=ed448,OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU"  \
+        -validity 3650
+
+=====
+
+wss-ecdh:
+
+NOTE: Use the keytool from JDK 17 and above, where support was added for specifying a signer of the certificate using
+the keytool -genkeypair. See: https://www.oracle.com/java/technologies/javase/17-relnote-issues.html
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias issuer-ca -keyalg ED25519 -sigalg ED25519 \
+        -storepass security -keypass security \
+        -ext bc:c,ca:true,pathlen:2 \
+        -dname "CN=issuer-ca,OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU"  \
+        -validity 3651
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias x25519 -keyalg X25519 \
+        -sigalg ED25519 -signer issuer-ca  -signerkeypass security \
+        -storepass security -keypass security \
+        -dname "CN=x25519, OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU" \
+        -validity 3650
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias x448 -keyalg X448 \
+        -sigalg ED25519 -signer issuer-ca  -signerkeypass security \
+        -storepass security -keypass security \
+        -dname "CN=x448, OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU" \
+        -validity 3650
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias secp256r1 -keyalg EC -groupname secp256r1 \
+        -sigalg ED25519 -signer issuer-ca  -signerkeypass security \
+        -storepass security -keypass security \
+        -dname "CN=secp256r1, OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU" \
+        -validity 3650
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias secp384r1 -keyalg EC -groupname secp384r1 \
+        -sigalg ED25519 -signer issuer-ca  -signerkeypass security \
+        -storepass security -keypass security \
+        -dname "CN=secp384r1, OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU" \
+        -validity 3650
+
+keytool -genkeypair -keystore wss-ecdh.p12 -alias secp521r1 -keyalg EC -groupname secp521r1 \
+        -sigalg ED25519 -signer issuer-ca  -signerkeypass security \
+        -storepass security -keypass security \
+        -dname "CN=secp521r1, OU=eDeliveryAS4-2.0,OU=wss4j,O=apache,C=EU" \
+        -validity 3650
+
+=====
+

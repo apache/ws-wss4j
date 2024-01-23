@@ -543,12 +543,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      *
      * @throws WSSecurityException if the KeyAgreementParameterSpec cannot be created
      */
-    public KeyAgreementParameters buildKeyAgreementParameter(PublicKey recipientPublicKey)
+    private KeyAgreementParameters buildKeyAgreementParameter(PublicKey recipientPublicKey)
             throws  WSSecurityException {
         KeyAgreementParameters dhSpec;
         try {
-
-            int keyBitLength  = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(keyEncAlgo);
+            int keyBitLength = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(keyEncAlgo);
             KeyDerivationParameters kdf = XMLCipherUtil.constructConcatKeyDerivationParameter(keyBitLength, digestAlgo);
             KeyPair dhKeyPair = org.apache.xml.security.utils.KeyUtils.generateEphemeralDHKeyPair(recipientPublicKey, null);
             dhSpec = XMLCipherUtil.constructAgreementParameters(keyAgreementMethod,
@@ -569,7 +568,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @return SecretKey the secret key for encrypting the transport key
      * @throws WSSecurityException if the secret key cannot be generated
      */
-    public SecretKey generateEncryptionKey(KeyAgreementParameters keyAgreementParameter) throws WSSecurityException {
+    private SecretKey generateEncryptionKey(KeyAgreementParameters keyAgreementParameter) throws WSSecurityException {
         try {
             // derive the key for encryption of the transport key
             return org.apache.xml.security.utils.KeyUtils.aesWrapKeyWithDHGeneratedKey(keyAgreementParameter);
@@ -580,7 +579,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
     }
 
-    protected byte[] encryptSymmetricKey(Key encryptingKey, SecretKey keyToBeEncrypted)
+    private byte[] encryptSymmetricKey(Key encryptingKey, SecretKey keyToBeEncrypted)
         throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {

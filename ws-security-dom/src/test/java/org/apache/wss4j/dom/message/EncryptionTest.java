@@ -19,8 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -358,7 +356,6 @@ public class EncryptionTest {
 
             String outputString =
                     XMLUtils.prettyDocumentToString(encryptedDoc);
-            Files.write(Paths.get("target", "encrypted-"+certAlias+".xml"), outputString.getBytes());
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Encrypted message:");
                 LOG.debug(outputString);

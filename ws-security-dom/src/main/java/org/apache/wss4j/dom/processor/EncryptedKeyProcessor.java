@@ -402,7 +402,7 @@ public class EncryptedKeyProcessor implements Processor {
     }
 
     /**
-     * if keInfo element contains AgreementMethod element then check it is supported EC Diffie-Hellman key agreement algorithm
+     * if keyInfo element contains AgreementMethod element then check if it is supported EC Diffie-Hellman key agreement algorithm
      *
      * @param keyInfoChildElement The KeyInfo child element
      * @return true if AgreementMethod element is present and DH algorithm supported and false if AgreementMethod element is not present
