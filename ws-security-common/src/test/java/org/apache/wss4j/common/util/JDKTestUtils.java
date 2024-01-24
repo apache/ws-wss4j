@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  */
 public class JDKTestUtils {
 
-    private static final org.slf4j.Logger LOG =  org.slf4j.LoggerFactory.getLogger(JDKTestUtils.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(JDKTestUtils.class);
     // Purpose of auxiliary security provider is to enable testing of algorithms not supported by default JDK security providers.
     private static final String TEST_PROVIDER_CLASSNAME_PROPERTY = "test.auxiliary.jce.provider.classname";
     private static final String TEST_PROVIDER_CLASSNAME_DEFAULT = "org.bouncycastle.jce.provider.BouncyCastleProvider";
@@ -47,7 +47,7 @@ public class JDKTestUtils {
 
     private static Provider auxiliaryProvider;
     private static boolean auxiliaryProviderInitialized = false;
-    private static  Set<String> supportedAuxiliaryProviderAlgorithms = null;
+    private static Set<String> supportedAuxiliaryProviderAlgorithms = null;
 
     private static final Map<String, Integer> javaAlgSupportFrom = Stream.of(
                     new AbstractMap.SimpleImmutableEntry<>("eddsa", 16),
@@ -80,7 +80,7 @@ public class JDKTestUtils {
         }
         try {
             String providerClassName = System.getProperty(TEST_PROVIDER_CLASSNAME_PROPERTY, TEST_PROVIDER_CLASSNAME_DEFAULT);
-            LOG.info("Initialize the auxiliary security provider: [{}]",  providerClassName);
+            LOG.info("Initialize the auxiliary security provider: [{}]", providerClassName);
             Class<?> c = Class.forName(providerClassName);
             Constructor<?> cons = c.getConstructor();
             auxiliaryProvider = (Provider)cons.newInstance();
@@ -89,7 +89,7 @@ public class JDKTestUtils {
                     .map(String::toLowerCase)
                     .collect(Collectors.toSet());
         } catch (Exception e) {
-            LOG.warn("Failed to initialize the auxiliary security provider: [{}]",  e.getMessage());
+            LOG.warn("Failed to initialize the auxiliary security provider: [{}]", e.getMessage());
         }
         auxiliaryProviderInitialized = true;
         return auxiliaryProvider;

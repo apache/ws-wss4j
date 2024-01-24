@@ -116,7 +116,7 @@ public class WSS4JConstants {
             "http://www.w3.org/2001/04/xmlenc#kw-aes256";
     public static final String KEYWRAP_TRIPLEDES =
             "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
-    public static final String  KDF_CONCAT =
+    public static final String KDF_CONCAT =
             "http://www.w3.org/2009/xmlenc11#ConcatKDF";
     public static final String AGREEMENT_METHOD_ECDH_ES =
             "http://www.w3.org/2009/xmlenc11#ECDH-ES";

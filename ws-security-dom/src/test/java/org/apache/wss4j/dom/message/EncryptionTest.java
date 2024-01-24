@@ -53,6 +53,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -361,6 +362,10 @@ public class EncryptionTest {
                 LOG.debug(outputString);
             }
             assertFalse(outputString.contains("counter_port_type"));
+            // Check for algorithms and agreement method element
+            assertTrue(outputString.contains(EncryptionConstants._TAG_AGREEMENTMETHOD));
+            assertTrue(outputString.contains(WSConstants.KEYWRAP_AES128));
+            assertTrue(outputString.contains(WSConstants.AGREEMENT_METHOD_ECDH_ES));
 
             WSSecurityEngine newEngine = new WSSecurityEngine();
             WSHandlerResult results =

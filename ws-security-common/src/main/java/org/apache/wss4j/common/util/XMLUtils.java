@@ -64,8 +64,8 @@ public final class XMLUtils {
      * Gets a direct child with specified localname and namespace. <p/>
      *
      * @param parentNode the node where to start the search
-     * @param localName  local name of the child to get
-     * @param namespace  the namespace of the child to get
+     * @param localName local name of the child to get
+     * @param namespace the namespace of the child to get
      * @return the node or <code>null</code> if not such node found
      */
     public static Element getDirectChildElement(Node parentNode, String localName, String namespace) {

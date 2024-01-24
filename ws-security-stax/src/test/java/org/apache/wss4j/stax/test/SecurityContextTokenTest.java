@@ -225,7 +225,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
-            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
@@ -444,7 +444,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
-            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
@@ -706,7 +706,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
-            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
@@ -930,7 +930,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
-            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");

@@ -1454,7 +1454,7 @@ public class Merlin extends CryptoBase {
 
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
-                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    // no cert chain, so lets check if getCertificate gives us a result.
                     Certificate retrievedCert = store.getCertificate(alias);
                     if (retrievedCert != null) {
                         certs = new Certificate[]{retrievedCert};
@@ -1479,7 +1479,7 @@ public class Merlin extends CryptoBase {
 
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
-                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    // no cert chain, so lets check if getCertificate gives us a result.
                     Certificate retrievedCert = store.getCertificate(alias);
                     if (retrievedCert != null) {
                         certs = new Certificate[]{retrievedCert};

@@ -144,7 +144,7 @@ public class SamlAssertionWrapper {
 
     /**
      * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
-     * This is the primary constructor.  All other constructor calls should
+     * This is the primary constructor. All other constructor calls should
      * be routed to this method to ensure that the wrapper is initialized
      * correctly.
      *

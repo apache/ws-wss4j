@@ -339,7 +339,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     refCustd.setValueType(customEKTokenValueType);
                 } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                     refCustd.setValueType(customEKTokenValueType);
                 } else {
@@ -454,7 +454,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                         refCustd.setValueType(customEKTokenValueType);
                     } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                         secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-                    }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
                         secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                         refCustd.setValueType(customEKTokenValueType);
                     } else {
@@ -544,7 +544,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @throws WSSecurityException if the KeyAgreementParameterSpec cannot be created
      */
     private KeyAgreementParameters buildKeyAgreementParameter(PublicKey recipientPublicKey)
-            throws  WSSecurityException {
+            throws WSSecurityException {
         KeyAgreementParameters dhSpec;
         try {
             int keyBitLength = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(keyEncAlgo);
@@ -794,7 +794,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * Get the id of the BSt generated  during <code>prepare()</code>.
+     * Get the id of the BSt generated during <code>prepare()</code>.
      *
      * @return Returns the the value of wsu:Id attribute of the
      * BinaruSecurityToken element.

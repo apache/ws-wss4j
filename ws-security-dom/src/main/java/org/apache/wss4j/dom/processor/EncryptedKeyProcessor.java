@@ -36,6 +36,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 import org.apache.xml.security.encryption.AgreementMethod;
 import org.apache.xml.security.encryption.XMLCipherUtil;
+import org.apache.xml.security.encryption.keys.RecipientKeyInfo;
 import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
 import org.apache.xml.security.encryption.params.KeyAgreementParameters;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -154,6 +155,11 @@ public class EncryptedKeyProcessor implements Processor {
             agreementMethod = getAgreementMethodFromElement(keyInfoChildElement);
             //  get the recipient key info element
             keyInfoChildElement = getRecipientKeyInfoChildElement(agreementMethod);
+            if (keyInfoChildElement == null) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, "noRecipientSecTokRef"
+                );
+            }
         }
         if (!symmetricKeyWrap || isDHKeyWrap) {
             CertificateResult certificateResult = getPublicKey(keyInfoChildElement, data);
@@ -396,7 +402,7 @@ public class EncryptedKeyProcessor implements Processor {
             cipher.init(Cipher.UNWRAP_MODE, kek);
             String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
             return cipher.unwrap(encryptedEphemeralKey, keyAlgorithm, Cipher.SECRET_KEY).getEncoded();
-        } catch (InvalidKeyException | NoSuchAlgorithmException  ex) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
     }
@@ -434,7 +440,7 @@ public class EncryptedKeyProcessor implements Processor {
         try {
             return new AgreementMethodImpl(keyInfoChildElement);
         } catch (XMLSecurityException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, ex);
         }
     }
 
@@ -443,14 +449,18 @@ public class EncryptedKeyProcessor implements Processor {
      *
      * @param agreementMethod The AgreementMethod element
      * @return the RecipientKeyInfo child element which contains the recipient's public key.
-     * @throws WSSecurityException if the RecipientKeyInfo element can not be retrieved.
+     * @throws WSSecurityException if the agreementMethod is null or RecipientKeyInfo element can not be retrieved.
      */
     private Element getRecipientKeyInfoChildElement(AgreementMethod agreementMethod) throws WSSecurityException {
         try {
-            Element receiverKeyInfoElement =  agreementMethod.getRecipientKeyInfo().getElement();
+            RecipientKeyInfo recipientKeyInfo = agreementMethod.getRecipientKeyInfo();
+            if (recipientKeyInfo == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noRecipientKeyInfo");
+            }
+            Element receiverKeyInfoElement = recipientKeyInfo.getElement();
             return getFirstElement(receiverKeyInfoElement);
         } catch (XMLSecurityException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, ex);
         }
     }
 
