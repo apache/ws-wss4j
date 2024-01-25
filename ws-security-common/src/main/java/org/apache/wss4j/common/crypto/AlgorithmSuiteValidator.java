@@ -250,7 +250,7 @@ public class AlgorithmSuiteValidator {
      * @return the key length in bits
      * @throws WSSecurityException if the key is not  EdEC or XDH or if length can not be determined
      */
-    private int getEdECndXDHKeyLength(PublicKey publicKey) throws  WSSecurityException {
+    private int getEdECndXDHKeyLength(PublicKey publicKey) throws WSSecurityException {
         String keyAlgorithmOId;
         try {
             keyAlgorithmOId = DERDecoderUtils.getAlgorithmIdFromPublicKey(publicKey);
@@ -264,16 +264,17 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
 
-        return switch (keyType) {
-            case ED25519, X25519 -> 256;
-            case ED448, X448 -> 456;
-            default -> {
-                LOG.warn(
-                        "An unknown public key was provided"
-                );
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-            }
-        };
+        int keyLength;
+        if (keyType == KeyUtils.KeyType.ED25519 || keyType == KeyUtils.KeyType.X25519) {
+            keyLength = 256;
+        } else if (keyType == KeyUtils.KeyType.ED448 || keyType == KeyUtils.KeyType.X448) {
+            keyLength = 456;
+        } else {
+            LOG.warn("An unknown public key was provided");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        return keyLength;
     }
 
     /**
