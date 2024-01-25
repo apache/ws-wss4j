@@ -38,6 +38,8 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.w3c.dom.Document;
 
 import javax.security.auth.x500.X500Principal;
@@ -349,10 +351,14 @@ public class SignatureCertTest {
     }
 
     /**
-     * The Ed25519 KeyValue test.
+     * The EdDSA KeyValue test.
      */
-    @Test
-    public void testED25519SignatureDirectReference() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+            "ed25519, 'Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519\"', 'CN=ed25519, OU=eDeliveryAS4-2.0, OU=wss4j, O=apache, C=EU'",
+            "ed448, 'Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448\"', 'CN=ed448, OU=eDeliveryAS4-2.0, OU=wss4j, O=apache, C=EU'",
+        })
+    public void testEdDSASignatureDirectReference(String alias, String algorithm, X500Principal certSubjectDN) throws Exception {
         try {
             // not needed after JDK 16
             if (!isJDK16up) {
@@ -366,7 +372,7 @@ public class SignatureCertTest {
             Crypto ed_crypto = CryptoFactory.getInstance("wss-eddsa.properties");
 
             WSSecSignature builder = new WSSecSignature(secHeader);
-            builder.setUserInfo("ed25519", "security");
+            builder.setUserInfo(alias, "security");
             builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             Document signedDoc = builder.build(ed_crypto);
             // test the algorithm attribute
@@ -376,7 +382,7 @@ public class SignatureCertTest {
                 LOG.debug(outputString);
             }
 
-            assertTrue(outputString.contains("Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519\""));
+            assertTrue(outputString.contains(algorithm));
 
             final WSHandlerResult results = verify(signedDoc, ed_crypto);
 
@@ -388,56 +394,8 @@ public class SignatureCertTest {
                     (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             assertTrue(principal instanceof X500Principal);
             X500Principal x500Principal = (X500Principal) principal;
-            assertEquals(new X500Principal("CN=ED25519,O=EDELIVERY,C=EU"), x500Principal);
+            assertEquals(certSubjectDN, x500Principal);
 
-        } finally {
-            if (!isJDK16up) {
-                Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-            }
-        }
-    }
-
-    /**
-     * Successful ECKeyValue test.
-     */
-    @Test
-    public void testED448KeyValue() throws Exception {
-        try {
-            // not needed after JDK 16
-            if (!isJDK16up) {
-                Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-            }
-
-            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader(doc);
-            secHeader.insertSecurityHeader();
-
-            Crypto ed_crypto = CryptoFactory.getInstance("wss-eddsa.properties");
-
-            WSSecSignature builder = new WSSecSignature(secHeader);
-            builder.setUserInfo("ed448", "security");
-            builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-            Document signedDoc = builder.build(ed_crypto);
-
-            String outputString =
-                    XMLUtils.prettyDocumentToString(signedDoc);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(outputString);
-            }
-
-            assertTrue(outputString.contains("Algorithm=\"http://www.w3.org/2021/04/xmldsig-more#eddsa-ed448\""));
-
-            final WSHandlerResult results = verify(signedDoc, ed_crypto);
-
-            WSSecurityEngineResult actionResult =
-                    results.getActionResults().get(WSConstants.SIGN).get(0);
-            assertNotNull(actionResult);
-
-            java.security.Principal principal =
-                    (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            assertTrue(principal instanceof X500Principal);
-            X500Principal x500Principal = (X500Principal) principal;
-            assertEquals(new X500Principal("CN=ED448, O=EDELIVERY, C=EU"), x500Principal);
         } finally {
             if (!isJDK16up) {
                 Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);

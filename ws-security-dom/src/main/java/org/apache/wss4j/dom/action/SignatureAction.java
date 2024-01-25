@@ -137,7 +137,7 @@ public class SignatureAction implements Action {
                 } else if (WSConstants.WSSE_NS.equals(part.getNamespace())
                     && WSConstants.BINARY_TOKEN_LN.equals(part.getName())) {
                     signBST = true;
-                }  else if ("KeyInfo".equals(part.getName()) && WSConstants.SIG_NS.equals(part.getNamespace())
+                } else if ("KeyInfo".equals(part.getName()) && WSConstants.SIG_NS.equals(part.getNamespace())
                     && part.getElement() == null) {
                     // Special code to sign the KeyInfo
                     part.setId(wsSign.getKeyInfoUri());

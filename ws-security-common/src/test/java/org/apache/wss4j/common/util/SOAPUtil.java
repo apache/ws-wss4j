@@ -39,7 +39,7 @@ public class SOAPUtil {
                     + "</SOAP-ENV:Body>"
                     + "</SOAP-ENV:Envelope>";
 
-    private static final org.slf4j.Logger LOG =  org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
 
     private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     private static MessageFactory saajFactory = null;

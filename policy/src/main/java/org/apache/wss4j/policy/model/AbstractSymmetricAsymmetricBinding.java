@@ -91,7 +91,7 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
     }
 
     protected void parseNestedSymmetricAsymmetricBindingBasePolicy(
-        Policy nestedPolicy,  AbstractSymmetricAsymmetricBinding asymmetricBindingBase
+        Policy nestedPolicy, AbstractSymmetricAsymmetricBinding asymmetricBindingBase
     ) {
         Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
         //we just process the first alternative

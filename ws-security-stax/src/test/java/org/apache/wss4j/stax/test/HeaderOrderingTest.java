@@ -521,7 +521,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -592,7 +592,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -696,7 +696,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //verify SigConf response:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP;
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.SEND_SIGV, sigv);
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, true);
@@ -772,7 +772,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPTION;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

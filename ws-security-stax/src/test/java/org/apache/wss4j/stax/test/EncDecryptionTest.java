@@ -2361,7 +2361,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             try {
                 doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null);
                 fail("Failure expected on the wrong key transport algorithm");
-            }  catch (XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 assertTrue(e.getCause() instanceof WSSecurityException);
             }
         }
@@ -2375,7 +2375,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             try {
                 doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null);
                 fail("Failure expected on the wrong key transport algorithm");
-            }  catch (XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 assertTrue(e.getCause() instanceof WSSecurityException);
             }
         }

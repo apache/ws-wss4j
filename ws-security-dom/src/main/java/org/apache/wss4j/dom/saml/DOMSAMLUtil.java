@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 /**
  * Some SAML Utility methods only for use in the DOM code.
  */
-public final class DOMSAMLUtil  {
+public final class DOMSAMLUtil {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DOMSAMLUtil.class);

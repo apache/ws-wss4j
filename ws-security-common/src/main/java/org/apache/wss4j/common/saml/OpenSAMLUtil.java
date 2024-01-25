@@ -166,7 +166,7 @@ public final class OpenSAMLUtil {
      * Convert a SAML Assertion from a XMLObject to a DOM Element
      *
      * @param xmlObject of type XMLObject
-     * @param doc  of type Document
+     * @param doc of type Document
      * @return Element
      * @throws WSSecurityException
      */
@@ -181,7 +181,7 @@ public final class OpenSAMLUtil {
      * Convert a SAML Assertion from a XMLObject to a DOM Element
      *
      * @param xmlObject of type XMLObject
-     * @param doc  of type Document
+     * @param doc of type Document
      * @param signObject whether to sign the XMLObject during marshalling
      * @return Element
      * @throws WSSecurityException

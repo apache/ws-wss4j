@@ -108,6 +108,18 @@ public class WSS4JConstants {
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
     public static final String KEYTRANSPORT_RSAOAEP_XENC11 =
         "http://www.w3.org/2009/xmlenc11#rsa-oaep";
+    public static final String KEYWRAP_AES128 =
+            "http://www.w3.org/2001/04/xmlenc#kw-aes128";
+    public static final String KEYWRAP_AES192 =
+            "http://www.w3.org/2001/04/xmlenc#kw-aes192";
+    public static final String KEYWRAP_AES256 =
+            "http://www.w3.org/2001/04/xmlenc#kw-aes256";
+    public static final String KEYWRAP_TRIPLEDES =
+            "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
+    public static final String KDF_CONCAT =
+            "http://www.w3.org/2009/xmlenc11#ConcatKDF";
+    public static final String AGREEMENT_METHOD_ECDH_ES =
+            "http://www.w3.org/2009/xmlenc11#ECDH-ES";
     public static final String TRIPLE_DES =
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
     public static final String AES_128 =

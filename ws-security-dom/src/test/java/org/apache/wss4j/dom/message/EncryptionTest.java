@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,15 +29,13 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.common.util.*;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -54,8 +53,11 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -311,6 +313,70 @@ public class EncryptionTest {
 
         LOG.info("After Encryption....");
         verify(encryptedEncryptedDoc, encCrypto, keystoreCallbackHandler);
+    }
+
+    /**
+     * Test that encrypt and decrypt a WS-Security envelope.
+     * This test uses the ECDSA-ES algorithm to (wrap) the symmetric key.
+     * <p/>
+     *
+     * @throws Exception Thrown when there is any problem in signing or verification
+     */
+    @ParameterizedTest
+    @CsvSource({"xdh, X25519",
+            "xdh, X448",
+            "ec, secp256r1",
+            "ec, secp384r1",
+            "ec, secp521r1",
+    })
+    public void testEncryptionDecryptionECDSA_ES(String algorithm, String certAlias) throws Exception {
+        try {
+            if (!JDKTestUtils.isAlgorithmSupportedByJDK(algorithm)) {
+                LOG.info("Add AuxiliaryProvider to execute test with algorithm [{}] and cert alias [{}]", algorithm,  certAlias);
+                Security.addProvider(JDKTestUtils.getAuxiliaryProvider());
+            }
+            Crypto encCrypto = CryptoFactory.getInstance("wss-ecdh.properties");
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+            builder.setUserInfo(certAlias);
+            builder.setKeyEncAlgo(WSConstants.KEYWRAP_AES128);
+            builder.setKeyAgreementMethod(WSConstants.AGREEMENT_METHOD_ECDH_ES);
+            builder.setDigestAlgorithm(WSS4JConstants.SHA256);
+            builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+
+            LOG.info("Before Encryption ...");
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+            SecretKey symmetricKey = keyGen.generateKey();
+
+            Document encryptedDoc = builder.build(encCrypto, symmetricKey);
+            LOG.info("After Encryption ....");
+
+            String outputString =
+                    XMLUtils.prettyDocumentToString(encryptedDoc);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Encrypted message:");
+                LOG.debug(outputString);
+            }
+            assertFalse(outputString.contains("counter_port_type"));
+            // Check for algorithms and agreement method element
+            assertTrue(outputString.contains(EncryptionConstants._TAG_AGREEMENTMETHOD));
+            assertTrue(outputString.contains(WSConstants.KEYWRAP_AES128));
+            assertTrue(outputString.contains(WSConstants.AGREEMENT_METHOD_ECDH_ES));
+
+            WSSecurityEngine newEngine = new WSSecurityEngine();
+            WSHandlerResult results =
+                    newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, encCrypto);
+
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.ENCR).get(0);
+            assertNotNull(actionResult);
+        } finally {
+            Security.removeProvider(JDKTestUtils.getAuxiliaryProvider().getName());
+        }
     }
 
     /**
