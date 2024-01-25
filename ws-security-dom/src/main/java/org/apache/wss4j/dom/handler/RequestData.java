@@ -395,7 +395,7 @@ public class RequestData {
                 return validatorMap.get(qName);
             }
         }
-        if (wssConfig != null)  {
+        if (wssConfig != null) {
             return wssConfig.getValidator(qName);
         }
         return null;

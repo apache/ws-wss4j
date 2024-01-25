@@ -761,7 +761,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     }
 
     /**
-     * Get the id of the BST generated  during <code>prepare()</code>.
+     * Get the id of the BST generated during <code>prepare()</code>.
      *
      * @return Returns the the value of wsu:Id attribute of the
      * BinaruSecurityToken element.
@@ -927,7 +927,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         decoder.expect(decoder.TYPE_SEQUENCE);
         decoder.getLength();
         decoder.expect(decoder.TYPE_OBJECT_IDENTIFIER);
-        int size  = decoder.getLength();
+        int size = decoder.getLength();
         if (size != 3) {
             LOG.debug("Invalid ECDSA Public key OID byte size: [{}]", size);
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidCert");

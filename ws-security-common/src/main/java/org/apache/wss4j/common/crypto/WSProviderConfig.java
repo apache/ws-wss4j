@@ -143,7 +143,7 @@ public final class WSProviderConfig {
      * Set the value of the internal addJceProviders flag.  This flag
      * turns on (or off) automatic registration of known JCE providers
      * that provide necessary cryptographic algorithms for use with WSS4J.
-     * By default, this flag is true.  You may wish (or need) to initialize
+     * By default, this flag is true. You may wish (or need) to initialize
      * the JCE manually, e.g., in some JVMs.
      */
     public static void setAddJceProviders(boolean value) {

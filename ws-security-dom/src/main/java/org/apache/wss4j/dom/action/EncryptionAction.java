@@ -64,6 +64,9 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getKeyTransportAlgorithm() != null) {
             wsEncrypt.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
         }
+        if (encryptionToken.getKeyAgreementMethodAlgorithm() != null) {
+            wsEncrypt.setKeyAgreementMethod(encryptionToken.getKeyAgreementMethodAlgorithm());
+        }
         if (encryptionToken.getDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
         }
@@ -77,7 +80,7 @@ public class EncryptionAction implements Action {
         wsEncrypt.setUserInfo(encryptionToken.getUser());
         wsEncrypt.setUseThisCert(encryptionToken.getCertificate());
         Crypto crypto = encryptionToken.getCrypto();
-        boolean enableRevocation = Boolean.valueOf(handler.getStringOption(WSHandlerConstants.ENABLE_REVOCATION));
+        boolean enableRevocation = Boolean.parseBoolean(handler.getStringOption(WSHandlerConstants.ENABLE_REVOCATION));
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(encryptionToken.getUser());
@@ -112,7 +115,7 @@ public class EncryptionAction implements Action {
             wsEncrypt.setCustomEKKeyInfoElement(pwcb.getKeyInfoReference());
         }
 
-        SecretKey symmetricKey = null;
+        SecretKey symmetricKey;
         if (ephemeralKey != null) {
             symmetricKey = KeyUtils.prepareSecretKey(wsEncrypt.getSymmetricEncAlgorithm(), ephemeralKey);
         } else {

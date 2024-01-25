@@ -1026,7 +1026,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on a Bearer assertion");
-            }  catch (XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
@@ -1070,7 +1070,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on an unknown subject confirmation method");
-            }  catch (XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
@@ -1131,7 +1131,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on an unsigned bearer token");
-            }  catch (XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }

@@ -18,7 +18,7 @@
  */
 /*
  * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
+ * individuals on behalf of the Apache Software Foundation. For more
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  *
@@ -56,7 +56,7 @@ public final class InetAddressUtils {
                 + "(([0-9A-Fa-f]{1,4}(:[0-9A-Fa-f]{1,4}){0,5})?)$"); // 0-6 hex fields
 
     /*
-     *  The above pattern is not totally rigorous as it allows for more than 7 hex fields in total
+     * The above pattern is not totally rigorous as it allows for more than 7 hex fields in total
      */
     private static final char COLON_CHAR = ':';
 
