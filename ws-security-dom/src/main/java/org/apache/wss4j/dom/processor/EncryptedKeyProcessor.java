@@ -452,6 +452,11 @@ public class EncryptedKeyProcessor implements Processor {
      * @throws WSSecurityException if the agreementMethod is null or RecipientKeyInfo element can not be retrieved.
      */
     private Element getRecipientKeyInfoChildElement(AgreementMethod agreementMethod) throws WSSecurityException {
+        if (agreementMethod == null) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noAgreementMethod"
+            );
+        }
         try {
             RecipientKeyInfo recipientKeyInfo = agreementMethod.getRecipientKeyInfo();
             if (recipientKeyInfo == null) {
