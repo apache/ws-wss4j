@@ -54,6 +54,7 @@ import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.apache.xml.security.utils.EncryptionConstants;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -102,6 +103,11 @@ public class EncryptionTest {
         key = keyGen.generateKey();
         keyData = key.getEncoded();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
+    }
+
+    @AfterEach
+    public void cleanup(){
+        JDKTestUtils.unregisterAuxiliaryProvider();
     }
 
     /**
@@ -334,6 +340,11 @@ public class EncryptionTest {
             if (!JDKTestUtils.isAlgorithmSupportedByJDK(algorithm)) {
                 LOG.info("Add AuxiliaryProvider to execute test with algorithm [{}] and cert alias [{}]", algorithm,  certAlias);
                 Security.addProvider(JDKTestUtils.getAuxiliaryProvider());
+            } else if (JDKTestUtils.getJDKVersion() == 11 && algorithm.equals("xdh") ) {
+                // workaround for jdk11 and xdh keys
+                // https://bugs.openjdk.java.net/browse/JDK-8219381 or https://bugs.openjdk.org/browse/JDK-8213363
+                // set the auxiliary provider as first provider to parse the xdh private key
+                Security.insertProviderAt(JDKTestUtils.getAuxiliaryProvider(), 1 );
             }
             Crypto encCrypto = CryptoFactory.getInstance("wss-ecdh.properties");
 
