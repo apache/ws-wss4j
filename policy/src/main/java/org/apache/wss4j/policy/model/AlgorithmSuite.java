@@ -402,25 +402,49 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         public String getDigest() {
             return digest;
         }
+        
+        public void setDigest(String digest) {
+            this.digest = digest;
+        }
 
         public String getEncryption() {
             return encryption;
+        }
+        
+        public void setEncryption(String encryption) {
+            this.encryption = encryption;
         }
 
         public String getSymmetricKeyWrap() {
             return symmetricKeyWrap;
         }
+        
+        public void setSymmetricKeyWrap(String symmetricKeyWrap) {
+            this.symmetricKeyWrap = symmetricKeyWrap;
+        }
 
         public String getAsymmetricKeyWrap() {
             return asymmetricKeyWrap;
+        }
+        
+        public void setAsymmetricKeyWrap(String asymmetricKeyWrap) {
+            this.asymmetricKeyWrap = asymmetricKeyWrap;
         }
 
         public String getEncryptionKeyDerivation() {
             return encryptionKeyDerivation;
         }
+        
+        public void setEncryptionKeyDerivation(String encryptionKeyDerivation) {
+            this.encryptionKeyDerivation = encryptionKeyDerivation;
+        }
 
         public String getSignatureKeyDerivation() {
             return signatureKeyDerivation;
+        }
+        
+        public void setSignatureKeyDerivation(String signatureKeyDerivation) {
+            this.signatureKeyDerivation = signatureKeyDerivation;
         }
 
         public String getSymmetricSignature() {
@@ -442,25 +466,49 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         public int getEncryptionDerivedKeyLength() {
             return encryptionDerivedKeyLength;
         }
+        
+        public void getEncryptionDerivedKeyLength(int encryptionDerivedKeyLength) {
+            this.encryptionDerivedKeyLength = encryptionDerivedKeyLength;
+        }
 
         public int getSignatureDerivedKeyLength() {
             return signatureDerivedKeyLength;
         }
+        
+        public void setSignatureDerivedKeyLength(int signatureDerivedKeyLength) {
+            this.signatureDerivedKeyLength = signatureDerivedKeyLength;
+        }
 
         public int getMinimumSymmetricKeyLength() {
             return minimumSymmetricKeyLength;
+        }
+        
+        public void setMinimumSymmetricKeyLength(int minimumSymmetricKeyLength) {
+            this.minimumSymmetricKeyLength = minimumSymmetricKeyLength;
         }
 
         public int getMaximumSymmetricKeyLength() {
             return maximumSymmetricKeyLength;
         }
 
+        public void setMaximumSymmetricKeyLength(int maximumSymmetricKeyLength) {
+            this.maximumSymmetricKeyLength = maximumSymmetricKeyLength;
+        }
+        
         public int getMinimumAsymmetricKeyLength() {
             return minimumAsymmetricKeyLength;
+        }
+        
+        public void setMinimumAsymmetricKeyLength(int minimumAsymmetricKeyLength) {
+            this.minimumAsymmetricKeyLength = minimumAsymmetricKeyLength;
         }
 
         public int getMaximumAsymmetricKeyLength() {
             return maximumAsymmetricKeyLength;
+        }
+        
+        public void setMaximumAsymmetricKeyLength(int maximumAsymmetricKeyLength) {
+            this.maximumAsymmetricKeyLength = maximumAsymmetricKeyLength;
         }
 
         public void setNamespace(String ns) {
