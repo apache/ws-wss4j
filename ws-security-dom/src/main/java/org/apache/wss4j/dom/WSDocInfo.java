@@ -25,7 +25,7 @@ package org.apache.wss4j.dom;
  * used Crypto, and others.
  *
  * Using the Document's hash a caller can identify a document and get
- * the stored information that me be necessary to process the document.
+ * the stored information that may be necessary to process the document.
  * The main usage for this is (are) the transformation functions that
  * are called during Signature/Verification process.
  */
