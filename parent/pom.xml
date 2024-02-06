@@ -41,7 +41,7 @@
         <jakarta.mail.api.version>2.1.2</jakarta.mail.api.version>
         <jasypt.version>1.9.3</jasypt.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
-        <junit.version>5.10.1</junit.version>
+        <junit.version>5.10.2</junit.version>
         <kerby.version>2.0.3</kerby.version>
         <neethi.version>3.2.0</neethi.version>
         <opensaml.version>5.0.0</opensaml.version>
