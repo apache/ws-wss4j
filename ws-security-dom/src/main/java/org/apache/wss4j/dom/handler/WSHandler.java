@@ -47,6 +47,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.encryption.params.KeyDerivationParameters;
 import org.w3c.dom.Document;
 
 /**
@@ -665,6 +666,11 @@ public abstract class WSHandler {
             algorithmSuite.addKeyAgreementMethodAlgorithm(transportAlgorithm);
         }
 
+        String keyDerivationAlgorithm = getString(WSHandlerConstants.ENC_KEY_DERIVATION_FUNCTION, mc);
+        if (keyDerivationAlgorithm != null && !keyDerivationAlgorithm.isEmpty()) {
+            algorithmSuite.addDerivedKeyAlgorithm(keyDerivationAlgorithm);
+        }
+
         reqData.setAlgorithmSuite(algorithmSuite);
     }
 
@@ -717,6 +723,15 @@ public abstract class WSHandler {
         String encKeyAgreementMethod =
                 getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
         actionToken.setKeyAgreementMethodAlgorithm(encKeyAgreementMethod);
+
+        String encKeyDerivationAlgorithm =
+                getString(WSHandlerConstants.ENC_KEY_DERIVATION_FUNCTION, mc);
+        actionToken.setKeyDerivationFunction(encKeyDerivationAlgorithm);
+
+        Object obj = getProperty(mc, WSHandlerConstants.ENC_KEY_DERIVATION_PARAMS);
+        if (obj instanceof KeyDerivationParameters) {
+            actionToken.setKeyDerivationParameters((KeyDerivationParameters)obj);
+        }
 
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);

@@ -61,12 +61,23 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getSymmetricAlgorithm() != null) {
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
+
         if (encryptionToken.getKeyTransportAlgorithm() != null) {
             wsEncrypt.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
         }
+
         if (encryptionToken.getKeyAgreementMethodAlgorithm() != null) {
             wsEncrypt.setKeyAgreementMethod(encryptionToken.getKeyAgreementMethodAlgorithm());
         }
+
+        if (encryptionToken.getKeyDerivationFunction() != null) {
+            wsEncrypt.setKeyDerivationMethod(encryptionToken.getKeyDerivationFunction());
+        }
+
+        if (encryptionToken.getKeyDerivationParameters() != null) {
+            wsEncrypt.setKeyDerivationParameters(encryptionToken.getKeyDerivationParameters());
+        }
+
         if (encryptionToken.getDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
         }

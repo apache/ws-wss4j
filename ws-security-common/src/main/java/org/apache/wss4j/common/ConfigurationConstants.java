@@ -753,6 +753,44 @@ public class ConfigurationConstants {
     public static final String ENC_KEY_AGREEMENT_METHOD = "encryptionKeyAgreementMethod";
 
     /**
+     * Defines the Key Derivation algorithm to derive encryption key used with the keyAgreement method.
+     * The default algorithm is:
+     * "http://www.w3.org/2021/04/xmldsig-more#hkdf"
+     *
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     *      call.setProperty(ConfigurationConstants.ENC_KEY_DERIVATION_FUNCTION,
+     *          WSConstants.KEYDERIVATION_HKDF);
+     * </pre>
+     *
+     */
+    public static final String ENC_KEY_DERIVATION_FUNCTION = "encryptionKeyDerivationFunction";
+
+    /**
+     * Defines the Key Derivation parameters to derive encryption key used with the keyAgreement method. In case the
+     * property value is set  it supersede the ENC_KEY_DERIVATION_FUNCTION value.
+     * The value for the property must implement the <code>org.apache.xml.security.encryption.params.KeyDerivationParameters</code>
+     * interface. Currently, only the <code>org.apache.xml.security.encryption.params.HKDFParams</code> and
+     * <code>org.apache.xml.security.encryption.params.ConcatKDFParams</code>.
+     *
+     *
+     * The application may set this parameter using the following method:
+     * <pre>
+     *     KeyDerivationParameters kdfParams = new ConcatKDFParams(keyBitLen, MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA256);
+     *     kdfParams.setAlgorithmId("00363532534541");
+     *     kdfParams.setPartyUInfo("00DFC9DB773C588F8F");
+     *     kdfParams.setPartyVInfo("00DFDA76F7AB09B7C9");
+     *     kdfParams.setSuppPubInfo(null);
+     *     kdfParams.setSuppPrivInfo(null);
+     *
+     *     call.set(ConfigurationConstants.ENC_KEY_DERIVATION_PARAMS,kdfParams);
+     * </pre>
+     *
+     */
+    public static final String ENC_KEY_DERIVATION_PARAMS = "encryptionKeyDerivationParams";
+
+    /**
      * Parameter to define which parts of the request shall be encrypted.
      * <p/>
      * The value of this parameter is a list of semi-colon separated
