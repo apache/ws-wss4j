@@ -91,7 +91,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * The Key Derivation Parameters for the with the Key keyAgreementMethod
      */
-    KeyDerivationParameters keyDerivationParameters;
+    private KeyDerivationParameters keyDerivationParameters;
 
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -224,7 +224,7 @@ public class WSSecEncryptedKey extends WSSecBase {
 
             Key kek;
             KeyAgreementParameters dhSpec = null;
-            if (isKeyAgreementMethodNotEmpty(keyAgreementMethod)) {
+            if (isKeyAgreementConfigured(keyAgreementMethod)) {
                 // generate ephemeral keys the key must match receivers keys
                 dhSpec = buildKeyAgreementParameter(remoteCert.getPublicKey());
                 kek = generateEncryptionKey(dhSpec);
@@ -382,7 +382,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             keyInfoElement.setAttributeNS(
                 WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
-            if (isKeyAgreementMethodNotEmpty(keyAgreementMethod)) {
+            if (isKeyAgreementConfigured(keyAgreementMethod)) {
                 try {
                     AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
                     agreementMethod.getRecipientKeyInfo().addUnknownElement(secToken.getElement());
@@ -401,11 +401,11 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * Method verifies is the key agreement method is not empty
+     * Method verifies is the key agreement method is configured(not empty)
      * @param keyAgreementMethod the key agreement method
      * @return true if the key agreement method is not empty else false
      */
-    private boolean isKeyAgreementMethodNotEmpty(String keyAgreementMethod) {
+    private boolean isKeyAgreementConfigured(String keyAgreementMethod) {
          return keyAgreementMethod != null && !keyAgreementMethod.isEmpty();
     }
 
