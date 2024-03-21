@@ -53,7 +53,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.security.*;
 import java.security.cert.X509Certificate;
-import java.util.Random;
 
 /**
  * Builder class to build an EncryptedKey.
@@ -620,7 +619,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 //   size or with limited entropy) may still make a significant
                 //   contribution to the security of the output keying material
                 byte[] semiRandom = new byte[keyBitLength / 8];
-                new Random().nextBytes(semiRandom);
+                new SecureRandom().nextBytes(semiRandom);
                 return XMLCipherUtil.constructHKDFKeyDerivationParameter(keyBitLength, WSS4JConstants.HMAC_SHA256, semiRandom, null);
             default:
                 throw new WSSecurityException(
