@@ -419,7 +419,9 @@ public class EncryptedKeyProcessor implements Processor {
                 && WSConstants.ENC_NS.equals(keyInfoChildElement.getNamespaceURI())) {
             String algorithmURI = keyInfoChildElement.getAttributeNS(null, "Algorithm");
             // Only ECDH_ES is supported for AgreementMethod
-            if (!WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(algorithmURI)) {
+            if (!(WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(algorithmURI)
+                || WSConstants.AGREEMENT_METHOD_X25519.equals(algorithmURI)
+                || WSConstants.AGREEMENT_METHOD_X448.equals(algorithmURI))) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM,
                         "unknownAlgorithm", new Object[]{algorithmURI});
