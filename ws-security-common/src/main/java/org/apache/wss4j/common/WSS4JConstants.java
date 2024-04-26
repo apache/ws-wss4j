@@ -116,10 +116,16 @@ public class WSS4JConstants {
             "http://www.w3.org/2001/04/xmlenc#kw-aes256";
     public static final String KEYWRAP_TRIPLEDES =
             "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
-    public static final String KDF_CONCAT =
+    public static final String KEYDERIVATION_CONCATKDF =
             "http://www.w3.org/2009/xmlenc11#ConcatKDF";
+    public static final String KEYDERIVATION_HKDF =
+            "http://www.w3.org/2021/04/xmldsig-more#hkdf";
     public static final String AGREEMENT_METHOD_ECDH_ES =
             "http://www.w3.org/2009/xmlenc11#ECDH-ES";
+    public static final String AGREEMENT_METHOD_X25519 =
+            "http://www.w3.org/2021/04/xmldsig-more#x25519";
+    public static final String AGREEMENT_METHOD_X448 =
+            "http://www.w3.org/2021/04/xmldsig-more#x448";
     public static final String TRIPLE_DES =
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
     public static final String AES_128 =
