@@ -445,7 +445,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
     }
 
     private void addIssuerSerial(X509Certificate cert, SecurityTokenReference secRef, boolean isQuoteDelimited) {
-        final String issuer = cert.getIssuerDN().getName();
+        final String issuer = cert.getIssuerX500Principal().getName();
         final java.math.BigInteger serialNumber = cert.getSerialNumber();
         final DOMX509IssuerSerial domIssuerSerial =
                 new DOMX509IssuerSerial(getDocument(), issuer, serialNumber, isQuoteDelimited);
