@@ -340,7 +340,7 @@ public abstract class CryptoBase implements Crypto {
             LOG.debug("The certificate is null so no constraints matching was possible");
             return false;
         }
-        String issuerDn = cert.getIssuerDN().getName();
+        String issuerDn = cert.getIssuerX500Principal().getName();
         return matchesName(issuerDn, issuerDNPatterns);
     }
 

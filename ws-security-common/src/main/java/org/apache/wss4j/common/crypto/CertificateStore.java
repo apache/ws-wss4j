@@ -108,7 +108,7 @@ public class CertificateStore extends CryptoBase {
      * @throws WSSecurityException
      */
     public String getX509Identifier(X509Certificate cert) throws WSSecurityException {
-        return cert.getSubjectDN().toString();
+        return cert.getSubjectX500Principal().toString();
     }
 
     /**
