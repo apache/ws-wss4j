@@ -448,9 +448,10 @@ public class EncryptionTest {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            HKDFParams keyDerivationParameters = new HKDFParams(keySize, hkdfMacFunction);
-            keyDerivationParameters.setInfo("test-key-info".getBytes());
-            keyDerivationParameters.setSalt(UUID.randomUUID().toString().getBytes());
+            HKDFParams keyDerivationParameters = HKDFParams.createBuilder(keySize, hkdfMacFunction)
+                    .info("test-key-info".getBytes())
+                    .salt(UUID.randomUUID().toString().getBytes())
+                    .build();
 
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setUserInfo(certAlias);
