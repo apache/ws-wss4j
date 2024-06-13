@@ -663,7 +663,7 @@ public abstract class WSHandler {
 
         String keyAgreementMethodAlgorithm = getString(WSHandlerConstants.ENC_KEY_AGREEMENT_METHOD, mc);
         if (keyAgreementMethodAlgorithm != null && !keyAgreementMethodAlgorithm.isEmpty()) {
-            algorithmSuite.addKeyAgreementMethodAlgorithm(transportAlgorithm);
+            algorithmSuite.addKeyAgreementMethodAlgorithm(keyAgreementMethodAlgorithm);
         }
 
         String keyDerivationAlgorithm = getString(WSHandlerConstants.ENC_KEY_DERIVATION_FUNCTION, mc);
