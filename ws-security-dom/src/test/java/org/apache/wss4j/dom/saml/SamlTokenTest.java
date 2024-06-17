@@ -43,7 +43,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.NameIDBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -133,6 +135,31 @@ public class SamlTokenTest {
         assertNotNull(receivedSamlAssertion);
         assertFalse(receivedSamlAssertion.isSigned());
         assertTrue(receivedSamlAssertion.getSignatureValue().length == 0);
+    }
+
+    @Test
+    public void testSAML1AuthnAssertionWithSubjectConfirmationData() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SubjectBean subjectBean = new SubjectBean("test@egelke.net", SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS ,SAML1Constants.CONF_SENDER_VOUCHES);
+        AttributeStatementBean attributeStatementBean = new AttributeStatementBean(subjectBean, Collections.EMPTY_LIST);
+        SubjectConfirmationDataBean subjectConfirmationDataBean = new SubjectConfirmationDataBean();
+        subjectConfirmationDataBean.addAny(attributeStatementBean);
+        callbackHandler.setSubjectConfirmationData(subjectConfirmationDataBean);
+
+        WSHandlerResult results =
+                createAndVerifyMessage(callbackHandler, true);
+        WSSecurityEngineResult actionResult =
+                results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+                (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
+        assertTrue(receivedSamlAssertion.getSignatureValue().length == 0);
+        assertTrue(receivedSamlAssertion.getSaml1().getAuthenticationStatements().get(0).getSubject().getSubjectConfirmation().getSubjectConfirmationData().hasChildren());
     }
 
     /**
