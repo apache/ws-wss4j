@@ -22,48 +22,23 @@ package org.apache.wss4j.common.saml.builder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.bean.ActionBean;
-import org.apache.wss4j.common.saml.bean.AdviceBean;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
+import org.apache.wss4j.common.saml.bean.*;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSStringBuilder;
+import org.opensaml.saml.common.AbstractSAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLVersion;
-import org.opensaml.saml.saml1.core.Action;
-import org.opensaml.saml.saml1.core.Advice;
-import org.opensaml.saml.saml1.core.Assertion;
-import org.opensaml.saml.saml1.core.AssertionIDReference;
-import org.opensaml.saml.saml1.core.Attribute;
-import org.opensaml.saml.saml1.core.AttributeStatement;
-import org.opensaml.saml.saml1.core.AttributeValue;
-import org.opensaml.saml.saml1.core.Audience;
-import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
-import org.opensaml.saml.saml1.core.AuthenticationStatement;
-import org.opensaml.saml.saml1.core.AuthorizationDecisionStatement;
-import org.opensaml.saml.saml1.core.Conditions;
-import org.opensaml.saml.saml1.core.ConfirmationMethod;
-import org.opensaml.saml.saml1.core.DecisionTypeEnumeration;
-import org.opensaml.saml.saml1.core.Evidence;
-import org.opensaml.saml.saml1.core.NameIdentifier;
-import org.opensaml.saml.saml1.core.Subject;
-import org.opensaml.saml.saml1.core.SubjectConfirmation;
-import org.opensaml.saml.saml1.core.SubjectLocality;
+import org.opensaml.saml.saml1.core.*;
 import org.opensaml.security.credential.BasicCredential;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.xmlsec.keyinfo.impl.BasicKeyInfoGeneratorFactory;
@@ -76,6 +51,9 @@ import org.w3c.dom.Element;
  * to construct SAML v1.1 statements using the OpenSaml library.
  */
 public final class SAML1ComponentBuilder {
+
+    private static final transient org.slf4j.Logger LOG =
+            org.slf4j.LoggerFactory.getLogger(SAML1ComponentBuilder.class);
 
     private static volatile SAMLObjectBuilder<Assertion> assertionV1Builder;
 
@@ -99,6 +77,9 @@ public final class SAML1ComponentBuilder {
         subjectConfirmationV1Builder;
 
     private static volatile SAMLObjectBuilder<ConfirmationMethod> confirmationMethodV1Builder;
+
+    //private static volatile SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataV1Builder;
+    private static volatile XMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataV1Builder;
 
     private static volatile SAMLObjectBuilder<AttributeStatement>
         attributeStatementV1Builder;
@@ -199,6 +180,11 @@ public final class SAML1ComponentBuilder {
             KeyInfo keyInfo = createKeyInfo(subjectBean.getKeyInfo());
             subjectConfirmation.setKeyInfo(keyInfo);
         }
+        if (subjectBean.getSubjectConfirmationData() != null) {
+            SubjectConfirmationData subjectConfirmationData = createSubjectConfirmationData(subjectBean.getSubjectConfirmationData());
+            subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
+        }
+
         subject.setNameIdentifier(nameIdentifier);
         subject.setSubjectConfirmation(subjectConfirmation);
 
@@ -245,6 +231,42 @@ public final class SAML1ComponentBuilder {
         }
 
         return null;
+    }
+
+    public static SubjectConfirmationData createSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationDataBean)
+            throws org.opensaml.security.SecurityException, WSSecurityException {
+        SubjectConfirmationData subjectConfirmationData = null;
+        if (subjectConfirmationDataV1Builder == null) {
+            subjectConfirmationDataV1Builder = (XMLObjectBuilder<SubjectConfirmationData>) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+        }
+        subjectConfirmationData = subjectConfirmationDataV1Builder.buildObject(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+
+        //Can't be used due to invalid NS:
+        //https://git.shibboleth.net/view/?p=java-opensaml.git;a=blob;f=opensaml-saml-impl/src/main/java/org/opensaml/saml/saml1/core/impl/SubjectConfirmationDataBuilder.java;h=98f02e28833316847eff5de70a4deaabc05f19f5;hb=HEAD
+        /*
+        if (subjectConfirmationDataV1Builder == null) {
+            subjectConfirmationDataV1Builder = (SAMLObjectBuilder<SubjectConfirmationData>)
+                    builderFactory.getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+        }
+        subjectConfirmationData = subjectConfirmationDataV1Builder.buildObject();
+         */
+
+        if (subjectConfirmationDataBean.getAny() != null) {
+            List<XMLObject> unknownObjects = subjectConfirmationData.getUnknownXMLObjects();
+            for (Object obj : subjectConfirmationDataBean.getAny()) {
+                if (obj == null) {
+                    LOG.warn("Ignore <null> object in SubjectConfirmationData.any");
+                } else if (obj instanceof XMLObject) {
+                    unknownObjects.add((XMLObject) obj);
+                } else if (obj instanceof AttributeStatementBean) {
+                    unknownObjects.addAll(createSamlv1AttributeStatement(Collections.singletonList((AttributeStatementBean) obj)));
+                } else {
+                    LOG.warn("Ignore object of the unsupported type {} in SubjectConfirmationData.any", obj.getClass());
+                }
+            }
+        }
+
+        return subjectConfirmationData;
     }
 
     /**
