@@ -43,6 +43,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
@@ -82,7 +83,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     private boolean handleCustomPasswordTypes = false;
     private boolean allowUsernameTokenNoPassword = false;
-    private boolean allowRSA15KeyTransportAlgorithm = false;
+    private boolean allowRSA15KeyTransportAlgorithm = FIPSUtils.isFIPSEnabled();
     private boolean useDerivedKeyForMAC = true;
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String tokenUser;
