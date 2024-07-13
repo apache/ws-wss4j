@@ -32,6 +32,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
@@ -80,7 +81,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Algorithm to be used with the ephemeral key
      */
-    private String symEncAlgo = WSConstants.AES_128;
+    private String symEncAlgo = FIPSUtils.isFIPSEnabled()
+        ? WSConstants.AES_128_GCM : WSConstants.AES_128;
 
     public WSSecEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);

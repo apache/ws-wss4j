@@ -43,6 +43,7 @@ import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
@@ -1410,7 +1411,7 @@ public abstract class WSHandler {
         boolean allowRsa15 =
             decodeBooleanConfigValue(
                 reqData.getMsgContext(), WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM,
-                false
+                FIPSUtils.isFIPSEnabled()
             );
         reqData.setAllowRSA15KeyTransportAlgorithm(allowRsa15);
     }

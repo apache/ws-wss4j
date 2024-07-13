@@ -42,6 +42,7 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -75,7 +76,8 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Algorithm used to encrypt the ephemeral key
      */
-    private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOAEP;
+    private String keyEncAlgo = FIPSUtils.isFIPSEnabled()
+        ? WSConstants.KEYTRANSPORT_RSA15 : WSConstants.KEYTRANSPORT_RSAOAEP;
 
     /**
      * Key agreement method algorithm used to encrypt the transport key.

@@ -41,6 +41,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -83,7 +84,7 @@ public class RequestData {
     private AlgorithmSuite algorithmSuite;
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
-    private boolean allowRSA15KeyTransportAlgorithm;
+    private boolean allowRSA15KeyTransportAlgorithm = FIPSUtils.isFIPSEnabled();
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
