@@ -23,6 +23,7 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -52,7 +53,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-
+import org.apache.xml.security.encryption.params.HKDFParams;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +107,7 @@ public class EncryptionTest {
     }
 
     @AfterEach
-    public void cleanup(){
+    public void cleanup() {
         JDKTestUtils.unregisterAuxiliaryProvider();
     }
 
@@ -323,28 +324,38 @@ public class EncryptionTest {
 
     /**
      * Test that encrypt and decrypt a WS-Security envelope.
-     * This test uses the ECDSA-ES algorithm to (wrap) the symmetric key.
+     * This test uses the key agreement algorithm to (wrap) the symmetric key with generating KDF with
+     * default parameter
      * <p/>
      *
+     * @param algorithm The key type algorithm
+     * @param certAlias The certificate alias from the configuration defined in wss-ecdh.properties
+     * @param keyAgreementMethod The key agreement method
+     * @param kdfAlgorithm The key derivation method
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     @ParameterizedTest
-    @CsvSource({"xdh, X25519",
-            "xdh, X448",
-            "ec, secp256r1",
-            "ec, secp384r1",
-            "ec, secp521r1",
+    @CsvSource({"xdh, X25519, http://www.w3.org/2021/04/xmldsig-more#x25519, http://www.w3.org/2009/xmlenc11#ConcatKDF",
+            "xdh, X448, http://www.w3.org/2021/04/xmldsig-more#x448, http://www.w3.org/2009/xmlenc11#ConcatKDF",
+            "ec, secp256r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2009/xmlenc11#ConcatKDF",
+            "ec, secp384r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2009/xmlenc11#ConcatKDF",
+            "ec, secp521r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2009/xmlenc11#ConcatKDF",
+            "xdh, X25519, http://www.w3.org/2021/04/xmldsig-more#x25519, http://www.w3.org/2021/04/xmldsig-more#hkdf",
+            "xdh, X448, http://www.w3.org/2021/04/xmldsig-more#x448, http://www.w3.org/2021/04/xmldsig-more#hkdf",
+            "ec, secp256r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2021/04/xmldsig-more#hkdf",
+            "ec, secp384r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2021/04/xmldsig-more#hkdf",
+            "ec, secp521r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2021/04/xmldsig-more#hkdf",
     })
-    public void testEncryptionDecryptionECDSA_ES(String algorithm, String certAlias) throws Exception {
+    public void testEncryptionDecryptionWithKeyAgreementAndDefaultKDF(String algorithm, String certAlias, String keyAgreementMethod, String kdfAlgorithm) throws Exception {
         try {
             if (!JDKTestUtils.isAlgorithmSupportedByJDK(algorithm)) {
-                LOG.info("Add AuxiliaryProvider to execute test with algorithm [{}] and cert alias [{}]", algorithm,  certAlias);
+                LOG.info("Add AuxiliaryProvider to execute test with algorithm [{}] and cert alias [{}]", algorithm, certAlias);
                 Security.addProvider(JDKTestUtils.getAuxiliaryProvider());
-            } else if (JDKTestUtils.getJDKVersion() == 11 && algorithm.equals("xdh") ) {
+            } else if (JDKTestUtils.getJDKVersion() == 11 && algorithm.equals("xdh")) {
                 // workaround for jdk11 and xdh keys
                 // https://bugs.openjdk.java.net/browse/JDK-8219381 or https://bugs.openjdk.org/browse/JDK-8213363
                 // set the auxiliary provider as first provider to parse the xdh private key
-                Security.insertProviderAt(JDKTestUtils.getAuxiliaryProvider(), 1 );
+                Security.insertProviderAt(JDKTestUtils.getAuxiliaryProvider(), 1);
             }
             Crypto encCrypto = CryptoFactory.getInstance("wss-ecdh.properties");
 
@@ -355,8 +366,11 @@ public class EncryptionTest {
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setUserInfo(certAlias);
             builder.setKeyEncAlgo(WSConstants.KEYWRAP_AES128);
-            builder.setKeyAgreementMethod(WSConstants.AGREEMENT_METHOD_ECDH_ES);
-            builder.setDigestAlgorithm(WSS4JConstants.SHA256);
+            builder.setKeyAgreementMethod(keyAgreementMethod);
+            builder.setKeyDerivationMethod(kdfAlgorithm);
+            if (kdfAlgorithm.equalsIgnoreCase(WSS4JConstants.KEYDERIVATION_CONCATKDF)){
+                builder.setDigestAlgorithm(WSS4JConstants.SHA256);
+            }
             builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
             LOG.info("Before Encryption ...");
@@ -368,6 +382,7 @@ public class EncryptionTest {
 
             String outputString =
                     XMLUtils.prettyDocumentToString(encryptedDoc);
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Encrypted message:");
                 LOG.debug(outputString);
@@ -376,7 +391,99 @@ public class EncryptionTest {
             // Check for algorithms and agreement method element
             assertTrue(outputString.contains(EncryptionConstants._TAG_AGREEMENTMETHOD));
             assertTrue(outputString.contains(WSConstants.KEYWRAP_AES128));
-            assertTrue(outputString.contains(WSConstants.AGREEMENT_METHOD_ECDH_ES));
+            assertTrue(outputString.contains(keyAgreementMethod));
+
+            WSSecurityEngine newEngine = new WSSecurityEngine();
+            WSHandlerResult results =
+                    newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, encCrypto);
+
+            WSSecurityEngineResult actionResult =
+                    results.getActionResults().get(WSConstants.ENCR).get(0);
+            assertNotNull(actionResult);
+        } finally {
+            Security.removeProvider(JDKTestUtils.getAuxiliaryProvider().getName());
+        }
+    }
+
+    /**
+     * Test that encrypt and decrypt a WS-Security envelope.
+     * This test uses the ECDSA-ES algorithm to (wrap) the symmetric key.
+     * <p/>
+     *
+     * @throws Exception Thrown when there is any problem in signing or verification
+     */
+    @ParameterizedTest
+    @CsvSource({
+            "xdh, X25519, http://www.w3.org/2021/04/xmldsig-more#x25519, http://www.w3.org/2001/04/xmlenc#kw-aes128, 128",
+            "xdh, X448, http://www.w3.org/2021/04/xmldsig-more#x448, http://www.w3.org/2001/04/xmlenc#kw-aes128, 128",
+            "ec, secp256r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes128, 128",
+            "ec, secp384r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes128, 128",
+            "ec, secp521r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes128, 128",
+            "xdh, X25519, http://www.w3.org/2021/04/xmldsig-more#x25519, http://www.w3.org/2001/04/xmlenc#kw-aes192, 192",
+            "xdh, X448, http://www.w3.org/2021/04/xmldsig-more#x448, http://www.w3.org/2001/04/xmlenc#kw-aes192, 192",
+            "ec, secp256r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes192, 192",
+            "ec, secp384r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes192, 192",
+            "ec, secp521r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes192, 192",
+            "xdh, X25519, http://www.w3.org/2021/04/xmldsig-more#x25519, http://www.w3.org/2001/04/xmlenc#kw-aes256, 256",
+            "xdh, X448, http://www.w3.org/2021/04/xmldsig-more#x448, http://www.w3.org/2001/04/xmlenc#kw-aes256, 256",
+            "ec, secp256r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes256, 256",
+            "ec, secp384r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes256, 256",
+            "ec, secp521r1, http://www.w3.org/2009/xmlenc11#ECDH-ES, http://www.w3.org/2001/04/xmlenc#kw-aes256, 256",
+    })
+    public void testEncryptionDecryptionWithKeyAgreementAndHKDF(String algorithm, String certAlias, String keyAgreementMethod, String keyWrapAlg, int keySize ) throws Exception {
+        String hkdfMacFunction = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
+        try {
+            if (!JDKTestUtils.isAlgorithmSupportedByJDK(algorithm)) {
+                LOG.info("Add AuxiliaryProvider to execute test with algorithm [{}] and cert alias [{}]", algorithm, certAlias);
+                Security.addProvider(JDKTestUtils.getAuxiliaryProvider());
+            } else if (JDKTestUtils.getJDKVersion() == 11 && algorithm.equals("xdh")) {
+                // workaround for jdk11 and xdh keys
+                // https://bugs.openjdk.java.net/browse/JDK-8219381 or https://bugs.openjdk.org/browse/JDK-8213363
+                // set the auxiliary provider as first provider to parse the xdh private key
+                Security.insertProviderAt(JDKTestUtils.getAuxiliaryProvider(), 1);
+            }
+            Crypto encCrypto = CryptoFactory.getInstance("wss-ecdh.properties");
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            HKDFParams keyDerivationParameters = HKDFParams.createBuilder(keySize, hkdfMacFunction)
+                    .info("test-key-info".getBytes())
+                    .salt(UUID.randomUUID().toString().getBytes())
+                    .build();
+
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+            builder.setUserInfo(certAlias);
+            builder.setKeyEncAlgo(keyWrapAlg);
+            builder.setKeyAgreementMethod(keyAgreementMethod);
+            builder.setKeyDerivationParameters(keyDerivationParameters);
+
+
+            LOG.info("Before Encryption ...");
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+            SecretKey symmetricKey = keyGen.generateKey();
+
+            Document encryptedDoc = builder.build(encCrypto, symmetricKey);
+            LOG.info("After Encryption ....");
+
+            String outputString =
+                    XMLUtils.prettyDocumentToString(encryptedDoc);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Encrypted message:");
+                LOG.debug(outputString);
+            }
+            assertFalse(outputString.contains("counter_port_type"));
+            // Check for algorithms and agreement method element
+            assertTrue(outputString.contains(EncryptionConstants._TAG_AGREEMENTMETHOD));
+            assertTrue(outputString.contains(EncryptionConstants._TAG_HKDFPARAMS));
+            assertTrue(outputString.contains(EncryptionConstants._TAG_INFO));
+            assertTrue(outputString.contains(EncryptionConstants._TAG_KEYLENGTH+">"+(keySize/8)+"</"));
+            assertTrue(outputString.contains(hkdfMacFunction));
+
+            assertTrue(outputString.contains(keyWrapAlg));
+            assertTrue(outputString.contains(keyAgreementMethod));
 
             WSSecurityEngine newEngine = new WSSecurityEngine();
             WSHandlerResult results =

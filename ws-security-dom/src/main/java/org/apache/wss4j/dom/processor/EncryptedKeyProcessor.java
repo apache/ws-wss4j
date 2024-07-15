@@ -35,6 +35,7 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 import org.apache.xml.security.encryption.AgreementMethod;
+import org.apache.xml.security.encryption.KeyDerivationMethod;
 import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.encryption.keys.RecipientKeyInfo;
 import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
@@ -150,9 +151,11 @@ public class EncryptedKeyProcessor implements Processor {
         PublicKey publicKey = null;
         boolean symmetricKeyWrap = isSymmetricKeyWrap(encryptedKeyTransportMethod);
         AgreementMethod agreementMethod = null;
+        KeyDerivationMethod keyDerivationMethod = null;
         if (isDHKeyWrap) {
             // get key agreement method value
             agreementMethod = getAgreementMethodFromElement(keyInfoChildElement);
+            keyDerivationMethod = getKeyDerivationFunction(agreementMethod);
             //  get the recipient key info element
             keyInfoChildElement = getRecipientKeyInfoChildElement(agreementMethod);
             if (keyInfoChildElement == null) {
@@ -182,6 +185,11 @@ public class EncryptedKeyProcessor implements Processor {
             if (agreementMethod != null) {
                 algorithmSuiteValidator.checkKeyAgreementMethodAlgorithm(
                         agreementMethod.getAlgorithm()
+                );
+            }
+            if (keyDerivationMethod != null) {
+                algorithmSuiteValidator.checkKeyDerivationFunction(
+                        keyDerivationMethod.getAlgorithm()
                 );
             }
         }
@@ -419,7 +427,9 @@ public class EncryptedKeyProcessor implements Processor {
                 && WSConstants.ENC_NS.equals(keyInfoChildElement.getNamespaceURI())) {
             String algorithmURI = keyInfoChildElement.getAttributeNS(null, "Algorithm");
             // Only ECDH_ES is supported for AgreementMethod
-            if (!WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(algorithmURI)) {
+            if (!(WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(algorithmURI)
+                || WSConstants.AGREEMENT_METHOD_X25519.equals(algorithmURI)
+                || WSConstants.AGREEMENT_METHOD_X448.equals(algorithmURI))) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM,
                         "unknownAlgorithm", new Object[]{algorithmURI});
@@ -559,6 +569,24 @@ public class EncryptedKeyProcessor implements Processor {
             return strElement;
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
+        }
+    }
+
+    /**
+     * Method retrieved the KeyDerivationMethod child element from the AgreementMethod object.
+     *
+     * @param agreementMethod object containing th KeyDerivationMethod.
+     * @return the {@link KeyDerivationMethod} object or null if no KeyDerivation element is specified in the agreementMethod.
+     * @throws WSSecurityException if KeyDerivationMethod can not be parsed from Element structure.
+     */
+    private KeyDerivationMethod getKeyDerivationFunction(AgreementMethod agreementMethod) throws WSSecurityException {
+        if (agreementMethod == null) {
+            return null;
+        }
+        try {
+            return agreementMethod.getKeyDerivationMethod();
+        } catch (XMLSecurityException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, ex);
         }
     }
 
