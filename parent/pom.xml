@@ -47,10 +47,10 @@
         <opensaml.version>5.0.0</opensaml.version>
         <slf4j.version>2.0.13</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
-        <woodstox.version>6.6.1</woodstox.version>
+        <woodstox.version>6.6.2</woodstox.version>
         <xz.version>1.9</xz.version>
         <xmlsec.version>4.0.3-SNAPSHOT</xmlsec.version>
-        <xmlunit.version>2.9.1</xmlunit.version>
+        <xmlunit.version>2.10.0</xmlunit.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
         <wss4j.osgi.symbolic.name>${project.groupId}.${project.artifactId}</wss4j.osgi.symbolic.name>
