@@ -19,6 +19,8 @@
 package org.apache.wss4j.common;
 
 
+import org.apache.xml.security.encryption.params.KeyDerivationParameters;
+
 /**
  * This class encapsulates configuration for Encryption Actions.
  */
@@ -28,6 +30,8 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
     private String mgfAlgorithm;
     private String symmetricAlgorithm;
     private String keyAgreementMethodAlgorithm;
+    private String keyDerivationFunction;
+    private KeyDerivationParameters keyDerivationParameters;
     private String keyTransportAlgorithm;
     private boolean getSymmetricKeyFromCallbackHandler;
 
@@ -55,6 +59,7 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
     public void setKeyTransportAlgorithm(String keyTransportAlgorithm) {
         this.keyTransportAlgorithm = keyTransportAlgorithm;
     }
+
     public String getKeyAgreementMethodAlgorithm() {
         return keyAgreementMethodAlgorithm;
     }
@@ -68,5 +73,20 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
         this.getSymmetricKeyFromCallbackHandler = getSymmetricKeyFromCallbackHandler;
     }
 
+    public String getKeyDerivationFunction() {
+        return keyDerivationFunction;
+    }
+
+    public void setKeyDerivationFunction(String keyDerivationFunction) {
+        this.keyDerivationFunction = keyDerivationFunction;
+    }
+
+    public KeyDerivationParameters getKeyDerivationParameters() {
+        return keyDerivationParameters;
+    }
+
+    public void setKeyDerivationParameters(KeyDerivationParameters keyDerivationParameters) {
+        this.keyDerivationParameters = keyDerivationParameters;
+    }
 }
 

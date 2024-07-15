@@ -19,8 +19,30 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.security.*;
-import java.security.cert.X509Certificate;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.*;
+import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.encryption.XMLCipherUtil;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
+import org.apache.xml.security.encryption.params.ConcatKDFParams;
+import org.apache.xml.security.encryption.params.HKDFParams;
+import org.apache.xml.security.encryption.params.KeyAgreementParameters;
+import org.apache.xml.security.encryption.params.KeyDerivationParameters;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.XMLUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
@@ -31,32 +53,8 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
-
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.token.DOMX509Data;
-import org.apache.wss4j.common.token.DOMX509IssuerSerial;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.encryption.XMLCipherUtil;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
-import org.apache.xml.security.encryption.params.KeyAgreementParameters;
-import org.apache.xml.security.encryption.params.KeyDerivationParameters;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import java.security.*;
+import java.security.cert.X509Certificate;
 
 /**
  * Builder class to build an EncryptedKey.
@@ -80,9 +78,22 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Key agreement method algorithm used to encrypt the transport key.
      * Example for ECDH-ES: http://www.w3.org/2009/xmlenc11#ECDH-ES
-     *
+     * and xec example: X25519: http://www.w3.org/2021/04/xmldsig-more#x25519,
+     *  x448: http://www.w3.org/2021/04/xmldsig-more#x448
      */
     private String keyAgreementMethod;
+
+    /**
+     * Method to derive the key to be used to encrypt the data with the Key keyAgreementMethod
+     *
+     */
+    private String keyDerivationMethod = WSS4JConstants.KEYDERIVATION_HKDF;
+
+
+    /**
+     * The Key Derivation Parameters for the with the Key keyAgreementMethod
+     */
+    private KeyDerivationParameters keyDerivationParameters;
 
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -215,7 +226,7 @@ public class WSSecEncryptedKey extends WSSecBase {
 
             Key kek;
             KeyAgreementParameters dhSpec = null;
-            if (WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(keyAgreementMethod)) {
+            if (isKeyAgreementConfigured(keyAgreementMethod)) {
                 // generate ephemeral keys the key must match receivers keys
                 dhSpec = buildKeyAgreementParameter(remoteCert.getPublicKey());
                 kek = generateEncryptionKey(dhSpec);
@@ -373,7 +384,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             keyInfoElement.setAttributeNS(
                 WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
-            if (WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(keyAgreementMethod)) {
+            if (isKeyAgreementConfigured(keyAgreementMethod)) {
                 try {
                     AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
                     agreementMethod.getRecipientKeyInfo().addUnknownElement(secToken.getElement());
@@ -389,7 +400,15 @@ public class WSSecEncryptedKey extends WSSecBase {
             }
             encryptedKeyElement.appendChild(keyInfoElement);
         }
+    }
 
+    /**
+     * Method verifies is the key agreement method is configured(not empty)
+     * @param keyAgreementMethod the key agreement method
+     * @return true if the key agreement method is not empty else false
+     */
+    private boolean isKeyAgreementConfigured(String keyAgreementMethod) {
+         return keyAgreementMethod != null && !keyAgreementMethod.isEmpty();
     }
 
     private void addIssuerSerial(X509Certificate remoteCert, SecurityTokenReference secToken, boolean isCommaDelimited)
@@ -534,21 +553,29 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * Method builds the KeyAgreementParameterSpec for the ECDH-ES Key Agreement Method using
-     * the recipient's public key and preconfigured values: keyEncAlgo, digestAlgo and keyAgreementMethod
+     * Method builds the KeyAgreementParameterSpec for the ECDH-ES, X25519 or X448
+     * Key Agreement Method using the recipient's public key and preconfigured values:
+     * keyEncAlgo, digestAlgo and keyAgreementMethod. If the keyDerivationParameters
+     * are not set, the default values for the key derivation method are used.
      *
      * @param recipientPublicKey the recipient's public key
      * @return KeyAgreementParameterSpec the {@link java.security.spec.AlgorithmParameterSpec} for generating the
      * key for encrypting transport key and generating XML elements.
      *
-     * @throws WSSecurityException if the KeyAgreementParameterSpec cannot be created
+     * @throws WSSecurityException if the KeyAgreementParameterSpec cannot be created due to
+     * invalid key agreement method or key derivation method and wrap algorithm not supported
      */
     private KeyAgreementParameters buildKeyAgreementParameter(PublicKey recipientPublicKey)
             throws WSSecurityException {
         KeyAgreementParameters dhSpec;
         try {
             int keyBitLength = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(keyEncAlgo);
-            KeyDerivationParameters kdf = XMLCipherUtil.constructConcatKeyDerivationParameter(keyBitLength, digestAlgo);
+            KeyDerivationParameters kdf = keyDerivationParameters;
+            if (keyDerivationParameters == null) {
+                LOG.debug("Set default KeyDerivationParameters for key derivation method: [{}]",
+                        keyDerivationMethod);
+                kdf = buildDefaultKeyDerivationParameters(keyBitLength);
+            }
             KeyPair dhKeyPair = org.apache.xml.security.utils.KeyUtils.generateEphemeralDHKeyPair(recipientPublicKey, null);
             dhSpec = XMLCipherUtil.constructAgreementParameters(keyAgreementMethod,
                     KeyAgreementParameters.ActorType.ORIGINATOR, kdf, null, recipientPublicKey);
@@ -560,6 +587,62 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         return dhSpec;
     }
+
+    /**
+     * Method builds the KeyDerivationParameters for keyDerivationMethod with default values.
+     * The default values for the key derivation method are:
+     * <ul>
+     *   <li>ConcatKDF
+     *     <ul>
+     *       <li> DigestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256"</li>
+     *       <li> AlgorithmID: "0000"</li>
+     *       <li> PartyUInfo: ""</li>
+     *       <li> PartyVInfo: ""</li>
+     *       <li> SuppPubInfo: null</li>
+     *       <li> SuppPrivInfo: null</li>
+     *     </ul>
+     *   <li>HKDF: SHA-256
+     *     <ul>
+     *       <li> PRF: http://www.w3.org/2001/04/xmldsig-more#hmac-sha256 </li>
+     *       <li> Salt: random 256 bit value</li>
+     *       <li> Info: null</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param keyBitLength the length of the derived key in bits
+     * @return KeyDerivationParameters the {@link KeyDerivationParameters} for generating the
+     * key for encrypting transport key and generating XML elements.
+     * @throws WSSecurityException if the KeyDerivationParameters cannot be created
+     */
+    private KeyDerivationParameters buildDefaultKeyDerivationParameters(int keyBitLength) throws WSSecurityException {
+
+        switch (keyDerivationMethod) {
+            case WSS4JConstants.KEYDERIVATION_CONCATKDF:
+                return ConcatKDFParams.createBuilder(keyBitLength, WSConstants.SHA256)
+                        .algorithmID("0000")
+                        .partyUInfo("")
+                        .partyVInfo("")
+                        .build();
+            case WSS4JConstants.KEYDERIVATION_HKDF:
+                // use semi random value for salt.
+                // rfc5869: Yet, even a salt value of less quality (shorter in
+                //   size or with limited entropy) may still make a significant
+                //   contribution to the security of the output keying material
+                byte[] semiRandom = new byte[keyBitLength / 8];
+                new SecureRandom().nextBytes(semiRandom);
+                return HKDFParams.createBuilder(keyBitLength, WSS4JConstants.HMAC_SHA256)
+                        .salt(semiRandom)
+                        .info(null)
+                        .build();
+            default:
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedKeyDerivationMethod",
+                        new Object[]{keyDerivationMethod}
+                );
+        }
+    }
+
 
     /**
      * Method generates the key for encrypting the transport key using the KeyAgreementParameterSpec
@@ -791,6 +874,22 @@ public class WSSecEncryptedKey extends WSSecBase {
 
     public void setKeyAgreementMethod(String keyAgreementMethod) {
         this.keyAgreementMethod = keyAgreementMethod;
+    }
+
+    public String getKeyDerivationMethod() {
+        return keyDerivationMethod;
+    }
+
+    public void setKeyDerivationMethod(String keyDerivationMethod) {
+        this.keyDerivationMethod = keyDerivationMethod;
+    }
+
+    public KeyDerivationParameters getKeyDerivationParameters() {
+        return keyDerivationParameters;
+    }
+
+    public void setKeyDerivationParameters(KeyDerivationParameters keyDerivationParameters) {
+        this.keyDerivationParameters = keyDerivationParameters;
     }
 
     /**

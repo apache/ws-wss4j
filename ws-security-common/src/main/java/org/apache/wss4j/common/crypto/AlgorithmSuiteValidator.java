@@ -152,6 +152,26 @@ public class AlgorithmSuiteValidator {
         }
     }
 
+    /**
+     * Method to check the Key Derivation algorithm is on the approved list  of the
+     * AlgorithmSuite configuration.
+     * @param keyDerivationFunction the key derivation function to be validated
+     * @throws WSSecurityException if the approved list is not empty and the key
+     * derivation function is not on the list
+     */
+    public void checkKeyDerivationFunction(
+            String keyDerivationFunction
+    ) throws WSSecurityException {
+        Set<String> keyDerivationFunctions = algorithmSuite.getDerivedKeyAlgorithms();
+        if (!keyDerivationFunctions.isEmpty()
+                && !keyDerivationFunctions.contains(keyDerivationFunction)) {
+            LOG.warn(
+                    "The Key derivation function does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
     public void checkSymmetricEncryptionAlgorithm(
         String symmetricAlgorithm
     ) throws WSSecurityException {
