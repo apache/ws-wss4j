@@ -769,10 +769,10 @@ public class ConfigurationConstants {
 
     /**
      * Defines the Key Derivation parameters to derive encryption key used with the keyAgreement method. In case the
-     * property value is set  it supersede the ENC_KEY_DERIVATION_FUNCTION value.
+     * property value is set, it supersedes the ENC_KEY_DERIVATION_FUNCTION value.
      * The value for the property must implement the <code>org.apache.xml.security.encryption.params.KeyDerivationParameters</code>
-     * interface. Currently, only the <code>org.apache.xml.security.encryption.params.HKDFParams</code> and
-     * <code>org.apache.xml.security.encryption.params.ConcatKDFParams</code>.
+     * interface. Currently, only <code>org.apache.xml.security.encryption.params.HKDFParams</code> and
+     * <code>org.apache.xml.security.encryption.params.ConcatKDFParams</code> are available.
      *
      *
      * The application may set this parameter using the following method:
