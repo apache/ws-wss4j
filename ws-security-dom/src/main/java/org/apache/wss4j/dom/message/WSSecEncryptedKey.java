@@ -36,6 +36,7 @@ import org.apache.xml.security.encryption.params.HKDFParams;
 import org.apache.xml.security.encryption.params.KeyAgreementParameters;
 import org.apache.xml.security.encryption.params.KeyDerivationParameters;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.XMLUtils;
@@ -629,8 +630,15 @@ public class WSSecEncryptedKey extends WSSecBase {
                 // rfc5869: Yet, even a salt value of less quality (shorter in
                 //   size or with limited entropy) may still make a significant
                 //   contribution to the security of the output keying material
-                byte[] semiRandom = new byte[keyBitLength / 8];
-                new SecureRandom().nextBytes(semiRandom);
+                byte[] semiRandom;
+                try { 
+                    int length = keyBitLength / 8;
+                    semiRandom = XMLSecurityConstants.generateBytes(length);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                            "empty", new Object[] {"Error in generating secret bytes " }
+                    );
+                }
                 return HKDFParams.createBuilder(keyBitLength, WSS4JConstants.HMAC_SHA256)
                         .salt(semiRandom)
                         .info(null)
