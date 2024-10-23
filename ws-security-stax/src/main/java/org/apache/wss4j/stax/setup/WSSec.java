@@ -31,8 +31,10 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -367,7 +369,8 @@ public class WSSec {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
         }
         if (securityProperties.getEncryptionSymAlgorithm() == null) {
-            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
+            securityProperties.setEncryptionSymAlgorithm(FIPSUtils.isFIPSEnabled()
+                ? WSS4JConstants.AES_256_GCM : WSSConstants.NS_XENC_AES256);    
         }
         if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
             //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
