@@ -49,7 +49,7 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <woodstox.version>6.6.2</woodstox.version>
         <xz.version>1.10</xz.version>
-        <xmlsec.version>4.0.3-SNAPSHOT</xmlsec.version>
+        <xmlsec.version>4.0.3</xmlsec.version>
         <xmlunit.version>2.10.0</xmlunit.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
