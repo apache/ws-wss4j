@@ -59,6 +59,11 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>November 2024</b> - 
+The Apache WSS4J team are pleased to announce the release of version 3.0.4. It contains a new feature regarding key derivation (https://issues.apache.org/jira/browse/WSS-710) and also a Santuario and other upgrades.
+</p>
+</li>
+<li>
 <p><b>February 2024</b> - 
 The Apache WSS4J team are pleased to announce the release of version 3.0.3. It contains an update to use XML Security for Java 3.0.4 and functionality to support key agreement using ECDH-ES.
 </p>
