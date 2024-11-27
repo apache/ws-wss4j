@@ -32,8 +32,9 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
 
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.token.DOMX509SKI;
 import org.apache.xml.security.encryption.AgreementMethod;
 import org.apache.xml.security.encryption.KeyDerivationMethod;
 import org.apache.xml.security.encryption.XMLCipherUtil;
@@ -41,6 +42,11 @@ import org.apache.xml.security.encryption.keys.RecipientKeyInfo;
 import org.apache.xml.security.encryption.keys.content.AgreementMethodImpl;
 import org.apache.xml.security.encryption.params.KeyAgreementParameters;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.ECKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.KeyValueContent;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,14 +81,7 @@ public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
 
-    private final Provider provider;
-
     public EncryptedKeyProcessor() {
-        this(null);
-    }
-
-    public EncryptedKeyProcessor(Provider provider) {
-        this.provider = provider;
     }
 
     public List<WSSecurityEngineResult> handleToken(
@@ -276,25 +275,40 @@ public class EncryptedKeyProcessor implements Processor {
             X509Certificate[] certs = getCertificatesFromX509Data(keyValueElement, data);
             builder.certificates(certs);
             if (certs == null || certs.length == 0) {
-                XMLSignatureFactory signatureFactory;
-                if (provider == null) {
-                    // Try to install the Santuario Provider - fall back to the JDK provider if this does
-                    // not work
-                    try {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                    } catch (NoSuchProviderException ex) {
-                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
-                    }
-                } else {
-                    signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
-                }
-
-                PublicKey publicKey = X509Util.parseKeyValue((Element) keyValueElement.getParentNode(),
-                        signatureFactory);
+                PublicKey publicKey = getPublicKeyFromKeyValue(keyValueElement);
                 builder.publicKey(publicKey);
             }
         }
         return builder.build();
+    }
+
+    private PublicKey getPublicKeyFromKeyValue(Element keyValueElement) throws WSSecurityException {
+        PublicKey publicKey = null;
+        KeyValueContent keyValue;
+        try {
+            Element keyValueChild = getFirstElement(keyValueElement);
+            if (keyValueChild == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
+            }
+            switch (keyValueChild.getLocalName()) {
+                case "ECKeyValue":
+                    keyValue = new ECKeyValue(keyValueChild, Constants.SignatureSpec11NS);
+                    break;
+                case "RSAKeyValue":
+                    keyValue = new RSAKeyValue(keyValueChild, Constants.SignatureSpecNS);
+                    break;
+                case "DSAKeyValue":
+                    keyValue = new DSAKeyValue(keyValueChild, Constants.SignatureSpecNS);
+                    break;
+                default:
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
+            }
+
+            publicKey = keyValue.getPublicKey();
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
+        }
+        return publicKey;
     }
 
     private PrivateKey getPrivateKey(
@@ -594,40 +608,50 @@ public class EncryptedKeyProcessor implements Processor {
         Element keyInfoChildElement,
         RequestData data
     ) throws WSSecurityException {
+        X509Certificate[] certs = new X509Certificate[0];
 
         if (WSConstants.SIG_NS.equals(keyInfoChildElement.getNamespaceURI())
             && WSConstants.X509_DATA_LN.equals(keyInfoChildElement.getLocalName())) {
             data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
 
-            Element x509Child = getFirstElement(keyInfoChildElement);
+            Element issuerSerialElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_ISSUER_SERIAL_LN,
+                    WSS4JConstants.SIG_NS);
+            if (issuerSerialElement != null) {
+                DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(issuerSerialElement);
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
+                certs = data.getDecCrypto().getX509Certificates(cryptoType);
+            }
 
-            if (x509Child != null && WSConstants.SIG_NS.equals(x509Child.getNamespaceURI())) {
-                if (WSConstants.X509_ISSUER_SERIAL_LN.equals(x509Child.getLocalName())) {
-                    DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(x509Child);
-                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
-                    cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
-                    return data.getDecCrypto().getX509Certificates(cryptoType);
-                } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
-                    byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
-                    if (token == null || token.length == 0) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData",
-                                                      new Object[] {"0"});
+            Element skiElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_SKI_LN, WSS4JConstants.SIG_NS);
+            if (skiElement != null && certs.length == 0) {
+                DOMX509SKI x509SKI = new DOMX509SKI(skiElement);
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+                cryptoType.setBytes(x509SKI.getSKIBytes());
+                certs = data.getDecCrypto().getX509Certificates(cryptoType);
+            }
+
+            Element x509CertElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_CERT_LN, WSS4JConstants.SIG_NS);
+            if (x509CertElement != null && certs.length == 0) {
+                byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509CertElement);
+                if (token == null || token.length == 0) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData",
+                                                  new Object[] {"0"});
+                }
+                try (InputStream in = new ByteArrayInputStream(token)) {
+                    X509Certificate cert = data.getDecCrypto().loadCertificate(in);
+                    if (cert != null) {
+                        certs = new X509Certificate[]{cert};
                     }
-                    try (InputStream in = new ByteArrayInputStream(token)) {
-                        X509Certificate cert = data.getDecCrypto().loadCertificate(in);
-                        if (cert != null) {
-                            return new X509Certificate[]{cert};
-                        }
-                    } catch (IOException e) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
-                        );
-                    }
+                } catch (IOException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
+                    );
                 }
             }
         }
 
-        return new X509Certificate[0];
+        return certs;
     }
 
     private Element getFirstElement(Element element) {
