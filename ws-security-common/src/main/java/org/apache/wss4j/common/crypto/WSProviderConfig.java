@@ -183,6 +183,8 @@ public final class WSProviderConfig {
                 //ignore
             }
         }
+
+        setJDKProviderIgnoreLineBreaks();
     }
 
     private static void addXMLDSigRIInternal() {
@@ -331,6 +333,26 @@ public final class WSProviderConfig {
             }
         }
         return currentProvider.getName();
+    }
+
+    /**
+     * After https://issues.apache.org/jira/browse/WSS-661,the Provider like
+     *  org.apache.jcp.xml.dsig.internal.dom.DOMXMLSignatureFactor will be inserted after
+     *  org.jcp.xml.dsig.internal.dom.DOMXMLSignatureFactory from JDK, hence the com.sun.* property
+     *  should be set explicitly as this JDK Provider will be selected.
+     * @return Return true if this is set, otherwise false if this system property is already set
+     */
+    private static void setJDKProviderIgnoreLineBreaks() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                String lineBreakPropName = "com.sun.org.apache.xml.internal.security.ignoreLineBreaks";
+                if (System.getProperty(lineBreakPropName) == null) {
+                    System.setProperty(lineBreakPropName, "true");
+                    LOG.debug("System property 'com.sun.org.apache.xml.internal.security.ignoreLineBreaks' is set");
+                }
+                return null;
+            }
+        });
     }
 
 }
