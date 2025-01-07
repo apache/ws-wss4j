@@ -239,6 +239,7 @@ public class WSS4JConstants {
     public static final String X509_ISSUER_SERIAL_LN = "X509IssuerSerial";
     public static final String X509_ISSUER_NAME_LN = "X509IssuerName";
     public static final String X509_SERIAL_NUMBER_LN = "X509SerialNumber";
+    public static final String X509_SKI_LN = "X509SKI";
     public static final String X509_DATA_LN = "X509Data";
     public static final String X509_CERT_LN = "X509Certificate";
     public static final String KEYINFO_LN = "KeyInfo";
