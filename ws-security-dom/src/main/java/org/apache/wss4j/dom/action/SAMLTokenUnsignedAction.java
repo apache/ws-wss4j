@@ -63,7 +63,8 @@ public class SAMLTokenUnsignedAction implements Action {
                 samlCallback.getIssuerCrypto(),
                 samlCallback.isSendKeyValue(),
                 samlCallback.getCanonicalizationAlgorithm(),
-                samlCallback.getSignatureAlgorithm()
+                samlCallback.getSignatureAlgorithm(),
+                samlCallback.getSignatureDigestAlgorithm()
             );
         }
 
