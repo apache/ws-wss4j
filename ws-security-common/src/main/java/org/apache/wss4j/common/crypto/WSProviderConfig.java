@@ -197,9 +197,7 @@ public final class WSProviderConfig {
     /**
      * Add a new JCE security provider to use for WSS4J, of the specified name and class. Return
      * either the name of the previously loaded provider, the name of the new loaded provider, or
-     * null if there's an exception in loading the provider. Add the provider either after the SUN
-     * provider (see WSS-99), or the IBMJCE provider. Otherwise fall back to the old behaviour of
-     * inserting the provider in position 2.
+     * null if there's an exception in loading the provider.
      *
      * @param name
      *            The name string of the provider (this may not be the real name of the provider)
@@ -229,9 +227,7 @@ public final class WSProviderConfig {
     /**
      * Add a new JCE security provider to use for WSS4J, of the specified name and class. Return
      * either the name of the previously loaded provider, the name of the new loaded provider, or
-     * null if there's an exception in loading the provider. Add the provider either after the SUN
-     * provider (see WSS-99), or the IBMJCE provider. Otherwise fall back to the old behaviour of
-     * inserting the provider in position 2.
+     * null if there's an exception in loading the provider.
      *
      * @param name
      *            The name string of the provider (this may not be the real name of the provider)
