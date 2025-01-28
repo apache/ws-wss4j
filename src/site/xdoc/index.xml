@@ -56,6 +56,40 @@ Profile 1.1</a>
 </li>
 </ul>
 </subsection>
+<subsection name="Supported versions">
+<p>The following Apache WSS4J releases are currently actively supported:</p>
+<table name="supported versions">
+<tr>
+<th>Version</th>
+<th>JDK minimum</th>
+<th>XML Security</th>
+<th>OpenSAML</th>
+<th>Jakarta</th>
+</tr>
+<tr>
+<td>WSS4J 4.0.x*</td>
+<td>17</td>
+<td>4.0.x</td>
+<td>5.x</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>WSS4J 3.0.x</td>
+<td>11</td>
+<td>3.0.x</td>
+<td>4.x</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>WSS4J 2.4.x</td>
+<td>8</td>
+<td>2.3.x</td>
+<td>3.x</td>
+<td>No</td>
+</tr>
+</table>
+<p>* Not yet released</p>
+</subsection>
 <subsection name="News">
 <ul>
 <li>
