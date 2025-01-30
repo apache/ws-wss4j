@@ -614,7 +614,7 @@ public class EncryptedKeyProcessor implements Processor {
             && WSConstants.X509_DATA_LN.equals(keyInfoChildElement.getLocalName())) {
             data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
 
-            Element issuerSerialElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_ISSUER_SERIAL_LN,
+            Element issuerSerialElement = XMLUtils.getDirectChildElement(keyInfoChildElement, WSS4JConstants.X509_ISSUER_SERIAL_LN,
                     WSS4JConstants.SIG_NS);
             if (issuerSerialElement != null) {
                 DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(issuerSerialElement);
@@ -623,7 +623,7 @@ public class EncryptedKeyProcessor implements Processor {
                 certs = data.getDecCrypto().getX509Certificates(cryptoType);
             }
 
-            Element skiElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_SKI_LN, WSS4JConstants.SIG_NS);
+            Element skiElement = XMLUtils.getDirectChildElement(keyInfoChildElement, WSS4JConstants.X509_SKI_LN, WSS4JConstants.SIG_NS);
             if (skiElement != null && certs.length == 0) {
                 DOMX509SKI x509SKI = new DOMX509SKI(skiElement);
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
@@ -631,7 +631,7 @@ public class EncryptedKeyProcessor implements Processor {
                 certs = data.getDecCrypto().getX509Certificates(cryptoType);
             }
 
-            Element x509CertElement = XMLUtils.findElement(keyInfoChildElement, WSS4JConstants.X509_CERT_LN, WSS4JConstants.SIG_NS);
+            Element x509CertElement = XMLUtils.getDirectChildElement(keyInfoChildElement, WSS4JConstants.X509_CERT_LN, WSS4JConstants.SIG_NS);
             if (x509CertElement != null && certs.length == 0) {
                 byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509CertElement);
                 if (token == null || token.length == 0) {
