@@ -23,6 +23,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.BouncyCastleUtils;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.w3c.dom.Document;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
@@ -33,6 +34,7 @@ import java.security.cert.X509Certificate;
  */
 public final class DOMX509SKI {
     private final Element element;
+    private byte[] skiBytes;
 
     /**
      * Constructor.
@@ -46,12 +48,33 @@ public final class DOMX509SKI {
     }
 
     /**
+     * Constructor.
+     */
+    public DOMX509SKI(Element skiElement) {
+        element = skiElement;
+
+        String text = XMLUtils.getElementText(element);
+        if (text == null) {
+            skiBytes = new byte[0];
+        } else {
+            skiBytes = org.apache.xml.security.utils.XMLUtils.decode(text);
+        }
+    }
+
+    /**
      * return the dom element.
      *
      * @return the dom element.
      */
     public Element getElement() {
         return element;
+    }
+
+    /**
+     * Return the SKI bytes.
+     */
+    public byte[] getSKIBytes() {
+        return skiBytes;
     }
 
     /**

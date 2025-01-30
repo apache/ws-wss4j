@@ -32,7 +32,7 @@
     <url>https://ws.apache.org/wss4j/</url>
 
     <properties>
-        <bcprov.version>1.79</bcprov.version>
+        <bcprov.version>1.80</bcprov.version>
         <commons.compress.version>1.27.1</commons.compress.version>
         <cryptacular.version>1.2.7</cryptacular.version>
         <ehcache.version>3.10.8</ehcache.version>
@@ -40,8 +40,8 @@
         <jakarta.mail.api.version>2.1.3</jakarta.mail.api.version>
         <jasypt.version>1.9.3</jasypt.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
-        <junit.version>5.11.3</junit.version>
-        <kerby.version>2.0.3</kerby.version>
+        <junit.version>5.11.4</junit.version>
+        <kerby.version>2.1.0</kerby.version>
         <neethi.version>3.2.1</neethi.version>
         <opensaml.version>4.3.2</opensaml.version>
         <slf4j.version>2.0.16</slf4j.version>
