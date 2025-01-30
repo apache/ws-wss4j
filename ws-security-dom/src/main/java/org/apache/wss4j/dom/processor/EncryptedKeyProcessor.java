@@ -631,7 +631,8 @@ public class EncryptedKeyProcessor implements Processor {
                 certs = data.getDecCrypto().getX509Certificates(cryptoType);
             }
 
-            Element x509CertElement = XMLUtils.getDirectChildElement(keyInfoChildElement, WSS4JConstants.X509_CERT_LN, WSS4JConstants.SIG_NS);
+            Element x509CertElement = XMLUtils.getDirectChildElement(keyInfoChildElement,
+                WSS4JConstants.X509_CERT_LN, WSS4JConstants.SIG_NS);
             if (x509CertElement != null && certs.length == 0) {
                 byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509CertElement);
                 if (token == null || token.length == 0) {
