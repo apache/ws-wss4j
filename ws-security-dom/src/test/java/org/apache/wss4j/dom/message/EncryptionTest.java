@@ -23,6 +23,7 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import javax.crypto.KeyGenerator;
@@ -613,6 +614,12 @@ public class EncryptionTest {
 
         assertTrue(outputString.contains("X509Data"));
         assertTrue(outputString.contains("X509SKI"));
+
+        RequestData data = new RequestData();
+        data.setCallbackHandler(keystoreCallbackHandler);
+        data.setDecCrypto(encCrypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5426));
+        new WSSecurityEngine().processSecurityHeader(encryptedDoc, data);
     }
 
     /**
