@@ -19,9 +19,14 @@
 
 package org.apache.wss4j.common.token;
 
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.crypto.BouncyCastleUtils;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.w3c.dom.Document;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Element;
+
+import java.security.cert.X509Certificate;
 
 
 /**
@@ -30,6 +35,18 @@ import org.w3c.dom.Element;
 public final class DOMX509SKI {
     private final Element element;
     private final byte[] skiBytes;
+
+    /**
+     * Constructor.
+     */
+    public DOMX509SKI(Document doc, X509Certificate remoteCertificate) {
+        skiBytes = BouncyCastleUtils.getSubjectKeyIdentifierBytes(remoteCertificate);
+
+        element = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SKI");
+        element.setTextContent(
+                org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes
+        ));
+    }
 
     /**
      * Constructor.
