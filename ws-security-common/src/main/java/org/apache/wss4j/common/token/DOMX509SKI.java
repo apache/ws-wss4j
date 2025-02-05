@@ -34,16 +34,17 @@ import java.security.cert.X509Certificate;
  */
 public final class DOMX509SKI {
     private final Element element;
-    private byte[] skiBytes;
+    private final byte[] skiBytes;
 
     /**
      * Constructor.
      */
     public DOMX509SKI(Document doc, X509Certificate remoteCertificate) {
-        element = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SKI");
+        skiBytes = BouncyCastleUtils.getSubjectKeyIdentifierBytes(remoteCertificate);
 
+        element = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SKI");
         element.setTextContent(
-                org.apache.xml.security.utils.XMLUtils.encodeToString(BouncyCastleUtils.getSubjectKeyIdentifierBytes(remoteCertificate)
+                org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes
         ));
     }
 
