@@ -748,7 +748,8 @@ public class WSSecEncryptedKey extends WSSecBase {
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
 
-        if (digestAlgo != null) {
+        if ((WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo) || WSConstants.KEYTRANSPORT_RSAOAEP.equals(
+                keyEncAlgo)) && digestAlgo != null) {
             Element digestElement =
                 XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_DIGESTMETHOD);
             digestElement.setAttributeNS(null, "Algorithm", digestAlgo);
