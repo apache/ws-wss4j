@@ -260,10 +260,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
 
     /**
-     * Now we need to setup the EncryptedKey header block:
+     * Now we need to set up the EncryptedKey header block:
      *  1) create a EncryptedKey element and set a wsu:Id for it
-     *  2) Generate ds:KeyInfo element, this wraps the wsse:SecurityTokenReference
-     *  3) Create and set up the SecurityTokenReference according to the keyIdentifier parameter
+     *  2) Generate ds:KeyInfo element
+     *  3) Create and set up the ds:KeyInfo child element - this can either be a SecurityTokenReference or X509Data/X509SKI
      *  4) Create the CipherValue element structure and insert the encrypted session key
      */
     protected void createEncryptedKeyElement(X509Certificate remoteCert, Crypto crypto, KeyAgreementParameters dhSpec)
@@ -276,6 +276,12 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         if (customEKKeyInfoElement != null) {
             encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
+        } else if (keyIdentifierType == WSConstants.X509_SKI) {
+            DOMX509SKI x509SKI = new DOMX509SKI(getDocument(), remoteCert);
+            DOMX509Data x509Data = new DOMX509Data(getDocument(), x509SKI);
+
+            Element keyInfoElement = createKeyInfoElement(x509Data.getElement(), dhSpec);
+            encryptedKeyElement.appendChild(keyInfoElement);
         } else {
             SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             if (addWSUNamespace) {
@@ -378,29 +384,38 @@ public class WSSecEncryptedKey extends WSSecBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
                                               new Object[] {keyIdentifierType});
             }
-            Element keyInfoElement =
-                getDocument().createElementNS(
-                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-                );
-            keyInfoElement.setAttributeNS(
-                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
-            );
-            if (isKeyAgreementConfigured(keyAgreementMethod)) {
-                try {
-                    AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
-                    agreementMethod.getRecipientKeyInfo().addUnknownElement(secToken.getElement());
-                    Element agreementMethodElement = agreementMethod.getElement();
-                    keyInfoElement.appendChild(agreementMethodElement);
-                } catch (XMLSecurityException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
-                            new Object[] {keyIdentifierType});
-                }
 
-            } else {
-                keyInfoElement.appendChild(secToken.getElement());
-            }
+            Element keyInfoElement = createKeyInfoElement(secToken.getElement(), dhSpec);
             encryptedKeyElement.appendChild(keyInfoElement);
         }
+    }
+
+    /**
+     * Method builds and returns a ds:KeyInfo element wrapping the provided child element.
+     */
+    private Element createKeyInfoElement(Element childElement, KeyAgreementParameters dhSpec) throws WSSecurityException {
+        Element keyInfoElement =
+                getDocument().createElementNS(
+                        WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                );
+        keyInfoElement.setAttributeNS(
+                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+        );
+        if (isKeyAgreementConfigured(keyAgreementMethod)) {
+            try {
+                AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
+                agreementMethod.getRecipientKeyInfo().addUnknownElement(childElement);
+                Element agreementMethodElement = agreementMethod.getElement();
+                keyInfoElement.appendChild(agreementMethodElement);
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
+                                              new Object[] {keyIdentifierType});
+            }
+
+        } else {
+            keyInfoElement.appendChild(childElement);
+        }
+        return keyInfoElement;
     }
 
     /**

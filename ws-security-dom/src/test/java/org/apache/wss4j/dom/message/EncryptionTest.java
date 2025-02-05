@@ -575,6 +575,52 @@ public class EncryptionTest {
         verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
     }
 
+
+    /**
+     * Test that encrypts a WS-Security envelope.
+     * The test uses the X509_SKI key identifier type.
+     */
+    @Test
+    public void testEncryptionX509SKI() throws Exception {
+        Crypto encCrypto = CryptoFactory.getInstance("wss-ecdh.properties");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("secp256r1");
+        builder.setKeyEncAlgo(WSConstants.KEYWRAP_AES128);
+        builder.setKeyAgreementMethod(WSConstants.AGREEMENT_METHOD_ECDH_ES);
+        builder.setKeyDerivationMethod(WSConstants.KEYDERIVATION_CONCATKDF);
+        builder.setDigestAlgorithm(WSS4JConstants.SHA256);
+        builder.setKeyIdentifierType(WSConstants.X509_SKI);
+
+        LOG.info("Before Encrypting X509SKI");
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+
+        Document encryptedDoc = builder.build(encCrypto, symmetricKey);
+        LOG.info("After Encrypting X509SKI");
+
+        String outputString =
+                XMLUtils.prettyDocumentToString(encryptedDoc);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message with X509SKI:");
+            LOG.debug(outputString);
+        }
+
+        assertTrue(outputString.contains("X509Data"));
+        assertTrue(outputString.contains("X509SKI"));
+
+        RequestData data = new RequestData();
+        data.setCallbackHandler(keystoreCallbackHandler);
+        data.setDecCrypto(encCrypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5426));
+        new WSSecurityEngine().processSecurityHeader(encryptedDoc, data);
+    }
+
     /**
      * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a
      * generated session key which is then encrypted using a public key.
