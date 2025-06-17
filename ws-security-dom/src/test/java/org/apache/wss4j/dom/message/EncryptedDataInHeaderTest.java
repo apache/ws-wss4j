@@ -36,7 +36,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -83,7 +82,7 @@ public class EncryptedDataInHeaderTest {
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         encrypt.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"

@@ -36,7 +36,7 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -210,12 +210,12 @@ public class DerivedKeyToken {
      */
     public void setSecurityTokenReference(SecurityTokenReference ref) {
         elementSecurityTokenReference = ref.getElement();
-        WSSecurityUtil.prependChildElement(element, ref.getElement());
+        XMLUtils.prependChildElement(element, ref.getElement());
     }
 
     public void setSecurityTokenReference(Element elem) {
         elementSecurityTokenReference = elem;
-        WSSecurityUtil.prependChildElement(element, elem);
+        XMLUtils.prependChildElement(element, elem);
     }
 
     /**

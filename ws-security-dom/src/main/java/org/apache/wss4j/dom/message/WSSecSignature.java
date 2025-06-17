@@ -521,7 +521,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     public void prependBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
             Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-            WSSecurityUtil.prependChildElement(securityHeaderElement, bstToken);
+            XMLUtils.prependChildElement(securityHeaderElement, bstToken);
             bstAddedToSecurityHeader = true;
         }
     }

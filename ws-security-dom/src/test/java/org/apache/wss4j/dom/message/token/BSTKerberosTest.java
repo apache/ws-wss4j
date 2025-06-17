@@ -39,7 +39,6 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
@@ -89,7 +88,7 @@ public class BSTKerberosTest {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -118,7 +117,7 @@ public class BSTKerberosTest {
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -154,7 +153,7 @@ public class BSTKerberosTest {
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(600);
@@ -192,7 +191,7 @@ public class BSTKerberosTest {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -226,7 +225,7 @@ public class BSTKerberosTest {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -270,7 +269,7 @@ public class BSTKerberosTest {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
@@ -309,7 +308,7 @@ public class BSTKerberosTest {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
@@ -350,7 +349,7 @@ public class BSTKerberosTest {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
@@ -387,7 +386,7 @@ public class BSTKerberosTest {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);

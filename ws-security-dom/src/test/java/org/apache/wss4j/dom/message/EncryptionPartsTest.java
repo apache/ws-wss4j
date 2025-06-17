@@ -19,8 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.common.SOAPConstants;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -165,7 +165,7 @@ public class EncryptionPartsTest {
                 "");
         encP.setRequired(false);
         encrypt.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -204,7 +204,7 @@ public class EncryptionPartsTest {
                 "");
         encP.setRequired(false);
         encrypt.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -242,7 +242,7 @@ public class EncryptionPartsTest {
                 "urn:foo.bar",
                 "");
         encrypt.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -430,8 +430,7 @@ public class EncryptionPartsTest {
     @Test
     public void testSOAPHeaderAndBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants =
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -502,8 +501,7 @@ public class EncryptionPartsTest {
     @Test
     public void testEncryptionPartDOMElement() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants =
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 

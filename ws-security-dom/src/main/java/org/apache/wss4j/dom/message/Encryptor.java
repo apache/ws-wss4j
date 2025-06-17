@@ -264,7 +264,7 @@ public class Encryptor {
         encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
         encryptedData.appendChild(encryptionMethod);
-        encryptedData.appendChild(WSSecurityUtil.cloneElement(doc, keyInfo.getElement()));
+        encryptedData.appendChild(XMLUtils.cloneElement(doc, keyInfo.getElement()));
 
         Element cipherData =
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
@@ -371,7 +371,7 @@ public class Encryptor {
             encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
             encryptedData.appendChild(encryptionMethod);
-            encryptedData.appendChild(WSSecurityUtil.cloneElement(doc, keyInfo.getElement()));
+            encryptedData.appendChild(XMLUtils.cloneElement(doc, keyInfo.getElement()));
 
             Element cipherData =
                 doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
@@ -452,7 +452,7 @@ public class Encryptor {
         String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
         try {
             if ("Header".equals(modifier)) {
-                String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+                String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
                 if (elementToEncrypt.getParentNode().getNamespaceURI().equals(soapNamespace)
                     && WSConstants.ELEM_HEADER.equals(elementToEncrypt.getParentNode().getLocalName())) {
                     createEncryptedHeaderElement(securityHeader, elementToEncrypt, idAllocator);

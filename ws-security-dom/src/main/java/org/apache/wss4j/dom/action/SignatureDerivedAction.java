@@ -34,6 +34,7 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -156,7 +157,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             }
 
             if (tokenElement != null) {
-                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeaderElement(), tokenElement);
+                XMLUtils.prependChildElement(reqData.getSecHeader().getSecurityHeaderElement(), tokenElement);
             }
 
             reqData.getSignatureValues().add(wsSign.getSignatureValue());

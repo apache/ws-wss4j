@@ -38,7 +38,6 @@ import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -306,7 +305,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      */
     public void prependDKElementToHeader() {
         Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-        WSSecurityUtil.prependChildElement(securityHeaderElement, dkt.getElement());
+        org.apache.wss4j.common.util.XMLUtils.prependChildElement(securityHeaderElement, dkt.getElement());
     }
 
     public void appendDKElementToHeader() {

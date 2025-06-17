@@ -25,8 +25,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -195,7 +195,7 @@ public class WSSecUsernameToken extends WSSecBase {
      */
     public void prependToHeader() {
         Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-        WSSecurityUtil.prependChildElement(securityHeaderElement, ut.getElement());
+        XMLUtils.prependChildElement(securityHeaderElement, ut.getElement());
     }
 
     /**

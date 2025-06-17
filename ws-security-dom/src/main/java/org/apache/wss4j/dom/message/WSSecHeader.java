@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -130,7 +129,7 @@ public class WSSecHeader {
         }
         if (securityHeader == null) {
             securityHeader =
-                WSSecurityUtil.findWsseSecurityHeaderBlock(
+                XMLUtils.findWsseSecurityHeaderBlock(
                     doc, doc.getDocumentElement(), actor, false
                 );
         }
@@ -161,11 +160,11 @@ public class WSSecHeader {
         }
 
         securityHeader =
-            WSSecurityUtil.findWsseSecurityHeaderBlock(
+            XMLUtils.findWsseSecurityHeaderBlock(
                 doc, doc.getDocumentElement(), actor, true
             );
 
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         String soapPrefix =
             XMLUtils.setNamespace(
                 securityHeader, soapNamespace, WSS4JConstants.DEFAULT_SOAP_PREFIX
@@ -206,7 +205,7 @@ public class WSSecHeader {
             }
 
             securityHeader =
-                WSSecurityUtil.findWsseSecurityHeaderBlock(
+                XMLUtils.findWsseSecurityHeaderBlock(
                     doc, doc.getDocumentElement(), actor, false
                 );
         }

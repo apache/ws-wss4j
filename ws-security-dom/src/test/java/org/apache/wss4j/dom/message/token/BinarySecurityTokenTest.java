@@ -36,7 +36,6 @@ import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -75,7 +74,7 @@ public class BinarySecurityTokenTest {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
@@ -116,7 +115,7 @@ public class BinarySecurityTokenTest {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificates(certs, crypto);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("PKIPath output");
@@ -150,7 +149,7 @@ public class BinarySecurityTokenTest {
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom Token output");
@@ -175,7 +174,7 @@ public class BinarySecurityTokenTest {
         bst.setValueType("http://custom_value_Type");
         secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);

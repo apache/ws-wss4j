@@ -20,8 +20,8 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,7 +74,7 @@ public class WSSecSAMLToken extends WSSecBase {
             Element element = getElement();
             if (element != null) {
                 Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-                WSSecurityUtil.prependChildElement(securityHeaderElement, element);
+                XMLUtils.prependChildElement(securityHeaderElement, element);
             }
         } catch (WSSecurityException ex) {
             throw new RuntimeException(ex.toString(), ex);

@@ -22,7 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +44,11 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.wss4j.common.SOAP11Constants;
+import org.apache.wss4j.common.SOAP12Constants;
+import org.apache.wss4j.common.SOAPConstants;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
@@ -56,9 +68,93 @@ public final class XMLUtils {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(XMLUtils.class);
 
+    private static boolean isSAAJ14 = false;
+
     private XMLUtils() {
         // complete
     }
+
+    private static final ClassValue<Method> GET_DOM_ELEMENTS_METHODS = new ClassValue<Method>() {
+        @Override
+        protected Method computeValue(Class<?> type) {
+            try {
+                return getMethod(type, "getDomElement");
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+                return null;
+            }
+        }
+    };
+
+    private static final ClassValue<Method> GET_ENVELOPE_METHODS = new ClassValue<Method>() {
+        @Override
+        protected Method computeValue(Class<?> type) {
+            try {
+                return getMethod(type, "getEnvelope");
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+                return null;
+            }
+        }
+    };
+
+    static {
+        try {
+            Method[] methods = XMLUtils.class.getClassLoader().
+                loadClass("com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("register")) {
+                    //this is the 1.4+ SAAJ impl
+                    isSAAJ14 = true;
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            LOG.debug("Can't load class com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl", cnfe);
+
+            try {
+                Method[] methods = XMLUtils.class.getClassLoader().
+                    loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+                for (Method method : methods) {
+                    if (method.getName().equals("register")) {
+                        //this is the SAAJ impl in JDK9
+                        isSAAJ14 = true;
+                        break;
+                    }
+                }
+            } catch (ClassNotFoundException cnfe1) {
+                LOG.debug("can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl", cnfe1);
+            }
+        }
+    }
+
+    private static Method getMethod(final Class<?> clazz, final String name,
+                                   final Class<?>... parameterTypes) throws NoSuchMethodException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                public Method run() throws Exception {
+                    return clazz.getMethod(name, parameterTypes);
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException)e;
+            }
+            throw new SecurityException(e);
+        }
+    }
+
+    private static <T extends AccessibleObject> T setAccessible(final T o) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            public T run() {
+                o.setAccessible(true);
+                return o;
+            }
+        });
+    }
+
+
 
     /**
      * Gets a direct child with specified localname and namespace. <p/>
@@ -505,4 +601,233 @@ public final class XMLUtils {
         return foundElement;
     }
 
+    /**
+     * find the first ws-security header block <p/>
+     *
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
+     */
+    public static Element findWsseSecurityHeaderBlock(
+        Document doc,
+        Element envelope,
+        boolean doCreate
+    ) throws WSSecurityException {
+        return findWsseSecurityHeaderBlock(doc, envelope, null, doCreate);
+    }
+
+    /**
+     * find a WS-Security header block for a given actor <p/>
+     *
+     * @param doc the DOM document (SOAP request)
+     * @param envelope the SOAP envelope
+     * @param actor the actor (role) name of the WSS header
+     * @param doCreate if true create a new WSS header block if none exists
+     * @return the WSS header or null if none found and doCreate is false
+     */
+    public static Element findWsseSecurityHeaderBlock(
+        Document doc,
+        Element envelope,
+        String actor,
+        boolean doCreate
+    ) throws WSSecurityException {
+        String soapNamespace = getSOAPNamespace(doc.getDocumentElement());
+        Element header =
+            XMLUtils.getDirectChildElement(
+                doc.getDocumentElement(),
+                WSS4JConstants.ELEM_HEADER,
+                soapNamespace
+            );
+        if (header == null) { // no SOAP header at all
+            if (doCreate) {
+                if (isSAAJ14) {
+                    try {
+                        Node node = null;
+                        Method method = GET_ENVELOPE_METHODS.get(doc.getClass());
+                        if (method != null) {
+                            try {
+                                node = (Node)setAccessible(method).invoke(doc);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                            }
+                        }
+                        if (node != null) {
+                            header = createElementInSameNamespace(node, WSS4JConstants.ELEM_HEADER);
+                        } else {
+                            header = createElementInSameNamespace(doc.getDocumentElement(), WSS4JConstants.ELEM_HEADER);
+                        }
+                        header = (Element)doc.importNode(header, true);
+                        header = (Element)getDomElement(header);
+                        header = prependChildElement(envelope, header);
+
+                    } catch (Exception e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                    }
+
+                } else {
+                    header = createElementInSameNamespace(envelope, WSS4JConstants.ELEM_HEADER);
+                    header = prependChildElement(envelope, header);
+                }
+            } else {
+                return null;
+            }
+        }
+
+        String actorLocal = WSS4JConstants.ATTR_ACTOR;
+        if (WSS4JConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+            actorLocal = WSS4JConstants.ATTR_ROLE;
+        }
+
+        //
+        // Iterate through the security headers
+        //
+        Element foundSecurityHeader = null;
+        for (
+            Node currentChild = header.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && WSS4JConstants.WSSE_LN.equals(currentChild.getLocalName())
+                && WSS4JConstants.WSSE_NS.equals(currentChild.getNamespaceURI())) {
+
+                Element elem = (Element)currentChild;
+                Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
+                String hActor = (attr != null) ? attr.getValue() : null;
+
+                if (isActorEqual(actor, hActor)) {
+                    if (foundSecurityHeader != null) {
+                        LOG.debug(
+                            "Two or more security headers have the same actor name: {}", actor
+                        );
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                    }
+                    foundSecurityHeader = elem;
+                }
+            }
+        }
+        if (foundSecurityHeader != null) {
+            return foundSecurityHeader;
+        } else if (doCreate) {
+            foundSecurityHeader = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Security");
+            foundSecurityHeader.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
+            foundSecurityHeader = (Element)doc.importNode(foundSecurityHeader, true);
+            foundSecurityHeader = (Element)getDomElement(foundSecurityHeader);
+
+            return prependChildElement(header, foundSecurityHeader);
+        }
+        return null;
+    }
+
+    /**
+     * create a new element in the same namespace <p/>
+     *
+     * @param parent for the new element
+     * @param localName of the new element
+     * @return the new element
+     */
+    private static Element createElementInSameNamespace(Node parent, String localName) {
+        String qName = localName;
+        String prefix = parent.getPrefix();
+        if (prefix != null && prefix.length() > 0) {
+            qName = prefix + ":" + localName;
+        }
+
+        String nsUri = parent.getNamespaceURI();
+        return parent.getOwnerDocument().createElementNS(nsUri, qName);
+    }
+
+    /**
+     * prepend a child element <p/>
+     *
+     * @param parent element of this child element
+     * @param child the element to append
+     * @return the child element
+     */
+    public static Element prependChildElement(
+        Element parent,
+        Element child
+    ) {
+        Node firstChild = parent.getFirstChild();
+        Element domChild = null;
+        try {
+            domChild = (Element)getDomElement(child);
+        } catch (WSSecurityException e) {
+            LOG.debug("Error when try to get Dom Element from the child", e);
+        }
+        if (firstChild == null) {
+            return (Element)parent.appendChild(domChild);
+        } else {
+            return (Element)parent.insertBefore(domChild, firstChild);
+        }
+    }
+
+    /**
+     * Try to get the DOM Node from the SAAJ Node with JAVA9
+     * @param node The original node we need check
+     * @return The DOM node
+     * @throws WSSecurityException
+     */
+    private static Node getDomElement(Node node) throws WSSecurityException {
+        if (node != null && isSAAJ14) {
+
+            Method method = GET_DOM_ELEMENTS_METHODS.get(node.getClass());
+            if (method != null) {
+                try {
+                    return (Node)setAccessible(method).invoke(node);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
+            }
+        }
+        return node;
+    }
+
+    /**
+     * Compares two actor strings and returns true if these are equal. Takes
+     * care of the null length strings and uses ignore case.
+     *
+     * @param actor
+     * @param hActor
+     * @return true is the actor arguments are equal
+     */
+    public static boolean isActorEqual(String actor, String hActor) {
+        if ((hActor == null || hActor.length() == 0)
+            && (actor == null || actor.length() == 0)) {
+            return true;
+        }
+
+        return hActor != null && actor != null && hActor.equalsIgnoreCase(actor);
+    }
+
+    public static SOAPConstants getSOAPConstants(Element startElement) {
+        Document doc = startElement.getOwnerDocument();
+        String ns = doc.getDocumentElement().getNamespaceURI();
+        if (WSS4JConstants.URI_SOAP12_ENV.equals(ns)) {
+            return new SOAP12Constants();
+        }
+        return new SOAP11Constants();
+    }
+
+    public static String getSOAPNamespace(Element startElement) {
+        return getSOAPConstants(startElement).getEnvelopeURI();
+    }
+
+    /**
+     * Register the jakarta.xml.soap.Node with new Cloned Dom Node with java9
+     * @param doc The SOAPDocumentImpl
+     * @param clonedElement The cloned Element
+     * @return new clonedElement which already associated with the SAAJ Node
+     * @throws WSSecurityException
+     */
+    public static Element cloneElement(Document doc, Element clonedElement) throws WSSecurityException {
+        clonedElement = (Element)clonedElement.cloneNode(true);
+        if (isSAAJ14) {
+            // here we need register the jakarta.xml.soap.Node with new instance
+            clonedElement = (Element)doc.importNode(clonedElement, true);
+            clonedElement = (Element)getDomElement(clonedElement);
+        }
+        return clonedElement;
+    }
 }

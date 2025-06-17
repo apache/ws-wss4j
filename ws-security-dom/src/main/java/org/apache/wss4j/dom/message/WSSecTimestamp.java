@@ -24,8 +24,8 @@ import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS
@@ -88,7 +88,7 @@ public class WSSecTimestamp extends WSSecBase {
      */
     public void prependToHeader() {
         Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-        WSSecurityUtil.prependChildElement(securityHeaderElement, ts.getElement());
+        XMLUtils.prependChildElement(securityHeaderElement, ts.getElement());
     }
 
     /**

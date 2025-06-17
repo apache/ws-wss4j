@@ -19,8 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -78,7 +78,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      */
     public void prependToHeader() {
         Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-        WSSecurityUtil.prependChildElement(securityHeaderElement, sc.getElement());
+        XMLUtils.prependChildElement(securityHeaderElement, sc.getElement());
     }
 
     /**

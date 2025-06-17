@@ -274,7 +274,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public void addExternalRefElement(Element dataRef) {
         if (dataRef != null) {
             Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-            WSSecurityUtil.prependChildElement(secHeaderElement, dataRef);
+            XMLUtils.prependChildElement(secHeaderElement, dataRef);
         }
     }
 
@@ -282,7 +282,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         if (attachmentEncryptedDataElements != null) {
             for (Element encryptedData : attachmentEncryptedDataElements) {
                 Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-                WSSecurityUtil.prependChildElement(secHeaderElement, encryptedData);
+                XMLUtils.prependChildElement(secHeaderElement, encryptedData);
             }
         }
     }

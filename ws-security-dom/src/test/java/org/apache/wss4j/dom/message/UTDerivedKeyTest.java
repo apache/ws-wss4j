@@ -43,7 +43,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -93,7 +92,7 @@ public class UTDerivedKeyTest {
         usernameToken.addIteration(doc, 500);
         assertTrue(usernameToken.getIteration() == 500);
 
-        WSSecurityUtil.prependChildElement(
+        XMLUtils.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
         );
 
@@ -573,7 +572,7 @@ public class UTDerivedKeyTest {
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(derivedKey);
 
-        WSSecurityUtil.prependChildElement(
+        XMLUtils.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
         );
 
@@ -623,7 +622,7 @@ public class UTDerivedKeyTest {
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(derivedKey);
 
-        WSSecurityUtil.prependChildElement(
+        XMLUtils.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
         );
 
@@ -674,7 +673,7 @@ public class UTDerivedKeyTest {
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         Document encryptedDoc = encrBuilder.build(derivedKey);
 
-        WSSecurityUtil.prependChildElement(
+        XMLUtils.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
         );
 

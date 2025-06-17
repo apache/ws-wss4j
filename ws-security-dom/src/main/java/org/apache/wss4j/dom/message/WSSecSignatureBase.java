@@ -242,7 +242,7 @@ public class WSSecSignatureBase extends WSSecBase {
 
                 clonedElements.add(element);
                 Document doc = this.getSecurityHeader().getSecurityHeaderDoc();
-                element.getParentNode().appendChild(WSSecurityUtil.cloneElement(doc, element));
+                element.getParentNode().appendChild(XMLUtils.cloneElement(doc, element));
                 WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, false);
             }
         }

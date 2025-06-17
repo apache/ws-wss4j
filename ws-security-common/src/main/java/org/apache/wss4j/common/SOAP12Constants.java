@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.common;
 
 import javax.xml.namespace.QName;
 
@@ -29,9 +29,9 @@ public class SOAP12Constants implements SOAPConstants {
      *
      */
     private static final long serialVersionUID = 3784866613259361834L;
-    private static final QName HEADER_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ELEM_HEADER);
-    private static final QName BODY_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ELEM_BODY);
-    private static final QName ROLE_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ATTR_ROLE);
+    private static final QName HEADER_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ELEM_HEADER);
+    private static final QName BODY_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ELEM_BODY);
+    private static final QName ROLE_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ATTR_ROLE);
 
     // Public constants for SOAP 1.2
 
@@ -41,7 +41,7 @@ public class SOAP12Constants implements SOAPConstants {
     public static final String PROP_WEBMETHOD = "soap12.webmethod";
 
     public String getEnvelopeURI() {
-        return WSConstants.URI_SOAP12_ENV;
+        return WSS4JConstants.URI_SOAP12_ENV;
     }
 
     public QName getHeaderQName() {
@@ -63,7 +63,7 @@ public class SOAP12Constants implements SOAPConstants {
      * Obtain the "next" role/actor URI
      */
     public String getNextRoleURI() {
-        return WSConstants.URI_SOAP12_NEXT_ROLE;
+        return WSS4JConstants.URI_SOAP12_NEXT_ROLE;
     }
 
     /**

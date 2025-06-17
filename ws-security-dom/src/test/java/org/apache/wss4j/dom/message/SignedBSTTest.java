@@ -39,7 +39,6 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -80,7 +79,7 @@ public class SignedBSTTest {
         String certUri = WSSConfig.getNewInstance().getIdAllocator().createSecureId("X509-", certs[0]);
         bst.setX509Certificate(certs[0]);
         bst.setID(certUri);
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         // Add the signature
         WSSecSignature sign = new WSSecSignature(secHeader);
@@ -90,7 +89,7 @@ public class SignedBSTTest {
         sign.setX509Certificate(certs[0]);
 
         // Add SOAP Body
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"

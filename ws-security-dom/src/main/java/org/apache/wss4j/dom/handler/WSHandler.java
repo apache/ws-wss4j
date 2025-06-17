@@ -44,6 +44,7 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -109,7 +110,7 @@ public abstract class WSHandler {
         WSSecHeader secHeader = new WSSecHeader(actor, mu, doc);
         secHeader.insertSecurityHeader();
         reqData.setSecHeader(secHeader);
-        reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc.getDocumentElement()));
+        reqData.setSoapConstants(XMLUtils.getSOAPConstants(doc.getDocumentElement()));
 
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {
@@ -1317,7 +1318,7 @@ public abstract class WSHandler {
          */
         for (WSHandlerResult rResult : results) {
             String hActor = rResult.getActor();
-            if (!WSSecurityUtil.isActorEqual(reqData.getActor(), hActor)) {
+            if (!XMLUtils.isActorEqual(reqData.getActor(), hActor)) {
                 continue;
             }
             List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();

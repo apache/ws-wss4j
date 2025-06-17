@@ -48,7 +48,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -183,7 +182,7 @@ public class SamlTokenDerivedTest {
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setStrElem(secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,

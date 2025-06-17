@@ -46,6 +46,7 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -125,7 +126,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         //
         if (secRefID != null) {
             String soapNamespace =
-                WSSecurityUtil.getSOAPNamespace(getDocument().getDocumentElement());
+                XMLUtils.getSOAPNamespace(getDocument().getDocumentElement());
             WSEncryptionPart encP =
                 new WSEncryptionPart("STRTransform", soapNamespace, "Content");
             encP.setId(secRefID);
@@ -466,10 +467,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
     public void prependSAMLElementsToHeader() {
         Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
         if (senderVouches) {
-            WSSecurityUtil.prependChildElement(securityHeaderElement, secRefSaml.getElement());
+            XMLUtils.prependChildElement(securityHeaderElement, secRefSaml.getElement());
         }
 
-        WSSecurityUtil.prependChildElement(securityHeaderElement, samlToken);
+        XMLUtils.prependChildElement(securityHeaderElement, samlToken);
     }
 
 

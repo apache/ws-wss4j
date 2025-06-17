@@ -784,7 +784,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void prependToHeader() {
         Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-        WSSecurityUtil.prependChildElement(secHeaderElement, encryptedKeyElement);
+        org.apache.wss4j.common.util.XMLUtils.prependChildElement(secHeaderElement, encryptedKeyElement);
     }
 
     /**
@@ -810,7 +810,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void prependBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
             Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
-            WSSecurityUtil.prependChildElement(secHeaderElement, bstToken.getElement());
+            org.apache.wss4j.common.util.XMLUtils.prependChildElement(secHeaderElement, bstToken.getElement());
             bstAddedToSecurityHeader = true;
         }
     }

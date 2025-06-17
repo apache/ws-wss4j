@@ -19,10 +19,10 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.common.SOAPConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
@@ -178,7 +178,7 @@ public class SignaturePartsTest {
                 "");
         encP.setRequired(false);
         sign.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -215,7 +215,7 @@ public class SignaturePartsTest {
                 "");
         encP.setRequired(false);
         sign.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -251,7 +251,7 @@ public class SignaturePartsTest {
                 "urn:foo.bar",
                 "");
         sign.getParts().add(encP);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY,
@@ -419,8 +419,7 @@ public class SignaturePartsTest {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        SOAPConstants soapConstants =
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -489,8 +488,7 @@ public class SignaturePartsTest {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        SOAPConstants soapConstants =
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
 
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =

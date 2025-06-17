@@ -157,7 +157,7 @@ public class XOPAttachmentTest {
         // Remove EncryptedData structure from the security header (which encrypted the attachment
         // in the first place)
         Element securityHeader =
-            WSSecurityUtil.findWsseSecurityHeaderBlock(encryptedDoc, encryptedDoc.getDocumentElement(), false);
+            XMLUtils.findWsseSecurityHeaderBlock(encryptedDoc, encryptedDoc.getDocumentElement(), false);
         Element encryptedAttachmentData =
             XMLUtils.getDirectChildElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
         assertNotNull(encryptedAttachmentData);

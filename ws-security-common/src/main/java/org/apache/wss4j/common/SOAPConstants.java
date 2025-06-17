@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.common;
 
 import javax.xml.namespace.QName;
 import java.io.Serializable;
