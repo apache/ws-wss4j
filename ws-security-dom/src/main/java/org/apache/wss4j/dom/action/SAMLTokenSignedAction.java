@@ -87,8 +87,7 @@ public class SAMLTokenSignedAction implements Action {
         wsSign.setExpandXopInclude(reqData.isExpandXopInclude());
         wsSign.setSignatureProvider(reqData.getSignatureProvider());
 
-        CallbackHandler callbackHandler =
-            handler.getPasswordCallbackHandler(reqData);
+        CallbackHandler callbackHandler = reqData.getCallbackHandler();
 
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {

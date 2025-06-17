@@ -43,9 +43,6 @@ public class SignatureAction implements Action {
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
-        if (callbackHandler == null) {
-            callbackHandler = handler.getPasswordCallbackHandler(reqData);
-        }
 
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {

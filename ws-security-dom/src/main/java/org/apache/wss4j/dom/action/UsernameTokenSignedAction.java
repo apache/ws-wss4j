@@ -50,9 +50,7 @@ public class UsernameTokenSignedAction implements Action {
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
-        if (callbackHandler == null) {
-            callbackHandler = handler.getPasswordCallbackHandler(reqData);
-        }
+ 
         WSPasswordCallback passwordCallback =
             handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
 

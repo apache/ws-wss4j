@@ -48,9 +48,6 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
-        if (callbackHandler == null) {
-            callbackHandler = handler.getPasswordCallbackHandler(reqData);
-        }
 
         EncryptionActionToken encryptionToken = null;
         if (actionToken instanceof EncryptionActionToken) {

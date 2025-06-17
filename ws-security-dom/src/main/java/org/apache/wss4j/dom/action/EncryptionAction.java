@@ -109,8 +109,7 @@ public class EncryptionAction implements Action {
         byte[] ephemeralKey = encryptionToken.getKey();
         if (encryptionToken.isGetSymmetricKeyFromCallbackHandler()
             || !encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
-            CallbackHandler callbackHandler =
-                handler.getPasswordCallbackHandler(reqData);
+            CallbackHandler callbackHandler = reqData.getCallbackHandler();
             // Get secret key for encryption from a CallbackHandler
             WSPasswordCallback pwcb =
                 new WSPasswordCallback(encryptionToken.getUser(), WSPasswordCallback.SECRET_KEY);

@@ -35,10 +35,6 @@ public class CustomTokenAction implements Action {
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
-            callbackHandler = handler.getPasswordCallbackHandler(reqData);
-        }
-
-        if (callbackHandler == null) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "noCallback"
             );

@@ -36,8 +36,7 @@ public class UsernameTokenAction implements Action {
         String username = reqData.getUsername();
         String password = null;
         if (reqData.getPwType() != null) {
-            CallbackHandler callbackHandler =
-                handler.getPasswordCallbackHandler(reqData);
+            CallbackHandler callbackHandler = reqData.getCallbackHandler();
             WSPasswordCallback passwordCallback =
                 handler.getPasswordCB(reqData.getUsername(), WSConstants.UT, callbackHandler, reqData);
             username = passwordCallback.getIdentifier();
