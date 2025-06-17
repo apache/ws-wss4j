@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -43,7 +43,7 @@ public class WSSecHeader {
 
     private final Document doc;
 
-    private String wsuPrefix = WSConstants.WSU_PREFIX;
+    private String wsuPrefix = WSS4JConstants.WSU_PREFIX;
 
     /**
      * Constructor.
@@ -168,13 +168,13 @@ public class WSSecHeader {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         String soapPrefix =
             XMLUtils.setNamespace(
-                securityHeader, soapNamespace, WSConstants.DEFAULT_SOAP_PREFIX
+                securityHeader, soapNamespace, WSS4JConstants.DEFAULT_SOAP_PREFIX
             );
 
         if (actor != null && actor.length() > 0) {
-            String actorLocal = WSConstants.ATTR_ACTOR;
-            if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
-                actorLocal = WSConstants.ATTR_ROLE;
+            String actorLocal = WSS4JConstants.ATTR_ACTOR;
+            if (WSS4JConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+                actorLocal = WSS4JConstants.ATTR_ROLE;
             }
             securityHeader.setAttributeNS(
                 soapNamespace,
@@ -184,16 +184,16 @@ public class WSSecHeader {
         }
         if (mustunderstand) {
             String mustUnderstandLocal = "1";
-            if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+            if (WSS4JConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
                 mustUnderstandLocal = "true";
             }
             securityHeader.setAttributeNS(
                 soapNamespace,
-                soapPrefix + ":" + WSConstants.ATTR_MUST_UNDERSTAND,
+                soapPrefix + ":" + WSS4JConstants.ATTR_MUST_UNDERSTAND,
                 mustUnderstandLocal
             );
         }
-        wsuPrefix = XMLUtils.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        wsuPrefix = XMLUtils.setNamespace(securityHeader, WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX);
 
         return securityHeader;
     }

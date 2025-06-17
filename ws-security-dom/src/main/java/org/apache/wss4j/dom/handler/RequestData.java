@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -42,7 +43,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.SOAPConstants;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -58,7 +58,7 @@ public class RequestData {
     private SOAPConstants soapConstants;
     private String actor;
     private String username;
-    private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
+    private String pwType = WSS4JConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
     private Crypto sigVerCrypto;
     private Crypto decCrypto;
     private SignatureActionToken signatureToken;

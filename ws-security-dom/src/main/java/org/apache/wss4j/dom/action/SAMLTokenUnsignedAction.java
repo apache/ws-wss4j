@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -28,7 +29,6 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 
 public class SAMLTokenUnsignedAction implements Action {
@@ -42,8 +42,8 @@ public class SAMLTokenUnsignedAction implements Action {
 
         CallbackHandler samlCallbackHandler =
                 handler.getCallbackHandler(
-                    WSHandlerConstants.SAML_CALLBACK_CLASS,
-                    WSHandlerConstants.SAML_CALLBACK_REF,
+                    ConfigurationConstants.SAML_CALLBACK_CLASS,
+                    ConfigurationConstants.SAML_CALLBACK_REF,
                     reqData
                 );
         if (samlCallbackHandler == null) {
