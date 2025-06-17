@@ -19,13 +19,9 @@
 
 package org.apache.wss4j.dom.engine;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.message.token.SignatureConfirmation;
-import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.w3c.dom.Element;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -241,16 +237,6 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
 
     public WSSecurityEngineResult(
         int act,
-        SamlAssertionWrapper ass
-    ) {
-        put(TAG_ACTION, act);
-        put(TAG_SAML_ASSERTION, ass);
-        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
-        put(TAG_TOKEN_ELEMENT, ass.getElement());
-    }
-
-    public WSSecurityEngineResult(
-        int act,
         Principal princ,
         X509Certificate[] certs,
         byte[] sv
@@ -314,39 +300,6 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
 
-    public WSSecurityEngineResult(int act, Timestamp tstamp) {
-        put(TAG_ACTION, act);
-        put(TAG_TIMESTAMP, tstamp);
-        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
-        put(TAG_TOKEN_ELEMENT, tstamp.getElement());
-    }
-
-    public WSSecurityEngineResult(int act, SecurityContextToken sct) {
-        put(TAG_ACTION, act);
-        put(TAG_SECURITY_CONTEXT_TOKEN, sct);
-        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
-        put(TAG_TOKEN_ELEMENT, sct.getElement());
-    }
-
-    public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
-        put(TAG_ACTION, act);
-        put(TAG_SIGNATURE_CONFIRMATION, sc);
-        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
-        put(TAG_TOKEN_ELEMENT, sc.getElement());
-    }
-
-    public WSSecurityEngineResult(int act, UsernameToken usernameToken) {
-        this(act, usernameToken, null);
-    }
-
-    public WSSecurityEngineResult(int act, UsernameToken usernameToken, Principal principal) {
-        put(TAG_ACTION, act);
-        put(TAG_USERNAME_TOKEN, usernameToken);
-        put(TAG_PRINCIPAL, principal);
-        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
-        put(TAG_TOKEN_ELEMENT, usernameToken.getElement());
-    }
-
     public WSSecurityEngineResult(int act, BinarySecurity token, X509Certificate[] certs) {
         put(TAG_ACTION, act);
         put(TAG_BINARY_SECURITY_TOKEN, token);
@@ -358,5 +311,37 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_TOKEN_ELEMENT, token.getElement());
     }
 
+    public void addSAMLAssertionResult(
+        Object assertion,
+        Element assertionElement
+    ) {
+        put(TAG_SAML_ASSERTION, assertion);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, assertionElement);
+    }
+
+    public void addTimestampResult(Object tstamp, Element tstampElement) {
+        put(TAG_TIMESTAMP, tstamp);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, tstampElement);
+    }
+
+    public void addSecurityContextTokenResult(Object sct, Element sctElement) {
+        put(TAG_SECURITY_CONTEXT_TOKEN, sct);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, sctElement);
+    }
+
+    public void addSignatureConfirmationResult(Object sc, Element scElement) {
+        put(TAG_SIGNATURE_CONFIRMATION, sc);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, scElement);
+    }
+
+    public void addUsernameTokenResult(Object usernameToken, Element usernameTokenElement) {
+        put(TAG_USERNAME_TOKEN, usernameToken);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, usernameTokenElement);
+    }
 
 }

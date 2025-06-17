@@ -42,8 +42,8 @@ public class SignatureConfirmationProcessor implements Processor {
         //
         SignatureConfirmation sigConf = new SignatureConfirmation(elem, data.getBSPEnforcer());
 
-        WSSecurityEngineResult result =
-            new WSSecurityEngineResult(WSConstants.SC, sigConf);
+        WSSecurityEngineResult result = new WSSecurityEngineResult(WSConstants.SC);
+        result.addSignatureConfirmationResult(sigConf, sigConf.getElement());
         String tokenId = sigConf.getID();
         if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);

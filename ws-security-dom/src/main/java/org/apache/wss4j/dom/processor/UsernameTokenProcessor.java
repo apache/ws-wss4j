@@ -74,7 +74,8 @@ public class UsernameTokenProcessor implements Processor {
                 secretKey = token.getDerivedKey(data.getBSPEnforcer(), rawPassword);
             }
         }
-        WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
+        WSSecurityEngineResult result = new WSSecurityEngineResult(action);
+        result.addUsernameTokenResult(token, token.getElement());
         String tokenId = token.getID();
         if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);

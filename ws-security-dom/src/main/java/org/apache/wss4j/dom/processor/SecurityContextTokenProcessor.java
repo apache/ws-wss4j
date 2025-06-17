@@ -52,8 +52,8 @@ public class SecurityContextTokenProcessor implements Processor {
         Validator validator =
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
 
-        WSSecurityEngineResult result =
-            new WSSecurityEngineResult(WSConstants.SCT, sct);
+        WSSecurityEngineResult result = new WSSecurityEngineResult(WSConstants.SCT);
+        result.addSecurityContextTokenResult(sct, sct.getElement());
         if (validator != null) {
             // Hook to allow the user to validate the SecurityContextToken
             Credential credential = new Credential();

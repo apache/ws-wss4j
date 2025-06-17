@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.w3c.dom.Element;

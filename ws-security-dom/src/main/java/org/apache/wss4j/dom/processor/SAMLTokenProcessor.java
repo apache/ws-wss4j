@@ -44,7 +44,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
@@ -117,11 +117,13 @@ public class SAMLTokenProcessor implements Processor {
         data.getWsDocInfo().addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (samlAssertion.isSigned()) {
-            result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, samlAssertion);
+            result = new WSSecurityEngineResult(WSConstants.ST_SIGNED);
+            result.addSAMLAssertionResult(samlAssertion, samlAssertion.getElement());
             result.put(WSSecurityEngineResult.TAG_DATA_REF_URIS, dataRefs);
             result.put(WSSecurityEngineResult.TAG_SIGNATURE_VALUE, samlAssertion.getSignatureValue());
         } else {
-            result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, samlAssertion);
+            result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED);
+            result.addSAMLAssertionResult(samlAssertion, samlAssertion.getElement());
         }
 
         if (id.length() != 0) {

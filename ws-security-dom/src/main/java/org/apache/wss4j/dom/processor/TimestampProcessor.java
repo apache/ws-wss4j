@@ -46,8 +46,8 @@ public class TimestampProcessor implements Processor {
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
 
-        WSSecurityEngineResult result =
-            new WSSecurityEngineResult(WSConstants.TS, timestamp);
+        WSSecurityEngineResult result = new WSSecurityEngineResult(WSConstants.TS);
+        result.addTimestampResult(timestamp, timestamp.getElement());
         String tokenId = timestamp.getID();
         if (tokenId.length() != 0) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);

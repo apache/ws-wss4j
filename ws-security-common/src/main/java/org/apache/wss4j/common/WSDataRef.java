@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.common;
 
 /**
  * WSDataRef stores information about decrypted/signed elements

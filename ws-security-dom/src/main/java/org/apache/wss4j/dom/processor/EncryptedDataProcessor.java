@@ -37,7 +37,7 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
