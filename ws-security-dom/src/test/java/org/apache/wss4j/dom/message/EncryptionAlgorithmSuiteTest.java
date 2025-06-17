@@ -25,6 +25,7 @@ import javax.crypto.SecretKey;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.SOAPUtil;

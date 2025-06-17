@@ -35,7 +35,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;

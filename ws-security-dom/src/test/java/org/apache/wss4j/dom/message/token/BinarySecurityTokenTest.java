@@ -35,7 +35,7 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

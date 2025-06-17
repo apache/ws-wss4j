@@ -44,7 +44,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecDKEncrypt;
 import org.apache.wss4j.dom.message.WSSecDKSign;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSecurityContextToken;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.stax.ext.WSSConstants;

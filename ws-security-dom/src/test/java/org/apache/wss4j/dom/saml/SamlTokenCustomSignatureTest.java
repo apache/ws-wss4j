@@ -43,7 +43,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 
 import org.junit.jupiter.api.Test;

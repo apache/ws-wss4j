@@ -30,6 +30,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.SOAPUtil;

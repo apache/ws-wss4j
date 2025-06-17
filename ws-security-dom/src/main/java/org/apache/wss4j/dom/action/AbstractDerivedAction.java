@@ -27,13 +27,13 @@ import javax.crypto.SecretKey;
 
 import org.apache.wss4j.common.SignatureEncryptionActionToken;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 

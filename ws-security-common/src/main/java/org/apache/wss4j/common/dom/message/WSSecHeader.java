@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.message;
+package org.apache.wss4j.common.dom.message;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;

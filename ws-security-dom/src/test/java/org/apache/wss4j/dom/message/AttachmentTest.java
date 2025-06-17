@@ -41,6 +41,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;

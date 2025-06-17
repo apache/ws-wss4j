@@ -42,6 +42,7 @@ import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;

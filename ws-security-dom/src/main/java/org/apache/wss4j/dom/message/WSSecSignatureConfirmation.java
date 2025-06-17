@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.w3c.dom.Document;

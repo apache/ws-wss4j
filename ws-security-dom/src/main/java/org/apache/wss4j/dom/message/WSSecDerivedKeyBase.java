@@ -30,6 +30,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;

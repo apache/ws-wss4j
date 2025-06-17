@@ -44,7 +44,7 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;

@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
