@@ -189,7 +189,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
         sigBuilder.setStrElem(secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        String soapNamespace = org.apache.wss4j.common.util.XMLUtils.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
                 new WSEncryptionPart(
                         WSConstants.ELEM_BODY,

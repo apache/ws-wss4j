@@ -465,8 +465,8 @@ public abstract class AbstractTestBase {
             /*
              * Check if it's a fault. Don't process faults.
              */
-            org.apache.wss4j.dom.SOAPConstants soapConstants =
-                    WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+            org.apache.wss4j.common.SOAPConstants soapConstants =
+                    org.apache.wss4j.common.util.XMLUtils.getSOAPConstants(doc.getDocumentElement());
             if (XMLUtils.findElement(
                 doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
             ) {
