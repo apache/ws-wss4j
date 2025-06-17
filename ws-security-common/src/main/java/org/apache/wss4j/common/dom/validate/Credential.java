@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.validate;
+package org.apache.wss4j.common.dom.validate;
 
 import java.security.Principal;
 import java.security.PublicKey;
@@ -25,7 +25,6 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.Subject;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.common.dom.message.token.Timestamp;
@@ -43,8 +42,8 @@ public class Credential {
     private Timestamp timestamp;
     private UsernameToken usernametoken;
     private BinarySecurity binarySecurityToken;
-    private SamlAssertionWrapper samlAssertion;
-    private SamlAssertionWrapper transformedToken;
+    private Object samlAssertion;
+    private Object transformedToken;
     private SecurityContextToken securityContextToken;
     private Principal principal;
     private byte[] secretKey;
@@ -168,7 +167,7 @@ public class Credential {
      * Set an SamlAssertionWrapper to be validated
      * @param samlAssertion an SamlAssertionWrapper to be validated
      */
-    public void setSamlAssertion(SamlAssertionWrapper samlAssertion) {
+    public void setSamlAssertion(Object samlAssertion) {
         this.samlAssertion = samlAssertion;
     }
 
@@ -176,7 +175,7 @@ public class Credential {
      * Get an SamlAssertionWrapper to be validated
      * @return an SamlAssertionWrapper to be validated
      */
-    public SamlAssertionWrapper getSamlAssertion() {
+    public Object getSamlAssertion() {
         return samlAssertion;
     }
 
@@ -184,7 +183,7 @@ public class Credential {
      * Set an SamlAssertionWrapper instance which corresponds to a Transformed Token.
      * @param transformedToken a transformed SamlAssertionWrapper instance
      */
-    public void setTransformedToken(SamlAssertionWrapper transformedToken) {
+    public void setTransformedToken(Object transformedToken) {
         this.transformedToken = transformedToken;
     }
 
@@ -192,7 +191,7 @@ public class Credential {
      * Get an SamlAssertionWrapper instance which corresponds to a Transformed Token.
      * @return a transformed SamlAssertionWrapper instance
      */
-    public SamlAssertionWrapper getTransformedToken() {
+    public Object getTransformedToken() {
         return transformedToken;
     }
 

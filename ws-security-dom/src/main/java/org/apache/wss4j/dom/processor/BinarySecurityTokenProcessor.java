@@ -36,7 +36,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Element;
 

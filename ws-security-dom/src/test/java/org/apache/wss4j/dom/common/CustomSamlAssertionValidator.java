@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.common;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 public class CustomSamlAssertionValidator extends SamlAssertionValidator {
@@ -34,7 +34,7 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
         //
         // Do some custom validation on the assertion
         //
-        SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
+        SamlAssertionWrapper samlAssertion = (SamlAssertionWrapper)credential.getSamlAssertion();
         if (!"www.example.com".equals(samlAssertion.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }

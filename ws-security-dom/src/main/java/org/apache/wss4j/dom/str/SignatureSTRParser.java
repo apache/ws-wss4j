@@ -105,7 +105,7 @@ public class SignatureSTRParser implements STRParser {
      */
     private Principal createPrincipalFromSAML(
         SamlAssertionWrapper samlAssertion, STRParserResult parserResult
-    ) {
+    ) throws WSSecurityException {
         SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
         String confirmMethod = null;
         List<String> methods = samlAssertion.getConfirmationMethods();

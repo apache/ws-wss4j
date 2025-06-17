@@ -18,15 +18,9 @@
  */
 package org.apache.wss4j.common.principal;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-
 import java.security.Principal;
 
 public interface SAMLTokenPrincipal extends Principal {
 
-    SamlAssertionWrapper getToken();
-
-    String getName();
-
-    String getId();
+    Object getToken();
 }

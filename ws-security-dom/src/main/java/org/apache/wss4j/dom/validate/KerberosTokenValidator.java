@@ -29,6 +29,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
 import org.apache.wss4j.common.kerberos.KerberosServiceContext;

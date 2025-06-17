@@ -19,9 +19,10 @@
 
 package org.apache.wss4j.common.principal;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * A principal that represents a SAML Token. It parses the Subject and returns the Subject
@@ -31,29 +32,38 @@ public class SAMLTokenPrincipalImpl implements Serializable, SAMLTokenPrincipal 
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private SamlAssertionWrapper samlAssertion;
+    private Object samlAssertion;
 
-    public SAMLTokenPrincipalImpl(SamlAssertionWrapper samlAssertion) {
+    public SAMLTokenPrincipalImpl(Object samlAssertion) throws WSSecurityException {
         this.samlAssertion = samlAssertion;
-        this.name = samlAssertion.getSubjectName();
+        
+        if (samlAssertion == null) {
+            throw new IllegalArgumentException("SAML Assertion cannot be null");
+        }
+
+        // Use reflection to extract the subject name from the SAML assertion
+        try {
+            Class<?> samlAssertionWrapperClass = Class.forName("org.apache.wss4j.common.saml.SamlAssertionWrapper");
+            if (samlAssertionWrapperClass.isInstance(samlAssertion)) {
+                Object samlWrapper = samlAssertionWrapperClass.cast(samlAssertion);
+                this.name = (String) samlAssertionWrapperClass.getMethod("getSubjectName").invoke(samlWrapper);
+            } else {
+                throw new IllegalArgumentException("Provided SAML Assertion is not of the expected type");
+            }
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", 
+                new Object[] {"Error extracting subject name from SAML Assertion"});
+        }
     }
 
     @Override
-    public SamlAssertionWrapper getToken() {
+    public Object getToken() {
         return samlAssertion;
     }
 
     @Override
     public String getName() {
         return this.name;
-    }
-
-    @Override
-    public String getId() {
-        if (samlAssertion != null) {
-            return samlAssertion.getId();
-        }
-        return null;
     }
 
 }

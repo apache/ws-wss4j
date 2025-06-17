@@ -52,7 +52,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 import org.junit.jupiter.api.Test;

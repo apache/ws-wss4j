@@ -49,7 +49,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.EncryptionUtils;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
@@ -96,7 +96,7 @@ public class SAMLTokenProcessor implements Processor {
         List<WSDataRef> dataRefs = createDataRefs(elem, samlAssertion, xmlSignature);
 
         Credential credential = handleSAMLToken(samlAssertion, data, validator);
-        samlAssertion = credential.getSamlAssertion();
+        samlAssertion = (SamlAssertionWrapper)credential.getSamlAssertion();
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
             LOG.debug(DOM2Writer.nodeToString(elem));

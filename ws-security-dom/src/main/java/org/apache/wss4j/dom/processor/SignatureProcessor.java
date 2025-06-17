@@ -79,7 +79,7 @@ import org.apache.wss4j.common.dom.transform.STRTransformUtil;
 import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

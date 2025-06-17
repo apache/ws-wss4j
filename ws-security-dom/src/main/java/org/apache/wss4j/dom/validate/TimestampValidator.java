@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.validate;
 
 
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.dom.message.token.Timestamp;

@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -99,7 +100,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         if (credential == null || credential.getSamlAssertion() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
-        SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
+        SamlAssertionWrapper samlAssertion = (SamlAssertionWrapper)credential.getSamlAssertion();
 
         // Check the Subject Confirmation requirements
         verifySubjectConfirmationMethod(samlAssertion);
