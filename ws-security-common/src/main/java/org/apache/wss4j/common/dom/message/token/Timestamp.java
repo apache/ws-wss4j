@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.dom.message.token;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -34,7 +35,7 @@ import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,8 +72,8 @@ public class Timestamp {
          ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()) {
                 Element currentChildElement = (Element) currentChild;
-                if (WSConstants.CREATED_LN.equals(currentChild.getLocalName())
-                    && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
+                if (WSS4JConstants.CREATED_LN.equals(currentChild.getLocalName())
+                    && WSS4JConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (createdString == null) {
                         String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (valueType != null && valueType.length() != 0) {
@@ -84,8 +85,8 @@ public class Timestamp {
                         // Test for multiple Created elements
                         bspEnforcer.handleBSPRule(BSPRule.R3203);
                     }
-                } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName())
-                    && WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
+                } else if (WSS4JConstants.EXPIRES_LN.equals(currentChild.getLocalName())
+                    && WSS4JConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (createdString == null) {
                         // Created must appear before Expires
                         bspEnforcer.handleBSPRule(BSPRule.R3221);
@@ -177,12 +178,12 @@ public class Timestamp {
 
         element =
             doc.createElementNS(
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+                WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":" + WSS4JConstants.TIMESTAMP_TOKEN_LN
             );
 
         Element elementCreated =
             doc.createElementNS(
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+                WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":" + WSS4JConstants.CREATED_LN
             );
         created = timeSource.now();
 
@@ -195,7 +196,7 @@ public class Timestamp {
 
             Element elementExpires =
                 doc.createElementNS(
-                    WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+                    WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":" + WSS4JConstants.EXPIRES_LN
                 );
             elementExpires.appendChild(doc.createTextNode(expires.atZone(ZoneOffset.UTC).format(formatter)));
             element.appendChild(elementExpires);
@@ -207,7 +208,7 @@ public class Timestamp {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**
@@ -260,14 +261,14 @@ public class Timestamp {
      * @param id
      */
     public void setID(String id) {
-        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
      * @return the value of the wsu:Id attribute
      */
     public String getID() {
-        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
 
     /**

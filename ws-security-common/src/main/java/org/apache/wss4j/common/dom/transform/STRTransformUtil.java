@@ -35,7 +35,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
-
+import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -242,7 +242,7 @@ public final class STRTransformUtil {
             || WSS4JConstants.WSC_SCT_05_12.equals(type)
             || WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
             || WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)
-            || isKerberosToken(type))) {
+            || KerberosSecurity.isKerberosToken(type))) {
             //try to find a custom token
             WSPasswordCallback pwcb =
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
@@ -260,17 +260,4 @@ public final class STRTransformUtil {
         return null;
     }
 
-    /**
-     * Return true if the valueType represents a Kerberos Token
-     * @param valueType the valueType of the token
-     * @return true if the valueType represents a Kerberos Token
-     */
-    private static boolean isKerberosToken(String valueType) {
-        return WSS4JConstants.WSS_KRB_V5_AP_REQ.equals(valueType)
-            || WSS4JConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)
-            || WSS4JConstants.WSS_KRB_V5_AP_REQ1510.equals(valueType)
-            || WSS4JConstants.WSS_GSS_KRB_V5_AP_REQ1510.equals(valueType)
-            || WSS4JConstants.WSS_KRB_V5_AP_REQ4120.equals(valueType)
-            || WSS4JConstants.WSS_GSS_KRB_V5_AP_REQ4120.equals(valueType);
-    }
 }

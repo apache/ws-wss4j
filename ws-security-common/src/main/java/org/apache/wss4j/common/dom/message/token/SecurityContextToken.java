@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.dom.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
@@ -49,7 +49,7 @@ public class SecurityContextToken {
      */
     private Element elementInstance;
 
-    private String tokenType = WSConstants.WSC_SCT;
+    private String tokenType = WSS4JConstants.WSC_SCT;
 
     /**
      * Constructor to create the SCT
@@ -115,9 +115,9 @@ public class SecurityContextToken {
         elementIdentifier.appendChild(doc.createTextNode(uuid));
 
         if (version == ConversationConstants.VERSION_05_02) {
-            tokenType = WSConstants.WSC_SCT;
+            tokenType = WSS4JConstants.WSC_SCT;
         } else {
-            tokenType = WSConstants.WSC_SCT_05_12;
+            tokenType = WSS4JConstants.WSC_SCT_05_12;
         }
     }
 
@@ -150,9 +150,9 @@ public class SecurityContextToken {
 
         // If the element is not a security context token, throw an exception
         if (el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02)) {
-            tokenType = WSConstants.WSC_SCT;
+            tokenType = WSS4JConstants.WSC_SCT;
         } else if (el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12)) {
-            tokenType = WSConstants.WSC_SCT_05_12;
+            tokenType = WSS4JConstants.WSC_SCT_05_12;
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
         }
@@ -177,7 +177,7 @@ public class SecurityContextToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**
@@ -266,7 +266,7 @@ public class SecurityContextToken {
      *         SecurityContextToken
      */
     public String getID() {
-        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
 
     /**
@@ -276,7 +276,7 @@ public class SecurityContextToken {
      *           SecurityContextToken
      */
     public void setID(String id) {
-        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
 
     @Override

@@ -42,7 +42,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.validate.NoOpValidator;
 
 import org.junit.jupiter.api.Test;

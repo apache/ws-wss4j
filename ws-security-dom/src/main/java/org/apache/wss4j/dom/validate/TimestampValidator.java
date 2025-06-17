@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.validate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 
 /**
  * This class validates a processed Timestamp, extracted from the Credential passed to

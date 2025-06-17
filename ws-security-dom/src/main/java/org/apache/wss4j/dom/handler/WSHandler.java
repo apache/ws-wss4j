@@ -46,7 +46,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.SignatureConfirmation;
+import org.apache.wss4j.common.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.params.KeyDerivationParameters;
 import org.w3c.dom.Document;

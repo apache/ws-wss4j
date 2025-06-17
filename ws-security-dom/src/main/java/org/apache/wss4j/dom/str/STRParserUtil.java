@@ -40,7 +40,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.processor.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

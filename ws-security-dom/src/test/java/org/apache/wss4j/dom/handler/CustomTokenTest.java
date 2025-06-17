@@ -38,7 +38,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

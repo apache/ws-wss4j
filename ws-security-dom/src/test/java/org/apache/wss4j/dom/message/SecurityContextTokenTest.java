@@ -33,7 +33,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;

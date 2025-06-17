@@ -182,6 +182,34 @@ public final class XMLUtils {
     }
 
     /**
+     * Gets all direct children with specified localname and namespace. <p/>
+     *
+     * @param fNode the node where to start the search
+     * @param localName local name of the children to get
+     * @param namespace the namespace of the children to get
+     * @return the list of nodes or <code>null</code> if not such nodes are found
+     */
+    public static List<Element> getDirectChildElements(
+        Node fNode,
+        String localName,
+        String namespace
+    ) {
+        List<Element> children = new ArrayList<>();
+        for (
+            Node currentChild = fNode.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && localName.equals(currentChild.getLocalName())
+                && namespace.equals(currentChild.getNamespaceURI())) {
+                children.add((Element)currentChild);
+            }
+        }
+        return children;
+    }
+
+    /**
      * Return the text content of an Element, or null if no such text content exists
      */
     public static String getElementText(Element e) {

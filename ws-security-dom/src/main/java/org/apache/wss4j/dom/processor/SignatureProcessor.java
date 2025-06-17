@@ -67,7 +67,7 @@ import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.str.STRParserParameters;

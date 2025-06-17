@@ -48,7 +48,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

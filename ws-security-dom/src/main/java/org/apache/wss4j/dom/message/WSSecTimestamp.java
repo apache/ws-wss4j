@@ -26,7 +26,7 @@ import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 
 /**
  * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS

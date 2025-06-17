@@ -27,9 +27,9 @@ import javax.security.auth.Subject;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
 
 /**
  * This class stores various Credential types that can be validated and/or returned by a

@@ -31,7 +31,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**

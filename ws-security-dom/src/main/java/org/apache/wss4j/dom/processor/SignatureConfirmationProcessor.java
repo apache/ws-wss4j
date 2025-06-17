@@ -23,7 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.SignatureConfirmation;
+import org.apache.wss4j.common.dom.message.token.SignatureConfirmation;
 import org.w3c.dom.Element;
 
 import java.util.List;

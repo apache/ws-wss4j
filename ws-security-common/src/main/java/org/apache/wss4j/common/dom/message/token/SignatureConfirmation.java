@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.dom.message.token;
 
 import java.util.Arrays;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -73,10 +73,10 @@ public class SignatureConfirmation {
     public SignatureConfirmation(Document doc, byte[] signVal) {
         element =
             doc.createElementNS(
-                WSConstants.WSSE11_NS,
-                WSConstants.WSSE11_PREFIX + ":" + WSConstants.SIGNATURE_CONFIRMATION_LN
+                WSS4JConstants.WSSE11_NS,
+                WSS4JConstants.WSSE11_PREFIX + ":" + WSS4JConstants.SIGNATURE_CONFIRMATION_LN
             );
-        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX);
         if (signVal != null) {
             String sv = org.apache.xml.security.utils.XMLUtils.encodeToString(signVal);
             element.setAttributeNS(null, SC_VALUE_ATTR, sv);
@@ -88,7 +88,7 @@ public class SignatureConfirmation {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**
@@ -114,7 +114,7 @@ public class SignatureConfirmation {
      * @param id
      */
     public void setID(String id) {
-        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
@@ -122,7 +122,7 @@ public class SignatureConfirmation {
      * @return the WSU ID
      */
     public String getID() {
-        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
 
     /**

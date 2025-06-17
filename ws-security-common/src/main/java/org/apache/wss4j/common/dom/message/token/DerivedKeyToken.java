@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.dom.message.token;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
@@ -124,7 +124,7 @@ public class DerivedKeyToken {
             XMLUtils.getDirectChildElement(
                 element,
                 ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
-                WSConstants.WSSE_NS
+                WSS4JConstants.WSSE_NS
             );
 
         ns = el.getNamespaceURI();
@@ -199,7 +199,7 @@ public class DerivedKeyToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**
@@ -494,7 +494,7 @@ public class DerivedKeyToken {
      *         DerivedKeyToken
      */
     public String getID() {
-        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
 
     /**
@@ -504,7 +504,7 @@ public class DerivedKeyToken {
      *           DerivedKeyToken
      */
     public void setID(String id) {
-        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

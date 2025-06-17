@@ -29,7 +29,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.DerivedKeyToken;
+import org.apache.wss4j.common.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.str.DerivedKeyTokenSTRParser;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;

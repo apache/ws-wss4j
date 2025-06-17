@@ -38,7 +38,7 @@ import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.token.SignatureConfirmation;
+import org.apache.wss4j.common.dom.message.token.SignatureConfirmation;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.dom.message.token;
 
 import java.security.Principal;
 import java.time.Instant;
@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -40,8 +41,7 @@ import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,11 +54,11 @@ import org.w3c.dom.Text;
  * Enhanced to support passwordless usernametokens as allowed by spec.
  */
 public class UsernameToken {
-    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
+    public static final String BASE64_ENCODING = WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary";
     public static final String PASSWORD_TYPE = "passwordType";
     public static final int DEFAULT_ITERATION = 1000;
     public static final QName TOKEN =
-        new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
+        new QName(WSS4JConstants.WSSE_NS, WSS4JConstants.USERNAME_TOKEN_LN);
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
@@ -103,27 +103,27 @@ public class UsernameToken {
         }
         elementUsername =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
+                element, WSS4JConstants.USERNAME_LN, WSS4JConstants.WSSE_NS
             );
         elementPassword =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
+                element, WSS4JConstants.PASSWORD_LN, WSS4JConstants.WSSE_NS
             );
         elementNonce =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
+                element, WSS4JConstants.NONCE_LN, WSS4JConstants.WSSE_NS
             );
         elementCreated =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.CREATED_LN, WSConstants.WSU_NS
+                element, WSS4JConstants.CREATED_LN, WSS4JConstants.WSU_NS
             );
         elementSalt =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
+                element, WSS4JConstants.SALT_LN, WSS4JConstants.WSSE11_NS
             );
         elementIteration =
             XMLUtils.getDirectChildElement(
-                element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
+                element, WSS4JConstants.ITERATION_LN, WSS4JConstants.WSSE11_NS
             );
         if (elementUsername == null) {
             throw new WSSecurityException(
@@ -169,15 +169,15 @@ public class UsernameToken {
         }
 
         if (elementPassword != null) {
-            if (elementPassword.hasAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR)) {
-                passwordType = elementPassword.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
+            if (elementPassword.hasAttributeNS(null, WSS4JConstants.PASSWORD_TYPE_ATTR)) {
+                passwordType = elementPassword.getAttributeNS(null, WSS4JConstants.PASSWORD_TYPE_ATTR);
             } else if (elementPassword.hasAttributeNS(
-                WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR)
+                WSS4JConstants.WSSE_NS, WSS4JConstants.PASSWORD_TYPE_ATTR)
             ) {
                 if (allowNamespaceQualifiedPasswordTypes) {
                     passwordType =
                         elementPassword.getAttributeNS(
-                            WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR
+                            WSS4JConstants.WSSE_NS, WSS4JConstants.PASSWORD_TYPE_ATTR
                         );
                 } else {
                     throw new WSSecurityException(
@@ -189,7 +189,7 @@ public class UsernameToken {
             }
 
         }
-        if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
+        if (WSS4JConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
@@ -215,12 +215,12 @@ public class UsernameToken {
     /**
      * Constructs a <code>UsernameToken</code> object according to the defined
      * parameters. <p/> This constructs set the password encoding to
-     * {@link WSConstants#PASSWORD_DIGEST}
+     * {@link WSS4JConstants#PASSWORD_DIGEST}
      *
      * @param doc the SOAP envelope as <code>Document</code>
      */
     public UsernameToken(boolean milliseconds, Document doc) {
-        this(milliseconds, doc, WSConstants.PASSWORD_DIGEST);
+        this(milliseconds, doc, WSS4JConstants.PASSWORD_DIGEST);
     }
 
     /**
@@ -229,9 +229,9 @@ public class UsernameToken {
      *
      * @param doc the SOAP envelope as <code>Document</code>
      * @param pwType the required password encoding, either
-     *               {@link WSConstants#PASSWORD_DIGEST} or
-     *               {@link WSConstants#PASSWORD_TEXT} or
-     *               {@link WSConstants#PW_NONE} <code>null</code> if no
+     *               {@link WSS4JConstants#PASSWORD_DIGEST} or
+     *               {@link WSS4JConstants#PASSWORD_TEXT} or
+     *               {@link WSS4JConstants#PW_NONE} <code>null</code> if no
      *               password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
@@ -240,21 +240,21 @@ public class UsernameToken {
 
     public UsernameToken(boolean milliseconds, Document doc, WSTimeSource timeSource, String pwType) {
         element =
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
+            doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:" + WSS4JConstants.USERNAME_TOKEN_LN);
 
         elementUsername =
-            doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
+            doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:" + WSS4JConstants.USERNAME_LN);
         elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
         if (pwType != null) {
             elementPassword =
-                doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
+                doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:" + WSS4JConstants.PASSWORD_LN);
             elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
 
             passwordType = pwType;
-            if (passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
+            if (passwordType.equals(WSS4JConstants.PASSWORD_DIGEST)) {
                 addNonce(doc);
                 addCreated(milliseconds, timeSource, doc);
             } else {
@@ -268,7 +268,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        XMLUtils.setNamespace(element, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX);
     }
 
     /**
@@ -276,7 +276,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSConstants.WSU_PREFIX, WSConstants.WSU_NS);
+        element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:" + WSS4JConstants.WSU_PREFIX, WSS4JConstants.WSU_NS);
     }
 
     /**
@@ -293,7 +293,7 @@ public class UsernameToken {
             LOG.debug(ex.getMessage(), ex);
             return;
         }
-        elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
+        elementNonce = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:" + WSS4JConstants.NONCE_LN);
         elementNonce.appendChild(doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(nonceValue)));
         elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
@@ -315,7 +315,7 @@ public class UsernameToken {
         }
         elementCreated =
             doc.createElementNS(
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+                WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":" + WSS4JConstants.CREATED_LN
             );
         Instant currentTime = timeSource.now();
 
@@ -333,9 +333,9 @@ public class UsernameToken {
     public void addSalt(Document doc, byte[] saltValue) {
         elementSalt =
             doc.createElementNS(
-                WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
+                WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX + ":" + WSS4JConstants.SALT_LN
             );
-        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX);
         elementSalt.appendChild(doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(saltValue)));
         element.appendChild(elementSalt);
     }
@@ -347,9 +347,9 @@ public class UsernameToken {
         String text = "" + iteration;
         elementIteration =
             doc.createElementNS(
-                WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
+                WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX + ":" + WSS4JConstants.ITERATION_LN
             );
-        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX);
         elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
         this.iteration = iteration;
@@ -452,7 +452,7 @@ public class UsernameToken {
 
     /**
      * Get the hashed indicator. If the indicator is <code>true> the password of the
-     * <code>UsernameToken</code> was encoded using {@link WSConstants#PASSWORD_DIGEST}
+     * <code>UsernameToken</code> was encoded using {@link WSS4JConstants#PASSWORD_DIGEST}
      *
      * @return the hashed indicator.
      */
@@ -557,7 +557,7 @@ public class UsernameToken {
      *         token
      */
     public String getID() {
-        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
 
     /**
@@ -568,7 +568,7 @@ public class UsernameToken {
      *            username token
      */
     public void setID(String id) {
-        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**
@@ -739,8 +739,8 @@ public class UsernameToken {
      */
     private void checkBSPCompliance(BSPEnforcer bspEnforcer) throws WSSecurityException {
         List<Element> passwordElements =
-            WSSecurityUtil.getDirectChildElements(
-                element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
+            XMLUtils.getDirectChildElements(
+                element, WSS4JConstants.PASSWORD_LN, WSS4JConstants.WSSE_NS
             );
         // We can only have one password element
         if (passwordElements.size() > 1) {
@@ -751,7 +751,7 @@ public class UsernameToken {
         // We must have a password type
         if (passwordElements.size() == 1) {
             Element passwordChild = passwordElements.get(0);
-            String type = passwordChild.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
+            String type = passwordChild.getAttributeNS(null, WSS4JConstants.PASSWORD_TYPE_ATTR);
             if (type == null || type.length() == 0) {
                 LOG.debug("The Username Token password does not have a Type attribute");
                 bspEnforcer.handleBSPRule(BSPRule.R4201);
@@ -759,8 +759,8 @@ public class UsernameToken {
         }
 
         List<Element> createdElements =
-            WSSecurityUtil.getDirectChildElements(
-                element, WSConstants.CREATED_LN, WSConstants.WSU_NS
+            XMLUtils.getDirectChildElements(
+                element, WSS4JConstants.CREATED_LN, WSS4JConstants.WSU_NS
             );
         // We can only have one created element
         if (createdElements.size() > 1) {
@@ -769,8 +769,8 @@ public class UsernameToken {
         }
 
         List<Element> nonceElements =
-            WSSecurityUtil.getDirectChildElements(
-                element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
+            XMLUtils.getDirectChildElements(
+                element, WSS4JConstants.NONCE_LN, WSS4JConstants.WSSE_NS
             );
         // We can only have one nonce element
         if (nonceElements.size() > 1) {
@@ -784,7 +784,7 @@ public class UsernameToken {
             // Encoding Type must be equal to Base64Binary
             if (encodingType == null || encodingType.length() == 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R4220);
-            } else if (!WSConstants.BASE64_ENCODING.equals(encodingType)) {
+            } else if (!WSS4JConstants.BASE64_ENCODING.equals(encodingType)) {
                 LOG.debug("The Username Token's nonce element has a bad encoding type");
                 bspEnforcer.handleBSPRule(BSPRule.R4221);
             }

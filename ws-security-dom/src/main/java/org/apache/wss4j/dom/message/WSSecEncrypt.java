@@ -36,7 +36,7 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;

@@ -34,7 +34,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 public abstract class AbstractDerivedAction {

@@ -27,7 +27,7 @@ import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
