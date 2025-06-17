@@ -99,6 +99,7 @@
             <artifactId>wss4j-ws-security-saml</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.ehcache</groupId>
