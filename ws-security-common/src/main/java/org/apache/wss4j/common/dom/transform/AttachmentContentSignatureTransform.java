@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.CRLFOutputStream;
-import org.apache.wss4j.dom.WSConstants;
+
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
@@ -57,7 +58,7 @@ import java.util.List;
 
 public class AttachmentContentSignatureTransform extends TransformService {
 
-    public static final String TRANSFORM_URI = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+    public static final String TRANSFORM_URI = WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
     public static final String ATTACHMENT_CALLBACKHANDLER = "AttachmentContentTransform.attachmentCallbackHandler";
 
     private AttachmentTransformParameterSpec attachmentTransformParameterSpec;
@@ -198,7 +199,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                  * supports context changes. The InclusiveNamespace PrefixList
                  * attribute SHOULD be empty or not present.
                  */
-                Canonicalizer canon = Canonicalizer.getInstance(WSConstants.C14N_EXCL_OMIT_COMMENTS);
+                Canonicalizer canon = Canonicalizer.getInstance(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
 
                 XMLSignatureInput xmlSignatureInput = new XMLSignatureStreamInput(inputStream); //NOPMD
                 canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet(), outputStream);

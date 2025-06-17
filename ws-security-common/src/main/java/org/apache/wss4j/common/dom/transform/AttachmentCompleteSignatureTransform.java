@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.dom.WSConstants;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.OctetStreamData;
@@ -35,7 +35,7 @@ import javax.xml.crypto.dsig.TransformException;
 
 public class AttachmentCompleteSignatureTransform extends AttachmentContentSignatureTransform {
 
-    public static final String TRANSFORM_URI = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+    public static final String TRANSFORM_URI = WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
 
     @Override
     public Data transform(Data data, XMLCryptoContext context) throws TransformException {

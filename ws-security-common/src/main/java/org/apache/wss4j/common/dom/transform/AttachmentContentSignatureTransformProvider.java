@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import java.security.Provider;
 
-public class AttachmentCompleteSignatureTransformProvider extends Provider {
+public class AttachmentContentSignatureTransformProvider extends Provider {
 
     private static final long serialVersionUID = -9148982936620100249L;
 
-    public AttachmentCompleteSignatureTransformProvider() {
-        super("AttachmentCompleteSignatureTransform", "2.5", "Attachment Complete Signature Transform Provider");
+    public AttachmentContentSignatureTransformProvider() {
+        super("AttachmentContentSignatureTransform", "2.5", "Attachment Content Signature Transform Provider");
         put(
-                "TransformService." + AttachmentCompleteSignatureTransform.TRANSFORM_URI,
-                "org.apache.wss4j.dom.transform.AttachmentCompleteSignatureTransform"
+                "TransformService." + AttachmentContentSignatureTransform.TRANSFORM_URI,
+                "org.apache.wss4j.common.dom.transform.AttachmentContentSignatureTransform"
         );
-        put("TransformService." + AttachmentCompleteSignatureTransform.TRANSFORM_URI + " MechanismType", "DOM");
+        put("TransformService." + AttachmentContentSignatureTransform.TRANSFORM_URI + " MechanismType", "DOM");
     }
 }

@@ -16,30 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
 
-import org.apache.wss4j.common.ext.Attachment;
+package org.apache.wss4j.common.dom.transform;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import java.security.Provider;
 
-public class AttachmentTransformParameterSpec implements TransformParameterSpec {
+/**
+ * A provider for the STR Transform.
+ */
+public class STRTransformProvider extends Provider {
 
-    private CallbackHandler attachmentCallbackHandler;
-    private Attachment attachment;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -9148982936620100249L;
 
-    public AttachmentTransformParameterSpec(
-            CallbackHandler attachmentCallbackHandler,
-            Attachment attachment) {
-        this.attachmentCallbackHandler = attachmentCallbackHandler;
-        this.attachment = attachment;
-    }
-
-    public CallbackHandler getAttachmentCallbackHandler() {
-        return attachmentCallbackHandler;
-    }
-
-    public Attachment getAttachment() {
-        return attachment;
-    }
+    public STRTransformProvider() {
+       super("STRTransform", "2.5", "Security Token Reference Transform Provider");
+       put(
+           "TransformService." + STRTransform.TRANSFORM_URI,
+           "org.apache.wss4j.common.dom.transform.STRTransform"
+       );
+       put("TransformService." + STRTransform.TRANSFORM_URI + " MechanismType", "DOM");
+   }
 }

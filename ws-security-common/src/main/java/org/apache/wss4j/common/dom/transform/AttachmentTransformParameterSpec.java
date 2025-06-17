@@ -16,20 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
-import java.security.Provider;
+import org.apache.wss4j.common.ext.Attachment;
 
-public class AttachmentContentSignatureTransformProvider extends Provider {
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-    private static final long serialVersionUID = -9148982936620100249L;
+public class AttachmentTransformParameterSpec implements TransformParameterSpec {
 
-    public AttachmentContentSignatureTransformProvider() {
-        super("AttachmentContentSignatureTransform", "2.5", "Attachment Content Signature Transform Provider");
-        put(
-                "TransformService." + AttachmentContentSignatureTransform.TRANSFORM_URI,
-                "org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform"
-        );
-        put("TransformService." + AttachmentContentSignatureTransform.TRANSFORM_URI + " MechanismType", "DOM");
+    private CallbackHandler attachmentCallbackHandler;
+    private Attachment attachment;
+
+    public AttachmentTransformParameterSpec(
+            CallbackHandler attachmentCallbackHandler,
+            Attachment attachment) {
+        this.attachmentCallbackHandler = attachmentCallbackHandler;
+        this.attachment = attachment;
+    }
+
+    public CallbackHandler getAttachmentCallbackHandler() {
+        return attachmentCallbackHandler;
+    }
+
+    public Attachment getAttachment() {
+        return attachment;
     }
 }

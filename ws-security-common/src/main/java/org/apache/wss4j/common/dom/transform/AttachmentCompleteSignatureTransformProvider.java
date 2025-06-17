@@ -16,27 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import java.security.Provider;
 
-/**
- * A provider for the STR Transform.
- */
-public class STRTransformProvider extends Provider {
+public class AttachmentCompleteSignatureTransformProvider extends Provider {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -9148982936620100249L;
 
-    public STRTransformProvider() {
-       super("STRTransform", "2.5", "Security Token Reference Transform Provider");
-       put(
-           "TransformService." + STRTransform.TRANSFORM_URI,
-           "org.apache.wss4j.dom.transform.STRTransform"
-       );
-       put("TransformService." + STRTransform.TRANSFORM_URI + " MechanismType", "DOM");
-   }
+    public AttachmentCompleteSignatureTransformProvider() {
+        super("AttachmentCompleteSignatureTransform", "2.5", "Attachment Complete Signature Transform Provider");
+        put(
+                "TransformService." + AttachmentCompleteSignatureTransform.TRANSFORM_URI,
+                "org.apache.wss4j.common.dom.transform.AttachmentCompleteSignatureTransform"
+        );
+        put("TransformService." + AttachmentCompleteSignatureTransform.TRANSFORM_URI + " MechanismType", "DOM");
+    }
 }

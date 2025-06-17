@@ -52,7 +52,7 @@ import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.transform.STRTransform;
+import org.apache.wss4j.common.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

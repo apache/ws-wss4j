@@ -38,9 +38,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.transform.AttachmentCiphertextTransform;
-import org.apache.wss4j.dom.transform.AttachmentCompleteSignatureTransformProvider;
-import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransformProvider;
+import org.apache.wss4j.common.dom.transform.AttachmentCiphertextTransform;
+import org.apache.wss4j.common.dom.transform.AttachmentCompleteSignatureTransformProvider;
+import org.apache.wss4j.common.dom.transform.AttachmentContentSignatureTransformProvider;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.transforms.Transform;
@@ -321,7 +321,7 @@ public final class WSSConfig {
                         Security.removeProvider("STRTransform");
                         WSProviderConfig.appendJceProvider(
                             "STRTransform",
-                            new org.apache.wss4j.dom.transform.STRTransformProvider()
+                            new org.apache.wss4j.common.dom.transform.STRTransformProvider()
                         );
 
                         Security.removeProvider("AttachmentContentSignatureTransform");

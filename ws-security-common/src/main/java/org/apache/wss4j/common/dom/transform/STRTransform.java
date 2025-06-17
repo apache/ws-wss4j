@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,12 +37,13 @@ import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
+
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
@@ -134,12 +135,12 @@ public class STRTransform extends TransformService {
         //
         String canonAlgo = null;
         Element transformParams = XMLUtils.getDirectChildElement(
-            transformElement, "TransformationParameters", WSConstants.WSSE_NS
+            transformElement, "TransformationParameters", WSS4JConstants.WSSE_NS
         );
         if (transformParams != null) {
             Element canonElem =
                 XMLUtils.getDirectChildElement(
-                    transformParams, "CanonicalizationMethod", WSConstants.SIG_NS
+                    transformParams, "CanonicalizationMethod", WSS4JConstants.SIG_NS
                 );
             canonAlgo = canonElem.getAttributeNS(null, "Algorithm");
         }
@@ -202,10 +203,10 @@ public class STRTransform extends TransformService {
                     // Add the WSSE/WSU namespaces to the element for C14n
                     //
                     XMLUtils.setNamespace(
-                        dereferencedToken, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX
+                        dereferencedToken, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX
                     );
                     XMLUtils.setNamespace(
-                        dereferencedToken, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
+                        dereferencedToken, WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX
                     );
                 }
             }

@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.dom.transform;
+package org.apache.wss4j.common.dom.transform;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.apache.xml.security.signature.XMLSignatureInput;
@@ -39,7 +39,7 @@ public class AttachmentCiphertextTransform extends TransformSpi {
 
     @Override
     protected String engineGetURI() {
-        return WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS;
+        return WSS4JConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS;
     }
 
     @Override
