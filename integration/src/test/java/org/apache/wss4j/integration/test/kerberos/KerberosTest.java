@@ -60,7 +60,6 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.KerberosTokenValidator;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -185,7 +184,7 @@ public class KerberosTest {
             }
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -327,7 +326,7 @@ public class KerberosTest {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
@@ -416,7 +415,7 @@ public class KerberosTest {
 
         Document signedDoc = sign.build(null);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -478,7 +477,7 @@ public class KerberosTest {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
@@ -559,7 +558,7 @@ public class KerberosTest {
 
         Document encryptedDoc = builder.build(null, secretKey);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -633,7 +632,7 @@ public class KerberosTest {
 
         Document encryptedDoc = builder.build(null, secretKey);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -785,7 +784,7 @@ public class KerberosTest {
             sign.setSecretKey(secretKey.getEncoded());
 
             sign.build(null);
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+            XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -882,7 +881,7 @@ public class KerberosTest {
 
             sign.build(null);
 
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+            XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1128,7 +1127,7 @@ public class KerberosTest {
             builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             builder.setEncKeyId(bst.getID());
             builder.build(null, secretKey);
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+            XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1222,7 +1221,7 @@ public class KerberosTest {
 
             builder.build(null, secretKey);
 
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
+            XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
