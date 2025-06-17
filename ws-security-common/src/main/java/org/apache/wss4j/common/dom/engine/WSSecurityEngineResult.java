@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.engine;
+package org.apache.wss4j.common.dom.engine;
 
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.token.BinarySecurity;

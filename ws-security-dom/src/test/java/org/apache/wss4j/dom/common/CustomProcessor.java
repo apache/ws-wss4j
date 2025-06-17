@@ -23,7 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 
 /**
  * a custom processor that inserts itself into the results list

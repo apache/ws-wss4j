@@ -31,7 +31,7 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.SignatureEncryptionActionToken;

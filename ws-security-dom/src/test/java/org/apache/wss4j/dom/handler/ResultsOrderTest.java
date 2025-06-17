@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.handler;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 
 import org.junit.jupiter.api.Test;
 

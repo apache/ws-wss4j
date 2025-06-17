@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.handler;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 
 public class WSHandlerResult {
     private final String actor;

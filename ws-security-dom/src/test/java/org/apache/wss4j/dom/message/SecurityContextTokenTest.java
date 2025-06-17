@@ -26,7 +26,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
