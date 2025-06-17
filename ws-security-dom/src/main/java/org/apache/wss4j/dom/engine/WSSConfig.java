@@ -30,9 +30,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
+import org.apache.wss4j.common.dom.WsuIdAllocator;
 import org.apache.wss4j.common.dom.resolvers.ResolverAttachment;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;

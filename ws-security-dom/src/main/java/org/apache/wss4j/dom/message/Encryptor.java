@@ -46,7 +46,7 @@ import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.dom.WsuIdAllocator;
+import org.apache.wss4j.common.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.AbstractSerializer;
