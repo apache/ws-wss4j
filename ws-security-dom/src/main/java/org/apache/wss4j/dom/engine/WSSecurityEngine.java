@@ -34,7 +34,7 @@ import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.Processor;

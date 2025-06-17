@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.common.dom;
 
 /**
  * WSDocInfo holds information about the document to process. It provides a
@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
@@ -108,9 +109,9 @@ public class WSDocInfo {
             return;
         }
 
-        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-            String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
-            TokenValue tokenValue = new TokenValue("Id", WSConstants.WSU_NS, element);
+        if (element.hasAttributeNS(WSS4JConstants.WSU_NS, "Id")) {
+            String id = element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
+            TokenValue tokenValue = new TokenValue("Id", WSS4JConstants.WSU_NS, element);
             TokenValue previousValue = tokens.put(id, tokenValue);
             if (checkMultipleElements && previousValue != null) {
                 throw new WSSecurityException(
@@ -132,7 +133,7 @@ public class WSDocInfo {
 
         // SAML Assertions
         if ("Assertion".equals(element.getLocalName())) {
-            if (WSConstants.SAML_NS.equals(element.getNamespaceURI())
+            if (WSS4JConstants.SAML_NS.equals(element.getNamespaceURI())
                 && element.hasAttributeNS(null, "AssertionID")) {
                 String id = element.getAttributeNS(null, "AssertionID");
                 TokenValue tokenValue = new TokenValue("AssertionID", null, element);
@@ -142,7 +143,7 @@ public class WSDocInfo {
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
                     );
                 }
-            } else if (WSConstants.SAML2_NS.equals(element.getNamespaceURI())
+            } else if (WSS4JConstants.SAML2_NS.equals(element.getNamespaceURI())
                 && element.hasAttributeNS(null, "ID")) {
                 String id = element.getAttributeNS(null, "ID");
                 TokenValue tokenValue = new TokenValue("ID", null, element);
