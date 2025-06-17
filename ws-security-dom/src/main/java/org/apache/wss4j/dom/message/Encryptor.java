@@ -35,6 +35,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
@@ -44,8 +46,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WsuIdAllocator;
-import org.apache.wss4j.dom.callback.CallbackLookup;
-import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.AbstractSerializer;

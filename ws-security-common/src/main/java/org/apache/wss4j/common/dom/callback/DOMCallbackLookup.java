@@ -17,17 +17,16 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.callback;
+package org.apache.wss4j.common.dom.callback;
 
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -84,10 +83,10 @@ public class DOMCallbackLookup implements CallbackLookup {
         //
         Element bodyElement = getSOAPBody();
         if (bodyElement != null) {
-            String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            String cId = bodyElement.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
             if (cId.equals(idToMatch)) {
                 if (context != null) {
-                    context.setIdAttributeNS(bodyElement, WSConstants.WSU_NS, "Id");
+                    context.setIdAttributeNS(bodyElement, WSS4JConstants.WSU_NS, "Id");
                 }
                 return bodyElement;
             }
@@ -97,9 +96,9 @@ public class DOMCallbackLookup implements CallbackLookup {
             XMLUtils.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             if (context != null) {
-                if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
-                    && idToMatch.equals(foundElement.getAttributeNS(WSConstants.WSU_NS, "Id"))) {
-                    context.setIdAttributeNS(foundElement, WSConstants.WSU_NS, "Id");
+                if (foundElement.hasAttributeNS(WSS4JConstants.WSU_NS, "Id")
+                    && idToMatch.equals(foundElement.getAttributeNS(WSS4JConstants.WSU_NS, "Id"))) {
+                    context.setIdAttributeNS(foundElement, WSS4JConstants.WSU_NS, "Id");
                 }
                 if (foundElement.hasAttributeNS(null, "Id")
                     && idToMatch.equals(foundElement.getAttributeNS(null, "Id"))) {
@@ -113,8 +112,8 @@ public class DOMCallbackLookup implements CallbackLookup {
         // Try to find a SAML Assertion Element if the ValueType corresponds to a SAML Assertion
         // (or is empty)
         //
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
-            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
+        if (WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
+            || WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
             || valueType == null || valueType.length() == 0) {
             foundElement =
                 XMLUtils.findSAMLAssertionElementById(
@@ -152,7 +151,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         // Try the SOAP Body first
         //
         Element bodyElement = getSOAPBody();
-        if (WSConstants.ELEM_BODY.equals(localname) && bodyElement.getNamespaceURI().equals(namespace)) {
+        if (WSS4JConstants.ELEM_BODY.equals(localname) && bodyElement.getNamespaceURI().equals(namespace)) {
             return Collections.singletonList(bodyElement);
         }
         return XMLUtils.findElements(doc.getDocumentElement(), localname, namespace);
@@ -163,6 +162,6 @@ public class DOMCallbackLookup implements CallbackLookup {
      * Get the SOAP Body
      */
     public Element getSOAPBody() {
-        return WSSecurityUtil.findBodyElement(doc);
+        return XMLUtils.findBodyElement(doc);
     }
 }

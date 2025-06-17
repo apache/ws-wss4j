@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.callback;
+package org.apache.wss4j.common.dom.callback;
 
 import java.util.List;
 

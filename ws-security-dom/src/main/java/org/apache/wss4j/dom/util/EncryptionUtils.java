@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.util;
 
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
@@ -28,7 +29,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.encryption.XMLCipher;

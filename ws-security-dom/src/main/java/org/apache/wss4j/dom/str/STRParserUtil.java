@@ -26,6 +26,8 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -36,8 +38,6 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.callback.CallbackLookup;
-import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;

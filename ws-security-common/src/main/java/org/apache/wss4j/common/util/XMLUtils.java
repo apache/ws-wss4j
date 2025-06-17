@@ -830,4 +830,17 @@ public final class XMLUtils {
         }
         return clonedElement;
     }
+
+    /**
+     * return the first soap "Body" element. <p/>
+     *
+     * @param doc
+     * @return the body element or <code>null</code> if document does not
+     *         contain a SOAP body
+     */
+    public static Element findBodyElement(Document doc) {
+        Element docElement = doc.getDocumentElement();
+        String ns = docElement.getNamespaceURI();
+        return XMLUtils.getDirectChildElement(docElement, WSS4JConstants.ELEM_BODY, ns);
+    }
 }

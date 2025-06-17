@@ -36,6 +36,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -43,7 +44,6 @@ import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.SignatureUtils;

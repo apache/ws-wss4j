@@ -40,10 +40,10 @@ import java.util.Map;
 import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.callback.CallbackLookup;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
