@@ -35,6 +35,6 @@ public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent<SamlSecurit
     }
 
     public SamlAssertionWrapper getSamlAssertionWrapper() throws WSSecurityException {
-        return ((SAMLTokenPrincipal)getSecurityToken().getPrincipal()).getToken();
+        return (SamlAssertionWrapper)((SAMLTokenPrincipal)getSecurityToken().getPrincipal()).getToken();
     }
 }

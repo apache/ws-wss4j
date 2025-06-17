@@ -252,10 +252,6 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     return samlAssertionWrapper.getSubjectName();
                 }
 
-                @Override
-                public String getId() {
-                    return samlAssertionWrapper.getId();
-                }
             };
         }
         return this.principal;
