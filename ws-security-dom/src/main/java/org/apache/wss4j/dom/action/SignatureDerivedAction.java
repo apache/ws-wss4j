@@ -58,8 +58,9 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             signatureToken = reqData.getSignatureToken();
         }
 
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(signatureToken.getUser(), WSConstants.DKT_SIGN, callbackHandler, reqData);
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.DKT_SIGN);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+      
         WSSecDKSign wsSign = new WSSecDKSign(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
@@ -75,7 +76,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         if (signatureToken.getC14nAlgorithm() != null) {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
-        wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
+        wsSign.setUserInfo(signatureToken.getUser(), pwCb.getPassword());
 
         if (reqData.isUse200512Namespace()) {
             wsSign.setWscVersion(ConversationConstants.VERSION_05_12);
@@ -102,7 +103,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
 
             tokenElement = setupEncryptedKeyTokenReference(reqData, signatureToken, wsSign, symmetricKey);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
-            tokenElement = setupSCTTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
+            tokenElement = setupSCTTokenReference(reqData, signatureToken, wsSign, pwCb, doc);
         } else {
             // DirectReference
             if (signatureToken.getDerivedKeyIdentifier() != 0) {
@@ -125,7 +126,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            byte[] key = getKey(signatureToken, reqData.getEncryptionToken(), passwordCallback, symmetricKey);
+            byte[] key = getKey(signatureToken, reqData.getEncryptionToken(), pwCb, symmetricKey);
             wsSign.prepare(key);
 
             List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(wsSign.getParts());

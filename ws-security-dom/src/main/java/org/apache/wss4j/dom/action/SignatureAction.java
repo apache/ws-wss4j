@@ -52,8 +52,9 @@ public class SignatureAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
 
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.SIGN);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+
         WSSecSignature wsSign = new WSSecSignature(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
@@ -76,11 +77,11 @@ public class SignatureAction implements Action {
 
         wsSign.setIncludeSignatureToken(signatureToken.isIncludeToken());
 
-        wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
+        wsSign.setUserInfo(signatureToken.getUser(), pwCb.getPassword());
         wsSign.setUseSingleCertificate(signatureToken.isUseSingleCert());
 
-        if (passwordCallback.getKey() != null) {
-            wsSign.setSecretKey(passwordCallback.getKey());
+        if (pwCb.getKey() != null) {
+            wsSign.setSecretKey(pwCb.getKey());
         } else if (signatureToken.getKey() != null) {
             wsSign.setSecretKey(signatureToken.getKey());
         } else if (signatureToken.getUser() == null) {

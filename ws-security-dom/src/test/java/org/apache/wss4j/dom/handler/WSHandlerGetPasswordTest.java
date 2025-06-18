@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.action.ActionUtils;
 import org.apache.wss4j.dom.common.CustomHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
@@ -64,11 +65,13 @@ public class WSHandlerGetPasswordTest {
         WSHandler handler = new CustomHandler();
         CallbackHandler callbackHandler =
             handler.getCallbackHandler("SomeCallbackTag", "SomeCallbackRef", reqData);
-        WSPasswordCallback callback =
-            handler.getPasswordCB("alice", WSConstants.UT, callbackHandler, reqData);
-        assertTrue("alice".equals(callback.getIdentifier()));
-        assertTrue("securityPassword".equals(callback.getPassword()));
-        assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
+
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback("alice", WSConstants.UT);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+
+        assertTrue("alice".equals(pwCb.getIdentifier()));
+        assertTrue("securityPassword".equals(pwCb.getPassword()));
+        assertTrue(WSPasswordCallback.USERNAME_TOKEN == pwCb.getUsage());
     }
 
     /**

@@ -97,9 +97,10 @@ public class SAMLTokenSignedAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
 
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(signatureToken.getUser(), WSConstants.ST_SIGNED, callbackHandler, reqData);
-        wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.ST_SIGNED);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+
+        wsSign.setUserInfo(signatureToken.getUser(), pwCb.getPassword());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());

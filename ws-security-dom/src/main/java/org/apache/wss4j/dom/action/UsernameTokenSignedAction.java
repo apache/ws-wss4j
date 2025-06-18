@@ -51,8 +51,8 @@ public class UsernameTokenSignedAction implements Action {
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
  
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(reqData.getUsername(), WSConstants.UT_SIGN);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
 
         if (reqData.getUsername() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
@@ -68,7 +68,7 @@ public class UsernameTokenSignedAction implements Action {
         int iterations = reqData.getDerivedKeyIterations();
         builder.addDerivedKey(iterations);
 
-        builder.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
+        builder.setUserInfo(reqData.getUsername(), pwCb.getPassword());
         builder.addCreated();
         builder.addNonce();
         boolean useMac = reqData.isUseDerivedKeyForMAC();

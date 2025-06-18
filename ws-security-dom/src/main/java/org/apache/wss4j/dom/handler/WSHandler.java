@@ -1144,23 +1144,30 @@ public abstract class WSHandler {
     }
 
     /**
-     * Get a password callback (WSPasswordCallback object) from a CallbackHandler instance
-     * @param username The username to supply to the CallbackHandler
-     * @param doAction The action to perform
-     * @param callbackHandler The CallbackHandler instance
+     * Configure a password callback (WSPasswordCallback object) from a CallbackHandler instance
+     * @param callbackHandler The CallbackHandler to use
+     * @param pwCb The WSPasswordCallback to supply to the CallbackHandler
      * @param requestData The RequestData which supplies the message context
-     * @return the WSPasswordCallback object containing the password
      * @throws WSSecurityException
      */
-    public WSPasswordCallback getPasswordCB(
-         String username,
-         int doAction,
+    public void performPasswordCallback(
          CallbackHandler callbackHandler,
+         WSPasswordCallback pwCb,
          RequestData requestData
     ) throws WSSecurityException {
 
         if (callbackHandler != null) {
-            return performPasswordCallback(callbackHandler, username, doAction);
+            Callback[] callbacks = new Callback[1];
+            callbacks[0] = pwCb;
+            //
+            // Call back the application to get the password
+            //
+            try {
+                callbackHandler.handle(callbacks);
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                        "empty", new Object[] {"WSHandler: password callback failed"});
+            }
         } else {
             //
             // If a callback isn't configured then try to get the password
@@ -1173,77 +1180,8 @@ public abstract class WSHandler {
                         "empty",
                         new Object[] {"WSHandler: application " + err});
             }
-            WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
             pwCb.setPassword(password);
-            return pwCb;
         }
-    }
-
-    /**
-     * Perform a callback on a CallbackHandler instance
-     * @param cbHandler the CallbackHandler instance
-     * @param username The username to supply to the CallbackHandler
-     * @param doAction The action to perform
-     * @return a WSPasswordCallback instance
-     * @throws WSSecurityException
-     */
-    private WSPasswordCallback performPasswordCallback(
-        CallbackHandler cbHandler,
-        String username,
-        int doAction
-    ) throws WSSecurityException {
-
-        WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
-        Callback[] callbacks = new Callback[1];
-        callbacks[0] = pwCb;
-        //
-        // Call back the application to get the password
-        //
-        try {
-            cbHandler.handle(callbacks);
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "empty", new Object[] {"WSHandler: password callback failed"});
-        }
-        return pwCb;
-    }
-
-    /**
-     * Construct a WSPasswordCallback instance
-     * @param username The username
-     * @param doAction The action to perform
-     * @return a WSPasswordCallback instance
-     * @throws WSSecurityException
-     */
-    private WSPasswordCallback constructPasswordCallback(
-        String username,
-        int doAction
-    ) throws WSSecurityException {
-
-        int reason;
-
-        switch (doAction) {
-        case WSConstants.UT:
-        case WSConstants.UT_SIGN:
-            reason = WSPasswordCallback.USERNAME_TOKEN;
-            break;
-        case WSConstants.SIGN:
-            reason = WSPasswordCallback.SIGNATURE;
-            break;
-        case WSConstants.DKT_SIGN:
-            reason = WSPasswordCallback.SECRET_KEY;
-            break;
-        case WSConstants.ENCR:
-            reason = WSPasswordCallback.SECRET_KEY;
-            break;
-        case WSConstants.DKT_ENCR:
-            reason = WSPasswordCallback.SECRET_KEY;
-            break;
-        default:
-            reason = WSPasswordCallback.UNKNOWN;
-            break;
-        }
-        return new WSPasswordCallback(username, reason);
     }
 
     private void splitEncParts(boolean required, String tmpS,

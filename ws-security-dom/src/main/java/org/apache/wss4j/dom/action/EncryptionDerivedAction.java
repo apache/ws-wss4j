@@ -57,8 +57,9 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             encryptionToken = reqData.getEncryptionToken();
         }
 
-        WSPasswordCallback passwordCallback =
-            handler.getPasswordCB(encryptionToken.getUser(), WSConstants.DKT_ENCR, callbackHandler, reqData);
+        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(encryptionToken.getUser(), WSConstants.DKT_ENCR);
+        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+
         WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsEncrypt.setWsDocInfo(reqData.getWsDocInfo());
@@ -71,7 +72,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         if (encryptionToken.getSymmetricAlgorithm() != null) {
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
-        wsEncrypt.setUserInfo(encryptionToken.getUser(), passwordCallback.getPassword());
+        wsEncrypt.setUserInfo(encryptionToken.getUser(), pwCb.getPassword());
 
         if (reqData.isUse200512Namespace()) {
             wsEncrypt.setWscVersion(ConversationConstants.VERSION_05_12);
@@ -100,7 +101,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
 
             tokenElement = setupEncryptedKeyTokenReference(reqData, encryptionToken, wsEncrypt, symmetricKey);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
-            tokenElement = setupSCTTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
+            tokenElement = setupSCTTokenReference(reqData, encryptionToken, wsEncrypt, pwCb, doc);
         }
 
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
@@ -114,7 +115,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
                 wsEncrypt.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            byte[] key = getKey(reqData.getSignatureToken(), passwordCallback, symmetricKey);
+            byte[] key = getKey(reqData.getSignatureToken(), pwCb, symmetricKey);
             wsEncrypt.prepare(key);
 
             Element externRefList = wsEncrypt.encrypt();
