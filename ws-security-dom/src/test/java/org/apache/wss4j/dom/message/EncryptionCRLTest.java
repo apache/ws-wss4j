@@ -135,12 +135,12 @@ public class EncryptionCRLTest {
         reqData.setEncryptionToken(actionToken);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
+        messageContext.put(WSHandlerConstants.ENABLE_REVOCATION, "true");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        handler.setOption(WSHandlerConstants.ENABLE_REVOCATION, "true");
         try {
             handler.send(
                 doc,

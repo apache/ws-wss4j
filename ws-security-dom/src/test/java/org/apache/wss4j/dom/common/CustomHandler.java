@@ -27,27 +27,13 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
  * A trivial extension of the WSHandler type for use in unit-testing.
  */
 public class CustomHandler extends WSHandler {
-
-    private Map<String, Object> optionsMap = new HashMap<>();
-
-    public Object
-    getOption(String key) {
-        return optionsMap.get(key);
-    }
-
-    public void
-    setOption(String key, Object option) {
-        optionsMap.put(key, option);
-    }
 
     public void send(
         Document doc,

@@ -390,7 +390,7 @@ public abstract class AbstractTestBase {
             * For every action we need a username, so get this now. The username
             * defined in the deployment descriptor takes precedence.
             */
-            reqData.setUsername((String) getOption(WSHandlerConstants.USER));
+            reqData.setUsername((String) mc.get(WSHandlerConstants.USER));
             if (reqData.getUsername() == null || reqData.getUsername().isEmpty()) {
                 reqData.setUsername((String) mc.get(WSHandlerConstants.USER));
             }
@@ -584,11 +584,6 @@ public abstract class AbstractTestBase {
         }
              */
             return true;
-        }
-
-        @Override
-        public Object getOption(String key) {
-            return null;
         }
 
     }

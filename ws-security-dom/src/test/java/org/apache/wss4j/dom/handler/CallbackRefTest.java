@@ -87,41 +87,4 @@ public class CallbackRefTest {
         assertTrue(outputString.contains("securityPassword"));
     }
 
-    /**
-     * A test for WSHandler.getPassword(...) where the password is obtained from a
-     * Callback Handler, which is obtained from the handler options using a ref.
-     */
-    @Test
-    public void
-    testHandlerOptionRef() throws Exception {
-
-        final WSSConfig cfg = WSSConfig.getNewInstance();
-        final RequestData reqData = new RequestData();
-        reqData.setWssConfig(cfg);
-        reqData.setUsername("alice");
-        reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        reqData.setMsgContext(new java.util.TreeMap<String, Object>());
-
-        final java.util.List<Integer> actions = new java.util.ArrayList<>();
-        actions.add(WSConstants.UT);
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        CustomHandler handler = new CustomHandler();
-        handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        HandlerAction action = new HandlerAction(WSConstants.UT);
-        handler.send(
-            doc,
-            reqData,
-            Collections.singletonList(action),
-            true
-        );
-
-        String outputString =
-            XMLUtils.prettyDocumentToString(doc);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(outputString);
-        }
-        assertTrue(outputString.contains("alice"));
-        assertTrue(outputString.contains("securityPassword"));
-    }
-
 }

@@ -1048,10 +1048,8 @@ public abstract class WSHandler {
         RequestData requestData
     ) throws WSSecurityException {
         Map<String, Object> mc = requestData.getMsgContext();
-        CallbackHandler cbHandler = (CallbackHandler) getOption(callbackHandlerRef);
-        if (cbHandler == null) {
-            cbHandler = (CallbackHandler) mc.get(callbackHandlerRef);
-        }
+        CallbackHandler cbHandler = (CallbackHandler) mc.get(callbackHandlerRef);
+        
         if (cbHandler == null) {
             String callback = getString(callbackHandlerClass, mc);
             if (callback != null) {
@@ -1116,12 +1114,6 @@ public abstract class WSHandler {
 
     protected PasswordEncryptor getPasswordEncryptor(RequestData requestData) {
         PasswordEncryptor passwordEncryptor = requestData.getPasswordEncryptor();
-        if (passwordEncryptor == null) {
-            Object o = getOption(WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
-            if (o instanceof PasswordEncryptor) {
-                passwordEncryptor = (PasswordEncryptor) o;
-            }
-        }
         if (passwordEncryptor == null) {
             Map<String, Object> mc = requestData.getMsgContext();
             Object o = mc.get(WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
@@ -1331,35 +1323,14 @@ public abstract class WSHandler {
      * @return the value found.
      * @throws IllegalArgumentException if <code>key</code> is null.
      */
-    public String getString(String key, Map<String, Object> mc) {
+    private String getString(String key, Map<String, Object> mc) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null");
-        }
-        String s = getStringOption(key);
-        if (s != null) {
-            return s;
         }
         if (mc == null) {
             throw new IllegalArgumentException("Message context cannot be null");
         }
         return (String) mc.get(key);
-    }
-
-
-    /**
-     * Returns the option on <code>name</code>.
-     *
-     * @param key the non-null key of the option.
-     * @return the option on <code>key</code> if <code>key</code>
-     *  exists and is of type java.lang.String; otherwise null.
-     */
-    public String getStringOption(String key) {
-        Object o = getOption(key);
-        if (o instanceof String) {
-            return (String) o;
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -1373,7 +1344,5 @@ public abstract class WSHandler {
             return null;
         }
     }
-
-    public abstract Object getOption(String key);
 
 }
