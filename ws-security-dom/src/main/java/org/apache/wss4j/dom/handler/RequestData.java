@@ -23,6 +23,7 @@ import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ import org.apache.xml.security.encryption.Serializer;
  */
 public class RequestData {
 
-    private Object msgContext;
+    private Map<String, Object> msgContext = Collections.emptyMap();
     private SOAPConstants soapConstants;
     private String actor;
     private String username;
@@ -197,11 +198,11 @@ public class RequestData {
 
     private boolean expandXopInclude;
 
-    public Object getMsgContext() {
+    public Map<String, Object> getMsgContext() {
         return msgContext;
     }
 
-    public void setMsgContext(Object msgContext) {
+    public void setMsgContext(Map<String, Object> msgContext) {
         this.msgContext = msgContext;
     }
 

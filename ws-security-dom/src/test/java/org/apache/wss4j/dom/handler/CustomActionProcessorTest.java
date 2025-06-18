@@ -41,6 +41,7 @@ import org.w3c.dom.Document;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -166,15 +167,15 @@ public class CustomActionProcessorTest {
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        reqData.setMsgContext("bread");
-        assertEquals(reqData.getMsgContext(), "bread");
+        reqData.setMsgContext(Map.of("bread", "bread"));
+        assertEquals(reqData.getMsgContext().get("bread"), "bread");
         handler.send(
             doc,
             reqData,
             Collections.singletonList(new HandlerAction(action)),
             true
         );
-        assertEquals(reqData.getMsgContext(), "crumb");
+        assertEquals(reqData.getMsgContext().get("bread"), "crumb");
     }
 
     /**
@@ -193,15 +194,15 @@ public class CustomActionProcessorTest {
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        reqData.setMsgContext("bread");
-        assertEquals(reqData.getMsgContext(), "bread");
+        reqData.setMsgContext(Map.of("bread", "bread"));
+        assertEquals(reqData.getMsgContext().get("bread"), "bread");
         handler.send(
             doc,
             reqData,
             Collections.singletonList(new HandlerAction(action)),
             true
         );
-        assertEquals(reqData.getMsgContext(), "crumb");
+        assertEquals(reqData.getMsgContext().get("bread"), "crumb");
     }
 
     /**
@@ -250,15 +251,15 @@ public class CustomActionProcessorTest {
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        reqData.setMsgContext("bread");
-        assertEquals(reqData.getMsgContext(), "bread");
+        reqData.setMsgContext(Map.of("bread", "bread"));
+        assertEquals(reqData.getMsgContext().get("bread"), "bread");
         handler.send(
             doc,
             reqData,
             actionList,
             true
         );
-        assertEquals(reqData.getMsgContext(), "crumb");
+        assertEquals(reqData.getMsgContext().get("bread"), "crumb");
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message:");

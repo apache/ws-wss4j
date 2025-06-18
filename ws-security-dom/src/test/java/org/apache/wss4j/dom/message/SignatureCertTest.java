@@ -242,7 +242,7 @@ public class SignatureCertTest {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        java.util.Map<String, String> config = new java.util.TreeMap<>();
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_CLASS, KeystoreCallbackHandler.class.getName());
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");

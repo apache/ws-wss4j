@@ -86,7 +86,7 @@ public abstract class WSHandler {
             reqData.setWsDocInfo(wsDocInfo);
         }
 
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
         reqData.setEncodePasswords(
             decodeBooleanConfigValue(mc, WSHandlerConstants.USE_ENCODED_PASSWORDS, false)
         );
@@ -196,7 +196,7 @@ public abstract class WSHandler {
          */
         if (reqData.isEnableSignatureConfirmation() && !isRequest) {
             String done =
-                (String)getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
+                (String)reqData.getMsgContext().get(WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
                 wssConfig.getAction(WSConstants.SC).execute(this, null, reqData);
             }
@@ -251,12 +251,10 @@ public abstract class WSHandler {
             && isRequest && !reqData.getSignatureValues().isEmpty()) {
             @SuppressWarnings("unchecked")
             Set<Integer> savedSignatures =
-                (Set<Integer>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+                (Set<Integer>)reqData.getMsgContext().get(WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
                 savedSignatures = new HashSet<>();
-                setProperty(
-                    reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
-                );
+                reqData.getMsgContext().put(WSHandlerConstants.SEND_SIGV, savedSignatures);
             }
             for (byte[] signatureValue : reqData.getSignatureValues()) {
                 savedSignatures.add(Arrays.hashCode(signatureValue));
@@ -303,7 +301,7 @@ public abstract class WSHandler {
             reqData.setWssConfig(wssConfig);
         }
 
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
         boolean enableSigConf =
             decodeBooleanConfigValue(mc, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, false);
         reqData.setEnableSignatureConfirmation(
@@ -427,7 +425,7 @@ public abstract class WSHandler {
         // First get all Signature values stored during sending the request
         //
         Set<Integer> savedSignatures =
-            (Set<Integer>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            (Set<Integer>) reqData.getMsgContext().get(WSHandlerConstants.SEND_SIGV);
         //
         // Now get all results that hold a SignatureConfirmation element from
         // the current run of receiver (we can have more than one run: if we
@@ -489,7 +487,7 @@ public abstract class WSHandler {
 
     protected void decodeUTParameter(RequestData reqData)
         throws WSSecurityException {
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
 
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, mc);
         if (type != null) {
@@ -534,7 +532,7 @@ public abstract class WSHandler {
     // the RequestData object
     protected void decodeSignatureParameter(RequestData reqData)
         throws WSSecurityException {
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
         String signatureUser = getString(WSHandlerConstants.SIGNATURE_USER, mc);
 
         SignatureActionToken actionToken = reqData.getSignatureToken();
@@ -635,7 +633,7 @@ public abstract class WSHandler {
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
         if (mc == null || reqData.getAlgorithmSuite() != null) {
             return;
         }
@@ -677,7 +675,7 @@ public abstract class WSHandler {
     // the RequestData object
     protected void decodeEncryptionParameter(RequestData reqData)
         throws WSSecurityException {
-        Object mc = reqData.getMsgContext();
+        Map<String, Object> mc = reqData.getMsgContext();
 
         EncryptionActionToken actionToken = reqData.getEncryptionToken();
         if (actionToken == null) {
@@ -727,7 +725,7 @@ public abstract class WSHandler {
                 getString(WSHandlerConstants.ENC_KEY_DERIVATION_FUNCTION, mc);
         actionToken.setKeyDerivationFunction(encKeyDerivationAlgorithm);
 
-        Object obj = getProperty(mc, WSHandlerConstants.ENC_KEY_DERIVATION_PARAMS);
+        Object obj = mc.get(WSHandlerConstants.ENC_KEY_DERIVATION_PARAMS);
         if (obj instanceof KeyDerivationParameters) {
             actionToken.setKeyDerivationParameters((KeyDerivationParameters)obj);
         }
@@ -864,7 +862,7 @@ public abstract class WSHandler {
     }
 
     protected boolean decodeBooleanConfigValue(
-        Object messageContext, String configTag, boolean defaultToTrue
+        Map<String, Object> messageContext, String configTag, boolean defaultToTrue
     ) throws WSSecurityException {
 
         String value = getString(configTag, messageContext);
@@ -963,7 +961,7 @@ public abstract class WSHandler {
         String cryptoPropertyRefId,
         RequestData requestData
     ) throws WSSecurityException {
-        Object mc = requestData.getMsgContext();
+        Map<String, Object> mc = requestData.getMsgContext();
         Crypto crypto = null;
 
         //
@@ -973,7 +971,7 @@ public abstract class WSHandler {
         if (refId != null) {
             crypto = cryptos.get(refId);
             if (crypto == null) {
-                Object obj = getProperty(mc, refId);
+                Object obj = mc.get(refId);
                 if (obj instanceof Properties) {
                     crypto = CryptoFactory.getInstance((Properties)obj,
                                                        Loader.getClassLoader(CryptoFactory.class),
@@ -1049,10 +1047,10 @@ public abstract class WSHandler {
         String callbackHandlerRef,
         RequestData requestData
     ) throws WSSecurityException {
-        Object mc = requestData.getMsgContext();
+        Map<String, Object> mc = requestData.getMsgContext();
         CallbackHandler cbHandler = (CallbackHandler) getOption(callbackHandlerRef);
         if (cbHandler == null) {
-            cbHandler = (CallbackHandler) getProperty(mc, callbackHandlerRef);
+            cbHandler = (CallbackHandler) mc.get(callbackHandlerRef);
         }
         if (cbHandler == null) {
             String callback = getString(callbackHandlerClass, mc);
@@ -1125,8 +1123,8 @@ public abstract class WSHandler {
             }
         }
         if (passwordEncryptor == null) {
-            Object mc = requestData.getMsgContext();
-            Object o = getProperty(mc, WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+            Map<String, Object> mc = requestData.getMsgContext();
+            Object o = mc.get(WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
             if (o instanceof PasswordEncryptor) {
                 passwordEncryptor = (PasswordEncryptor) o;
             }
@@ -1201,9 +1199,7 @@ public abstract class WSHandler {
             return;
         }
         List<WSHandlerResult> results =
-            (List<WSHandlerResult>) getProperty(
-                reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
-            );
+            (List<WSHandlerResult>) reqData.getMsgContext().get(WSHandlerConstants.RECV_RESULTS);
         if (results == null) {
             return;
         }
@@ -1335,7 +1331,7 @@ public abstract class WSHandler {
      * @return the value found.
      * @throws IllegalArgumentException if <code>key</code> is null.
      */
-    public String getString(String key, Object mc) {
+    public String getString(String key, Map<String, Object> mc) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null");
         }
@@ -1346,7 +1342,7 @@ public abstract class WSHandler {
         if (mc == null) {
             throw new IllegalArgumentException("Message context cannot be null");
         }
-        return (String) getProperty(mc, key);
+        return (String) mc.get(key);
     }
 
 
@@ -1379,9 +1375,5 @@ public abstract class WSHandler {
     }
 
     public abstract Object getOption(String key);
-    public abstract Object getProperty(Object msgContext, String key);
-
-    public abstract void setProperty(Object msgContext, String key,
-            Object value);
 
 }

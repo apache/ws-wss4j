@@ -20,6 +20,9 @@
 package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.dom.action.Action;
+
+import java.util.Map;
+
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -39,8 +42,8 @@ public class CustomAction implements Action {
         //
         // leave a breadcrumb, if asked...
         //
-        if (reqData.getMsgContext().equals("bread")) {
-            reqData.setMsgContext("crumb");
+        if (reqData.getMsgContext().containsKey("bread")) {
+            reqData.setMsgContext(Map.of("bread", "crumb"));
         }
     }
 }

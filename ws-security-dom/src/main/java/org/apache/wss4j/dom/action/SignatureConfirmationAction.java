@@ -43,9 +43,7 @@ public class SignatureConfirmationAction implements Action {
         LOG.debug("Perform Signature confirmation");
 
         List<WSHandlerResult> results =
-            (List<WSHandlerResult>) handler.getProperty(
-                reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
-            );
+            (List<WSHandlerResult>) reqData.getMsgContext().get(WSHandlerConstants.RECV_RESULTS);
         if (results == null || results.isEmpty()) {
             return;
         }
@@ -90,9 +88,8 @@ public class SignatureConfirmationAction implements Action {
             wsc.build(null);
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
-        handler.setProperty(
-            reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE, ""
-        );
+
+        reqData.getMsgContext().put(WSHandlerConstants.SIG_CONF_DONE, "");
     }
 
 }

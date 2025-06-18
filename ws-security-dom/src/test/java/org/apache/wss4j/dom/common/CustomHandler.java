@@ -49,24 +49,6 @@ public class CustomHandler extends WSHandler {
         optionsMap.put(key, option);
     }
 
-    @SuppressWarnings("unchecked")
-    public void
-    setProperty(
-        Object ctx,
-        String key,
-        Object value
-    ) {
-        ((Map<String, Object>)ctx).put(key, value);
-    }
-
-    public Object
-    getProperty(Object ctx, String key) {
-        if (ctx instanceof Map<?,?>) {
-            return ((Map<?,?>)ctx).get(key);
-        }
-        return null;
-    }
-
     public void send(
         Document doc,
         RequestData reqData,

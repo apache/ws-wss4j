@@ -100,7 +100,7 @@ public class CallbackRefTest {
         reqData.setWssConfig(cfg);
         reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        reqData.setMsgContext(new java.util.TreeMap<String, String>());
+        reqData.setMsgContext(new java.util.TreeMap<String, Object>());
 
         final java.util.List<Integer> actions = new java.util.ArrayList<>();
         actions.add(WSConstants.UT);

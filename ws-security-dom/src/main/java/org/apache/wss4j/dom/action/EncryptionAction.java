@@ -91,7 +91,7 @@ public class EncryptionAction implements Action {
         wsEncrypt.setUserInfo(encryptionToken.getUser());
         wsEncrypt.setUseThisCert(encryptionToken.getCertificate());
         Crypto crypto = encryptionToken.getCrypto();
-        boolean enableRevocation = Boolean.parseBoolean(handler.getStringOption(WSHandlerConstants.ENABLE_REVOCATION));
+        boolean enableRevocation = Boolean.parseBoolean((String)reqData.getMsgContext().get(WSHandlerConstants.ENABLE_REVOCATION));
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(encryptionToken.getUser());
