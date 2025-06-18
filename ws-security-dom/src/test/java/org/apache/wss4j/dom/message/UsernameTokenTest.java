@@ -814,8 +814,8 @@ public class UsernameTokenTest implements CallbackHandler {
 
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
-        config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
 
@@ -1109,10 +1109,10 @@ public class UsernameTokenTest implements CallbackHandler {
 
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
-        config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, "true");
         config.put(WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, "true");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
 

@@ -67,18 +67,6 @@ public class CustomHandler extends WSHandler {
         return null;
     }
 
-    public void
-    setPassword(Object msgContext, String password) {
-    }
-
-    public String
-    getPassword(Object msgContext) {
-        if (msgContext instanceof Map<?,?>) {
-            return (String)((Map<?,?>)msgContext).get("password");
-        }
-        return null;
-    }
-
     public void send(
         Document doc,
         RequestData reqData,

@@ -584,7 +584,7 @@ public class SignatureTest {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(
             WSHandlerConstants.SIG_ALGO,
             "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
@@ -798,7 +798,7 @@ public class SignatureTest {
 
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
@@ -841,7 +841,7 @@ public class SignatureTest {
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
@@ -880,7 +880,7 @@ public class SignatureTest {
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
@@ -918,7 +918,7 @@ public class SignatureTest {
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_C14N_ALGO, WSConstants.C14N_WITH_COMMENTS);
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -970,7 +970,7 @@ public class SignatureTest {
         File propsFile = new File(basedir + "/src/test/resources/crypto.properties");
 
         config.put(WSHandlerConstants.SIG_PROP_FILE, propsFile.getPath());
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

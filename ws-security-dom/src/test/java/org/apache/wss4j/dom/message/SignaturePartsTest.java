@@ -26,6 +26,7 @@ import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
@@ -599,6 +600,7 @@ public class SignaturePartsTest {
         config.put(
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.SIG_NS + "}KeyInfo"
         );
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

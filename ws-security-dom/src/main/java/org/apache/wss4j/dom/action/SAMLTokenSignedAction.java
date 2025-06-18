@@ -98,7 +98,7 @@ public class SAMLTokenSignedAction implements Action {
         }
 
         WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.ST_SIGNED);
-        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+        ActionUtils.performPasswordCallback(callbackHandler, pwCb, reqData);
 
         wsSign.setUserInfo(signatureToken.getUser(), pwCb.getPassword());
 

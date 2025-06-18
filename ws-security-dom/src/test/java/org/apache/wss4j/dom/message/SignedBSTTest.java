@@ -33,7 +33,7 @@ import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
-
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.HandlerAction;
@@ -136,6 +136,7 @@ public class SignedBSTTest {
             WSHandlerConstants.SIGNATURE_PARTS,
             "{}{" + WSConstants.WSSE_NS + "}BinarySecurityToken"
         );
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

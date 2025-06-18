@@ -19,9 +19,13 @@
 
 package org.apache.wss4j.dom.action;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.RequestData;
 
 public final class ActionUtils {
     
@@ -65,6 +69,34 @@ public final class ActionUtils {
             break;
         }
         return new WSPasswordCallback(username, reason);
+    }
+
+    /**
+     * Configure a password callback (WSPasswordCallback object) from a CallbackHandler instance
+     * @param callbackHandler The CallbackHandler to use
+     * @param pwCb The WSPasswordCallback to supply to the CallbackHandler
+     * @param requestData The RequestData which supplies the message context
+     * @throws WSSecurityException
+     */
+    public static void performPasswordCallback(
+         CallbackHandler callbackHandler,
+         WSPasswordCallback pwCb,
+         RequestData requestData
+    ) throws WSSecurityException {
+
+        if (callbackHandler != null) {
+            Callback[] callbacks = new Callback[1];
+            callbacks[0] = pwCb;
+            //
+            // Call back the application to get the password
+            //
+            try {
+                callbackHandler.handle(callbacks);
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                        "empty", new Object[] {"WSHandler: password callback failed"});
+            }
+        }
     }
 
 }

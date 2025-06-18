@@ -601,8 +601,8 @@ public class XOPAttachmentTest {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        config.put("password", "security");
         config.put(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, "true");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -651,8 +651,8 @@ public class XOPAttachmentTest {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        config.put("password", "security");
         config.put(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, "true");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

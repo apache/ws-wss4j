@@ -34,6 +34,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -184,8 +185,8 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "security");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40");
-        wss4JHandler.setPassword(messageContext, "security");
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
 
         Enumeration<?> enumeration = properties.propertyNames();

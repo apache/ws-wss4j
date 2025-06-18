@@ -52,7 +52,7 @@ public class UsernameTokenSignedAction implements Action {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
  
         WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(reqData.getUsername(), WSConstants.UT_SIGN);
-        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+        ActionUtils.performPasswordCallback(callbackHandler, pwCb, reqData);
 
         if (reqData.getUsername() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");

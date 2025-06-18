@@ -59,7 +59,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         }
 
         WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.DKT_SIGN);
-        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+        ActionUtils.performPasswordCallback(callbackHandler, pwCb, reqData);
       
         WSSecDKSign wsSign = new WSSecDKSign(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());

@@ -35,6 +35,7 @@ import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
@@ -119,13 +120,13 @@ public class SamlTokenCustomSignatureTest {
 
         Map<String, Object> config = new TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(
             WSHandlerConstants.SIGNATURE_PARTS,
             "{Element}{urn:oasis:names:tc:SAML:1.0:assertion}Assertion"
         );
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
         reqData.setMsgContext(config);
 
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

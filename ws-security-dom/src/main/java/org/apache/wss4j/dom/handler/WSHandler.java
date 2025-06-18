@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -42,7 +41,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -1143,47 +1141,6 @@ public abstract class WSHandler {
         return passwordEncryptor;
     }
 
-    /**
-     * Configure a password callback (WSPasswordCallback object) from a CallbackHandler instance
-     * @param callbackHandler The CallbackHandler to use
-     * @param pwCb The WSPasswordCallback to supply to the CallbackHandler
-     * @param requestData The RequestData which supplies the message context
-     * @throws WSSecurityException
-     */
-    public void performPasswordCallback(
-         CallbackHandler callbackHandler,
-         WSPasswordCallback pwCb,
-         RequestData requestData
-    ) throws WSSecurityException {
-
-        if (callbackHandler != null) {
-            Callback[] callbacks = new Callback[1];
-            callbacks[0] = pwCb;
-            //
-            // Call back the application to get the password
-            //
-            try {
-                callbackHandler.handle(callbacks);
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                        "empty", new Object[] {"WSHandler: password callback failed"});
-            }
-        } else {
-            //
-            // If a callback isn't configured then try to get the password
-            // from the message context
-            //
-            String password = getPassword(requestData.getMsgContext());
-            if (password == null) {
-                String err = "provided null or empty password";
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty",
-                        new Object[] {"WSHandler: application " + err});
-            }
-            pwCb.setPassword(password);
-        }
-    }
-
     private void splitEncParts(boolean required, String tmpS,
                                List<WSEncryptionPart> parts, RequestData reqData)
         throws WSSecurityException {
@@ -1427,8 +1384,4 @@ public abstract class WSHandler {
     public abstract void setProperty(Object msgContext, String key,
             Object value);
 
-
-    public abstract String getPassword(Object msgContext);
-
-    public abstract void setPassword(Object msgContext, String password);
 }

@@ -58,7 +58,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         }
 
         WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(encryptionToken.getUser(), WSConstants.DKT_ENCR);
-        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
+        ActionUtils.performPasswordCallback(callbackHandler, pwCb, reqData);
 
         WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());

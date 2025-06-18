@@ -56,7 +56,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.HandlerAction;
@@ -191,7 +190,7 @@ public abstract class AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "transmitter.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "default");
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
 
@@ -200,7 +199,7 @@ public abstract class AbstractTestBase {
         encProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "transmitter.jks");
         encProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "default");
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
         messageContext.put(WSHandlerConstants.ENCRYPTION_USER, "receiver");
         messageContext.put(WSHandlerConstants.ENC_PROP_REF_ID, "" + encProperties.hashCode());
         messageContext.put("" + encProperties.hashCode(), encProperties);
@@ -213,9 +212,6 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
-        if (messageContext.get(WSHandlerConstants.PW_CALLBACK_REF) == null) {
-            requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
-        }
         requestData.setWssConfig(WSSConfig.getNewInstance());
 
         wss4JHandler.doSender(messageContext, requestData, true);
@@ -607,17 +603,6 @@ public abstract class AbstractTestBase {
             ((Map<String, Object>) msgContext).put(key, value);
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public String getPassword(Object msgContext) {
-            return (String) ((Map<String, Object>) msgContext).get("password");
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void setPassword(Object msgContext, String password) {
-            ((Map<String, Object>) msgContext).put("password", password);
-        }
     }
 
     protected class TestSecurityEventListener implements SecurityEventListener {

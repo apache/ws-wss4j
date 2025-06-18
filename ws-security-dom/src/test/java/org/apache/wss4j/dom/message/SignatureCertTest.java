@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
-
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
@@ -244,7 +244,7 @@ public class SignatureCertTest {
         reqData.setUsername("wss40");
         java.util.Map<String, String> config = new java.util.TreeMap<>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
-        config.put("password", "security");
+        config.put(WSHandlerConstants.PW_CALLBACK_CLASS, KeystoreCallbackHandler.class.getName());
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
         reqData.setMsgContext(config);

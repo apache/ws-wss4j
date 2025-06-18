@@ -167,7 +167,7 @@ public class PasswordTypeTest {
 
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<>();
-        config.put("password", "verySecret");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);

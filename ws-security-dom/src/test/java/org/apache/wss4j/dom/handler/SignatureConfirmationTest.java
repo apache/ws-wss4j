@@ -75,7 +75,7 @@ public class SignatureConfirmationTest {
         java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        msgContext.put("password", "security");
+        msgContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
@@ -116,7 +116,7 @@ public class SignatureConfirmationTest {
         java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "false");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        msgContext.put("password", "security");
+        msgContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
@@ -155,7 +155,7 @@ public class SignatureConfirmationTest {
         java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        msgContext.put("password", "security");
+        msgContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
@@ -220,7 +220,7 @@ public class SignatureConfirmationTest {
         java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        msgContext.put("password", "security");
+        msgContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
@@ -320,7 +320,7 @@ public class SignatureConfirmationTest {
         java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
         msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
-        msgContext.put("password", "security");
+        msgContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 

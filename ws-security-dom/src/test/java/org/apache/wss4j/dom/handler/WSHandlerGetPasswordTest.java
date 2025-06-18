@@ -23,14 +23,12 @@ import java.util.Collections;
 
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.action.ActionUtils;
 import org.apache.wss4j.dom.common.CustomHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 
 import org.junit.jupiter.api.Test;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
@@ -46,71 +44,6 @@ public class WSHandlerGetPasswordTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
-
-    /**
-     * A unit test for WSHandler.getPassword(...), where the password is obtained
-     * from the Message Context.
-     */
-    @Test
-    public void
-    testGetPasswordRequestContextUnit() throws Exception {
-
-        final WSSConfig cfg = WSSConfig.getNewInstance();
-        final RequestData reqData = new RequestData();
-        reqData.setWssConfig(cfg);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
-        messageContext.put("password", "securityPassword");
-        reqData.setMsgContext(messageContext);
-
-        WSHandler handler = new CustomHandler();
-        CallbackHandler callbackHandler =
-            handler.getCallbackHandler("SomeCallbackTag", "SomeCallbackRef", reqData);
-
-        WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback("alice", WSConstants.UT);
-        handler.performPasswordCallback(callbackHandler, pwCb, reqData);
-
-        assertTrue("alice".equals(pwCb.getIdentifier()));
-        assertTrue("securityPassword".equals(pwCb.getPassword()));
-        assertTrue(WSPasswordCallback.USERNAME_TOKEN == pwCb.getUsage());
-    }
-
-    /**
-     * A WSHandler test for WSHandler.getPassword(...), where the password is obtained
-     * from the Message Context.
-     */
-    @Test
-    public void
-    testGetPasswordRequestContext() throws Exception {
-
-        final WSSConfig cfg = WSSConfig.getNewInstance();
-        final RequestData reqData = new RequestData();
-        reqData.setWssConfig(cfg);
-        reqData.setUsername("alice");
-        reqData.setPwType(WSConstants.PASSWORD_TEXT);
-        java.util.Map<String, Object> messageContext = new java.util.TreeMap<>();
-        messageContext.put("password", "securityPassword");
-        reqData.setMsgContext(messageContext);
-
-        final java.util.List<Integer> actions = new java.util.ArrayList<>();
-        actions.add(WSConstants.UT);
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        CustomHandler handler = new CustomHandler();
-        HandlerAction action = new HandlerAction(WSConstants.UT);
-        handler.send(
-            doc,
-            reqData,
-            Collections.singletonList(action),
-            true
-        );
-
-        String outputString =
-            XMLUtils.prettyDocumentToString(doc);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(outputString);
-        }
-        assertTrue(outputString.contains("alice"));
-        assertTrue(outputString.contains("securityPassword"));
-    }
 
     /**
      * A test for WSHandler.getPassword(...), where the password is obtained from a
