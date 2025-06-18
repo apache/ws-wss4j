@@ -117,6 +117,7 @@
         <module>bindings</module>
         <module>policy</module>
         <module>ws-security-common</module>
+        <module>ws-security-saml</module>
         <module>ws-security-dom</module>
         <module>ws-security-stax</module>
         <module>ws-security-web</module>
