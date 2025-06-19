@@ -155,19 +155,8 @@ public abstract class WSHandler {
                              + " The danger here is that the actual encryption bytes will not be signed");
                     reqData.setStoreBytesInAttachment(false);
                 }
-            } else if (actionToDo.getAction() == WSConstants.ST_SIGNED
-                && actionToDo.getActionToken() == null) {
-                decodeSignatureParameter(reqData);
-                 // it is possible and legal that we do not have a signature crypto here - thus ignore the exception.
-                // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
-                // required.
-                try {
-                    SignatureActionToken actionToken = new SignatureActionToken();
-                    actionToken.setCrypto(loadSignatureCrypto(reqData));
-                    actionToDo.setActionToken(actionToken);
-                } catch (Exception ex) {
-                    LOG.debug(ex.getMessage(), ex);
-                }
+            } else if (actionToDo.getAction() == WSConstants.ST_SIGNED) {
+                configureSTSignedAction(reqData, actionToDo);
             } else if ((actionToDo.getAction() == WSConstants.ENCR
                 || actionToDo.getAction() == WSConstants.DKT_ENCR)
                 && actionToDo.getActionToken() == null) {
@@ -269,6 +258,31 @@ public abstract class WSHandler {
             for (byte[] signatureValue : reqData.getSignatureValues()) {
                 savedSignatures.add(Arrays.hashCode(signatureValue));
             }
+        }
+    }
+
+    private void configureSTSignedAction(RequestData reqData, HandlerAction actionToDo) throws WSSecurityException {
+        if (actionToDo.getActionToken() == null) {
+            decodeSignatureParameter(reqData);
+            // it is possible and legal that we do not have a signature crypto here - thus ignore the exception.
+            // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
+            // required.
+            try {
+                SignatureActionToken actionToken = new SignatureActionToken();
+                actionToken.setCrypto(loadSignatureCrypto(reqData));
+                actionToDo.setActionToken(actionToken);
+            } catch (Exception ex) {
+                LOG.debug(ex.getMessage(), ex);
+            }
+        }
+        if (reqData.getSamlCallbackHandler() == null) {
+            CallbackHandler samlCallbackHandler =
+                getCallbackHandler(
+                    WSHandlerConstants.SAML_CALLBACK_CLASS,
+                    WSHandlerConstants.SAML_CALLBACK_REF,
+                    reqData
+                );
+            reqData.setSamlCallbackHandler(samlCallbackHandler);
         }
     }
 

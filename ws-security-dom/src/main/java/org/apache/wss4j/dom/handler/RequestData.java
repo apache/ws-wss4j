@@ -97,6 +97,7 @@ public class RequestData {
     private Serializer encryptionSerializer;
     private WSDocInfo wsDocInfo;
     private Provider signatureProvider;
+    private CallbackHandler samlCallbackHandler;
 
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -780,4 +781,22 @@ public class RequestData {
     public void setSignatureProvider(Provider signatureProvider) {
         this.signatureProvider = signatureProvider;
     }
+
+    /**
+     * Get the CallbackHandler used for SAML processing.
+     * This is used to process SAML Assertions, and to sign SAML Assertions.
+     * @return the CallbackHandler used for SAML processing.
+     */
+    public CallbackHandler getSamlCallbackHandler() {
+        return samlCallbackHandler;
+    }
+
+    /**
+     * Set the CallbackHandler used for SAML processing.
+     * @param samlCallbackHandler
+     */
+    public void setSamlCallbackHandler(CallbackHandler samlCallbackHandler) {
+        this.samlCallbackHandler = samlCallbackHandler;
+    }
+
 }
