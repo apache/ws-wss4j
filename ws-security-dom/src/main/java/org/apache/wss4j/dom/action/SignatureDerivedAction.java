@@ -221,4 +221,9 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             return passwordCallback.getKey();
         }
     }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.DKT_SIGN};
+    }
 }

@@ -187,4 +187,9 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             return passwordCallback.getKey();
         }
     }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.DKT_ENCR};
+    }
 }

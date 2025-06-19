@@ -68,4 +68,9 @@ public class UsernameTokenAction implements Action {
 
         builder.build();
     }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.UT, WSConstants.UT_NOPASSWORD};
+    }
 }

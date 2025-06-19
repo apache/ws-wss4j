@@ -91,4 +91,9 @@ public class SignatureConfirmationAction implements Action {
         reqData.getMsgContext().put(WSHandlerConstants.SIG_CONF_DONE, "");
     }
 
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.SC};
+    }
+
 }

@@ -26,6 +26,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 
@@ -67,5 +68,10 @@ public class SAMLTokenUnsignedAction implements Action {
         if (signatureValue != null) {
             reqData.getSignatureValues().add(signatureValue);
         }
+    }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.ST_UNSIGNED};
     }
 }

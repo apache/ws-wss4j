@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.action;
 
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 
@@ -39,5 +40,10 @@ public class TimestampAction implements Action {
         timeStampBuilder.setWsDocInfo(reqData.getWsDocInfo());
         timeStampBuilder.setExpandXopInclude(reqData.isExpandXopInclude());
         timeStampBuilder.build();
+    }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.TS};
     }
 }

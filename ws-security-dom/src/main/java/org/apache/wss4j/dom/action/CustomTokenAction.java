@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.action;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.w3c.dom.Element;
 
@@ -66,5 +67,10 @@ public class CustomTokenAction implements Action {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                     "empty", new Object[] {"Error appending custom token"});
         }
+    }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.CUSTOM_TOKEN};
     }
 }

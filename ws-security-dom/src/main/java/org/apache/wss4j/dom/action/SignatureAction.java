@@ -172,4 +172,8 @@ public class SignatureAction implements Action {
         }
     }
 
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.SIGN};
+    }
 }

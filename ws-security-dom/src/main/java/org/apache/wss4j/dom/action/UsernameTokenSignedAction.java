@@ -146,4 +146,9 @@ public class UsernameTokenSignedAction implements Action {
 
         Arrays.fill(salt, (byte)0);
     }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.UT_SIGN};
+    }
 }

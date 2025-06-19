@@ -113,4 +113,9 @@ public class SAMLTokenSignedAction implements Action {
         }
     }
 
+    @Override
+    public Integer[] getSupportedActions() {
+        return new Integer[]{WSConstants.ST_SIGNED};
+    }
+
 }

@@ -71,60 +71,25 @@ public final class WSSConfig {
         org.slf4j.LoggerFactory.getLogger(WSSConfig.class);
 
     /**
-     * The default collection of actions supported by the toolkit.
+     * The default collection of actions supported by the toolkit
+     * 
+     * Instead of hard-coding, you can use Java's ServiceLoader mechanism to discover Action implementations
+     * at runtime. Each Action implementation should be registered in
+     * META-INF/services/org.apache.wss4j.dom.action.Action with its fully qualified class name.
+     * 
+     * You will still need to map Integers to Action classes. This can be done by having each Action
+     * implementation provide a method (e.g., getSupportedActions()) that returns the Integer actions it supports.
      */
     private static final Map<Integer, Class<?>> DEFAULT_ACTIONS;
     static {
         final Map<Integer, Class<?>> tmp = new HashMap<>();
         try {
-            tmp.put(
-                WSConstants.UT,
-                org.apache.wss4j.dom.action.UsernameTokenAction.class
-            );
-            tmp.put(
-                WSConstants.UT_NOPASSWORD,
-                org.apache.wss4j.dom.action.UsernameTokenAction.class
-            );
-            tmp.put(
-                WSConstants.ENCR,
-                org.apache.wss4j.dom.action.EncryptionAction.class
-            );
-            tmp.put(
-                WSConstants.SIGN,
-                org.apache.wss4j.dom.action.SignatureAction.class
-            );
-            tmp.put(
-                WSConstants.DKT_SIGN,
-                org.apache.wss4j.dom.action.SignatureDerivedAction.class
-            );
-            tmp.put(
-                WSConstants.DKT_ENCR,
-                org.apache.wss4j.dom.action.EncryptionDerivedAction.class
-            );
-            tmp.put(
-                WSConstants.ST_SIGNED,
-                org.apache.wss4j.dom.action.SAMLTokenSignedAction.class
-            );
-            tmp.put(
-                WSConstants.ST_UNSIGNED,
-                org.apache.wss4j.dom.action.SAMLTokenUnsignedAction.class
-            );
-            tmp.put(
-                WSConstants.TS,
-                org.apache.wss4j.dom.action.TimestampAction.class
-            );
-            tmp.put(
-                WSConstants.UT_SIGN,
-                org.apache.wss4j.dom.action.UsernameTokenSignedAction.class
-            );
-            tmp.put(
-                WSConstants.SC,
-                org.apache.wss4j.dom.action.SignatureConfirmationAction.class
-            );
-            tmp.put(
-                WSConstants.CUSTOM_TOKEN,
-                org.apache.wss4j.dom.action.CustomTokenAction.class
-            );
+            java.util.ServiceLoader<Action> loader = java.util.ServiceLoader.load(Action.class);
+            for (Action action : loader) {
+                for (Integer supportedAction : action.getSupportedActions()) {
+                    tmp.put(supportedAction, action.getClass());
+                }
+            }
         } catch (final Exception ex) {
             LOG.debug(ex.getMessage(), ex);
         }

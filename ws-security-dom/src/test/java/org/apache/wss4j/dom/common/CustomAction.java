@@ -44,4 +44,10 @@ public class CustomAction implements Action {
             reqData.setMsgContext(Map.of("bread", "crumb"));
         }
     }
+
+    @Override
+    public Integer[] getSupportedActions() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedActions'");
+    }
 }

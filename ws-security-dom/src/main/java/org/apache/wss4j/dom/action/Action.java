@@ -33,4 +33,5 @@ public interface Action {
         RequestData reqData
     ) throws WSSecurityException;
 
+    Integer[] getSupportedActions();
 }
