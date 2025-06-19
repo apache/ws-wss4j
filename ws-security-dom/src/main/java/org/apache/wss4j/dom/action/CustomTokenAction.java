@@ -23,7 +23,6 @@ import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -31,7 +30,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 public class CustomTokenAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {

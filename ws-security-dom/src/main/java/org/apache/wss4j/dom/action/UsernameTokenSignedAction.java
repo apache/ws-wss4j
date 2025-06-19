@@ -33,7 +33,6 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -47,7 +46,7 @@ import org.w3c.dom.Document;
  */
 
 public class UsernameTokenSignedAction implements Action {
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
  

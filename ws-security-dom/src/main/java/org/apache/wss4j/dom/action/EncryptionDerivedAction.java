@@ -36,7 +36,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecDKEncrypt;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -45,7 +44,7 @@ import org.w3c.dom.Node;
 
 public class EncryptionDerivedAction extends AbstractDerivedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
 

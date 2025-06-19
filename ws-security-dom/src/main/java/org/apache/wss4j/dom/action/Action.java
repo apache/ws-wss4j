@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.action;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 
 /**
  * Interface for all actions
@@ -30,7 +29,6 @@ import org.apache.wss4j.dom.handler.WSHandler;
 public interface Action {
 
     void execute(
-        WSHandler handler,
         SecurityActionToken actionToken,
         RequestData reqData
     ) throws WSSecurityException;

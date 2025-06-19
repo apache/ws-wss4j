@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 
 /**
@@ -35,7 +34,6 @@ public class CustomAction implements Action {
 
     public void
     execute(
-        WSHandler handler,
         SecurityActionToken action,
         RequestData reqData
     ) throws WSSecurityException {

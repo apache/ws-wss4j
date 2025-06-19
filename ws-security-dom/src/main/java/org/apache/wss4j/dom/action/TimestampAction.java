@@ -22,12 +22,11 @@ package org.apache.wss4j.dom.action;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 
 public class TimestampAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
         throws WSSecurityException {
         //
         // add the Timestamp to the SOAP Envelope

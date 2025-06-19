@@ -157,6 +157,16 @@ public abstract class WSHandler {
                 }
             } else if (actionToDo.getAction() == WSConstants.ST_SIGNED) {
                 configureSTSignedAction(reqData, actionToDo);
+            } else if (actionToDo.getAction() == WSConstants.ST_UNSIGNED) {
+                if (reqData.getSamlCallbackHandler() == null) {
+                    CallbackHandler samlCallbackHandler =
+                        getCallbackHandler(
+                            WSHandlerConstants.SAML_CALLBACK_CLASS,
+                            WSHandlerConstants.SAML_CALLBACK_REF,
+                            reqData
+                        );
+                    reqData.setSamlCallbackHandler(samlCallbackHandler);
+                }
             } else if ((actionToDo.getAction() == WSConstants.ENCR
                 || actionToDo.getAction() == WSConstants.DKT_ENCR)
                 && actionToDo.getActionToken() == null) {
@@ -197,7 +207,7 @@ public abstract class WSHandler {
             String done =
                 (String)reqData.getMsgContext().get(WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
-                wssConfig.getAction(WSConstants.SC).execute(this, null, reqData);
+                wssConfig.getAction(WSConstants.SC).execute(null, reqData);
             }
         }
 
@@ -237,7 +247,7 @@ public abstract class WSHandler {
 
             if (WSConstants.NO_SECURITY != actionToDo.getAction()) {
                 wssConfig.getAction(actionToDo.getAction()).execute(
-                    this, actionToDo.getActionToken(), reqData);
+                    actionToDo.getActionToken(), reqData);
             }
         }
 

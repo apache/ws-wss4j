@@ -30,12 +30,11 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 
 public class SAMLTokenSignedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
 
         CallbackHandler samlCallbackHandler = reqData.getSamlCallbackHandler();

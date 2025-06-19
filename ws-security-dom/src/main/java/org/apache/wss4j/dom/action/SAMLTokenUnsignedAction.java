@@ -21,31 +21,24 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 
 public class SAMLTokenUnsignedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         builder.setWsDocInfo(reqData.getWsDocInfo());
         builder.setExpandXopInclude(reqData.isExpandXopInclude());
 
-        CallbackHandler samlCallbackHandler =
-                handler.getCallbackHandler(
-                    ConfigurationConstants.SAML_CALLBACK_CLASS,
-                    ConfigurationConstants.SAML_CALLBACK_REF,
-                    reqData
-                );
+        CallbackHandler samlCallbackHandler = reqData.getSamlCallbackHandler();
         if (samlCallbackHandler == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,

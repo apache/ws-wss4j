@@ -26,7 +26,6 @@ import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
@@ -38,7 +37,7 @@ public class SignatureConfirmationAction implements Action {
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
-    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
+    public void execute(SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         LOG.debug("Perform Signature confirmation");
 
