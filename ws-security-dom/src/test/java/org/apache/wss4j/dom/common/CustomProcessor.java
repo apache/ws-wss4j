@@ -45,7 +45,7 @@ public class CustomProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getQNames'");
     }

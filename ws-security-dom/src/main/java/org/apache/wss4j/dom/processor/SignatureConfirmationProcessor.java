@@ -56,7 +56,7 @@ public class SignatureConfirmationProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.SIGNATURE_CONFIRMATION};
     }
 

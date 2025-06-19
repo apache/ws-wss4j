@@ -243,7 +243,7 @@ public class ReferenceListProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.REFERENCE_LIST};
     }
 

@@ -126,7 +126,7 @@ public class EncryptedAssertionProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.ENCRYPTED_ASSERTION};
     }
 

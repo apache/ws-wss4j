@@ -95,7 +95,7 @@ public class DerivedKeyTokenProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.DERIVED_KEY_TOKEN_05_02, WSConstants.DERIVED_KEY_TOKEN_05_12};
     }
 

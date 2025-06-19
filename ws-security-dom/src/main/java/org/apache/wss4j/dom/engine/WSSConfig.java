@@ -104,7 +104,7 @@ public final class WSSConfig {
      * META-INF/services/org.apache.wss4j.dom.processor.Processor with its fully qualified class name.
      * 
      * You will still need to map QNames to Processor classes. This can be done by having each Processor
-     * implementation provide a method (e.g., getQNames()) that returns the QNames it supports.
+     * implementation provide a method (e.g., getSupportedQNames()) that returns the QNames it supports.
      */
     private static final Map<QName, Class<?>> DEFAULT_PROCESSORS;
     static {
@@ -112,7 +112,7 @@ public final class WSSConfig {
         try {
             java.util.ServiceLoader<Processor> loader = java.util.ServiceLoader.load(Processor.class);
             for (Processor processor : loader) {
-                for (QName qname : processor.getQNames()) {
+                for (QName qname : processor.getSupportedQNames()) {
                     tmp.put(qname, processor.getClass());
                 }
             }

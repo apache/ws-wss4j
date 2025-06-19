@@ -178,7 +178,7 @@ public class UsernameTokenProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.USERNAME_TOKEN};
     }
 

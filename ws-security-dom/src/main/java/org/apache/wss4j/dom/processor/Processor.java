@@ -35,6 +35,6 @@ public interface Processor {
         RequestData request
     ) throws WSSecurityException;
 
-    QName[] getQNames();
+    QName[] getSupportedQNames();
 
 }

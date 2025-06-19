@@ -118,7 +118,7 @@ public class SecurityContextTokenProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.SECURITY_CONTEXT_TOKEN_05_02, WSConstants.SECURITY_CONTEXT_TOKEN_05_12};
     }
 

@@ -810,7 +810,7 @@ public class EncryptedKeyProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.ENCRYPTED_KEY};
     }
 }

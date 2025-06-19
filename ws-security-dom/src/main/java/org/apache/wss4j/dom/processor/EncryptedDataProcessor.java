@@ -223,7 +223,7 @@ public class EncryptedDataProcessor implements Processor {
     }
 
     @Override
-    public QName[] getQNames() {
+    public QName[] getSupportedQNames() {
         return new QName[]{WSConstants.ENCRYPTED_DATA};
     }
 }
