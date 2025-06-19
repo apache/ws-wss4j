@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.crypto.SecretKey;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -239,6 +240,11 @@ public class ReferenceListProcessor implements Processor {
             && !WSConstants.AES_256_GCM.equals(encAlgo)) {
             bspEnforcer.handleBSPRule(BSPRule.R5620);
         }
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.REFERENCE_LIST};
     }
 
 }

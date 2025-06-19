@@ -221,4 +221,9 @@ public class EncryptedDataProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5620);
         }
     }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.ENCRYPTED_DATA};
+    }
 }

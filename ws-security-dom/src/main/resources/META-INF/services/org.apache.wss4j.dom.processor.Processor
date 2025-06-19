@@ -1,0 +1,12 @@
+org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor
+org.apache.wss4j.dom.processor.DerivedKeyTokenProcessor
+org.apache.wss4j.dom.processor.EncryptedAssertionProcessor
+org.apache.wss4j.dom.processor.EncryptedDataProcessor
+org.apache.wss4j.dom.processor.EncryptedKeyProcessor
+org.apache.wss4j.dom.processor.ReferenceListProcessor
+org.apache.wss4j.dom.processor.SAMLTokenProcessor
+org.apache.wss4j.dom.processor.SecurityContextTokenProcessor
+org.apache.wss4j.dom.processor.SignatureProcessor
+org.apache.wss4j.dom.processor.SignatureConfirmationProcessor
+org.apache.wss4j.dom.processor.TimestampProcessor
+org.apache.wss4j.dom.processor.UsernameTokenProcessor

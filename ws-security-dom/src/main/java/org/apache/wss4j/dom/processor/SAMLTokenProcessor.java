@@ -284,4 +284,10 @@ public class SAMLTokenProcessor implements Processor {
 
         return protectedRefs;
     }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.SAML_TOKEN, WSConstants.SAML2_TOKEN};
+    }
+
 }

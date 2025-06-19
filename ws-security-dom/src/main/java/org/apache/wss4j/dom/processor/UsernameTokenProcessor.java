@@ -22,6 +22,8 @@ package org.apache.wss4j.dom.processor;
 import java.time.Instant;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
@@ -173,6 +175,11 @@ public class UsernameTokenProcessor implements Processor {
             return validator.validate(credential, data);
         }
         return credential;
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.USERNAME_TOKEN};
     }
 
 }

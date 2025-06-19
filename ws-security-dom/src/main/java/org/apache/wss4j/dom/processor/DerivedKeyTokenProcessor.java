@@ -22,6 +22,8 @@ package org.apache.wss4j.dom.processor;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
@@ -90,6 +92,11 @@ public class DerivedKeyTokenProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, dkt.getElement());
         data.getWsDocInfo().addResult(result);
         return Collections.singletonList(result);
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.DERIVED_KEY_TOKEN_05_02, WSConstants.DERIVED_KEY_TOKEN_05_12};
     }
 
 

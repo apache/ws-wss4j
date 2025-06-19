@@ -26,11 +26,15 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 public interface Processor {
 
     List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData request
     ) throws WSSecurityException;
+
+    QName[] getQNames();
 
 }

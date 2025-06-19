@@ -23,6 +23,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.WSConstants;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 
 /**
@@ -40,5 +43,13 @@ public class CustomProcessor implements Processor {
         result.put("foo", this);
         return java.util.Collections.singletonList(result);
     }
+
+    @Override
+    public QName[] getQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getQNames'");
+    }
+
+    
 
 }

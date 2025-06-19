@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.processor;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
@@ -65,4 +67,8 @@ public class TimestampProcessor implements Processor {
         return java.util.Collections.singletonList(result);
     }
 
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.TIMESTAMP};
+    }
 }

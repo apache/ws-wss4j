@@ -32,6 +32,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.token.DOMX509SKI;
@@ -806,5 +807,10 @@ public class EncryptedKeyProcessor implements Processor {
                 bspEnforcer.handleBSPRule(BSPRule.R5621);
             }
         }
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.ENCRYPTED_KEY};
     }
 }

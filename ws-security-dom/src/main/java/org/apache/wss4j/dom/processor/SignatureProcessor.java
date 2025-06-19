@@ -45,6 +45,7 @@ import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -761,6 +762,11 @@ public class SignatureProcessor implements Processor {
                 }
             }
         }
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.SIGNATURE};
     }
 
 }

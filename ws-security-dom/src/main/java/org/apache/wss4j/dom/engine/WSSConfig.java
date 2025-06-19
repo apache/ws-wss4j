@@ -133,71 +133,24 @@ public final class WSSConfig {
 
     /**
      * The default collection of processors supported by the toolkit
+     * 
+     * Instead of hard-coding, you can use Java's ServiceLoader mechanism to discover Processor implementations
+     * at runtime. Each Processor implementation should be registered in
+     * META-INF/services/org.apache.wss4j.dom.processor.Processor with its fully qualified class name.
+     * 
+     * You will still need to map QNames to Processor classes. This can be done by having each Processor
+     * implementation provide a method (e.g., getQNames()) that returns the QNames it supports.
      */
     private static final Map<QName, Class<?>> DEFAULT_PROCESSORS;
     static {
         final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
-            tmp.put(
-                WSConstants.SAML_TOKEN,
-                org.apache.wss4j.dom.processor.SAMLTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.SAML2_TOKEN,
-                org.apache.wss4j.dom.processor.SAMLTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.ENCRYPTED_ASSERTION,
-                org.apache.wss4j.dom.processor.EncryptedAssertionProcessor.class
-            );
-            tmp.put(
-                WSConstants.ENCRYPTED_KEY,
-                org.apache.wss4j.dom.processor.EncryptedKeyProcessor.class
-            );
-            tmp.put(
-                WSConstants.SIGNATURE,
-                org.apache.wss4j.dom.processor.SignatureProcessor.class
-            );
-            tmp.put(
-                WSConstants.TIMESTAMP,
-                org.apache.wss4j.dom.processor.TimestampProcessor.class
-            );
-            tmp.put(
-                WSConstants.USERNAME_TOKEN,
-                org.apache.wss4j.dom.processor.UsernameTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.REFERENCE_LIST,
-                org.apache.wss4j.dom.processor.ReferenceListProcessor.class
-            );
-            tmp.put(
-                WSConstants.SIGNATURE_CONFIRMATION,
-                org.apache.wss4j.dom.processor.SignatureConfirmationProcessor.class
-            );
-            tmp.put(
-                WSConstants.DERIVED_KEY_TOKEN_05_02,
-                org.apache.wss4j.dom.processor.DerivedKeyTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.DERIVED_KEY_TOKEN_05_12,
-                tmp.get(WSConstants.DERIVED_KEY_TOKEN_05_02)
-            );
-            tmp.put(
-                WSConstants.SECURITY_CONTEXT_TOKEN_05_02,
-                org.apache.wss4j.dom.processor.SecurityContextTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.SECURITY_CONTEXT_TOKEN_05_12,
-                tmp.get(WSConstants.SECURITY_CONTEXT_TOKEN_05_02)
-            );
-            tmp.put(
-                WSConstants.BINARY_TOKEN,
-                org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor.class
-            );
-            tmp.put(
-                WSConstants.ENCRYPTED_DATA,
-                org.apache.wss4j.dom.processor.EncryptedDataProcessor.class
-            );
+            java.util.ServiceLoader<Processor> loader = java.util.ServiceLoader.load(Processor.class);
+            for (Processor processor : loader) {
+                for (QName qname : processor.getQNames()) {
+                    tmp.put(qname, processor.getClass());
+                }
+            }
         } catch (final Exception ex) {
             LOG.debug(ex.getMessage(), ex);
         }

@@ -28,6 +28,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 public class SignatureConfirmationProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationProcessor.class);
@@ -51,6 +53,11 @@ public class SignatureConfirmationProcessor implements Processor {
         data.getWsDocInfo().addResult(result);
         data.getWsDocInfo().addTokenElement(elem);
         return java.util.Collections.singletonList(result);
+    }
+
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.SIGNATURE_CONFIRMATION};
     }
 
 }

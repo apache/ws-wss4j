@@ -181,4 +181,9 @@ public class BinarySecurityTokenProcessor implements Processor {
         return token;
     }
 
+    @Override
+    public QName[] getQNames() {
+        return new QName[]{WSConstants.BINARY_TOKEN};
+    }
+
 }
