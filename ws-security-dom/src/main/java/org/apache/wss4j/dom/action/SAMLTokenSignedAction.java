@@ -23,7 +23,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
-import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -37,21 +36,8 @@ import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 
 public class SAMLTokenSignedAction implements Action {
 
-    private static final org.slf4j.Logger LOG =
-        org.slf4j.LoggerFactory.getLogger(SAMLTokenSignedAction.class);
-
     public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
-        Crypto crypto = null;
-
-        // it is possible and legal that we do not have a signature crypto here - thus ignore the exception.
-        // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
-        // required.
-        try {
-            crypto = handler.loadSignatureCrypto(reqData);
-        } catch (Exception ex) {
-            LOG.debug(ex.getMessage(), ex);
-        }
 
         CallbackHandler samlCallbackHandler =
                 handler.getCallbackHandler(
@@ -89,14 +75,7 @@ public class SAMLTokenSignedAction implements Action {
 
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
 
-        SignatureActionToken signatureToken = null;
-        if (actionToken instanceof SignatureActionToken) {
-            signatureToken = (SignatureActionToken)actionToken;
-        }
-        if (signatureToken == null) {
-            signatureToken = reqData.getSignatureToken();
-        }
-
+        SignatureActionToken signatureToken = reqData.getSignatureToken();
         WSPasswordCallback pwCb = ActionUtils.constructPasswordCallback(signatureToken.getUser(), WSConstants.ST_SIGNED);
         ActionUtils.performPasswordCallback(callbackHandler, pwCb, reqData);
 
@@ -124,7 +103,7 @@ public class SAMLTokenSignedAction implements Action {
 
         try {
             wsSign.build(
-                    crypto,
+                    actionToken.getCrypto(),
                     samlAssertion,
                     samlCallback.getIssuerCrypto(),
                     samlCallback.getIssuerKeyName(),

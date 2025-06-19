@@ -158,6 +158,16 @@ public abstract class WSHandler {
             } else if (actionToDo.getAction() == WSConstants.ST_SIGNED
                 && actionToDo.getActionToken() == null) {
                 decodeSignatureParameter(reqData);
+                 // it is possible and legal that we do not have a signature crypto here - thus ignore the exception.
+                // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
+                // required.
+                try {
+                    SignatureActionToken actionToken = new SignatureActionToken();
+                    actionToken.setCrypto(loadSignatureCrypto(reqData));
+                    actionToDo.setActionToken(actionToken);
+                } catch (Exception ex) {
+                    LOG.debug(ex.getMessage(), ex);
+                }
             } else if ((actionToDo.getAction() == WSConstants.ENCR
                 || actionToDo.getAction() == WSConstants.DKT_ENCR)
                 && actionToDo.getActionToken() == null) {
