@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message;
+package org.apache.wss4j.common.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.DigestMethod;
@@ -34,8 +35,6 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-import org.apache.wss4j.common.dom.message.WSSecBase;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
@@ -47,10 +46,9 @@ import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.common.dom.transform.STRTransform;
-import org.apache.wss4j.common.dom.message.SignatureUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This is the base class for WS Security messages that are used for signature generation or
@@ -244,7 +242,7 @@ public class WSSecSignatureBase extends WSSecBase {
                 clonedElements.add(element);
                 Document doc = this.getSecurityHeader().getSecurityHeaderDoc();
                 element.getParentNode().appendChild(XMLUtils.cloneElement(doc, element));
-                WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, false);
+                inlineAttachments(includeElements, attachmentCallbackHandler, false);
             }
         }
     }
@@ -354,4 +352,21 @@ public class WSSecSignatureBase extends WSSecBase {
         }
     }
 
+    private static void inlineAttachments(List<Element> includeElements,
+                                         CallbackHandler attachmentCallbackHandler,
+                                         boolean removeAttachments) throws WSSecurityException {
+        for (Element includeElement : includeElements) {
+            String xopURI = includeElement.getAttributeNS(null, "href");
+            if (xopURI != null) {
+                // Retrieve the attachment bytes
+                byte[] attachmentBytes =
+                    AttachmentUtils.getBytesFromAttachment(xopURI, attachmentCallbackHandler, removeAttachments);
+                String encodedBytes = org.apache.xml.security.utils.XMLUtils.encodeToString(attachmentBytes);
+
+                Node encodedChild =
+                    includeElement.getOwnerDocument().createTextNode(encodedBytes);
+                includeElement.getParentNode().replaceChild(encodedChild, includeElement);
+            }
+        }
+    }
 }

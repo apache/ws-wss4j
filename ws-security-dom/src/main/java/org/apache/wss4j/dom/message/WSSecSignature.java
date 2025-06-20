@@ -49,6 +49,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.DERDecoder;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecSignatureBase;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.DOMX509Data;
