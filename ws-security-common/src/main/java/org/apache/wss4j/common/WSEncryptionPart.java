@@ -19,6 +19,11 @@
 
 package org.apache.wss4j.common;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Element;
 
 
@@ -185,6 +190,31 @@ public class WSEncryptionPart {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    /**
+     * Find the DOM Element in the SOAP Envelope that is referenced by this WSEncryptionPart. 
+     * The "Id" is used before the Element localname/namespace.
+     *
+     * @param callbackLookup The CallbackLookup object used to find Elements
+     * @return the DOM Element in the SOAP Envelope that is found
+     */
+    public List<Element> findElements(
+        CallbackLookup callbackLookup
+    ) throws WSSecurityException {
+        // See if the DOM Element is stored in the WSEncryptionPart first
+        if (getElement() != null) {
+            return Collections.singletonList(getElement());
+        }
+
+        // Next try to find the Element via its wsu:Id
+        String id = getId();
+        if (id != null) {
+            Element foundElement = callbackLookup.getElement(id, null, false);
+            return Collections.singletonList(foundElement);
+        }
+        // Otherwise just lookup all elements with the localname/namespace
+        return callbackLookup.getElements(getName(), getNamespace());
     }
 
 }

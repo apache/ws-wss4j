@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.util;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -171,35 +170,6 @@ public final class WSSecurityUtil {
         String ns = docElement.getNamespaceURI();
         return XMLUtils.getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
     }
-
-
-    /**
-     * Find the DOM Element in the SOAP Envelope that is referenced by the
-     * WSEncryptionPart argument. The "Id" is used before the Element localname/namespace.
-     *
-     * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
-     * @param callbackLookup The CallbackLookup object used to find Elements
-     * @return the DOM Element in the SOAP Envelope that is found
-     */
-    public static List<Element> findElements(
-        WSEncryptionPart part, CallbackLookup callbackLookup
-    ) throws WSSecurityException {
-        // See if the DOM Element is stored in the WSEncryptionPart first
-        if (part.getElement() != null) {
-            return Collections.singletonList(part.getElement());
-        }
-
-        // Next try to find the Element via its wsu:Id
-        String id = part.getId();
-        if (id != null) {
-            Element foundElement = callbackLookup.getElement(id, null, false);
-            return Collections.singletonList(foundElement);
-        }
-        // Otherwise just lookup all elements with the localname/namespace
-        return callbackLookup.getElements(part.getName(), part.getNamespace());
-    }
-
-
 
     /**
      * Get the default encryption part - the SOAP Body of type "Content".
