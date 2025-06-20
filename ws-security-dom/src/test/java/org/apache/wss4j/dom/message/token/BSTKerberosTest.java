@@ -49,6 +49,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.namespace.QName;
 
 import java.util.Arrays;
 
@@ -447,6 +448,12 @@ public class BSTKerberosTest {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             return credential;
+        }
+
+        @Override
+        public QName[] getSupportedQNames() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
         }
 
     }

@@ -1,0 +1,4 @@
+org.apache.wss4j.dom.validate.SamlAssertionValidator
+org.apache.wss4j.dom.validate.SignatureTrustValidator
+org.apache.wss4j.dom.validate.TimestampValidator
+org.apache.wss4j.dom.validate.UsernameTokenValidator

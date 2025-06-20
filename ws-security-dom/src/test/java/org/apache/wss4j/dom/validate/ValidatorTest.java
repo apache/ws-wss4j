@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -316,6 +317,12 @@ public class ValidatorTest {
             } catch (Exception ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
+        }
+
+        @Override
+        public QName[] getSupportedQNames() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
         }
 
     }

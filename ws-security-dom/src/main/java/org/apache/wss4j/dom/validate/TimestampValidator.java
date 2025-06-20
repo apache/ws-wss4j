@@ -22,7 +22,11 @@ package org.apache.wss4j.dom.validate;
 
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.dom.message.token.Timestamp;
 
 /**
@@ -77,6 +81,9 @@ public class TimestampValidator implements Validator {
         return credential;
     }
 
-
+    @Override
+    public QName[] getSupportedQNames() {
+        return new QName[]{WSConstants.TIMESTAMP};
+    }
 
 }

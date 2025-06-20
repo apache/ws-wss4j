@@ -25,6 +25,7 @@ import java.security.MessageDigest;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.validate.Credential;
@@ -206,6 +207,11 @@ public class UsernameTokenValidator implements Validator {
                 + "contain any password element");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        return new QName[]{WSConstants.USERNAME_TOKEN};
     }
 
 }

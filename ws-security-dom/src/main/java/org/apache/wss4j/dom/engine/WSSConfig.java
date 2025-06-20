@@ -123,32 +123,25 @@ public final class WSSConfig {
     }
 
     /**
-     * The default collection of validators supported by the toolkit
+     * The default collection of vaidators supported by the toolkit
+     * 
+     * Instead of hard-coding, you can use Java's ServiceLoader mechanism to discover Validator implementations
+     * at runtime. Each Action Validator should be registered in
+     * META-INF/services/org.apache.wss4j.dom.validate.Validator with its fully qualified class name.
+     * 
+     * You will still need to map QNames to Validator classes. This can be done by having each Validator
+     * implementation provide a method (e.g., getSupportedQNames()) that returns the QName actions it supports.
      */
     private static final Map<QName, Class<?>> DEFAULT_VALIDATORS;
     static {
         final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
-            tmp.put(
-                WSConstants.SAML_TOKEN,
-                org.apache.wss4j.dom.validate.SamlAssertionValidator.class
-            );
-            tmp.put(
-                WSConstants.SAML2_TOKEN,
-                org.apache.wss4j.dom.validate.SamlAssertionValidator.class
-            );
-            tmp.put(
-                WSConstants.SIGNATURE,
-                org.apache.wss4j.dom.validate.SignatureTrustValidator.class
-            );
-            tmp.put(
-                WSConstants.TIMESTAMP,
-                org.apache.wss4j.dom.validate.TimestampValidator.class
-            );
-            tmp.put(
-                WSConstants.USERNAME_TOKEN,
-                org.apache.wss4j.dom.validate.UsernameTokenValidator.class
-            );
+            java.util.ServiceLoader<Validator> loader = java.util.ServiceLoader.load(Validator.class);
+            for (Validator validator : loader) {
+                for (QName qName : validator.getSupportedQNames()) {
+                    tmp.put(qName, validator.getClass());
+                }
+            }
         } catch (final Exception ex) {
             LOG.debug(ex.getMessage(), ex);
         }

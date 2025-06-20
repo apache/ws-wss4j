@@ -20,6 +20,8 @@
 package org.apache.wss4j.dom.validate;
 
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -38,6 +40,12 @@ public class NoOpValidator implements Validator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         return credential;
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 
 }

@@ -24,9 +24,12 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 
 /**
@@ -124,6 +127,11 @@ public class SignatureTrustValidator implements Validator {
     protected void validatePublicKey(PublicKey publicKey, Crypto crypto)
         throws WSSecurityException {
         crypto.verifyTrust(publicKey);
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        return new QName[]{WSConstants.SIGNATURE};
     }
 
 }

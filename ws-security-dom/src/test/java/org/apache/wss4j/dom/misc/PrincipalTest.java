@@ -363,5 +363,11 @@ public class PrincipalTest {
             }
         }
 
+        @Override
+        public QName[] getSupportedQNames() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
+        }
+
     }
 }

@@ -23,6 +23,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
@@ -118,6 +119,12 @@ public class JAASUsernameTokenValidator implements Validator {
 
     protected CallbackHandler getCallbackHandler(String name, String password) {
         return new NamePasswordCallbackHandler(name, password);
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 
 }

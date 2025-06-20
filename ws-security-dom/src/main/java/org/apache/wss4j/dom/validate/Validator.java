@@ -20,6 +20,8 @@
 package org.apache.wss4j.dom.validate;
 
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -42,5 +44,6 @@ public interface Validator {
      */
     Credential validate(Credential credential, RequestData data) throws WSSecurityException;
 
+    QName[] getSupportedQNames();
 
 }
