@@ -22,7 +22,7 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 /**
  * ServletContextListener that cleans up WSS4J security providers at context
