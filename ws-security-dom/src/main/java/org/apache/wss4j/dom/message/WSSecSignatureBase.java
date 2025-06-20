@@ -47,7 +47,7 @@ import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.common.dom.transform.STRTransform;
-import org.apache.wss4j.dom.util.SignatureUtils;
+import org.apache.wss4j.common.dom.message.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

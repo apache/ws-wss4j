@@ -49,7 +49,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
-import org.apache.wss4j.dom.util.SignatureUtils;
+import org.apache.wss4j.common.dom.message.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;

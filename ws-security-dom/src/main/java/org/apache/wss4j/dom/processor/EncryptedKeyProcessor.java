@@ -73,7 +73,7 @@ import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.util.EncryptionUtils;
-import org.apache.wss4j.dom.util.SignatureUtils;
+import org.apache.wss4j.common.dom.message.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.xml.security.algorithms.JCEMapper;
