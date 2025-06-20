@@ -56,7 +56,7 @@ import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.ConfigurationConverter;

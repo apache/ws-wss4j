@@ -50,7 +50,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;

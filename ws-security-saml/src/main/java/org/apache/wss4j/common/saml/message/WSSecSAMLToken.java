@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message;
+package org.apache.wss4j.common.saml.message;
 
 import org.apache.wss4j.common.dom.message.WSSecBase;
 import org.apache.wss4j.common.dom.message.WSSecHeader;

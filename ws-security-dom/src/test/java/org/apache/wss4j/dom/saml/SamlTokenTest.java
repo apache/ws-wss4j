@@ -67,7 +67,7 @@ import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;

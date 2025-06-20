@@ -46,7 +46,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;

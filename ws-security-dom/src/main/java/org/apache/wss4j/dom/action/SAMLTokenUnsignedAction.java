@@ -29,7 +29,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.action.Action;
-import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 
 public class SAMLTokenUnsignedAction implements Action {
 
