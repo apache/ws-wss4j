@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.action;
+package org.apache.wss4j.common.saml.action;
 
 import javax.security.auth.callback.CallbackHandler;
 

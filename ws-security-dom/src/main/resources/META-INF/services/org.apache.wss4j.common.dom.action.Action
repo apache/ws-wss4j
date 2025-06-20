@@ -2,7 +2,6 @@ org.apache.wss4j.dom.action.CustomTokenAction
 org.apache.wss4j.dom.action.EncryptionAction
 org.apache.wss4j.dom.action.EncryptionDerivedAction
 org.apache.wss4j.dom.action.SAMLTokenSignedAction
-org.apache.wss4j.dom.action.SAMLTokenUnsignedAction
 org.apache.wss4j.dom.action.SignatureAction
 org.apache.wss4j.dom.action.SignatureConfirmationAction
 org.apache.wss4j.dom.action.SignatureDerivedAction
