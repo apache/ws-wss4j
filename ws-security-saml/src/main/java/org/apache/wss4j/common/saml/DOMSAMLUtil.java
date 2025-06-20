@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml;
+package org.apache.wss4j.common.saml;
 
 import java.security.MessageDigest;
 import java.security.Principal;
@@ -26,16 +26,13 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Element;
 
 /**
@@ -51,16 +48,16 @@ public final class DOMSAMLUtil {
     }
 
     public static void validateSAMLResults(
-        WSHandlerResult handlerResults,
+        Map<Integer, List<WSSecurityEngineResult>> actionResults,
         Certificate[] tlsCerts,
         Element body
     ) throws WSSecurityException {
         List<WSSecurityEngineResult> samlResults = new ArrayList<>();
-        if (handlerResults.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
-            samlResults.addAll(handlerResults.getActionResults().get(WSConstants.ST_SIGNED));
+        if (actionResults.containsKey(WSConstants.ST_SIGNED)) {
+            samlResults.addAll(actionResults.get(WSConstants.ST_SIGNED));
         }
-        if (handlerResults.getActionResults().containsKey(WSConstants.ST_UNSIGNED)) {
-            samlResults.addAll(handlerResults.getActionResults().get(WSConstants.ST_UNSIGNED));
+        if (actionResults.containsKey(WSConstants.ST_UNSIGNED)) {
+            samlResults.addAll(actionResults.get(WSConstants.ST_UNSIGNED));
         }
 
         if (samlResults.isEmpty()) {
@@ -68,11 +65,11 @@ public final class DOMSAMLUtil {
         }
 
         List<WSSecurityEngineResult> signedResults = new ArrayList<>();
-        if (handlerResults.getActionResults().containsKey(WSConstants.SIGN)) {
-            signedResults.addAll(handlerResults.getActionResults().get(WSConstants.SIGN));
+        if (actionResults.containsKey(WSConstants.SIGN)) {
+            signedResults.addAll(actionResults.get(WSConstants.SIGN));
         }
-        if (handlerResults.getActionResults().containsKey(WSConstants.UT_SIGN)) {
-            signedResults.addAll(handlerResults.getActionResults().get(WSConstants.UT_SIGN));
+        if (actionResults.containsKey(WSConstants.UT_SIGN)) {
+            signedResults.addAll(actionResults.get(WSConstants.UT_SIGN));
         }
 
         for (WSSecurityEngineResult samlResult : samlResults) {

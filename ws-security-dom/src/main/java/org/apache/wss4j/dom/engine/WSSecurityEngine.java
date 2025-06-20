@@ -39,7 +39,7 @@ import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.dom.processor.Processor;
-import org.apache.wss4j.dom.saml.DOMSAMLUtil;
+import org.apache.wss4j.common.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -371,7 +371,7 @@ public class WSSecurityEngine {
         // Validate SAML Subject Confirmation requirements
         if (requestData.isValidateSamlSubjectConfirmation()) {
             Element bodyElement = callbackLookupToUse.getSOAPBody();
-            DOMSAMLUtil.validateSAMLResults(handlerResult, requestData.getTlsCerts(), bodyElement);
+            DOMSAMLUtil.validateSAMLResults(handlerResult.getActionResults(), requestData.getTlsCerts(), bodyElement);
         }
 
         wsDocInfo.clear();
