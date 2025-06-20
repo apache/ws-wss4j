@@ -53,7 +53,6 @@ import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.message.WSSecSignature;
 import org.apache.wss4j.common.dom.transform.STRTransform;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -111,7 +110,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
         prepare(uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW);
 
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
+            String soapNamespace = XMLUtils.getSOAPNamespace(getDocument().getDocumentElement());
+            WSEncryptionPart defaulEncryptionPart = new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
+            getParts().add(defaulEncryptionPart);
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {

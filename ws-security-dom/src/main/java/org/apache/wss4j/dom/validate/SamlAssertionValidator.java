@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
