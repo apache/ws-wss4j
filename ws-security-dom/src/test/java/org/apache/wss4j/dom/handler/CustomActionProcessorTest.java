@@ -24,8 +24,8 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomAction;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.CustomProcessor;
-
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.Crypto;

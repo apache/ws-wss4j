@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.engine;
+package org.apache.wss4j.common.dom.engine;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -29,19 +29,19 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.action.Action;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.dom.WsuIdAllocator;
+import org.apache.wss4j.common.dom.action.Action;
+import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.resolvers.ResolverAttachment;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.dom.transform.AttachmentCiphertextTransform;
 import org.apache.wss4j.common.dom.transform.AttachmentCompleteSignatureTransformProvider;
 import org.apache.wss4j.common.dom.transform.AttachmentContentSignatureTransformProvider;
-import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.utils.resolver.ResourceResolver;
@@ -211,7 +211,7 @@ public final class WSSConfig {
 
     static {
         try {
-            Transform.register(WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS,
+            Transform.register(WSS4JConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS,
                     AttachmentCiphertextTransform.class);
         } catch (Exception e) {
             LOG.debug(e.getMessage(), e);

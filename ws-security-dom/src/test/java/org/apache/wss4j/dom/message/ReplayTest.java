@@ -31,7 +31,7 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
@@ -46,7 +46,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;

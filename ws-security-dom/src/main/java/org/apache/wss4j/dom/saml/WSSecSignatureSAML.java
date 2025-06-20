@@ -50,7 +50,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.common.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;

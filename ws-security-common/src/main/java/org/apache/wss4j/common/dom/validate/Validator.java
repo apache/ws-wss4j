@@ -17,14 +17,13 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.validate;
+package org.apache.wss4j.common.dom.validate;
 
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
 
 /**
  * This interface describes a pluggable way of validating credentials that have been extracted

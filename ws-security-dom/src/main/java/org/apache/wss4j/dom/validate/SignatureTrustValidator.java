@@ -28,9 +28,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 
 /**
  * This class verifies trust in a credential used to verify a signature, which is extracted

@@ -20,8 +20,8 @@
 package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.dom.WSConstants;
 
 import javax.xml.namespace.QName;

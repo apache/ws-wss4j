@@ -27,7 +27,8 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.action.Action;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 
 public class SAMLTokenUnsignedAction implements Action {

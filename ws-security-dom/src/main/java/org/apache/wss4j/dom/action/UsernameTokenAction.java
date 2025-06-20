@@ -25,7 +25,8 @@ import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.action.Action;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 
 public class UsernameTokenAction implements Action {

@@ -28,8 +28,9 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
 import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.message.token.UsernameToken;
 
 

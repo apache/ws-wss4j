@@ -30,7 +30,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.dom.WSConstants;
 
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

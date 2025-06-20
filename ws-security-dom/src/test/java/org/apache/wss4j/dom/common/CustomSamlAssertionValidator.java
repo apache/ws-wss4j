@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 

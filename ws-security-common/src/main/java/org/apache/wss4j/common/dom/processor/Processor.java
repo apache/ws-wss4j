@@ -17,21 +17,24 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.action;
+package org.apache.wss4j.common.dom.processor;
 
-import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.w3c.dom.Element;
 
-/**
- * Interface for all actions
- */
-public interface Action {
+import java.util.List;
 
-    void execute(
-        SecurityActionToken actionToken,
-        RequestData reqData
+import javax.xml.namespace.QName;
+
+public interface Processor {
+
+    List<WSSecurityEngineResult> handleToken(
+        Element elem,
+        RequestData request
     ) throws WSSecurityException;
 
-    Integer[] getSupportedActions();
+    QName[] getSupportedQNames();
+
 }

@@ -27,7 +27,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.WsuIdAllocator;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

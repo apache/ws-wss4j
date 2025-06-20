@@ -24,7 +24,7 @@ import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

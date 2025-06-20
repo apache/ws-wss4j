@@ -36,7 +36,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 import org.junit.jupiter.api.Test;
 import org.opensaml.xmlsec.signature.Signature;

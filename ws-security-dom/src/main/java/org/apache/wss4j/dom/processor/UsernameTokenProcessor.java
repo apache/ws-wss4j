@@ -32,10 +32,11 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.xml.security.utils.XMLUtils;
 
 public class UsernameTokenProcessor implements Processor {

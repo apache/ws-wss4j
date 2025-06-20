@@ -26,7 +26,8 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 import org.junit.jupiter.api.Test;
 import org.apache.wss4j.common.util.XMLUtils;

@@ -28,8 +28,9 @@ import java.util.regex.PatternSyntaxException;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;

@@ -23,8 +23,9 @@ package org.apache.wss4j.dom.validate;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 
 /**
  * This class does not do any Validation at all.

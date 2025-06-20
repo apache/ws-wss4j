@@ -25,7 +25,7 @@ import org.apache.wss4j.dom.WSConstants;
 
 import org.junit.jupiter.api.Test;
 
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;

@@ -32,7 +32,8 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.common.dom.RequestData;
 
 /**
  * This will process incoming <code>saml2:EncryptedAssertion</code> elements.

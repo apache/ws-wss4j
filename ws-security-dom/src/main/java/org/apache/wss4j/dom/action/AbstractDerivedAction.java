@@ -31,7 +31,7 @@ import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.common.dom.message.token.SecurityContextToken;

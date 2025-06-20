@@ -42,8 +42,8 @@ import org.apache.wss4j.dom.common.CombinedCallbackHandler;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
-
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 

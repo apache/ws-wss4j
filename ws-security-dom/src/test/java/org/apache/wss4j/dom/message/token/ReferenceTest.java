@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.message.token;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 import org.junit.jupiter.api.Test;
 
