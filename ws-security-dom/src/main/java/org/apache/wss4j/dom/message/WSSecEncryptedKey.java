@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.dom.message.WSSecBase;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.*;
