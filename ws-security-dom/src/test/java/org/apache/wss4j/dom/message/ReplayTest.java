@@ -26,7 +26,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 

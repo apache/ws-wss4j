@@ -38,7 +38,7 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;

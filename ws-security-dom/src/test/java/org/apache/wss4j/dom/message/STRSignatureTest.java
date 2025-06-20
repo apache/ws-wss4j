@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.SOAPConstants;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 
 import org.junit.jupiter.api.Test;
 

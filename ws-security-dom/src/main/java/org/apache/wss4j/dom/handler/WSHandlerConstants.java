@@ -20,7 +20,7 @@
 package org.apache.wss4j.dom.handler;
 
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 
 import java.util.HashMap;
 import java.util.Map;

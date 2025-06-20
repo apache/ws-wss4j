@@ -33,7 +33,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.action.Action;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;

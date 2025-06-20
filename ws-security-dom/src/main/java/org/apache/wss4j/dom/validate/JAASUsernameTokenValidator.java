@@ -25,7 +25,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;

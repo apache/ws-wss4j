@@ -27,7 +27,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSPasswordCallback;

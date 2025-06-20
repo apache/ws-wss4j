@@ -24,7 +24,7 @@ import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.WsuIdAllocator;
 import org.apache.wss4j.common.dom.engine.WSSConfig;

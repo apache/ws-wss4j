@@ -36,7 +36,7 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.apache.xml.security.utils.XMLUtils;

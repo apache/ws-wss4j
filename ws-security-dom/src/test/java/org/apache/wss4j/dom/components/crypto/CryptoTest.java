@@ -24,7 +24,7 @@ import java.security.KeyStore;
 import java.util.Properties;
 
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomCrypto;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;

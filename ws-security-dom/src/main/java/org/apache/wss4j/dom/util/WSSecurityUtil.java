@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.util;
 
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.dom.callback.CallbackLookup;

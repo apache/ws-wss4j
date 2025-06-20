@@ -35,7 +35,7 @@ public class WSEncryptionPart {
     /**
      * An xpath expression pointing to the data element
      * that may be specified in case the encryption part is of type
-     * <code>org.apache.wss4j.dom.WSConstants.PART_TYPE_ELEMENT</code>
+     * <code>org.apache.wss4j.common.dom.WSConstants.PART_TYPE_ELEMENT</code>
      */
     private String xpath;
 

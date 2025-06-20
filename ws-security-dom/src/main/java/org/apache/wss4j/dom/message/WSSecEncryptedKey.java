@@ -27,7 +27,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.*;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.encryption.XMLEncryptionException;

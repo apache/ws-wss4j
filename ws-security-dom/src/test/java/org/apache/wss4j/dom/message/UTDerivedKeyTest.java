@@ -33,7 +33,7 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
