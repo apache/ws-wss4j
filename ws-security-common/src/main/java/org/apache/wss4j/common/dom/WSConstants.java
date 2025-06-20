@@ -171,7 +171,7 @@ public final class WSConstants extends WSS4JConstants {
 
     /**
      * Sets the {@link
-     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
+     * org.apache.wss4j.common.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
      * } method to send the signing certificate as a <code>BinarySecurityToken</code>.
      * <p/>
      * The signing method takes the signing certificate, converts it to a
@@ -191,7 +191,7 @@ public final class WSConstants extends WSS4JConstants {
 
     /**
      * Sets the {@link
-     *org.apache.wss4j.dom.message.WSSecSignature#build(Crypto)
+     *org.apache.wss4j.common.dom.message.WSSecSignature#build(Crypto)
      *} or the {@link
      *org.apache.wss4j.dom.message.WSSecEncrypt#build(Crypto, SecretKey)
      * } method to send the issuer name and the serial number of a certificate to
@@ -211,7 +211,7 @@ public final class WSConstants extends WSS4JConstants {
 
     /**
      * Sets the {@link
-     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
+     * org.apache.wss4j.common.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
      * } or the {@link
      * org.apache.wss4j.dom.message.WSSecEncrypt#build(Document, Crypto, WSSecHeader)
      * }method to send the certificate used to encrypt the symmetric key.
@@ -231,7 +231,7 @@ public final class WSConstants extends WSS4JConstants {
 
     /**
      * Sets the {@link
-     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
+     * org.apache.wss4j.common.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
      * } method to send a <code>SubjectKeyIdentifier</code> to identify
      * the signing certificate.
      * <p/>
@@ -323,7 +323,7 @@ public final class WSConstants extends WSS4JConstants {
 
 
     /**
-     *Sets the {@link org.apache.wss4j.dom.message.WSSecSignature#build(Crypto)}
+     *Sets the {@link org.apache.wss4j.common.dom.message.WSSecSignature#build(Crypto)}
      * or the {@link org.apache.wss4j.dom.message.WSSecEncrypt#build(Crypto, SecretKey)}
      * method to send the issuer name and the serial number of a certificate to the receiver.
      *<p/>

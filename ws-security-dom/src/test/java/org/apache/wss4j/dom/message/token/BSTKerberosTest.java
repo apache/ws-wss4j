@@ -36,7 +36,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
-import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.common.dom.message.WSSecSignature;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.common.dom.validate.Credential;

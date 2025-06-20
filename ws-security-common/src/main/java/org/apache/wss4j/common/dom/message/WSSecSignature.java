@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message;
+package org.apache.wss4j.common.dom.message;
 
 import java.security.NoSuchProviderException;
 import java.security.Provider;
@@ -48,8 +48,6 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.DERDecoder;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.common.dom.message.WSSecSignatureBase;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.DOMX509Data;
@@ -65,7 +63,6 @@ import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.common.dom.transform.STRTransform;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -398,7 +395,10 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         prepare(cr);
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
+            String soapNamespace = XMLUtils.getSOAPNamespace(getDocument().getDocumentElement());
+            WSEncryptionPart defaultEncryptionPart = 
+                new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
+            getParts().add(defaultEncryptionPart);
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if (part.getId() == null && "STRTransform".equals(part.getName())) {
