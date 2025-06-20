@@ -36,8 +36,8 @@ import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
@@ -77,9 +77,13 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                 if (el.equals(WSConstants.ENCRYPTED_KEY)) {
-                    EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                    List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, data, data.getSamlAlgorithmSuite());
+                    Processor proc = data.getWssConfig().getProcessor(WSConstants.ENCRYPTED_KEY);
+                    AlgorithmSuite oldAlgorithmSuite = data.getAlgorithmSuite();
+                    // Hack to work around hard-coding the EncryptedKeyProcessor
+                    data.setAlgorithmSuite(data.getSamlAlgorithmSuite());
+                    List<WSSecurityEngineResult> result = proc.handleToken((Element)node, data);
+                    data.setAlgorithmSuite(oldAlgorithmSuite);
+                    
                     byte[] secret =
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
