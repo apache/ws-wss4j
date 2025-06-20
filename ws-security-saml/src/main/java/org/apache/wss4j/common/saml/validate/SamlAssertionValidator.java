@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.validate;
+package org.apache.wss4j.common.saml.validate;
 
 import java.time.Instant;
 import java.util.List;
