@@ -134,7 +134,7 @@ public class SignatureSTRParser implements STRParser {
                 STRParserUtil.getAssertionFromKeyIdentifier(
                     secRef, secRef.getElement(), data
                 );
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
             SAMLKeyInfo samlKi =
                 SAMLUtil.getCredentialFromSubject(samlAssertion,
@@ -299,7 +299,7 @@ public class SignatureSTRParser implements STRParser {
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
             SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
             if (keyInfo == null) {
@@ -383,7 +383,7 @@ public class SignatureSTRParser implements STRParser {
                             new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
                         );
                     }
-                    STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+                    STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
                     SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
                     X509Certificate[] foundCerts = keyInfo.getCerts();

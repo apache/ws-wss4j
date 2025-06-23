@@ -107,7 +107,7 @@ public class EncryptedKeySTRParser implements STRParser {
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
             SAMLKeyInfo keyInfo =
                 SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
@@ -144,7 +144,7 @@ public class EncryptedKeySTRParser implements STRParser {
                     STRParserUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, data
                     );
-                STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+                STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
                 SAMLKeyInfo samlKi =
                     SAMLUtil.getCredentialFromSubject(samlAssertion,

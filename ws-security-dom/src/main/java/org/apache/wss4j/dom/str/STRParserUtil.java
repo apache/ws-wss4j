@@ -185,24 +185,22 @@ public final class STRParserUtil {
      * Check that the SAML token referenced by the SecurityTokenReference argument
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the SAML token
-     * @param samlAssertion The SAML Token SamlAssertionWrapper object
+     * @param saml2Token If the STR refers to a SAML 2 token or not
      * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
     public static void checkSamlTokenBSPCompliance(
         SecurityTokenReference secRef,
-        SamlAssertionWrapper samlAssertion,
+        boolean saml2Token,
         BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         // Check the KeyIdentifier ValueType attributes
         if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
-            if (samlAssertion.getSaml1() != null
-                && !WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)) {
+            if (!saml2Token && !WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R6603);
             }
-            if (samlAssertion.getSaml2() != null
-                && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
+            if (saml2Token && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R6616);
             }
             String encoding = secRef.getKeyIdentifierEncodingType();
@@ -213,15 +211,15 @@ public final class STRParserUtil {
 
         // Check the TokenType attribute
         String tokenType = secRef.getTokenType();
-        if (samlAssertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+        if (!saml2Token && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R6611);
         }
-        if (samlAssertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+        if (saml2Token && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R6617);
         }
 
         // Check the ValueType attribute of the Reference for SAML2
-        if (samlAssertion.getSaml2() != null && secRef.containsReference()) {
+        if (saml2Token && secRef.containsReference()) {
             String valueType = secRef.getReference().getValueType();
             if (valueType != null && valueType.length() != 0) {
                 bspEnforcer.handleBSPRule(BSPRule.R6614);

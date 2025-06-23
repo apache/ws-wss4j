@@ -94,7 +94,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
         SecurityTokenReference secRef,
         RequestData data
     ) throws WSSecurityException {
-        STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
+        STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
         SAMLKeyInfo samlKi =
             SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto());
         if (samlKi == null) {
