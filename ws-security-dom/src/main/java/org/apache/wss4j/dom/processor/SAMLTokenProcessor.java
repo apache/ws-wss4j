@@ -43,13 +43,13 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;
 import org.opensaml.xmlsec.signature.KeyInfo;
@@ -278,7 +278,7 @@ public class SAMLTokenProcessor implements Processor {
                 }
                 ref.setTransformAlgorithms(transformAlgorithms);
 
-                ref.setXpath(EncryptionUtils.getXPath(token));
+                ref.setXpath(XMLUtils.getXPath(token));
                 protectedRefs.add(ref);
             }
         }

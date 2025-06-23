@@ -35,7 +35,6 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.parser.XMLParserException;
 import org.apache.xml.security.utils.JavaUtils;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -223,10 +222,10 @@ public final class EncryptionUtils {
             soapHeader.replaceChild(decryptedHeader, parent);
 
             dataRef.setProtectedElement((Element)decryptedHeader);
-            dataRef.setXpath(getXPath(decryptedHeader));
+            dataRef.setXpath(XMLUtils.getXPath(decryptedHeader));
         } else if (content) {
             dataRef.setProtectedElement(encData);
-            dataRef.setXpath(getXPath(encData));
+            dataRef.setXpath(XMLUtils.getXPath(encData));
         } else {
             if (decryptedNode == null) {
                 if (previousSibling == null) {
@@ -238,7 +237,7 @@ public final class EncryptionUtils {
             if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
                 dataRef.setProtectedElement((Element)decryptedNode);
             }
-            dataRef.setXpath(getXPath(decryptedNode));
+            dataRef.setXpath(XMLUtils.getXPath(decryptedNode));
         }
 
         return dataRef;
@@ -444,54 +443,6 @@ public final class EncryptionUtils {
         }
 
         return prefix.toString() + suffix.toString();
-    }
-
-    /**
-     * @param decryptedNode the decrypted node
-     * @return a fully built xpath
-     *        (eg. &quot;/soapenv:Envelope/soapenv:Body/ns:decryptedElement&quot;)
-     *        if the decryptedNode is an Element or an Attr node and is not detached
-     *        from the document. <code>null</code> otherwise
-     */
-    public static String getXPath(Node decryptedNode) {
-        if (decryptedNode == null) {
-            return null;
-        }
-
-        String result = "";
-        if (Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
-            result = decryptedNode.getNodeName();
-            result = prependFullPath(result, decryptedNode.getParentNode());
-        } else if (Node.ATTRIBUTE_NODE == decryptedNode.getNodeType()) {
-            result = "@" + decryptedNode.getNodeName();
-            result = prependFullPath(result, ((Attr)decryptedNode).getOwnerElement());
-        } else {
-            return null;
-        }
-
-        return result;
-    }
-
-
-    /**
-     * Recursively build an absolute xpath (starting with the root &quot;/&quot;)
-     *
-     * @param xpath the xpath expression built so far
-     * @param node the current node whose name is to be prepended
-     * @return a fully built xpath
-     */
-    private static String prependFullPath(String xpath, Node node) {
-        if (node == null) {
-            // probably a detached node... not really useful
-            return null;
-        } else if (Node.ELEMENT_NODE == node.getNodeType()) {
-            xpath = node.getNodeName() + "/" + xpath;
-            return prependFullPath(xpath, node.getParentNode());
-        } else if (Node.DOCUMENT_NODE == node.getNodeType()) {
-            return "/" + xpath;
-        } else {
-            return prependFullPath(xpath, node.getParentNode());
-        }
     }
 
     public static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {

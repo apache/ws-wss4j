@@ -78,7 +78,6 @@ import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.wss4j.common.dom.transform.AttachmentContentSignatureTransform;
 import org.apache.wss4j.common.dom.transform.STRTransform;
 import org.apache.wss4j.common.dom.transform.STRTransformUtil;
-import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.wss4j.common.dom.validate.Credential;
@@ -573,7 +572,7 @@ public class SignatureProcessor implements Processor {
                 }
                 ref.setTransformAlgorithms(transformAlgorithms);
 
-                ref.setXpath(EncryptionUtils.getXPath(se));
+                ref.setXpath(XMLUtils.getXPath(se));
                 protectedRefs.add(ref);
             }
         }
