@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.str;
 
 import java.security.Principal;
+import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -297,22 +298,24 @@ public class SignatureSTRParser implements STRParser {
             parserResult.setSecretKey(dkt.deriveKey(keyLength, secret));
         } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
+            // Check BSP compliance
+            Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+            boolean saml2Token = "urn:oasis:names:tc:SAML:2.0:assertion".equals(token.getNamespaceURI());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, saml2Token, data.getBSPEnforcer());
+
+             // Get certificates and public key from the SAML assertion that was previously processed
+            X509Certificate[] certs = (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+            if (certs != null && certs.length > 0) {
+                parserResult.setCerts(new X509Certificate[]{certs[0]});
+            }
+            PublicKey publicKey = (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+            parserResult.setPublicKey(publicKey);
+            byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            parserResult.setSecretKey(secretKey);
+
+            // TODO revisit this part
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
-
-            SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
-            if (keyInfo == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
-                );
-            }
-            X509Certificate[] foundCerts = keyInfo.getCerts();
-            if (foundCerts != null && foundCerts.length > 0) {
-                parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
-            }
-            parserResult.setSecretKey(keyInfo.getSecret());
-            parserResult.setPublicKey(keyInfo.getPublicKey());
             parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult));
         }
 

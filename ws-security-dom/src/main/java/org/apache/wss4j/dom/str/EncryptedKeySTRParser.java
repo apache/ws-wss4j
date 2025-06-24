@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.str;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import javax.xml.namespace.QName;
@@ -105,15 +106,16 @@ public class EncryptedKeySTRParser implements STRParser {
             parserResult.setCerts(certs);
         } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
-            SamlAssertionWrapper samlAssertion =
-                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
+            // Check BSP compliance
+            Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+            boolean saml2Token = "urn:oasis:names:tc:SAML:2.0:assertion".equals(token.getNamespaceURI());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, saml2Token, data.getBSPEnforcer());
 
-            SAMLKeyInfo keyInfo =
-                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
-                        data.getSigVerCrypto());
-            parserResult.setCerts(keyInfo.getCerts());
-            parserResult.setPublicKey(keyInfo.getPublicKey());
+            // Get certificates and public key from the SAML assertion that was previously processed
+            X509Certificate[] certs = (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+            parserResult.setCerts(certs);
+            PublicKey publicKey = (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+            parserResult.setPublicKey(publicKey);
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,

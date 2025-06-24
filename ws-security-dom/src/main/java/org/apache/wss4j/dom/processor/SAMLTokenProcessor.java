@@ -151,6 +151,23 @@ public class SAMLTokenProcessor implements Processor {
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
+
+        // Save subject certs and secrets for further processing
+        SAMLKeyInfo keyInfo =
+            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
+                data.getSigVerCrypto());
+        if (keyInfo != null) {
+            if (keyInfo.getPublicKey() != null) {
+                result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, keyInfo.getPublicKey());
+            }
+            if (keyInfo.getCerts() != null) {
+                result.put(WSSecurityEngineResult.TAG_X509_CERTIFICATES, keyInfo.getCerts());
+            }
+            if (keyInfo.getSecret() != null) {
+                result.put(WSSecurityEngineResult.TAG_SECRET, keyInfo.getSecret());
+            }
+        }
+
         data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }

@@ -134,10 +134,17 @@ public class SecurityTokenRefSTRParser implements STRParser {
             parserResult.setPrincipal(dkt.createPrincipal());
         } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
-            SamlAssertionWrapper samlAssertion =
-                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            byte[] secretKey =
-                getSecretKeyFromAssertion(samlAssertion, secRef, data);
+            // Check BSP compliance
+            Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+            boolean saml2Token = "urn:oasis:names:tc:SAML:2.0:assertion".equals(token.getNamespaceURI());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, saml2Token, data.getBSPEnforcer());
+
+            byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            if (secretKey == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken",
+                    new Object[] {"No Secret Key"});
+            }
             parserResult.setSecretKey(secretKey);
         } else if (action != null
             && (WSConstants.SCT == action.intValue() || WSConstants.BST == action.intValue())) {

@@ -26,9 +26,6 @@ import java.util.List;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
@@ -36,7 +33,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.w3c.dom.Element;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element associated
@@ -105,15 +102,13 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             parserResult.setSecretKey(secretKey);
         } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
-            SamlAssertionWrapper samlAssertion =
-                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
+            // Check BSP compliance
+            Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+            boolean saml2Token = "urn:oasis:names:tc:SAML:2.0:assertion".equals(token.getNamespaceURI());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, saml2Token, data.getBSPEnforcer());
 
-            SAMLKeyInfo keyInfo =
-                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto());
-            // TODO Handle malformed SAML tokens where they don't have the
-            // secret in them
-            byte[] secretKey = keyInfo.getSecret();
+            // TODO Handle malformed SAML tokens where they don't have the secret in them
+            byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
         } else {
             throw new WSSecurityException(
