@@ -36,7 +36,7 @@ import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.Reference;
@@ -131,22 +131,19 @@ public class SignatureSTRParser implements STRParser {
         byte[] secretKey = STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                                WSPasswordCallback.SECRET_KEY, data);
         if (secretKey == null || secretKey.length == 0) {
-            SamlAssertionWrapper samlAssertion =
-                STRParserUtil.getAssertionFromKeyIdentifier(
-                    secRef, secRef.getElement(), data
-                );
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
+            SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
+            SAMLKeyInfo samlKi = keyInfoProcessor.processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
 
-            SAMLKeyInfo samlKi =
-                SAMLUtil.getCredentialFromSubject(samlAssertion,
-                        new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
             X509Certificate[] foundCerts = samlKi.getCerts();
             if (foundCerts != null && foundCerts.length > 0) {
                 parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
             }
             secretKey = samlKi.getSecret();
             parserResult.setPublicKey(samlKi.getPublicKey());
-            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult));
+            parserResult.setPrincipal(samlKi.getSamlPrincipal());
+            if (samlKi.isHolderOfKey() && samlKi.isAssertionSigned()) {
+                parserResult.setTrustedCredential(true);
+            }
         }
         parserResult.setSecretKey(secretKey);
     }

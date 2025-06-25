@@ -31,7 +31,9 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -64,8 +66,8 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
 
     public SAMLKeyInfo processSAMLKeyInfoFromAssertionElement(Element assertionElement, RequestData data, 
         Crypto userCrypto) throws WSSecurityException {
-        SamlAssertionWrapper assertion = new SamlAssertionWrapper(assertionElement);
-        return SAMLUtil.getCredentialFromSubject(assertion, this, data, userCrypto);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(assertionElement);
+        return processSAMLKeyInfoFromAssertion(samlAssertion, data, userCrypto);
     }
 
     public SAMLKeyInfo processSAMLKeyInfoFromSecurityTokenReference(SecurityTokenReference secRef,
@@ -74,7 +76,27 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         SamlAssertionWrapper samlAssertion = STRParserUtil.getAssertionFromKeyIdentifier(secRef, secRef.getElement(), data);
         STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
-        return SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
+        return processSAMLKeyInfoFromAssertion(samlAssertion, data, data.getSigVerCrypto());
+    }
+
+    private SAMLKeyInfo processSAMLKeyInfoFromAssertion(SamlAssertionWrapper samlAssertion,
+        RequestData data,
+        Crypto crypto
+    ) throws WSSecurityException {
+        SAMLKeyInfo samlKeyInfo = 
+            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data, crypto);
+
+        SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
+        samlKeyInfo.setSamlPrincipal(samlPrincipal);
+        String confirmMethod = null;
+        List<String> methods = samlAssertion.getConfirmationMethods();
+        if (methods != null && !methods.isEmpty()) {
+            confirmMethod = methods.get(0);
+        }
+        samlKeyInfo.setHolderOfKey(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
+        samlKeyInfo.setAssertionSigned(samlAssertion.isSigned());
+
+        return samlKeyInfo;
     }
 
     public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement, RequestData data) throws WSSecurityException {

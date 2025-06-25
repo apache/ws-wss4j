@@ -42,6 +42,12 @@ public class SAMLKeyInfo {
      */
     private PublicKey publicKey;
 
+    private boolean isHolderOfKey;
+
+    private boolean isAssertionSigned;
+
+    private java.security.Principal samlPrincipal;
+
     public SAMLKeyInfo() {
     }
 
@@ -81,4 +87,26 @@ public class SAMLKeyInfo {
         this.publicKey = publicKey;
     }
 
+    public boolean isAssertionSigned() {
+        return isAssertionSigned;
+    }
+
+    public void setAssertionSigned(boolean isAssertionSigned) {
+        this.isAssertionSigned = isAssertionSigned;
+    }
+    public boolean isHolderOfKey() {
+        return isHolderOfKey;
+    }
+
+    public void setHolderOfKey(boolean isHolderOfKey) {
+        this.isHolderOfKey = isHolderOfKey;
+    }
+
+    public java.security.Principal getSamlPrincipal() {
+        return samlPrincipal;
+    }
+
+    public void setSamlPrincipal(java.security.Principal samlPrincipal) {
+        this.samlPrincipal = samlPrincipal;
+    }
 }
