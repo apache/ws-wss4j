@@ -44,6 +44,7 @@ import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
+import org.apache.wss4j.dom.str.STRParserUtil;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.xml.security.utils.XMLUtils;
 
@@ -65,6 +66,15 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         Crypto userCrypto) throws WSSecurityException {
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(assertionElement);
         return SAMLUtil.getCredentialFromSubject(assertion, this, data, userCrypto);
+    }
+
+    public SAMLKeyInfo processSAMLKeyInfoFromSecurityTokenReference(SecurityTokenReference secRef,
+        RequestData data
+    ) throws WSSecurityException {
+        SamlAssertionWrapper samlAssertion = STRParserUtil.getAssertionFromKeyIdentifier(secRef, secRef.getElement(), data);
+        STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
+
+        return SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
     }
 
     public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement, RequestData data) throws WSSecurityException {

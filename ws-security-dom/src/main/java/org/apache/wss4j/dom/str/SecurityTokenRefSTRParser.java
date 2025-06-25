@@ -27,8 +27,7 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -84,25 +83,6 @@ public class SecurityTokenRefSTRParser implements STRParser {
         }
 
         return processSTR(secRef, uri, parameters);
-    }
-
-    /**
-     * Get a SecretKey from a SAML Assertion
-     */
-    private byte[] getSecretKeyFromAssertion(
-        SamlAssertionWrapper samlAssertion,
-        SecurityTokenReference secRef,
-        RequestData data
-    ) throws WSSecurityException {
-        STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
-        SAMLKeyInfo samlKi =
-            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
-        if (samlKi == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken",
-                new Object[] {"No Secret Key"});
-        }
-        return samlKi.getSecret();
     }
 
     /**
@@ -216,11 +196,14 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                         WSPasswordCallback.SECRET_KEY, data);
                 if (secretKey == null || secretKey.length == 0) {
-                    SamlAssertionWrapper samlAssertion =
-                        STRParserUtil.getAssertionFromKeyIdentifier(
-                            secRef, strElement, data
-                        );
-                    secretKey = getSecretKeyFromAssertion(samlAssertion, secRef, data);
+                    SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
+                    SAMLKeyInfo samlKi = keyInfoProcessor.processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
+                    if (samlKi == null || samlKi.getSecret() == null) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken",
+                            new Object[] {"No Secret Key"});
+                    }
+                    secretKey = samlKi.getSecret();
                 }
                 parserResult.setSecretKey(secretKey);
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {

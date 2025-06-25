@@ -27,8 +27,7 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -142,15 +141,8 @@ public class EncryptedKeySTRParser implements STRParser {
         if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                SamlAssertionWrapper samlAssertion =
-                    STRParserUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, data
-                    );
-                STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
-
-                SAMLKeyInfo samlKi =
-                    SAMLUtil.getCredentialFromSubject(samlAssertion,
-                            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
+                SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
+                SAMLKeyInfo samlKi = keyInfoProcessor.processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
                 parserResult.setCerts(samlKi.getCerts());
                 parserResult.setPublicKey(samlKi.getPublicKey());
             } else {
