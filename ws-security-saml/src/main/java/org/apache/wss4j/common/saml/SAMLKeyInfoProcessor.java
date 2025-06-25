@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.saml;
 
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Element;
 
@@ -27,5 +29,8 @@ import org.w3c.dom.Element;
  */
 public interface SAMLKeyInfoProcessor {
 
-    SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException;
+    SAMLKeyInfo processSAMLKeyInfoFromAssertionElement(Element samlAssertion, RequestData data, 
+        Crypto userCrypto) throws WSSecurityException;
+
+    SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement, RequestData data) throws WSSecurityException;
 }

@@ -150,7 +150,7 @@ public class EncryptedKeySTRParser implements STRParser {
 
                 SAMLKeyInfo samlKi =
                     SAMLUtil.getCredentialFromSubject(samlAssertion,
-                            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto());
+                            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
                 parserResult.setCerts(samlKi.getCerts());
                 parserResult.setPublicKey(samlKi.getPublicKey());
             } else {

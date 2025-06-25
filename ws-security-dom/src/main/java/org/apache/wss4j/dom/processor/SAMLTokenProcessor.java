@@ -154,7 +154,7 @@ public class SAMLTokenProcessor implements Processor {
 
         // Save subject certs and secrets for further processing
         SAMLKeyInfo keyInfo =
-            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
+            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data,
                 data.getSigVerCrypto());
         if (keyInfo != null) {
             if (keyInfo.getPublicKey() != null) {
@@ -179,7 +179,7 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         // Parse the subject if it exists
         samlAssertion.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
+            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto()
         );
 
         // Now delegate the rest of the verification to the Validator
@@ -206,7 +206,7 @@ public class SAMLTokenProcessor implements Processor {
             }
             SAMLKeyInfo samlKeyInfo =
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto()
                 );
 
             PublicKey key = null;

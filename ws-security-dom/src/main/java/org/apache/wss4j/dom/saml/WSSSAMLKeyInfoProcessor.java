@@ -29,10 +29,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
@@ -58,13 +61,13 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
     private static final QName BINARY_SECRET_05_12 =
         new QName(WST_NS_05_12, "BinarySecret");
 
-    private RequestData data;
-
-    public WSSSAMLKeyInfoProcessor(RequestData data) {
-        this.data = data;
+    public SAMLKeyInfo processSAMLKeyInfoFromAssertionElement(Element assertionElement, RequestData data, 
+        Crypto userCrypto) throws WSSecurityException {
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(assertionElement);
+        return SAMLUtil.getCredentialFromSubject(assertion, this, data, userCrypto);
     }
 
-    public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException {
+    public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement, RequestData data) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //

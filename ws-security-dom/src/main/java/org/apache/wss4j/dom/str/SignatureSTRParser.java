@@ -139,7 +139,7 @@ public class SignatureSTRParser implements STRParser {
 
             SAMLKeyInfo samlKi =
                 SAMLUtil.getCredentialFromSubject(samlAssertion,
-                        new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto());
+                        new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
             X509Certificate[] foundCerts = samlKi.getCerts();
             if (foundCerts != null && foundCerts.length > 0) {
                 parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
@@ -383,7 +383,7 @@ public class SignatureSTRParser implements STRParser {
                     } else {
                         samlAssertion = new SamlAssertionWrapper(processedToken);
                         samlAssertion.parseSubject(
-                            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
+                            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto()
                         );
                     }
                     STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());

@@ -36,6 +36,7 @@ import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
@@ -70,21 +71,23 @@ public final class SAMLUtil {
      *
      * @param samlAssertion The SAML Assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param data RequestData
      * @return a SAMLKeyInfo object
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         SamlAssertionWrapper samlAssertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
+        RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
         if (samlAssertion.getSaml1() != null) {
             return getCredentialFromSubject(
-                samlAssertion.getSaml1(), keyInfoProcessor, sigCrypto
+                samlAssertion.getSaml1(), keyInfoProcessor, data, sigCrypto
             );
         } else if (samlAssertion.getSaml2() != null) {
             return getCredentialFromSubject(
-                samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto
+                samlAssertion.getSaml2(), keyInfoProcessor, data, sigCrypto
             );
         }
 
@@ -97,6 +100,7 @@ public final class SAMLUtil {
      * SAML 1.1 assertion
      * @param assertion The SAML 1.1 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param data RequestData
      * @param sigCrypto A Crypto instance
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
@@ -104,6 +108,7 @@ public final class SAMLUtil {
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml.saml1.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
+        RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
         for (org.opensaml.saml.saml1.core.Statement stmt : assertion.getStatements()) {
@@ -128,7 +133,7 @@ public final class SAMLUtil {
                     XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
                 if (keyInfoElement != null) {
                     return getCredentialFromKeyInfo(
-                        keyInfoElement, keyInfoProcessor, sigCrypto
+                        keyInfoElement, keyInfoProcessor, data, sigCrypto
                     );
                 }
             }
@@ -142,6 +147,7 @@ public final class SAMLUtil {
      * SAML 2 assertion
      * @param assertion The SAML 2 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param data RequestData
      * @param sigCrypto A Crypto instance
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
@@ -149,6 +155,7 @@ public final class SAMLUtil {
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml.saml2.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
+        RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
         org.opensaml.saml.saml2.core.Subject samlSubject = assertion.getSubject();
@@ -164,7 +171,7 @@ public final class SAMLUtil {
                         XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
                     if (keyInfoElement != null) {
                         return getCredentialFromKeyInfo(
-                            keyInfoElement, keyInfoProcessor, sigCrypto
+                            keyInfoElement, keyInfoProcessor, data, sigCrypto
                         );
                     }
                 }
@@ -179,6 +186,7 @@ public final class SAMLUtil {
      * KeyInfo (DOM Element) argument.
      * @param keyInfoElement The KeyInfo as a DOM Element
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param data The RequestData object
      * @param sigCrypto A Crypto instance
      * @return The credential (as a SAMLKeyInfo object)
      * @throws WSSecurityException
@@ -186,13 +194,14 @@ public final class SAMLUtil {
     public static SAMLKeyInfo getCredentialFromKeyInfo(
         Element keyInfoElement,
         SAMLKeyInfoProcessor keyInfoProcessor,
+        RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //
         if (keyInfoProcessor != null) {
-            SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfo(keyInfoElement);
+            SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfo(keyInfoElement, data);
             if (samlKeyInfo != null) {
                 return samlKeyInfo;
             }

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
@@ -581,7 +582,7 @@ public class SamlAssertionWrapper {
      * @throws WSSecurityException
      */
     public void verifySignature(
-        SAMLKeyInfoProcessor keyInfoProcessor, Crypto sigCrypto
+        SAMLKeyInfoProcessor keyInfoProcessor, RequestData data, Crypto sigCrypto
     ) throws WSSecurityException {
         Signature sig = getSignature();
         if (sig != null) {
@@ -593,7 +594,7 @@ public class SamlAssertionWrapper {
                 );
             }
             SAMLKeyInfo samlKeyInfo =
-                SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), keyInfoProcessor, sigCrypto);
+                SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), keyInfoProcessor, data, sigCrypto);
             verifySignature(samlKeyInfo);
         } else {
             LOG.debug("SamlAssertionWrapper: no signature to validate");
@@ -668,17 +669,18 @@ public class SamlAssertionWrapper {
      */
     public void parseSubject(
         SAMLKeyInfoProcessor keyInfoProcessor,
+        RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
         if (samlVersion == SAMLVersion.VERSION_11) {
             subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor, sigCrypto
+                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor, data, sigCrypto
                 );
         } else if (samlVersion == SAMLVersion.VERSION_20) {
             subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor, sigCrypto
+                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor, data, sigCrypto
                 );
         }
     }

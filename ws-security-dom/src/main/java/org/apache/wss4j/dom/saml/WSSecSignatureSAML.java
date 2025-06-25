@@ -37,7 +37,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.DOMX509Data;
@@ -243,10 +243,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 SignatureActionToken actionToken = new SignatureActionToken();
                 data.setSignatureToken(actionToken);
                 actionToken.setCrypto(userCrypto);
-                SAMLKeyInfo samlKeyInfo =
-                    SAMLUtil.getCredentialFromSubject(
-                            samlAssertion, new WSSSAMLKeyInfoProcessor(data), userCrypto
-                    );
+                SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
+                SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfoFromAssertionElement(samlToken, data, userCrypto);
                 if (samlKeyInfo != null) {
                     publicKey = samlKeyInfo.getPublicKey();
                     certs = samlKeyInfo.getCerts();
