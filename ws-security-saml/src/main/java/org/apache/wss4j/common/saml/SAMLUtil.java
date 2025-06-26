@@ -38,6 +38,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.w3c.dom.Element;
@@ -81,18 +82,31 @@ public final class SAMLUtil {
         RequestData data,
         Crypto sigCrypto
     ) throws WSSecurityException {
+        SAMLKeyInfo samlKeyInfo = null;
         if (samlAssertion.getSaml1() != null) {
-            return getCredentialFromSubject(
+            samlKeyInfo = getCredentialFromSubject(
                 samlAssertion.getSaml1(), keyInfoProcessor, data, sigCrypto
             );
         } else if (samlAssertion.getSaml2() != null) {
-            return getCredentialFromSubject(
+            samlKeyInfo = getCredentialFromSubject(
                 samlAssertion.getSaml2(), keyInfoProcessor, data, sigCrypto
             );
+        } else {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                      new Object[] {"Cannot get credentials from an unknown SAML Assertion"});
         }
 
-        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                      new Object[] {"Cannot get credentials from an unknown SAML Assertion"});
+        if (samlKeyInfo != null) {
+            List<String> methods = samlAssertion.getConfirmationMethods();
+            if (methods != null && !methods.isEmpty()) {
+                String confirmMethod = methods.get(0);
+                samlKeyInfo.setHolderOfKey(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
+            }
+            samlKeyInfo.setAssertionSigned(samlAssertion.isSigned());
+            samlKeyInfo.setSamlPrincipal(new SAMLTokenPrincipalImpl(samlAssertion));
+        }
+
+        return samlKeyInfo;
     }
 
     /**

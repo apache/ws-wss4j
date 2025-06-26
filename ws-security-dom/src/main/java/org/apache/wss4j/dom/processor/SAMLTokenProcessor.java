@@ -166,6 +166,7 @@ public class SAMLTokenProcessor implements Processor {
             if (keyInfo.getSecret() != null) {
                 result.put(WSSecurityEngineResult.TAG_SECRET, keyInfo.getSecret());
             }
+            result.put(WSSecurityEngineResult.TAG_SAML_KEYINFO, keyInfo);
         }
 
         data.getWsDocInfo().addResult(result);

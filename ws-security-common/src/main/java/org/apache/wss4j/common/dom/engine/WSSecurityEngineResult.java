@@ -166,6 +166,11 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_PUBLIC_KEY = "public-key";
 
+    /**
+     * Tag denoting a SAMLKeyInfo associated with this token
+     */
+    public static final String TAG_SAML_KEYINFO = "saml-keyinfo";
+
     //
     // General tags
     //

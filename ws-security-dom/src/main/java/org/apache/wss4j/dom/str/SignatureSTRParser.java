@@ -310,10 +310,11 @@ public class SignatureSTRParser implements STRParser {
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
 
-            // TODO revisit this part
-            SamlAssertionWrapper samlAssertion =
-                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult));
+            SAMLKeyInfo samlKeyInfo = (SAMLKeyInfo)result.get(WSSecurityEngineResult.TAG_SAML_KEYINFO);
+            if (samlKeyInfo != null && samlKeyInfo.isHolderOfKey() && samlKeyInfo.isAssertionSigned()) {
+                parserResult.setTrustedCredential(true);
+            }
+            parserResult.setPrincipal((Principal)result.get(WSSecurityEngineResult.TAG_PRINCIPAL));
         }
 
         REFERENCE_TYPE referenceType = getReferenceType(secRef);
