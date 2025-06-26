@@ -19,8 +19,6 @@
 
 package org.apache.wss4j.dom.str;
 
-import java.util.List;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
@@ -30,7 +28,6 @@ import org.apache.wss4j.common.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -38,10 +35,8 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.common.dom.processor.Processor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -55,64 +50,6 @@ public final class STRParserUtil {
 
     private STRParserUtil() {
         // complete
-    }
-
-    /**
-     * Get an SamlAssertionWrapper object from parsing a SecurityTokenReference that uses
-     * a KeyIdentifier that points to a SAML Assertion.
-     *
-     * @param secRef the SecurityTokenReference to the SAML Assertion
-     * @param strElement The SecurityTokenReference DOM element
-     * @param request The RequestData instance used to obtain configuration
-     * @return an SamlAssertionWrapper object
-     * @throws WSSecurityException
-     */
-    public static SamlAssertionWrapper getAssertionFromKeyIdentifier(
-        SecurityTokenReference secRef,
-        Element strElement,
-        RequestData request
-    ) throws WSSecurityException {
-        String keyIdentifierValue = secRef.getKeyIdentifierValue();
-        String type = secRef.getKeyIdentifierValueType();
-        WSSecurityEngineResult result = request.getWsDocInfo().getResult(keyIdentifierValue);
-
-        SamlAssertionWrapper samlAssertion = null;
-        Element token = null;
-        if (result != null) {
-            samlAssertion =
-                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            return samlAssertion;
-        } else {
-            token =
-                findProcessedTokenElement(
-                    strElement.getOwnerDocument(), request.getWsDocInfo(), request.getCallbackHandler(),
-                    keyIdentifierValue, type
-                );
-            if (token != null) {
-                if (!"Assertion".equals(token.getLocalName())) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
-                    );
-                }
-                return new SamlAssertionWrapper(token);
-            }
-            token =
-                findUnprocessedTokenElement(
-                    strElement.getOwnerDocument(), request.getWsDocInfo(), keyIdentifierValue, type
-                );
-
-            if (token == null || !"Assertion".equals(token.getLocalName())) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
-                );
-            }
-            Processor proc = request.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
-            List<WSSecurityEngineResult> samlResult = proc.handleToken(token, request);
-            return
-                (SamlAssertionWrapper)samlResult.get(0).get(
-                    WSSecurityEngineResult.TAG_SAML_ASSERTION
-                );
-        }
     }
 
 

@@ -71,7 +71,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
     public SAMLKeyInfo processSAMLKeyInfoFromSecurityTokenReference(SecurityTokenReference secRef,
         RequestData data
     ) throws WSSecurityException {
-        SamlAssertionWrapper samlAssertion = STRParserUtil.getAssertionFromKeyIdentifier(secRef, secRef.getElement(), data);
+        SamlAssertionWrapper samlAssertion = getAssertionFromKeyIdentifier(secRef, secRef.getElement(), data);
         STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
 
         return SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto());
@@ -140,4 +140,63 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
 
         return null;
     }
+
+    /**
+     * Get an SamlAssertionWrapper object from parsing a SecurityTokenReference that uses
+     * a KeyIdentifier that points to a SAML Assertion.
+     *
+     * @param secRef the SecurityTokenReference to the SAML Assertion
+     * @param strElement The SecurityTokenReference DOM element
+     * @param request The RequestData instance used to obtain configuration
+     * @return an SamlAssertionWrapper object
+     * @throws WSSecurityException
+     */
+    private static SamlAssertionWrapper getAssertionFromKeyIdentifier(
+        SecurityTokenReference secRef,
+        Element strElement,
+        RequestData request
+    ) throws WSSecurityException {
+        String keyIdentifierValue = secRef.getKeyIdentifierValue();
+        String type = secRef.getKeyIdentifierValueType();
+        WSSecurityEngineResult result = request.getWsDocInfo().getResult(keyIdentifierValue);
+
+        SamlAssertionWrapper samlAssertion = null;
+        Element token = null;
+        if (result != null) {
+            samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            return samlAssertion;
+        } else {
+            token =
+            STRParserUtil.findProcessedTokenElement(
+                    strElement.getOwnerDocument(), request.getWsDocInfo(), request.getCallbackHandler(),
+                    keyIdentifierValue, type
+                );
+            if (token != null) {
+                if (!"Assertion".equals(token.getLocalName())) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
+                    );
+                }
+                return new SamlAssertionWrapper(token);
+            }
+            token =
+                STRParserUtil.findUnprocessedTokenElement(
+                    strElement.getOwnerDocument(), request.getWsDocInfo(), keyIdentifierValue, type
+                );
+
+            if (token == null || !"Assertion".equals(token.getLocalName())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
+                );
+            }
+            Processor proc = request.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
+            List<WSSecurityEngineResult> samlResult = proc.handleToken(token, request);
+            return
+                (SamlAssertionWrapper)samlResult.get(0).get(
+                    WSSecurityEngineResult.TAG_SAML_ASSERTION
+                );
+        }
+    }
+    
 }
