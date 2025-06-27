@@ -47,7 +47,6 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.saml.SignedSamlTokenHOKTest;
 import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -280,7 +279,7 @@ public class SignaturePartsTest {
         // Construct issuer and user crypto instances
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
+        ClassLoader loader = Loader.getClassLoader(SignaturePartsTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
         input.close();
