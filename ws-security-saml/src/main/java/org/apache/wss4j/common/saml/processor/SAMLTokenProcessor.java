@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.processor;
+package org.apache.wss4j.common.saml.processor;
 
 import java.security.NoSuchProviderException;
 import java.security.Provider;
