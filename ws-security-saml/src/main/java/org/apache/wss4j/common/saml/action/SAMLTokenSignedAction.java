@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.action;
+package org.apache.wss4j.common.saml.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -32,6 +32,7 @@ import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.action.Action;
 import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
+import org.apache.wss4j.common.dom.action.ActionUtils;
 
 public class SAMLTokenSignedAction implements Action {
 

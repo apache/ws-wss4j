@@ -1,1 +1,2 @@
 org.apache.wss4j.common.saml.action.SAMLTokenUnsignedAction
+org.apache.wss4j.common.saml.action.SAMLTokenSignedAction

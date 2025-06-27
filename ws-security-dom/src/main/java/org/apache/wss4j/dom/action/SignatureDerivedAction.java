@@ -38,6 +38,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.action.Action;
+import org.apache.wss4j.common.dom.action.ActionUtils;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
