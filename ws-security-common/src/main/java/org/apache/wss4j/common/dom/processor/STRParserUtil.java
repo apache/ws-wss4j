@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.str;
+package org.apache.wss4j.common.dom.processor;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

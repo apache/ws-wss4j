@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.saml;
 
-import java.security.Principal;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -28,10 +27,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
-import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -40,12 +37,8 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.common.dom.processor.STRParserUtil;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
-import org.apache.wss4j.dom.str.STRParserUtil;
-import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**
@@ -106,7 +99,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     Text txt = (Text)node.getFirstChild();
                     return new SAMLKeyInfo(XMLUtils.decode(txt.getData()));
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
-                    STRParserParameters parameters = new STRParserParameters();
+                    /* TODO need to revisit STRParserParameters parameters = new STRParserParameters();
                     parameters.setData(data);
                     parameters.setStrElement((Element)node);
 
@@ -133,6 +126,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     }
 
                     return samlKeyInfo;
+                    */
                 }
             }
             node = node.getNextSibling();

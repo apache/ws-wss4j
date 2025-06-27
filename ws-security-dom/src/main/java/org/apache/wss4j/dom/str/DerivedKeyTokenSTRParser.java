@@ -32,6 +32,7 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.processor.STRParserUtil;
 import org.apache.wss4j.common.dom.RequestData;
 import org.w3c.dom.Element;
 
