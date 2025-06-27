@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.str;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -42,7 +43,6 @@ import org.apache.wss4j.common.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.common.dom.message.token.UsernameToken;
 import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.processor.STRParserUtil;
-import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
 /**
@@ -197,14 +197,16 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     STRParserUtil.getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType,
                                                         WSPasswordCallback.SECRET_KEY, data);
                 if (secretKey == null || secretKey.length == 0) {
-                    SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
-                    SAMLKeyInfo samlKi = keyInfoProcessor.processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
-                    if (samlKi == null || samlKi.getSecret() == null) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken",
-                            new Object[] {"No Secret Key"});
+                    Optional<SAMLKeyInfoProcessor> keyInfoProcessor = data.getWssConfig().getSAMLKeyInfoProcessor();
+                    if (keyInfoProcessor.isPresent()) {
+                        SAMLKeyInfo samlKi = keyInfoProcessor.get().processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
+                        if (samlKi == null || samlKi.getSecret() == null) {
+                            throw new WSSecurityException(
+                                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken",
+                                new Object[] {"No Secret Key"});
+                        }
+                        secretKey = samlKi.getSecret();
                     }
-                    secretKey = samlKi.getSecret();
                 }
                 parserResult.setSecretKey(secretKey);
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {

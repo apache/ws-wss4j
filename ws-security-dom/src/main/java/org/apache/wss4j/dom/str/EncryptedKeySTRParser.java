@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.str;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -38,7 +39,6 @@ import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.processor.STRParserUtil;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
 /**
@@ -142,10 +142,12 @@ public class EncryptedKeySTRParser implements STRParser {
         if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                SAMLKeyInfoProcessor keyInfoProcessor = new WSSSAMLKeyInfoProcessor();
-                SAMLKeyInfo samlKi = keyInfoProcessor.processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
-                parserResult.setCerts(samlKi.getCerts());
-                parserResult.setPublicKey(samlKi.getPublicKey());
+                Optional<SAMLKeyInfoProcessor> keyInfoProcessor = data.getWssConfig().getSAMLKeyInfoProcessor();
+                if (keyInfoProcessor.isPresent()) {
+                    SAMLKeyInfo samlKi = keyInfoProcessor.get().processSAMLKeyInfoFromSecurityTokenReference(secRef, data);
+                    parserResult.setCerts(samlKi.getCerts());
+                    parserResult.setPublicKey(samlKi.getPublicKey());
+                }
             } else {
                 STRParserUtil.checkBinarySecurityBSPCompliance(secRef, null, data.getBSPEnforcer());
                 parserResult.setCerts(secRef.getKeyIdentifier(crypto));

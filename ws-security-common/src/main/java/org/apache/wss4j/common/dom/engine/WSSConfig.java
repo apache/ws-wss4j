@@ -24,6 +24,7 @@ import java.security.PrivilegedAction;
 import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -37,6 +38,7 @@ import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.resolvers.ResolverAttachment;
 import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.dom.transform.AttachmentCiphertextTransform;
@@ -480,5 +482,11 @@ public final class WSSConfig {
     public static void setAddJceProviders(boolean addJceProviders) {
         WSSConfig.addJceProviders = addJceProviders;
         WSProviderConfig.setAddJceProviders(addJceProviders);
+    }
+
+    public Optional<SAMLKeyInfoProcessor> getSAMLKeyInfoProcessor() {
+        java.util.ServiceLoader<SAMLKeyInfoProcessor> loader = 
+            java.util.ServiceLoader.load(SAMLKeyInfoProcessor.class);
+        return loader.findFirst();
     }
 }
