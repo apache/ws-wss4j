@@ -48,7 +48,7 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.saml.SignedSamlTokenHOKTest;
-import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
+import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;

@@ -46,7 +46,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
-
+import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 

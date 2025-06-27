@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml;
+package org.apache.wss4j.common.saml.message;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;

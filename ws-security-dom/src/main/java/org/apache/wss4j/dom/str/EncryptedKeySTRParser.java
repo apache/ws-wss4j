@@ -38,7 +38,7 @@ import org.apache.wss4j.common.dom.WSDocInfo;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.processor.STRParserUtil;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
 /**

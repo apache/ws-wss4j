@@ -31,7 +31,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.action.Action;
-import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
+import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 
 public class SAMLTokenSignedAction implements Action {
 

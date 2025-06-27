@@ -49,7 +49,7 @@ import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;
 import org.opensaml.xmlsec.signature.KeyInfo;

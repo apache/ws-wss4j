@@ -52,7 +52,7 @@ import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.common.dom.message.token.UsernameToken;
 import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.common.dom.processor.STRParserUtil;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
 /**
