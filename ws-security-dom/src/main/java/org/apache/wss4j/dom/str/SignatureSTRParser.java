@@ -33,12 +33,9 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -104,7 +101,6 @@ public class SignatureSTRParser implements STRParser {
      * A method to create a Principal from a SAML Assertion
      * @param samlAssertion An SamlAssertionWrapper object
      * @return A principal
-     */
     private Principal createPrincipalFromSAML(
         SamlAssertionWrapper samlAssertion, STRParserResult parserResult
     ) throws WSSecurityException {
@@ -119,6 +115,7 @@ public class SignatureSTRParser implements STRParser {
         }
         return samlPrincipal;
     }
+    */
 
     /**
      * Parse the KeyIdentifier for a SAML Assertion
@@ -373,7 +370,7 @@ public class SignatureSTRParser implements STRParser {
                             strElement.getOwnerDocument(), wsDocInfo,
                             data.getCallbackHandler(), uri, secRef.getReference().getValueType()
                         );
-                    SamlAssertionWrapper samlAssertion = null;
+
                     if (processedToken == null) {
                         Processor proc = data.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
                         WSSecurityEngineResult samlResult = proc.handleToken(token, data).get(0);
@@ -398,7 +395,7 @@ public class SignatureSTRParser implements STRParser {
                     } else {
                         Optional<SAMLKeyInfoProcessor> keyInfoProcessor = data.getWssConfig().getSAMLKeyInfoProcessor();
                         if (keyInfoProcessor.isPresent()) {
-                            samlAssertion = new SamlAssertionWrapper(processedToken);
+                            /*TODO revisit SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(processedToken);
                             samlAssertion.parseSubject(
                                 keyInfoProcessor.get(), data, data.getSigVerCrypto()
                             );
@@ -411,6 +408,7 @@ public class SignatureSTRParser implements STRParser {
                             }
                             secretKey = keyInfo.getSecret();
                             principal = createPrincipalFromSAML(samlAssertion, parserResult);
+                            */
                         }
                     }
                 } else if (el.equals(WSConstants.ENCRYPTED_KEY)) {
