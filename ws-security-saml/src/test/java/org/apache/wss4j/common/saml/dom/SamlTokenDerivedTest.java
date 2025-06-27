@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml;
+package org.apache.wss4j.common.saml.dom;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -38,8 +38,7 @@ import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;

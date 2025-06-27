@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml;
+package org.apache.wss4j.common.saml.dom;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -52,12 +52,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
-import org.apache.wss4j.dom.common.SAML2CallbackHandler;
-import org.apache.wss4j.dom.common.SAMLElementCallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
@@ -94,7 +89,6 @@ import org.w3c.dom.Element;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 

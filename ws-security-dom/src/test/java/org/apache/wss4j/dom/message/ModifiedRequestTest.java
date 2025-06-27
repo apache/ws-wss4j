@@ -31,17 +31,12 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
@@ -49,7 +44,6 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 import org.apache.wss4j.common.dom.message.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -216,52 +210,6 @@ public class ModifiedRequestTest {
             fail("Failure expected on the required element not being signed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-        }
-    }
-
-    /**
-     * Test a duplicated signed SAML Assertion.
-     */
-    @Test
-    public void testDuplicatedSignedSAMLAssertion() throws Exception {
-        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
-        callbackHandler.setIssuer("www.example.com");
-
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
-        Document signedDoc =
-            wsSign.build(
-                 null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", "security"
-            );
-        Element assertionElement = (Element) samlAssertion.getElement().cloneNode(true);
-        assertionElement.removeChild(assertionElement.getFirstChild());
-        secHeader.getSecurityHeaderElement().appendChild(assertionElement);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
-            String outputString =
-                XMLUtils.prettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-
-        try {
-            verify(signedDoc);
-            fail("Failure expected on duplicate tokens");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains(
-                "Multiple security tokens with the same Id have been detected"
-            ));
         }
     }
 

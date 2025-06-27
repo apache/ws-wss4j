@@ -20,28 +20,16 @@
 package org.apache.wss4j.dom.misc;
 
 import java.security.Principal;
-import java.security.cert.X509Certificate;
-import java.util.List;
+
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
-import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.dom.engine.WSSConfig;
@@ -50,9 +38,7 @@ import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.common.saml.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.Validator;
 
 import org.junit.jupiter.api.Test;
@@ -103,209 +89,6 @@ public class PrincipalTest {
     }
 
     /**
-     * Test the principal that is created after processing a Username Token, which has been
-     * transformed into a SAML Assertion.
-     */
-    @Test
-    public void testTransformedUsernameToken() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
-        builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build();
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        WSHandlerResult results =
-            verify(signedDoc, new DummyValidator(), WSConstants.USERNAME_TOKEN, null);
-
-        Principal principal =
-            (Principal)results.getResults().get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof SAMLTokenPrincipal);
-        assertTrue(principal.getName().contains("uid=joe"));
-        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
-    }
-
-    /**
-     * Test the principal that is created after processing a SAML Token
-     */
-    @Test
-    public void testSAMLToken() throws Exception {
-        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        callbackHandler.setIssuer("www.example.com");
-
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-
-        Document unsignedDoc = wsSign.build(samlAssertion);
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-
-        WSHandlerResult results = verify(unsignedDoc, null);
-
-        List<WSSecurityEngineResult> samlResults =
-            results.getActionResults().get(WSConstants.ST_UNSIGNED);
-        WSSecurityEngineResult actionResult = samlResults.get(0);
-
-        SamlAssertionWrapper receivedSamlAssertion =
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(receivedSamlAssertion);
-
-        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof SAMLTokenPrincipal);
-        assertTrue(principal.getName().contains("uid=joe"));
-        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
-    }
-
-    /**
-     * Test the principal that is created after processing a SAML2 Token
-     */
-    @Test
-    public void testSAML2Token() throws Exception {
-        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
-        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
-        callbackHandler.setIssuer("www.example.com");
-
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-
-        Document unsignedDoc = wsSign.build(samlAssertion);
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-
-        WSHandlerResult results = verify(unsignedDoc, null);
-
-        List<WSSecurityEngineResult> samlResults =
-            results.getActionResults().get(WSConstants.ST_UNSIGNED);
-        WSSecurityEngineResult actionResult = samlResults.get(0);
-
-        SamlAssertionWrapper receivedSamlAssertion =
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(receivedSamlAssertion);
-
-        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof SAMLTokenPrincipal);
-        assertTrue(principal.getName().contains("uid=joe"));
-        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
-    }
-
-    /**
-     * Test the principal that is created after processing a SAML Token, which has been
-     * transformed into another SAML Token.
-     */
-    @Test
-    public void testTransformedSAMLToken() throws Exception {
-        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        callbackHandler.setIssuer("www.example.com");
-
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-
-        Document unsignedDoc = wsSign.build(samlAssertion);
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-
-        WSHandlerResult results =
-            verify(unsignedDoc, new DummyValidator(), WSConstants.SAML_TOKEN, null);
-
-        List<WSSecurityEngineResult> samlResults =
-            results.getActionResults().get(WSConstants.ST_UNSIGNED);
-        WSSecurityEngineResult actionResult = samlResults.get(0);
-
-        SamlAssertionWrapper receivedSamlAssertion =
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(receivedSamlAssertion);
-
-        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof SAMLTokenPrincipal);
-        assertTrue(principal.getName().contains("uid=joe"));
-        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
-    }
-
-    /**
-     * Test the principal that is created after processing (and explicitly validating)
-     * a BinarySecurityToken.
-     */
-    @Test
-    public void testBinarySecurityToken() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        X509Security bst = new X509Security(doc);
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("wss40");
-        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        bst.setX509Certificate(certs[0]);
-
-        XMLUtils.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
-
-        if (LOG.isDebugEnabled()) {
-            String outputString =
-                XMLUtils.prettyDocumentToString(doc);
-            LOG.debug(outputString);
-        }
-
-        WSHandlerResult results =
-            verify(doc, new DummyValidator(), WSConstants.BINARY_TOKEN, crypto);
-
-        List<WSSecurityEngineResult> bstResults =
-            results.getActionResults().get(WSConstants.BST);
-        WSSecurityEngineResult actionResult = bstResults.get(0);
-
-        BinarySecurity token =
-            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertNotNull(token);
-
-        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof SAMLTokenPrincipal);
-        assertTrue(principal.getName().contains("uid=joe"));
-        assertNotNull(((SAMLTokenPrincipal)principal).getToken());
-    }
-
-    /**
      * Verifies the soap envelope
      */
     private WSHandlerResult verify(
@@ -340,34 +123,4 @@ public class PrincipalTest {
         return secEngine.processSecurityHeader(doc, requestData);
     }
 
-    /**
-     * A Dummy Validator instance that just creates a new SAML Assertion, ignoring the
-     * credential it has been passed.
-     */
-    private static class DummyValidator implements Validator {
-
-        public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-            try {
-                SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-                callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-                callbackHandler.setIssuer("www.example.com");
-
-                SAMLCallback samlCallback = new SAMLCallback();
-                SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-                SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-                credential.setTransformedToken(samlAssertion);
-                return credential;
-            } catch (Exception ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
-            }
-        }
-
-        @Override
-        public QName[] getSupportedQNames() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
-        }
-
-    }
 }

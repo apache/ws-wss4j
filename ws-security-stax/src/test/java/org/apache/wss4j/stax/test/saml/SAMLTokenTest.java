@@ -53,7 +53,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.common.dom.message.WSSecHeader;
 import org.apache.wss4j.common.saml.message.WSSecSAMLToken;

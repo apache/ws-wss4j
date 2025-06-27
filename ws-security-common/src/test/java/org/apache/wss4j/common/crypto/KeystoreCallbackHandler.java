@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.common;
+package org.apache.wss4j.common.crypto;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

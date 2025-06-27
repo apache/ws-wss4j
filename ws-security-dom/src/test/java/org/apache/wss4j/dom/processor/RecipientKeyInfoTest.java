@@ -23,7 +23,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;

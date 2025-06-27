@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.common;
+package org.apache.wss4j.common.saml.dom;
 
 import java.io.IOException;
 

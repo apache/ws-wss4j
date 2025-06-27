@@ -21,13 +21,11 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.SOAPConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
@@ -40,22 +38,14 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.InputStream;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,88 +258,6 @@ public class SignaturePartsTest {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
-    }
-
-    /**
-     * Test signing of a header through a STR Dereference Transform
-     */
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testSOAPHeaderSTRTransform() throws Exception {
-        // Construct issuer and user crypto instances
-        Crypto issuerCrypto = new Merlin();
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        ClassLoader loader = Loader.getClassLoader(SignaturePartsTest.class);
-        InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
-        keyStore.load(input, "security".toCharArray());
-        input.close();
-        ((Merlin)issuerCrypto).setKeyStore(keyStore);
-
-        Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
-
-        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-        callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-
-        samlCallback.setIssuer("www.example.com");
-
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        wsSign.setUserInfo("wss40", "security");
-
-        WSEncryptionPart encP =
-            new WSEncryptionPart("STRTransform", "", "Element");
-        wsSign.getParts().add(encP);
-
-        //
-        // set up for keyHolder
-        //
-        Document signedDoc = wsSign.build(userCrypto, samlAssertion, null, null, null);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed SAML message (key holder):");
-            String outputString =
-                XMLUtils.prettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-
-        // Construct trust crypto instance
-        Crypto trustCrypto = new Merlin();
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
-        trustStore.load(input, "security".toCharArray());
-        input.close();
-        ((Merlin)trustCrypto).setTrustStore(trustStore);
-
-        WSHandlerResult results =
-            secEngine.processSecurityHeader(doc, null, null, trustCrypto);
-        WSSecurityEngineResult stUnsignedActionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
-        SamlAssertionWrapper receivedSamlAssertion =
-            (SamlAssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertNotNull(receivedSamlAssertion);
-        assertTrue(receivedSamlAssertion.isSigned());
-
-        WSSecurityEngineResult signActionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
-        assertNotNull(signActionResult);
-        assertFalse(signActionResult.isEmpty());
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-
-        WSDataRef wsDataRef = refs.get(0);
-        String xpath = wsDataRef.getXpath();
-        assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/saml1:Assertion", xpath);
     }
 
     /**

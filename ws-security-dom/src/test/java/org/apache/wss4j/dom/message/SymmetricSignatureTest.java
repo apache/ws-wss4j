@@ -32,7 +32,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 
 import org.apache.wss4j.common.dom.engine.WSSConfig;
