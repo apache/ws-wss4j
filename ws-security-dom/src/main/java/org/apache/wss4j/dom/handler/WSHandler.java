@@ -1358,7 +1358,7 @@ public abstract class WSHandler {
      * @return the value found.
      * @throws IllegalArgumentException if <code>key</code> is null.
      */
-    private String getString(String key, Map<String, Object> mc) {
+    protected String getString(String key, Map<String, Object> mc) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null");
         }
