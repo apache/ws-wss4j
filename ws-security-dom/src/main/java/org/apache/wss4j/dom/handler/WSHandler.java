@@ -264,7 +264,9 @@ public abstract class WSHandler {
                 (Set<Integer>)reqData.getMsgContext().get(WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
                 savedSignatures = new HashSet<>();
-                reqData.getMsgContext().put(WSHandlerConstants.SEND_SIGV, savedSignatures);
+                setProperty(
+                    reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
+                );
             }
             for (byte[] signatureValue : reqData.getSignatureValues()) {
                 savedSignatures.add(Arrays.hashCode(signatureValue));
@@ -460,7 +462,7 @@ public abstract class WSHandler {
         // First get all Signature values stored during sending the request
         //
         Set<Integer> savedSignatures =
-            (Set<Integer>) reqData.getMsgContext().get(WSHandlerConstants.SEND_SIGV);
+            (Set<Integer>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
         //
         // Now get all results that hold a SignatureConfirmation element from
         // the current run of receiver (we can have more than one run: if we
@@ -760,7 +762,7 @@ public abstract class WSHandler {
                 getString(WSHandlerConstants.ENC_KEY_DERIVATION_FUNCTION, mc);
         actionToken.setKeyDerivationFunction(encKeyDerivationAlgorithm);
 
-        Object obj = mc.get(WSHandlerConstants.ENC_KEY_DERIVATION_PARAMS);
+        Object obj = getProperty(mc, WSHandlerConstants.ENC_KEY_DERIVATION_PARAMS);
         if (obj instanceof KeyDerivationParameters) {
             actionToken.setKeyDerivationParameters((KeyDerivationParameters)obj);
         }
@@ -1006,7 +1008,7 @@ public abstract class WSHandler {
         if (refId != null) {
             crypto = cryptos.get(refId);
             if (crypto == null) {
-                Object obj = mc.get(refId);
+                Object obj = getProperty(mc, refId);
                 if (obj instanceof Properties) {
                     crypto = CryptoFactory.getInstance((Properties)obj,
                                                        Loader.getClassLoader(CryptoFactory.class),
@@ -1084,6 +1086,9 @@ public abstract class WSHandler {
     ) throws WSSecurityException {
         Map<String, Object> mc = requestData.getMsgContext();
         CallbackHandler cbHandler = (CallbackHandler) mc.get(callbackHandlerRef);
+        if (cbHandler == null) {
+            cbHandler = (CallbackHandler) getProperty(mc, callbackHandlerRef);
+        }
         
         if (cbHandler == null) {
             String callback = getString(callbackHandlerClass, mc);
@@ -1151,7 +1156,7 @@ public abstract class WSHandler {
         PasswordEncryptor passwordEncryptor = requestData.getPasswordEncryptor();
         if (passwordEncryptor == null) {
             Map<String, Object> mc = requestData.getMsgContext();
-            Object o = mc.get(WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+            Object o = getProperty(mc, WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
             if (o instanceof PasswordEncryptor) {
                 passwordEncryptor = (PasswordEncryptor) o;
             }
@@ -1226,7 +1231,9 @@ public abstract class WSHandler {
             return;
         }
         List<WSHandlerResult> results =
-            (List<WSHandlerResult>) reqData.getMsgContext().get(WSHandlerConstants.RECV_RESULTS);
+            (List<WSHandlerResult>) getProperty(
+                reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
+            );
         if (results == null) {
             return;
         }
@@ -1365,7 +1372,7 @@ public abstract class WSHandler {
         if (mc == null) {
             throw new IllegalArgumentException("Message context cannot be null");
         }
-        return (String) mc.get(key);
+        return (String) getProperty(mc, key);
     }
 
     /**
@@ -1379,5 +1386,13 @@ public abstract class WSHandler {
             return null;
         }
     }
+
+    public abstract Object getProperty(Object msgContext, String key);
+
+    public abstract void setProperty(Object msgContext, String key,
+            Object value);
+
+
+    public abstract String getPassword(Object msgContext);
 
 }

@@ -586,6 +586,25 @@ public abstract class AbstractTestBase {
             return true;
         }
 
+        @SuppressWarnings("unchecked")
+        @Override
+        public Object getProperty(Object msgContext, String key) {
+            return ((Map<String, Object>) msgContext).get(key);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public void setProperty(Object msgContext, String key, Object value) {
+            ((Map<String, Object>) msgContext).put(key, value);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public String getPassword(Object msgContext) {
+            return (String) ((Map<String, Object>) msgContext).get("password");
+        }
+
+
     }
 
     protected class TestSecurityEventListener implements SecurityEventListener {

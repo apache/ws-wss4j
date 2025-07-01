@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -78,6 +79,29 @@ public class CustomHandler extends WSHandler {
         List<Integer> actions
     ) throws WSSecurityException {
         return checkReceiverResultsAnyOrder(results, actions);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setProperty(
+        Object ctx,
+        String key,
+        Object value
+    ) {
+        ((Map<String, Object>)ctx).put(key, value);
+    }
+
+    public Object getProperty(Object ctx, String key) {
+        if (ctx instanceof Map<?,?>) {
+            return ((Map<?,?>)ctx).get(key);
+        }
+        return null;
+    }
+
+    public String getPassword(Object msgContext) {
+        if (msgContext instanceof Map<?,?>) {
+            return (String)((Map<?,?>)msgContext).get("password");
+        }
+        return null;
     }
 
 
