@@ -367,12 +367,6 @@ public class WSSecurityEngine {
         WSHandlerResult handlerResult =
             new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
 
-        // TODO off-load this to CXF Validate SAML Subject Confirmation requirements
-        /*if (requestData.isValidateSamlSubjectConfirmation()) {
-            Element bodyElement = callbackLookupToUse.getSOAPBody();
-            DOMSAMLUtil.validateSAMLResults(handlerResult.getActionResults(), requestData.getTlsCerts(), bodyElement);
-        }*/
-
         wsDocInfo.clear();
 
         return handlerResult;
