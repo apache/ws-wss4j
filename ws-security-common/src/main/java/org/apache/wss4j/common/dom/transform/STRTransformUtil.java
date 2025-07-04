@@ -22,10 +22,6 @@ package org.apache.wss4j.common.dom.transform;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -33,9 +29,7 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.callback.CallbackLookup;
-import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
-import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.common.dom.processor.STRParserUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -72,7 +66,7 @@ public final class STRTransformUtil {
             LOG.debug("STR: Reference");
 
             Reference reference = secRef.getReference();
-            return getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
+            return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             //
             // second case: IssuerSerial, lookup in keystore, wrap in BST according
@@ -94,7 +88,7 @@ public final class STRTransformUtil {
             LOG.debug("STR: KeyIdentifier");
             if (WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                return getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(),
+                return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(),
                                                      secRef.getKeyIdentifierValueType());
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
@@ -143,121 +137,6 @@ public final class STRTransformUtil {
      * Hidden in utility class.
      */
     private STRTransformUtil() {
-    }
-
-    //
-    // TODO This was copied from STRParserUtil, remove once/if we copy that across to this module
-    //
-
-    private static Element getTokenElement(
-        Document doc, WSDocInfo docInfo, CallbackHandler cb,
-        String uri, String valueType
-    ) throws WSSecurityException {
-        LOG.debug("Token reference uri: {}", uri);
-        LOG.debug("Token reference ValueType: {}", valueType);
-
-        if (uri == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI"
-            );
-        }
-
-        Element tokElement =
-            findProcessedTokenElement(doc, docInfo, cb, uri, valueType);
-        if (tokElement == null) {
-            tokElement = findUnprocessedTokenElement(doc, docInfo, uri, valueType);
-        }
-
-        if (tokElement == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
-                "noToken", new Object[] {uri});
-        }
-        return tokElement;
-    }
-
-    /**
-     * Find a token that has not been processed already - in other words, it searches for
-     * the element, rather than trying to access previous results to find the element
-     * @param doc Parent Document
-     * @param docInfo WSDocInfo instance
-     * @param uri URI of the element
-     * @param type Type of the element
-     * @return A DOM element
-     * @throws WSSecurityException
-     */
-    private static Element findUnprocessedTokenElement(
-        Document doc,
-        WSDocInfo docInfo,
-        String uri,
-        String type
-    ) throws WSSecurityException {
-        String id = XMLUtils.getIDFromReference(uri);
-        //
-        // Delegate finding the element to the CallbackLookup instance
-        //
-        CallbackLookup callbackLookup = null;
-        if (docInfo != null) {
-            callbackLookup = docInfo.getCallbackLookup();
-        }
-        if (callbackLookup == null) {
-            callbackLookup = new DOMCallbackLookup(doc);
-        }
-        return callbackLookup.getElement(id, type, true);
-    }
-
-    /**
-     * Find a token that has been processed already - in other words, it access previous
-     * results to find the element, rather than conducting a general search
-     * @param doc Parent Document
-     * @param docInfo WSDocInfo instance
-     * @param cb CallbackHandler instance
-     * @param uri URI of the element
-     * @param type Type of the element
-     * @return A DOM element
-     * @throws WSSecurityException
-     */
-    private static Element findProcessedTokenElement(
-        Document doc,
-        WSDocInfo docInfo,
-        CallbackHandler cb,
-        String uri,
-        String type
-    ) throws WSSecurityException {
-        String id = XMLUtils.getIDFromReference(uri);
-        //
-        // Try to find it from the WSDocInfo instance first
-        //
-        if (docInfo != null) {
-            Element token = docInfo.getTokenElement(id);
-            if (token != null) {
-                return token;
-            }
-        }
-
-        //
-        // Try to find a custom token
-        //
-        if (cb != null && (WSS4JConstants.WSC_SCT.equals(type)
-            || WSS4JConstants.WSC_SCT_05_12.equals(type)
-            || WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
-            || WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)
-            || KerberosSecurity.isKerberosToken(type))) {
-            //try to find a custom token
-            WSPasswordCallback pwcb =
-                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
-            try {
-                cb.handle(new Callback[]{pwcb});
-                Element assertionElem = pwcb.getCustomToken();
-                if (assertionElem != null) {
-                    return (Element)doc.importNode(assertionElem, true);
-                }
-            } catch (Exception e) {
-                LOG.debug(e.getMessage(), e);
-                // Consume this failure
-            }
-        }
-        return null;
     }
 
 }
