@@ -98,26 +98,6 @@ public class SignatureSTRParser implements STRParser {
     }
 
     /**
-     * A method to create a Principal from a SAML Assertion
-     * @param samlAssertion An SamlAssertionWrapper object
-     * @return A principal
-    private Principal createPrincipalFromSAML(
-        SamlAssertionWrapper samlAssertion, STRParserResult parserResult
-    ) throws WSSecurityException {
-        SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
-        String confirmMethod = null;
-        List<String> methods = samlAssertion.getConfirmationMethods();
-        if (methods != null && !methods.isEmpty()) {
-            confirmMethod = methods.get(0);
-        }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && samlAssertion.isSigned()) {
-            parserResult.setTrustedCredential(true);
-        }
-        return samlPrincipal;
-    }
-    */
-
-    /**
      * Parse the KeyIdentifier for a SAML Assertion
      */
     private void parseSAMLKeyIdentifier(
@@ -395,20 +375,21 @@ public class SignatureSTRParser implements STRParser {
                     } else {
                         Optional<SAMLKeyInfoProcessor> keyInfoProcessor = data.getWssConfig().getSAMLKeyInfoProcessor();
                         if (keyInfoProcessor.isPresent()) {
-                            /*TODO revisit SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(processedToken);
-                            samlAssertion.parseSubject(
-                                keyInfoProcessor.get(), data, data.getSigVerCrypto()
-                            );
-                            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion.getSaml2() != null, data.getBSPEnforcer());
+                            SAMLKeyInfo keyInfo = keyInfoProcessor.get().processSAMLKeyInfoFromAssertionElement(processedToken, data, 
+                                data.getSigVerCrypto());
+     
+                            boolean saml2Token = "urn:oasis:names:tc:SAML:2.0:assertion".equals(processedToken.getNamespaceURI());
+                            STRParserUtil.checkSamlTokenBSPCompliance(secRef, saml2Token, data.getBSPEnforcer());
 
-                            SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
                             X509Certificate[] foundCerts = keyInfo.getCerts();
                             if (foundCerts != null && foundCerts.length > 0) {
                                 parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
                             }
                             secretKey = keyInfo.getSecret();
-                            principal = createPrincipalFromSAML(samlAssertion, parserResult);
-                            */
+                            if (keyInfo.isHolderOfKey() && keyInfo.isAssertionSigned()) {
+                                parserResult.setTrustedCredential(true);
+                            }
+                            principal = keyInfo.getSamlPrincipal();
                         }
                     }
                 } else if (el.equals(WSConstants.ENCRYPTED_KEY)) {
