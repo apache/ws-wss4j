@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.components.crypto;
 import java.security.Security;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

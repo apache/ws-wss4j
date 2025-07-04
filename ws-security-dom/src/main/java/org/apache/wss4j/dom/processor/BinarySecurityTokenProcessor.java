@@ -31,14 +31,14 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.api.dom.processor.Processor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.Validator;
 import org.w3c.dom.Element;
 
 /**

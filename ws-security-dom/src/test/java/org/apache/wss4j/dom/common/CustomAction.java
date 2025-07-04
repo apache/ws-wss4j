@@ -19,13 +19,13 @@
 
 package org.apache.wss4j.dom.common;
 
-import org.apache.wss4j.common.dom.action.Action;
+import org.apache.wss4j.api.dom.action.Action;
 
 import java.util.Map;
 
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 
 /**
  * a custom action that leaves a breadcumb

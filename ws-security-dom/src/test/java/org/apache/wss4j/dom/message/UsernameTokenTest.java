@@ -36,19 +36,19 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.*;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.handler.HandlerAction;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

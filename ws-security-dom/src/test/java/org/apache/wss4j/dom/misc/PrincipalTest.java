@@ -29,17 +29,17 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

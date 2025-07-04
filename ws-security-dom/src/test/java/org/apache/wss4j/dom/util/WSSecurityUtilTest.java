@@ -22,8 +22,8 @@ package org.apache.wss4j.dom.util;
 import java.util.List;
 
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.junit.jupiter.api.Test;
 

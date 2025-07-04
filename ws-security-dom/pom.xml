@@ -90,7 +90,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-ws-security-common</artifactId>
+            <artifactId>wss4j-ws-security-api-dom</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

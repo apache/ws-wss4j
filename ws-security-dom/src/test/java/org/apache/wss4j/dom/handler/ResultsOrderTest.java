@@ -19,10 +19,10 @@
 
 package org.apache.wss4j.dom.handler;
 
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 
 import org.junit.jupiter.api.Test;
 

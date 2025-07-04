@@ -20,16 +20,16 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 
 import org.junit.jupiter.api.Test;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.common.dom.message.WSSecSignature;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.message.WSSecSignature;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 

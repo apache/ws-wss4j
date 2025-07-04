@@ -30,15 +30,15 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
+import org.apache.wss4j.api.dom.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.processor.Processor;
-import org.apache.wss4j.common.dom.processor.STRParserUtil;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.processor.Processor;
+import org.apache.wss4j.api.dom.processor.STRParserUtil;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**

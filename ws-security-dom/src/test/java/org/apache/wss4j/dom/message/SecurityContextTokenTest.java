@@ -22,19 +22,19 @@ package org.apache.wss4j.dom.message;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
-import org.apache.wss4j.common.dom.message.WSSecSignature;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.api.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;

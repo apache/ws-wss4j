@@ -36,15 +36,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

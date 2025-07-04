@@ -25,16 +25,16 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.RequestData;
 import org.opensaml.saml.common.SAMLVersion;
 
 /**

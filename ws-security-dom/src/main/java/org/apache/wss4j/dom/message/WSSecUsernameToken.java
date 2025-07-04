@@ -19,15 +19,15 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.message.WSSecBase;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.message.WSSecBase;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

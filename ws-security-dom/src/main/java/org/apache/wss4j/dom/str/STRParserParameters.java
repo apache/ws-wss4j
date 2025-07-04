@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.str;
 
 import org.w3c.dom.Element;
 
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 
 /**
  * This class holds the parameters for parsing a SecurityTokenReference Element by a STRParser implementation.

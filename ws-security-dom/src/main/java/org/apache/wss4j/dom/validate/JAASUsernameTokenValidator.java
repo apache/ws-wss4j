@@ -25,13 +25,13 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
-import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
 
 
 /**

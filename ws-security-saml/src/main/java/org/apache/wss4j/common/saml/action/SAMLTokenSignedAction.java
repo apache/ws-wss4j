@@ -28,11 +28,11 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.action.Action;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.action.Action;
 import org.apache.wss4j.common.saml.message.WSSecSignatureSAML;
-import org.apache.wss4j.common.dom.action.ActionUtils;
+import org.apache.wss4j.api.dom.action.ActionUtils;
 
 public class SAMLTokenSignedAction implements Action {
 

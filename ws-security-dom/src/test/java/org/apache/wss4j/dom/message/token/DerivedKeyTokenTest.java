@@ -20,7 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.dom.message.token.DerivedKeyToken;
+import org.apache.wss4j.api.dom.message.token.DerivedKeyToken;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

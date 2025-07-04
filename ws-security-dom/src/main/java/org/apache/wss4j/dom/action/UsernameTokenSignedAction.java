@@ -25,18 +25,18 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.action.Action;
-import org.apache.wss4j.common.dom.action.ActionUtils;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.action.Action;
+import org.apache.wss4j.api.dom.action.ActionUtils;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.common.dom.message.WSSecSignature;
+import org.apache.wss4j.api.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 

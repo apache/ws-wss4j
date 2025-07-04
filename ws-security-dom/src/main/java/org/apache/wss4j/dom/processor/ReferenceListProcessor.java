@@ -40,17 +40,17 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.processor.Processor;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.processor.Processor;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.EncryptionUtils;
-import org.apache.wss4j.common.dom.message.SignatureUtils;
+import org.apache.wss4j.api.dom.message.SignatureUtils;
 import org.apache.wss4j.dom.util.X509Util;
 
 public class ReferenceListProcessor implements Processor {

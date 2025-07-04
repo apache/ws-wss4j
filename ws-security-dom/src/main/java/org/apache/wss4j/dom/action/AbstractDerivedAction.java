@@ -27,14 +27,14 @@ import javax.crypto.SecretKey;
 
 import org.apache.wss4j.common.SignatureEncryptionActionToken;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.api.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 public abstract class AbstractDerivedAction {

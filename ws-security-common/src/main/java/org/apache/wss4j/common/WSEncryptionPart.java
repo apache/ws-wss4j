@@ -22,7 +22,7 @@ package org.apache.wss4j.common;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.callback.CallbackLookup;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Element;
 
