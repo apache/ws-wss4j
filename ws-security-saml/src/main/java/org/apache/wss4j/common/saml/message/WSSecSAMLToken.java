@@ -115,7 +115,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * A complete <code>SAMLAssertion</code> is added to the
      * <code>wsse:Security</code> header.
      *
-     * @param samlAssertion TODO
+     * @param samlAssertion the SAML Assertion to add
      * @return Document with UsernameToken added
      */
     public Document build(SamlAssertionWrapper samlAssertion) {

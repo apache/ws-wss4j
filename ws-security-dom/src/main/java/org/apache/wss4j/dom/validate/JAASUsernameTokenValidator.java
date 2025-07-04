@@ -124,8 +124,7 @@ public class JAASUsernameTokenValidator implements Validator {
 
     @Override
     public QName[] getSupportedQNames() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
+        return new QName[]{WSConstants.USERNAME_TOKEN};
     }
 
 }

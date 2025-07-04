@@ -40,6 +40,7 @@ import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
 
 /**
@@ -236,7 +237,6 @@ public class KerberosTokenValidator implements Validator {
                     LOG.debug("Session key could not be obtained from the KerberosTokenDecoder.");
                 }
             } catch (KerberosTokenDecoderException e) {
-                // TODO
                 throw new WSSecurityException(ErrorCode.FAILURE, e, "Error retrieving session key.");
             }
         } else {
@@ -283,7 +283,6 @@ public class KerberosTokenValidator implements Validator {
 
     @Override
     public QName[] getSupportedQNames() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
+        return new QName[]{WSConstants.BINARY_TOKEN};
     }
 }

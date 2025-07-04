@@ -203,8 +203,7 @@ public class ValidatorTest {
 
         @Override
         public QName[] getSupportedQNames() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
+            return new QName[]{WSConstants.BINARY_TOKEN};
         }
 
     }
