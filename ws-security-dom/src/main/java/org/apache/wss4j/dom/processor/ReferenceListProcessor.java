@@ -37,7 +37,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;

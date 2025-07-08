@@ -23,9 +23,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.api.dom.token.Reference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.api.dom.WSDocInfo;

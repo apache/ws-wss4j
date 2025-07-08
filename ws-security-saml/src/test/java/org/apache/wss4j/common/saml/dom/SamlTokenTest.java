@@ -47,7 +47,7 @@ import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;

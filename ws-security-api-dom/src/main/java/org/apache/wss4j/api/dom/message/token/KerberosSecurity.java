@@ -43,7 +43,7 @@ import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
 import org.apache.wss4j.common.kerberos.KerberosClientExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosContext;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
-import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
 
 import org.ietf.jgss.GSSCredential;
 import org.w3c.dom.Document;

@@ -38,7 +38,7 @@ import org.apache.wss4j.common.kerberos.KerberosServiceContext;
 import org.apache.wss4j.common.kerberos.KerberosServiceExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
-import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.message.token.KerberosSecurity;

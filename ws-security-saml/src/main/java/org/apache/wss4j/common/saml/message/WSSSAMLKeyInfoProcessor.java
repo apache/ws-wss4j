@@ -33,7 +33,7 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.api.dom.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.api.dom.processor.Processor;

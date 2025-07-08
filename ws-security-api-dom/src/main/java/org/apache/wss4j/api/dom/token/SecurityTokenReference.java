@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.api.dom.token;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;

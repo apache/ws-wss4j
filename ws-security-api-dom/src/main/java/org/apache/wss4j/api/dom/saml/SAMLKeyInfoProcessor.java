@@ -23,7 +23,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.w3c.dom.Element;
 
 /**

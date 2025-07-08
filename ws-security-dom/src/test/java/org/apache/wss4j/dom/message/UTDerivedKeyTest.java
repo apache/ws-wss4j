@@ -29,7 +29,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;

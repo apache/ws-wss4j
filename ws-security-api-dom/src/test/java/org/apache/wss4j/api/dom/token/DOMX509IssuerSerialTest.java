@@ -1,4 +1,4 @@
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.api.dom.token;
 
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.junit.jupiter.api.Test;

@@ -39,9 +39,9 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.token.PKIPathSecurity;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.api.dom.token.PKIPathSecurity;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 
 import org.apache.wss4j.api.dom.WSDocInfo;

@@ -47,7 +47,7 @@ import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
-import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;

@@ -25,7 +25,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.api.dom.message.WSSecBase;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.*;
+import org.apache.wss4j.api.dom.token.*;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.api.dom.WSConstants;

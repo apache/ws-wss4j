@@ -35,7 +35,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
@@ -159,8 +159,8 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
         String secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
         secRefSaml.setID(secRefID);
 
-        org.apache.wss4j.common.token.Reference ref =
-                new org.apache.wss4j.common.token.Reference(doc);
+        org.apache.wss4j.api.dom.token.Reference ref =
+                new org.apache.wss4j.api.dom.token.Reference(doc);
         ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);

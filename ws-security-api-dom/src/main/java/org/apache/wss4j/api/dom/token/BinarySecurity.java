@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.api.dom.token;
 
 import java.io.IOException;
 import java.util.Arrays;

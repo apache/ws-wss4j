@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.api.dom.token;
 
 import javax.xml.namespace.QName;
 

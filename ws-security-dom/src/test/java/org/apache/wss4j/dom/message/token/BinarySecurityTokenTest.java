@@ -31,9 +31,9 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.token.PKIPathSecurity;
-import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
+import org.apache.wss4j.api.dom.token.PKIPathSecurity;
+import org.apache.wss4j.api.dom.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 

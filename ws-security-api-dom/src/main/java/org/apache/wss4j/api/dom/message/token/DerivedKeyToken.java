@@ -33,7 +33,7 @@ import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 
