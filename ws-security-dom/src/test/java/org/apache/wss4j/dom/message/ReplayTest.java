@@ -32,7 +32,7 @@ import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;

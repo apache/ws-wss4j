@@ -35,7 +35,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.api.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;

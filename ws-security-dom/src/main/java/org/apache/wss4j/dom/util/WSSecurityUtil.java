@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.util;
 
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;

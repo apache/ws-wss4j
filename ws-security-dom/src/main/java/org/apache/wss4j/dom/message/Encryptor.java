@@ -34,7 +34,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.callback.CallbackLookup;
 import org.apache.wss4j.api.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.api.dom.message.WSSecHeader;

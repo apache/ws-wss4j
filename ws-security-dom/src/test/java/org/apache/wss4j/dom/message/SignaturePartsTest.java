@@ -20,7 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.api.dom.SOAPConstants;
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.api.dom.WSConstants;

@@ -40,7 +40,7 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;

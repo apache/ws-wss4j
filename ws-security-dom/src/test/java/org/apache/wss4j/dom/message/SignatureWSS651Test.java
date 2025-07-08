@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import java.util.List;
 
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.api.dom.message.WSSecHeader;

@@ -36,7 +36,7 @@ import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.api.dom.EncryptionActionToken;
 import org.apache.wss4j.api.dom.SignatureActionToken;
 import org.apache.wss4j.api.dom.SignatureEncryptionActionToken;
-import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;

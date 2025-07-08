@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.common;
+package org.apache.wss4j.api.dom;
 
 import java.util.Collections;
 import java.util.List;
