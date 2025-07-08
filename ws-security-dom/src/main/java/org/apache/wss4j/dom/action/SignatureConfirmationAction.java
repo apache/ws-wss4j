@@ -21,8 +21,8 @@ package org.apache.wss4j.dom.action;
 
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.SecurityActionToken;
-import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.api.dom.SecurityActionToken;
+import org.apache.wss4j.api.dom.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.RequestData;

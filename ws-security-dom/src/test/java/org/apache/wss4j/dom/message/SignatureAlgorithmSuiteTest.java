@@ -26,7 +26,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.api.dom.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;

@@ -25,9 +25,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.EncryptionActionToken;
-import org.apache.wss4j.common.SecurityActionToken;
-import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.api.dom.EncryptionActionToken;
+import org.apache.wss4j.api.dom.SecurityActionToken;
+import org.apache.wss4j.api.dom.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;

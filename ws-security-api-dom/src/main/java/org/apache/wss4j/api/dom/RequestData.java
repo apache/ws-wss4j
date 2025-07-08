@@ -33,8 +33,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.common.EncryptionActionToken;
-import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;

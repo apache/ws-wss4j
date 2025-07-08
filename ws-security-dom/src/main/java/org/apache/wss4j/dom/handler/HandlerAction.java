@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.handler;
 
-import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.api.dom.SecurityActionToken;
 
 
 /**

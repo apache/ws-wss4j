@@ -31,7 +31,7 @@ import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.EncryptionActionToken;
+import org.apache.wss4j.api.dom.EncryptionActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;

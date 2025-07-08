@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 
-import org.apache.wss4j.common.SignatureEncryptionActionToken;
+import org.apache.wss4j.api.dom.SignatureEncryptionActionToken;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSPasswordCallback;

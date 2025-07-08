@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.api.dom.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.WSConstants;

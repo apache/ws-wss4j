@@ -30,7 +30,7 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
-import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.api.dom.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
