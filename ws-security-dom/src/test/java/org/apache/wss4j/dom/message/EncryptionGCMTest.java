@@ -26,7 +26,7 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.api.dom.engine.WSSConfig;

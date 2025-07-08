@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.api.dom.engine;
 
-import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.w3c.dom.Element;
 

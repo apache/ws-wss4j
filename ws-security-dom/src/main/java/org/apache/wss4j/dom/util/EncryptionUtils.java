@@ -27,7 +27,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.api.dom.WSDocInfo;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;

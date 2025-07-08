@@ -41,7 +41,7 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.api.dom.processor.Processor;
 import org.apache.wss4j.api.dom.RequestData;

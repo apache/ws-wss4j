@@ -21,7 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.common.util.SOAPUtil;
-import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
