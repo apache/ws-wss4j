@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.api.dom.validate.Credential;
-import org.apache.wss4j.api.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -44,7 +44,7 @@ import org.opensaml.saml.common.SAMLVersion;
  * checks that the Subject contains a KeyInfo (and processes it) for the holder-of-key case,
  * and verifies that the Assertion is signed as well for holder-of-key.
  */
-public class SamlAssertionValidator extends SignatureTrustValidator {
+public class SamlAssertionValidator implements Validator {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAssertionValidator.class);
@@ -216,7 +216,10 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         SAMLKeyInfo samlKeyInfo = samlAssertion.getSignatureKeyInfo();
         trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
         trustCredential.setCertificates(samlKeyInfo.getCerts());
-        return super.validate(trustCredential, data);
+
+        // Delegate to signature validator
+        Validator validator = data.getWssConfig().getValidator(WSConstants.SIGNATURE);
+        return validator.validate(trustCredential, data);
     }
 
     /**

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.api.dom.validate;
+package org.apache.wss4j.dom.validate;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -29,6 +29,8 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.wss4j.api.dom.RequestData;
 
 /**
