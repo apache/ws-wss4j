@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.common.SOAPConstants;
+import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.api.dom.WSConstants;
@@ -431,7 +431,7 @@ public class EncryptionPartsTest {
     @Test
     public void testSOAPHeaderAndBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -502,7 +502,7 @@ public class EncryptionPartsTest {
     @Test
     public void testEncryptionPartDOMElement() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 

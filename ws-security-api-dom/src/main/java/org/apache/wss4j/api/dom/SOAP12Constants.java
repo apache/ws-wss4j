@@ -17,24 +17,33 @@
  * under the License.
  */
 
-package org.apache.wss4j.common;
+package org.apache.wss4j.api.dom;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.WSS4JConstants;
+
 /**
- * SOAP 1.1 constants
+ * SOAP 1.2 constants
  */
-public class SOAP11Constants implements SOAPConstants {
+public class SOAP12Constants implements SOAPConstants {
     /**
      *
      */
-    private static final long serialVersionUID = 3809268485386395322L;
-    private static final QName HEADER_QNAME = new QName(WSS4JConstants.URI_SOAP11_ENV, WSS4JConstants.ELEM_HEADER);
-    private static final QName BODY_QNAME = new QName(WSS4JConstants.URI_SOAP11_ENV, WSS4JConstants.ELEM_BODY);
-    private static final QName ROLE_QNAME = new QName(WSS4JConstants.URI_SOAP11_ENV, WSS4JConstants.ATTR_ACTOR);
+    private static final long serialVersionUID = 3784866613259361834L;
+    private static final QName HEADER_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ELEM_HEADER);
+    private static final QName BODY_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ELEM_BODY);
+    private static final QName ROLE_QNAME = new QName(WSS4JConstants.URI_SOAP12_ENV, WSS4JConstants.ATTR_ROLE);
+
+    // Public constants for SOAP 1.2
+
+    /**
+     * MessageContext property name for webmethod
+     */
+    public static final String PROP_WEBMETHOD = "soap12.webmethod";
 
     public String getEnvelopeURI() {
-        return WSS4JConstants.URI_SOAP11_ENV;
+        return WSS4JConstants.URI_SOAP12_ENV;
     }
 
     public QName getHeaderQName() {
@@ -56,14 +65,14 @@ public class SOAP11Constants implements SOAPConstants {
      * Obtain the "next" role/actor URI
      */
     public String getNextRoleURI() {
-        return WSS4JConstants.URI_SOAP11_NEXT_ACTOR;
+        return WSS4JConstants.URI_SOAP12_NEXT_ROLE;
     }
 
     /**
      * Obtain the MustUnderstand string
      */
     public String getMustUnderstand() {
-        return "1";
+        return "true";
     }
 
 }

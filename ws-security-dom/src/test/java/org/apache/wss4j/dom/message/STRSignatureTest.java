@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.common.SOAPConstants;
+import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.api.dom.WSConstants;
 
@@ -62,7 +62,7 @@ public class STRSignatureTest {
     @Test
     public void testX509SignatureDirectSTR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -110,7 +110,7 @@ public class STRSignatureTest {
     @Test
     public void testWSS96() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -167,7 +167,7 @@ public class STRSignatureTest {
     @Test
     public void testX509SignatureISSTR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -219,7 +219,7 @@ public class STRSignatureTest {
     @Test
     public void testX509SignatureSKISTR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 

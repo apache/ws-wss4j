@@ -44,9 +44,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.wss4j.common.SOAP11Constants;
-import org.apache.wss4j.common.SOAP12Constants;
-import org.apache.wss4j.common.SOAPConstants;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Attr;
@@ -829,17 +826,9 @@ public final class XMLUtils {
         return hActor != null && actor != null && hActor.equalsIgnoreCase(actor);
     }
 
-    public static SOAPConstants getSOAPConstants(Element startElement) {
-        Document doc = startElement.getOwnerDocument();
-        String ns = doc.getDocumentElement().getNamespaceURI();
-        if (WSS4JConstants.URI_SOAP12_ENV.equals(ns)) {
-            return new SOAP12Constants();
-        }
-        return new SOAP11Constants();
-    }
-
     public static String getSOAPNamespace(Element startElement) {
-        return getSOAPConstants(startElement).getEnvelopeURI();
+        Document doc = startElement.getOwnerDocument();
+        return doc.getDocumentElement().getNamespaceURI();
     }
 
     /**

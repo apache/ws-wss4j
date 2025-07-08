@@ -17,9 +17,14 @@
  * under the License.
  */
 
-package org.apache.wss4j.common;
+package org.apache.wss4j.api.dom;
 
 import javax.xml.namespace.QName;
+
+import org.apache.wss4j.common.WSS4JConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.io.Serializable;
 
 /**
@@ -71,5 +76,13 @@ public interface SOAPConstants extends Serializable {
      */
     String getMustUnderstand();
 
+    static SOAPConstants getSOAPConstants(Element startElement) {
+        Document doc = startElement.getOwnerDocument();
+        String ns = doc.getDocumentElement().getNamespaceURI();
+        if (WSS4JConstants.URI_SOAP12_ENV.equals(ns)) {
+            return new SOAP12Constants();
+        }
+        return new SOAP11Constants();
+    }
 
 }

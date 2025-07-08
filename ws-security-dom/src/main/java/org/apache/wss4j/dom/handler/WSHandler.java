@@ -29,6 +29,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.api.dom.WSDocInfo;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
@@ -109,7 +110,7 @@ public abstract class WSHandler {
         WSSecHeader secHeader = new WSSecHeader(actor, mu, doc);
         secHeader.insertSecurityHeader();
         reqData.setSecHeader(secHeader);
-        reqData.setSoapConstants(XMLUtils.getSOAPConstants(doc.getDocumentElement()));
+        reqData.setSoapConstants(SOAPConstants.getSOAPConstants(doc.getDocumentElement()));
 
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {

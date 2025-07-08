@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.common.SOAPConstants;
+import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.WSDataRef;
@@ -329,7 +329,7 @@ public class SignaturePartsTest {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -398,7 +398,7 @@ public class SignaturePartsTest {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc.getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
 
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =

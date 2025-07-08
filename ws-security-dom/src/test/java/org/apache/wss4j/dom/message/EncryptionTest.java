@@ -29,7 +29,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.SOAPConstants;
+import org.apache.wss4j.api.dom.SOAPConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -728,8 +728,7 @@ public class EncryptionTest {
         /*
          * Set up the parts structure to encrypt the body
          */
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc
-                .getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
@@ -799,8 +798,7 @@ public class EncryptionTest {
         /*
          * Set up the parts structure to encrypt the body
          */
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc
-                .getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
@@ -869,8 +867,7 @@ public class EncryptionTest {
         builder.prepare(crypto, symmetricKey);
         builder.setEmbedEncryptedKey(true);
 
-        SOAPConstants soapConstants = XMLUtils.getSOAPConstants(doc
-                .getDocumentElement());
+        SOAPConstants soapConstants = SOAPConstants.getSOAPConstants(doc.getDocumentElement());
         java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
