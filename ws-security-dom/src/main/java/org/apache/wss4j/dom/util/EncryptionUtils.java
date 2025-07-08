@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.util;
 
-import org.apache.wss4j.common.callback.CallbackLookup;
+import org.apache.wss4j.api.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;

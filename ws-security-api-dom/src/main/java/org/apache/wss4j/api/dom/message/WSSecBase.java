@@ -20,7 +20,7 @@
 package org.apache.wss4j.api.dom.message;
 
 import org.apache.wss4j.api.dom.WSEncryptionPart;
-import org.apache.wss4j.common.callback.CallbackLookup;
+import org.apache.wss4j.api.dom.callback.CallbackLookup;
 import org.apache.wss4j.api.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;

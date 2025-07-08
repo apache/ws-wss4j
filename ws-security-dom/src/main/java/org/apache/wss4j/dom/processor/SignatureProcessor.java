@@ -54,7 +54,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.callback.CallbackLookup;
+import org.apache.wss4j.api.dom.callback.CallbackLookup;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;

@@ -24,7 +24,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.callback.CallbackLookup;
+import org.apache.wss4j.api.dom.callback.CallbackLookup;
 import org.apache.wss4j.api.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
