@@ -38,7 +38,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.RequestData;

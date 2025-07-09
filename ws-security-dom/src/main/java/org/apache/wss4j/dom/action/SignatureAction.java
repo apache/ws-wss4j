@@ -33,7 +33,7 @@ import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.action.Action;
 import org.apache.wss4j.api.dom.action.ActionUtils;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -52,7 +52,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;

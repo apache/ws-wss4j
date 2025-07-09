@@ -46,7 +46,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.api.dom.validate.Validator;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

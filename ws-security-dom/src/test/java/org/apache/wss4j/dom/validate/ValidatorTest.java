@@ -37,7 +37,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 

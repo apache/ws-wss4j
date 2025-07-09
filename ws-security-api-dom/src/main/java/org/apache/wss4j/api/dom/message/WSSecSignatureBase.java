@@ -21,6 +21,8 @@ package org.apache.wss4j.api.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,14 +31,19 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.api.dom.callback.DOMCallbackLookup;
+import org.apache.wss4j.api.dom.token.SecurityTokenReference;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -59,14 +66,78 @@ public class WSSecSignatureBase extends WSSecBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
 
+    protected KeyInfo keyInfo;
+    protected XMLSignatureFactory signatureFactory;
+    protected byte[] secretKey;
+    protected String strUri;
+    protected Element bstToken;
+    protected boolean bstAddedToSecurityHeader;
+    protected String certUri;
+    protected String keyInfoUri;
+    protected SecurityTokenReference secRef;
+    protected CanonicalizationMethod c14nMethod;
+    protected XMLSignature sig;
+    protected byte[] signatureValue;
+    protected boolean useCustomSecRef;
+
     private List<Element> clonedElements = new ArrayList<>();
+    private String sigAlgo;
+    private Element customKeyInfoElement;
+    private Provider signatureProvider;
+    private String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
+    private boolean addInclusivePrefixes = true;
+    private String digestAlgo = WSConstants.SHA1;
 
     public WSSecSignatureBase(WSSecHeader securityHeader) {
+        this(securityHeader, null);
+    }
+
+    public WSSecSignatureBase(WSSecHeader securityHeader, Provider provider) {
         super(securityHeader);
+        init(provider);
     }
 
     public WSSecSignatureBase(Document doc) {
+        this(doc, null);
+    }
+
+    public WSSecSignatureBase(Document doc, Provider provider) {
         super(doc);
+        init(provider);
+    }
+
+    private void init(Provider provider) {
+        if (provider == null) {
+            // Try to install the Santuario Provider - fall back to the JDK provider if this does
+            // not work
+            try {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+            } catch (NoSuchProviderException ex) {
+                signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            }
+        } else {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", provider);
+        }
+    }
+
+    /**
+     * This method adds references to the Signature.
+     *
+     * @param references The list of references to sign
+     * @throws WSSecurityException
+     */
+    public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
+        List<WSEncryptionPart> references
+    ) throws WSSecurityException {
+        return
+            addReferencesToSign(
+                getDocument(),
+                references,
+                getWsDocInfo(),
+                signatureFactory,
+                addInclusivePrefixes,
+                digestAlgo
+            );
     }
 
     /**
@@ -368,5 +439,186 @@ public class WSSecSignatureBase extends WSSecBase {
                 includeElement.getParentNode().replaceChild(encodedChild, includeElement);
             }
         }
+    }
+
+    /**
+     * Set the name (uri) of the signature encryption algorithm to use.
+     *
+     * If the algorithm is not set then an automatic detection of the signature
+     * algorithm to use is performed during the <code>prepare()</code>
+     * method. Refer to WSConstants which algorithms are supported.
+     *
+     * @param algo the name of the signature algorithm
+     * @see WSConstants#RSA
+     * @see WSConstants#DSA
+     */
+    public void setSignatureAlgorithm(String algo) {
+        sigAlgo = algo;
+    }
+
+    /**
+     * Get the name (uri) of the signature algorithm that is being used.
+     *
+     * Call this method after <code>prepare</code> to get the information
+     * which signature algorithm was automatically detected if no signature
+     * algorithm was preset.
+     *
+     * @return the identifier URI of the signature algorithm
+     */
+    public String getSignatureAlgorithm() {
+        return sigAlgo;
+    }
+
+     /**
+     * Prepend the BinarySecurityToken to the elements already in the Security
+     * header.
+     *
+     * The method can be called any time after <code>prepare()</code>.
+     * This allows to insert the BST element at any position in the Security
+     * header.
+     */
+    public void prependBSTElementToHeader() {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            XMLUtils.prependChildElement(securityHeaderElement, bstToken);
+            bstAddedToSecurityHeader = true;
+        }
+    }
+
+    /**
+     * Append the BinarySecurityToken to the security header.
+     */
+    public void appendBSTElementToHeader() {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            securityHeaderElement.appendChild(bstToken);
+            bstAddedToSecurityHeader = true;
+        }
+    }
+
+    public void setCustomKeyInfoElement(Element keyInfoElement) {
+        this.customKeyInfoElement = keyInfoElement;
+    }
+
+    public Element getCustomKeyInfoElement() {
+        return customKeyInfoElement;
+    }
+
+    public Provider getSignatureProvider() {
+        return signatureProvider;
+    }
+
+    public void setSignatureProvider(Provider signatureProvider) {
+        this.signatureProvider = signatureProvider;
+    }
+
+
+    /**
+     * Set the canonicalization method to use.
+     *
+     * If the canonicalization method is not set then the recommended Exclusive
+     * XML Canonicalization is used by default. Refer to WSConstants which
+     * algorithms are supported.
+     *
+     * @param algo Is the name of the signature algorithm
+     * @see WSConstants#C14N_OMIT_COMMENTS
+     * @see WSConstants#C14N_WITH_COMMENTS
+     * @see WSConstants#C14N_EXCL_OMIT_COMMENTS
+     * @see WSConstants#C14N_EXCL_WITH_COMMENTS
+     */
+    public void setSigCanonicalization(String algo) {
+        canonAlgo = algo;
+    }
+
+    /**
+     * Get the canonicalization method.
+     *
+     * If the canonicalization method was not set then Exclusive XML
+     * Canonicalization is used by default.
+     *
+     * @return The string describing the canonicalization algorithm.
+     */
+    public String getSigCanonicalization() {
+        return canonAlgo;
+    }
+
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
+    }
+
+    protected void marshalKeyInfo(WSDocInfo wsDocInfo) throws WSSecurityException {
+        List<XMLStructure> kiChildren = null;
+        if (getCustomKeyInfoElement() == null) {
+            XMLStructure structure = new DOMStructure(secRef.getElement());
+            wsDocInfo.addTokenElement(secRef.getElement(), false);
+            kiChildren = Collections.singletonList(structure);
+        } else {
+            Node kiChild = getCustomKeyInfoElement().getFirstChild();
+            kiChildren = new ArrayList<>();
+            while (kiChild != null) {
+                kiChildren.add(new DOMStructure(kiChild));
+                kiChild = kiChild.getNextSibling();
+            }
+        }
+
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+        keyInfo = keyInfoFactory.newKeyInfo(kiChildren, keyInfoUri);
+    }
+
+    /**
+     * Get the SecurityTokenReference to be used in the KeyInfo element.
+     */
+    public SecurityTokenReference getSecurityTokenReference() {
+        return secRef;
+    }
+
+    /**
+     * Set the SecurityTokenReference to be used in the KeyInfo element. If this
+     * method is not called, a SecurityTokenRefence will be generated.
+     */
+    public void setSecurityTokenReference(SecurityTokenReference secRef) {
+        useCustomSecRef = true;
+        this.secRef = secRef;
+    }
+
+    /**
+     * @return the digest algorithm to use
+     */
+    public String getDigestAlgo() {
+        return digestAlgo;
+    }
+
+    /**
+     * Set the string that defines which digest algorithm to use.
+     * The default is WSConstants.SHA1.
+     *
+     * @param digestAlgo the digestAlgo to set
+     */
+    public void setDigestAlgo(String digestAlgo) {
+        this.digestAlgo = digestAlgo;
+    }
+
+    /**
+     * Returns the computed Signature value.
+     *
+     * Call this method after <code>computeSignature()</code> or <code>build()</code>
+     * methods were called.
+     *
+     * @return Returns the signatureValue.
+     */
+    public byte[] getSignatureValue() {
+        return signatureValue;
+    }
+
+    /**
+     * Set the secret key to use
+     * @param secretKey the secret key to use
+     */
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
     }
 }

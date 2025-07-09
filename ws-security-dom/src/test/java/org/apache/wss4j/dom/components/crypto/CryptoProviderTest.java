@@ -31,7 +31,7 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.jupiter.api.Test;

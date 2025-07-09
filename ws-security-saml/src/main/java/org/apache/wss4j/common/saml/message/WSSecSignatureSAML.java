@@ -51,12 +51,12 @@ import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.WSDocInfo;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.api.dom.RequestData;
-import org.apache.wss4j.api.dom.message.WSSecSignature;
+import org.apache.wss4j.api.dom.message.WSSecSignatureBase;
 import org.apache.wss4j.api.dom.transform.STRTransform;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class WSSecSignatureSAML extends WSSecSignature {
+public class WSSecSignatureSAML extends WSSecSignatureBase {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureSAML.class);
