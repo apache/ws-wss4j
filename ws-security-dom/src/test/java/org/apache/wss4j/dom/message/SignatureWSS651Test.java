@@ -25,7 +25,6 @@ import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;

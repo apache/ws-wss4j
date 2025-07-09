@@ -211,7 +211,6 @@ public class SignatureConfirmationTest {
     /**
      * Test to see that a signature confirmation response is correctly processed.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void
     testSignatureConfirmationProcessing() throws Exception {
@@ -312,7 +311,6 @@ public class SignatureConfirmationTest {
         newEngine.processSecurityHeader(doc, data);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testSignatureResponseForUnsignedRequest() throws Exception {
         final RequestData reqData = new RequestData();

@@ -52,6 +52,7 @@ public class WSSecurityUtilTest {
 
     @Test
     public void testDeprecatedEncryptionAction() throws Exception {
+        @SuppressWarnings("deprecation")
         String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
         List<Integer> decodeActions = WSSecurityUtil.decodeAction(action);
         assertEquals(2, decodeActions.size());
@@ -61,6 +62,7 @@ public class WSSecurityUtilTest {
 
     @Test
     public void testDeprecatedEncryptionHandlerAction() throws Exception {
+        @SuppressWarnings("deprecation")
         String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
         List<HandlerAction> decodeActions = WSSecurityUtil.decodeHandlerAction(action, WSSConfig.getNewInstance());
         assertEquals(2, decodeActions.size());
@@ -88,6 +90,7 @@ public class WSSecurityUtilTest {
 
     @Test
     public void testDeprecatedEncryptionDerivedAction() throws Exception {
+        @SuppressWarnings("deprecation")
         String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT_DERIVED;
         List<Integer> decodeActions = WSSecurityUtil.decodeAction(action);
         assertEquals(2, decodeActions.size());
@@ -97,6 +100,7 @@ public class WSSecurityUtilTest {
 
     @Test
     public void testDeprecatedEncryptionHandlerDerivedAction() throws Exception {
+        @SuppressWarnings("deprecation")
         String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT_DERIVED;
         List<HandlerAction> decodeActions = WSSecurityUtil.decodeHandlerAction(action, WSSConfig.getNewInstance());
         assertEquals(2, decodeActions.size());
