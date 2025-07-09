@@ -42,6 +42,8 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
+import org.apache.wss4j.api.dom.action.EncryptionActionToken;
+import org.apache.wss4j.api.dom.action.SignatureActionToken;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.xml.security.encryption.Serializer;

@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.api.dom.action;
 
-import org.apache.wss4j.api.dom.SecurityActionToken;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.common.ext.WSSecurityException;
 

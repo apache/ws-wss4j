@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.api.dom;
+package org.apache.wss4j.api.dom.action;
 
 
 import org.apache.xml.security.encryption.params.KeyDerivationParameters;

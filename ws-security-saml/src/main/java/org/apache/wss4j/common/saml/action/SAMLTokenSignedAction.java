@@ -21,8 +21,8 @@ package org.apache.wss4j.common.saml.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.api.dom.SecurityActionToken;
-import org.apache.wss4j.api.dom.SignatureActionToken;
+import org.apache.wss4j.api.dom.action.SecurityActionToken;
+import org.apache.wss4j.api.dom.action.SignatureActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;

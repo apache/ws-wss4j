@@ -28,8 +28,8 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import org.apache.wss4j.api.dom.EncryptionActionToken;
-import org.apache.wss4j.api.dom.SignatureActionToken;
+import org.apache.wss4j.api.dom.action.EncryptionActionToken;
+import org.apache.wss4j.api.dom.action.SignatureActionToken;
 import org.apache.wss4j.api.dom.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
