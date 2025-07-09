@@ -21,12 +21,9 @@ package org.apache.wss4j.common.saml.dom;
 
 import java.nio.file.Path;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
 
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
@@ -62,7 +59,6 @@ public class ReplayTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ReplayTest.class);
 
-    private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
 
     @TempDir

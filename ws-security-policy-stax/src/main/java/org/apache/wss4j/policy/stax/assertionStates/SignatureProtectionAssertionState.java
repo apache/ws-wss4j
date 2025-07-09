@@ -112,7 +112,6 @@ public class SignatureProtectionAssertionState extends AssertionState implements
                 }
             }
         } else if (securityEvent instanceof TokenSecurityEvent) {
-            @SuppressWarnings("unchecked")
             TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                 = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);

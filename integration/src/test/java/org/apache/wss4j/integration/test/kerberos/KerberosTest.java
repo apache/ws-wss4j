@@ -1011,6 +1011,7 @@ public class KerberosTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testKerberosEncryptionOutboundDeprecatedTag() throws Exception {
         if (!runTests) {

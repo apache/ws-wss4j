@@ -103,7 +103,6 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 signedElementEvents.add(signedElementSecurityEvent);
             }
         } else if (securityEvent instanceof TokenSecurityEvent) {
-            @SuppressWarnings("unchecked")
             TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                 = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);

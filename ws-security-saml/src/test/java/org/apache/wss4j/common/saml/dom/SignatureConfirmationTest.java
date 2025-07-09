@@ -57,7 +57,6 @@ public class SignatureConfirmationTest {
         crypto = CryptoFactory.getInstance();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void
     testSAMLSignatureConfirmationProcessing() throws Exception {

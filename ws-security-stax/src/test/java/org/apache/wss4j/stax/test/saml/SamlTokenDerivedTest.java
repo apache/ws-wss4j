@@ -41,7 +41,6 @@ import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;

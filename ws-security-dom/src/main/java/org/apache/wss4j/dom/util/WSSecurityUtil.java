@@ -192,6 +192,7 @@ public final class WSSecurityUtil {
         return doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
     }
 
+    @SuppressWarnings("deprecation")
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
         String actionToParse = action;
         if (actionToParse == null) {
@@ -250,6 +251,7 @@ public final class WSSecurityUtil {
      * @return The list of HandlerAction Objects
      * @throws WSSecurityException
      */
+    @SuppressWarnings("deprecation")
     public static List<HandlerAction> decodeHandlerAction(
         String action,
         WSSConfig wssConfig

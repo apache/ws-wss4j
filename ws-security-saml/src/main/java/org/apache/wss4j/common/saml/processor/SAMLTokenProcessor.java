@@ -288,7 +288,6 @@ public class SAMLTokenProcessor implements Processor {
                 ref.setDigestValue(reference.getDigestValue());
 
                 // Set the Transform algorithms as well
-                @SuppressWarnings("unchecked")
                 List<Transform> transforms = reference.getTransforms();
                 List<String> transformAlgorithms = new ArrayList<>(transforms.size());
                 for (Transform transform : transforms) {

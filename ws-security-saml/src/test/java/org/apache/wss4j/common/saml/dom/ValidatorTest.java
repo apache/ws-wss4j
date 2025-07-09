@@ -22,7 +22,6 @@ package org.apache.wss4j.common.saml.dom;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.crypto.Crypto;
@@ -62,7 +61,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ValidatorTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ValidatorTest.class);
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**
      * In this test, a BinarySecurityToken is added to the SOAP header. A custom processor
@@ -156,21 +154,6 @@ public class ValidatorTest {
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
-    }
-
-
-    /**
-     * Verifies the soap envelope
-     *
-     * @param doc soap document
-     * @param wssConfig
-     * @throws Exception Thrown when there is a problem in verification
-     */
-    private WSHandlerResult verify(
-        Document doc, WSSConfig wssConfig, CallbackHandler cb, Crypto crypto
-    ) throws Exception {
-        secEngine.setWssConfig(wssConfig);
-        return secEngine.processSecurityHeader(doc, null, cb, crypto);
     }
 
 

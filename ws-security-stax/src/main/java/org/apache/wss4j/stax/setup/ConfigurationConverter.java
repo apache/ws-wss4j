@@ -75,6 +75,7 @@ public final class ConfigurationConverter {
         return properties;
     }
 
+    @SuppressWarnings("deprecation")
     public static void parseActions(
         Map<String, Object> config,
         WSSSecurityProperties properties

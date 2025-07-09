@@ -517,7 +517,6 @@ public class OutboundWSSec {
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent instanceof TokenSecurityEvent) {
-                    @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
                     TokenUsage mainSig = WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE;
@@ -540,7 +539,6 @@ public class OutboundWSSec {
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent instanceof TokenSecurityEvent) {
-                    @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
                     TokenUsage mainSig = WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE;
