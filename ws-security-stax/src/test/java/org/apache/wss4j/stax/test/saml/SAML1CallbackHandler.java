@@ -22,8 +22,8 @@ package org.apache.wss4j.stax.test.saml;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -33,7 +33,7 @@ import java.io.IOException;
  * A Callback Handler implementation for a SAML 1.1 assertion. By default it creates an
  * authentication assertion using Sender Vouches.
  */
-public class SAML1CallbackHandler extends org.apache.wss4j.common.saml.dom.SAML1CallbackHandler {
+public class SAML1CallbackHandler extends org.apache.wss4j.dom.saml.dom.SAML1CallbackHandler {
 
     private String issuerKeyName;
     private String issuerKeyPassword;

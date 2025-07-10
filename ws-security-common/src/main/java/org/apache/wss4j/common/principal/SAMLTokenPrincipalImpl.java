@@ -43,7 +43,7 @@ public class SAMLTokenPrincipalImpl implements Serializable, SAMLTokenPrincipal 
 
         // Use reflection to extract the subject name from the SAML assertion
         try {
-            Class<?> samlAssertionWrapperClass = Class.forName("org.apache.wss4j.common.saml.SamlAssertionWrapper");
+            Class<?> samlAssertionWrapperClass = Class.forName("org.apache.wss4j.dom.saml.SamlAssertionWrapper");
             if (samlAssertionWrapperClass.isInstance(samlAssertion)) {
                 Object samlWrapper = samlAssertionWrapperClass.cast(samlAssertion);
                 this.name = (String) samlAssertionWrapperClass.getMethod("getSubjectName").invoke(samlWrapper);

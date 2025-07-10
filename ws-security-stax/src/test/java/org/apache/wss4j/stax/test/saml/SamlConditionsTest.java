@@ -36,10 +36,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.shibboleth.shared.xml.DOMTypeSupport;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.ProxyRestrictionBean;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;

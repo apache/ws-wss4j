@@ -26,7 +26,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 
 public class CallbackHandlerImpl implements CallbackHandler {
 

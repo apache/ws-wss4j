@@ -19,11 +19,11 @@
 package org.apache.wss4j.stax.test.saml;
 
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
-import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.bean.AttributeBean;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.SubjectConfirmationDataBean;
+import org.apache.wss4j.dom.saml.bean.Version;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;

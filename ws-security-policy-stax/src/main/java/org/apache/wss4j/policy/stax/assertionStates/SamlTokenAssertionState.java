@@ -20,7 +20,7 @@ package org.apache.wss4j.policy.stax.assertionStates;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;

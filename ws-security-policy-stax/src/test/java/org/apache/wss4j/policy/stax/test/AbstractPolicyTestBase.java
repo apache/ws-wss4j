@@ -21,8 +21,8 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
