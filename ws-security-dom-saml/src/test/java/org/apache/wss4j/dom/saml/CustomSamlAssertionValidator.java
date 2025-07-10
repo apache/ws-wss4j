@@ -17,10 +17,9 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.dom.saml.validate.SamlAssertionValidator;

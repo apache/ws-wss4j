@@ -17,17 +17,16 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.dom.saml.SAMLCallback;
 import org.apache.wss4j.dom.saml.bean.AdviceBean;
 import org.apache.wss4j.dom.saml.bean.KeyInfoBean;
 import org.apache.wss4j.dom.saml.bean.SubjectBean;
 import org.apache.wss4j.dom.saml.bean.Version;
-import org.apache.wss4j.dom.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -35,12 +34,12 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
 /**
- * A Callback Handler implementation for a SAML 2 assertion. By default it creates an
+ * A Callback Handler implementation for a SAML 1.1 assertion. By default it creates an
  * authentication assertion using Sender Vouches.
  */
-public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
+public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
 
-    public SAML2CallbackHandler() throws Exception {
+    public SAML1CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("wss40.properties");
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -50,7 +49,8 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
 
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
-        confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+        confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
+        issuer = "www.example.com";
     }
 
     public void handle(Callback[] callbacks)
@@ -58,9 +58,8 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         for (Callback callback : callbacks) {
             if (callback instanceof SAMLCallback) {
                 SAMLCallback samlCallback = (SAMLCallback) callback;
-                samlCallback.setSamlVersion(Version.SAML_20);
+                samlCallback.setSamlVersion(Version.SAML_11);
                 samlCallback.setIssuer(issuer);
-                samlCallback.setIssuerFormat(issuerFormat);
                 if (conditions != null) {
                     samlCallback.setConditions(conditions);
                 }
@@ -81,11 +80,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 if (subjectNameIDFormat != null) {
                     subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
                 }
-                if (subjectConfirmationNameID != null) {
-                    subjectBean.setSubjectConfirmationNameID(subjectConfirmationNameID);
-                }
-                subjectBean.setSubjectConfirmationData(subjectConfirmationData);
-                if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
+                if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     try {
                         KeyInfoBean keyInfo = createKeyInfo();
                         subjectBean.setKeyInfo(keyInfo);
@@ -93,17 +88,12 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                         throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
                     }
                 }
-                samlCallback.setSubject(subjectBean);
-                createAndSetStatement(null, samlCallback);
+                createAndSetStatement(subjectBean, samlCallback);
                 samlCallback.setSignAssertion(signAssertion);
             } else {
                 throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
-    }
-
-    public void setSubjectName(String newSubjectName) {
-        this.subjectName = newSubjectName;
     }
 
 }

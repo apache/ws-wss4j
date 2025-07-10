@@ -17,10 +17,9 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import javax.xml.crypto.dsig.CanonicalizationMethod;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,8 +35,6 @@ import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.saml.message.WSSecSAMLToken;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
 import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;

@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;
@@ -31,8 +30,6 @@ import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
 import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;

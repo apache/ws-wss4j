@@ -17,13 +17,12 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SAMLCallback;
 import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.dom.saml.bean.KeyInfoBean;
 import org.apache.wss4j.dom.saml.bean.SubjectBean;

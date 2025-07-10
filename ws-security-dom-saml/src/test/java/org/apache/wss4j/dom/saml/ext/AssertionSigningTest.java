@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom.ext;
+package org.apache.wss4j.dom.saml.ext;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -34,7 +34,7 @@ import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.saml.dom.SAML2CallbackHandler;
+import org.apache.wss4j.dom.saml.SAML2CallbackHandler;
 
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.io.IOException;
 
@@ -25,9 +25,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
 import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 import org.w3c.dom.Element;
 

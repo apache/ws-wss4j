@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,9 +25,6 @@ import java.time.Instant;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -30,9 +30,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.token.BinarySecurity;
 import org.apache.wss4j.api.dom.token.X509Security;
 import org.apache.wss4j.common.util.SOAPUtil;

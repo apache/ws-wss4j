@@ -17,11 +17,10 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.dom.saml.SAMLCallback;
 import org.apache.wss4j.dom.saml.bean.ActionBean;
 import org.apache.wss4j.dom.saml.bean.AttributeBean;
 import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;

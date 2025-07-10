@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -40,9 +40,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.saml.bean.NameIDBean;
 import org.apache.wss4j.dom.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.dom.saml.builder.SAML1Constants;

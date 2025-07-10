@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.common.crypto.KeystoreCallbackHandler;

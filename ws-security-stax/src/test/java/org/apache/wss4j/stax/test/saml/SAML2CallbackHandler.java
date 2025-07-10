@@ -33,7 +33,7 @@ import java.io.IOException;
  * A Callback Handler implementation for a SAML 2 assertion. By default it creates an
  * authentication assertion using Sender Vouches.
  */
-public class SAML2CallbackHandler extends org.apache.wss4j.dom.saml.dom.SAML2CallbackHandler {
+public class SAML2CallbackHandler extends org.apache.wss4j.dom.saml.SAML2CallbackHandler {
 
     private String issuerKeyName;
     private String issuerKeyPassword;

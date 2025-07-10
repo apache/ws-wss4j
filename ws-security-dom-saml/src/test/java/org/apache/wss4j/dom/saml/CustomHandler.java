@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.saml.dom;
+package org.apache.wss4j.dom.saml;
 
 import java.nio.file.Path;
 
@@ -32,9 +32,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.saml.SAMLCallback;
-import org.apache.wss4j.dom.saml.SAMLUtil;
-import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.saml.bean.ConditionsBean;
 import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.saml.message.WSSecSAMLToken;
