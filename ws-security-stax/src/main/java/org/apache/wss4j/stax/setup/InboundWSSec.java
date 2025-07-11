@@ -30,14 +30,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.DocumentCreatorImpl;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.WSSecurityStreamReader;
 import org.apache.wss4j.stax.impl.processor.input.OperationInputProcessor;
 import org.apache.wss4j.stax.impl.processor.input.SecurityHeaderInputProcessor;
 import org.apache.wss4j.stax.impl.processor.input.SignatureConfirmationInputProcessor;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessor;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;

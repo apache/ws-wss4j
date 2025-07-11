@@ -26,12 +26,12 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
-import org.apache.wss4j.stax.securityToken.RsaKeyValueSecurityToken;
-import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityToken.RsaKeyValueSecurityToken;
+import org.apache.wss4j.api.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.11 KeyValueToken Assertion

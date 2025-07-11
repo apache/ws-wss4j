@@ -27,7 +27,7 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

@@ -21,7 +21,7 @@ package org.apache.wss4j.stax.impl.resourceResolvers;
 import org.apache.xml.security.stax.ext.ResourceResolver;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument;
 
 import javax.xml.namespace.QName;

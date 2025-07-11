@@ -20,12 +20,12 @@ package org.apache.wss4j.policy.stax.test;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;

@@ -25,9 +25,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.RequiredElementSecurityEvent;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.RequiredElementSecurityEvent;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

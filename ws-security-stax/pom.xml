@@ -49,6 +49,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-api-stax</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-dom-saml</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

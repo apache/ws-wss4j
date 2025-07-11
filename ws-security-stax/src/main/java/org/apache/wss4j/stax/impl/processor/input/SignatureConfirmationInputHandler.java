@@ -22,7 +22,7 @@ import org.apache.wss4j.binding.wss11.SignatureConfirmationType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.securityEvent.SignatureConfirmationSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.SignatureConfirmationSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
 import org.apache.xml.security.stax.ext.InputProcessorChain;

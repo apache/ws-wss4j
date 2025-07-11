@@ -24,9 +24,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -23,7 +23,7 @@ import java.security.Key;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.wss4j.common.util.UsernameTokenUtil;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;

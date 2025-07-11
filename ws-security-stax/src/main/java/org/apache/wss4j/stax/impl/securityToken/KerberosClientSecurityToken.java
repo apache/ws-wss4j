@@ -39,7 +39,7 @@ import org.apache.wss4j.common.kerberos.KerberosClientExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosContext;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 

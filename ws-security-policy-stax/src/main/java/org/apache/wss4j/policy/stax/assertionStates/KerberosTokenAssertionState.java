@@ -26,14 +26,14 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
-import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.KeyIdentifier;
-import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.4 KerberosToken Assertion

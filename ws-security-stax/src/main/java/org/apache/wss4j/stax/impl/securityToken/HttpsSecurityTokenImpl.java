@@ -24,8 +24,8 @@ import java.security.cert.X509Certificate;
 import javax.security.auth.Subject;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.securityToken.HttpsSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityToken.HttpsSecurityToken;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;

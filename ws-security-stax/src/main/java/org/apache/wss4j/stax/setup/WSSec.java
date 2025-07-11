@@ -35,10 +35,10 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.FIPSUtils;
-import org.apache.wss4j.stax.ext.WSSConfigurationException;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConfigurationException;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -98,7 +98,7 @@ public class WSSec {
      * @return A new OutboundWSSec
      * @throws WSSecurityException
      *          if the initialisation failed
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static OutboundWSSec getOutboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
@@ -117,7 +117,7 @@ public class WSSec {
      * @return A new InboundWSSec
      * @throws WSSecurityException
      *          if the initialisation failed
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
@@ -132,7 +132,7 @@ public class WSSec {
      * @return A new InboundWSSec
      * @throws WSSecurityException
      *          if the initialisation failed
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties,
@@ -149,7 +149,7 @@ public class WSSec {
      * @return A new InboundWSSec
      * @throws WSSecurityException
      *          if the initialisation failed
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties,
@@ -168,7 +168,7 @@ public class WSSec {
      *
      * @param securityProperties The configuration to validate
      * @return The validated configuration
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties)
@@ -452,7 +452,7 @@ public class WSSec {
      *
      * @param securityProperties The configuration to validate
      * @return The validated configuration
-     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     * @throws org.apache.wss4j.api.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(WSSSecurityProperties securityProperties)

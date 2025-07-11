@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import org.apache.wss4j.api.stax.validate.Validator;
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;

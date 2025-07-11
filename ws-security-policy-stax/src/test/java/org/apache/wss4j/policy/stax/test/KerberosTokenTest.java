@@ -25,12 +25,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;

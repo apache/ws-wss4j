@@ -24,7 +24,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;

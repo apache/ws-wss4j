@@ -87,7 +87,7 @@ import org.apache.wss4j.policy.builders.WSS10Builder;
 import org.apache.wss4j.policy.builders.WSS11Builder;
 import org.apache.wss4j.policy.builders.X509TokenBuilder;
 import org.apache.wss4j.policy.stax.OperationPolicy;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

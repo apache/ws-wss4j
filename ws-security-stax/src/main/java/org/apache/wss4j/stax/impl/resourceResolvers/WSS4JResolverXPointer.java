@@ -21,7 +21,7 @@ package org.apache.wss4j.stax.impl.resourceResolvers;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.ResourceResolver;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;

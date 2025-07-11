@@ -48,7 +48,7 @@ import org.apache.wss4j.dom.message.AttachmentCallbackHandler;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.api.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;

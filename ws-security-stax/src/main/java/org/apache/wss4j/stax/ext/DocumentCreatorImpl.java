@@ -22,6 +22,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.wss4j.api.stax.ext.DocumentCreator;
 import org.w3c.dom.Document;
 
 /**

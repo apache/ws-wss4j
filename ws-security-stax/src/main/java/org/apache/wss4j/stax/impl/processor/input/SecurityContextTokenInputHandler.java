@@ -20,9 +20,9 @@ package org.apache.wss4j.stax.impl.processor.input;
 
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.wss4j.stax.validate.SecurityContextTokenValidator;
 import org.apache.wss4j.stax.validate.SecurityContextTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;

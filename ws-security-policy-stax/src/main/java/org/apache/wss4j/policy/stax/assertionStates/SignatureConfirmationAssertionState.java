@@ -28,7 +28,7 @@ import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 

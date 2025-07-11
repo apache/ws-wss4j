@@ -29,8 +29,8 @@ import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
-import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.6 SecurityContextToken Assertion
