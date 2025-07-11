@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl;
+package org.apache.wss4j.api.stax;
 
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 

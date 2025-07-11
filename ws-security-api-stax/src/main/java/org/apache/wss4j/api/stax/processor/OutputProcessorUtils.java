@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl.processor.output;
+package org.apache.wss4j.api.stax.processor;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +24,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.api.stax.SecurityHeaderOrder;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;

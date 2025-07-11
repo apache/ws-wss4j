@@ -43,6 +43,7 @@ import org.apache.wss4j.api.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurePart;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.processor.OutputProcessorUtils;
 import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;

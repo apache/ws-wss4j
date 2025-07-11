@@ -33,7 +33,7 @@
             net.shibboleth*;resolution:=optional,
             com.sun.security.jgss*;resolution:=optional
         </wss4j.osgi.import>
-       <wss4j.module.name>org.apache.wss4j.saml</wss4j.module.name>
+       <wss4j.module.name>org.apache.wss4j.dom.saml</wss4j.module.name>
     </properties>
     
     <build>

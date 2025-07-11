@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.processor.OutputProcessorUtils;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
