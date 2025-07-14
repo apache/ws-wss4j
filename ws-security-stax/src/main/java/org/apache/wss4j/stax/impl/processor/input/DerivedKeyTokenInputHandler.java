@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType;
 import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl;

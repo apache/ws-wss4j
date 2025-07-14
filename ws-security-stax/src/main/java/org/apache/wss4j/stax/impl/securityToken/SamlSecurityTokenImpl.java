@@ -42,7 +42,7 @@ import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.dom.saml.SAMLUtil;
 import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;

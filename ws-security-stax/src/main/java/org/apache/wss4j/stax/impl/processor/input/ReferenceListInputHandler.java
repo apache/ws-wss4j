@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.exceptions.XMLSecurityException;

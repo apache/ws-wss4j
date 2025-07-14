@@ -33,7 +33,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.securityToken.X509SecurityToken;

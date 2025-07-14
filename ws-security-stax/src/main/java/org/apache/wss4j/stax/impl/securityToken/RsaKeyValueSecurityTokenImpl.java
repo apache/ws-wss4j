@@ -28,7 +28,7 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.api.stax.securityToken.RsaKeyValueSecurityToken;
 import org.apache.xml.security.binding.xmldsig.RSAKeyValueType;

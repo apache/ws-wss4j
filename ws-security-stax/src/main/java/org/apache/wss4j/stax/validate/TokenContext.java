@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 

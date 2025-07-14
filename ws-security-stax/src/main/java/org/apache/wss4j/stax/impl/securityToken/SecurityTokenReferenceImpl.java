@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.Deque;
 import java.util.Map;
 
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.securityToken.SecurityTokenReference;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
