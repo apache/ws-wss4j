@@ -45,6 +45,8 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.validate.Validator;
+import org.apache.xml.security.stax.ext.OutputProcessor;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
 /**
@@ -53,6 +55,31 @@ import org.apache.xml.security.stax.ext.XMLSecurityProperties;
  * Probably we will allow to configure the framework per WSDL
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
+
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(WSSSecurityProperties.class);
+
+     /**
+     * The default collection of Output Processors supported by the toolkit
+     * 
+     * Instead of hard-coding, you can use Java's ServiceLoader mechanism to discover implementations
+     * at runtime. Each implementation should be registered in
+     * META-INF/services/org.apache.xml.security.stax.ext.OutputProcessor with its fully qualified class name.
+     * 
+     */
+    private static final Map<XMLSecurityConstants.Action, Class<?>> DEFAULT_OUTPUT_PROCESSORS;
+    static {
+        final Map<XMLSecurityConstants.Action, Class<?>> tmp = new HashMap<>();
+        try {
+            java.util.ServiceLoader<OutputProcessor> loader = java.util.ServiceLoader.load(OutputProcessor.class);
+            for (OutputProcessor outputProcessor : loader) {
+                tmp.put(outputProcessor.getAction(), outputProcessor.getClass());
+            }
+        } catch (final Exception ex) {
+            LOG.debug(ex.getMessage(), ex);
+        }
+        DEFAULT_OUTPUT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
+    }
 
     private boolean mustUnderstand = true;
     private String actor;
@@ -969,4 +996,29 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setDocumentCreator(DocumentCreator documentCreator) {
         this.documentCreator = documentCreator;
     }
+
+    /**
+     * Lookup OutputProcessor for the given action.
+     *
+     * @param action
+     * @return An OutputProcessor to create a security token
+     * @throws WSSecurityException
+     */
+    public OutputProcessor getOutputProcessor(XMLSecurityConstants.Action action) throws WSSecurityException {
+        final Object actionObject = DEFAULT_OUTPUT_PROCESSORS.get(action);
+
+        if (actionObject instanceof Class<?>) {
+            try {
+                return (OutputProcessor)((Class<?>)actionObject).getDeclaredConstructor().newInstance();
+            } catch (Exception ex) {
+                LOG.debug(ex.getMessage(), ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                        "unableToLoadClass", new Object[] {((Class<?>)actionObject).getName()});
+            }
+        } else if (actionObject instanceof OutputProcessor) {
+            return (OutputProcessor)actionObject;
+        }
+        return null;
+    }
+
 }

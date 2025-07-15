@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl.processor.output;
+package org.apache.wss4j.stax.saml.impl.processor.output;
 
 import java.security.Key;
 import java.security.PrivateKey;
@@ -44,6 +44,7 @@ import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurePart;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.api.stax.processor.OutputProcessorUtils;
+import org.apache.wss4j.api.stax.processor.WSSSignatureOutputProcessor;
 import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
@@ -71,8 +72,17 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
         super();
-        addBeforeProcessor(BinarySecurityTokenOutputProcessor.class);
+        //addBeforeProcessor(BinarySecurityTokenOutputProcessor.class);
         addBeforeProcessor(WSSSignatureOutputProcessor.class);
+    }
+
+    @Override
+    public XMLSecurityConstants.Action getAction() {
+        if (super.getAction() != null) {
+            return super.getAction();
+        }
+        // default action is SAML token signed
+        return WSSConstants.SAML_TOKEN_SIGNED;
     }
 
     @Override
@@ -435,7 +445,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                       String securityTokenReferenceId, boolean senderVouches,
                                       boolean includeSTR) throws XMLSecurityException {
             super();
-            this.addAfterProcessor(UsernameTokenOutputProcessor.class);
+            //this.addAfterProcessor(UsernameTokenOutputProcessor.class);
             this.addAfterProcessor(SAMLTokenOutputProcessor.class);
             this.addBeforeProcessor(WSSSignatureOutputProcessor.class);
             this.samlAssertionWrapper = samlAssertionWrapper;

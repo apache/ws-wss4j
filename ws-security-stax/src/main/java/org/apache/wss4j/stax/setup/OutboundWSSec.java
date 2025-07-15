@@ -37,6 +37,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.DocumentCreatorImpl;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.processor.WSSSignatureOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.BinarySecurityTokenOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.CustomTokenOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.DerivedKeyTokenOutputProcessor;
@@ -44,14 +45,12 @@ import org.apache.wss4j.stax.impl.processor.output.EncryptEndingOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.EncryptOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.EncryptedKeyOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.ReferenceListOutputProcessor;
-import org.apache.wss4j.stax.impl.processor.output.SAMLTokenOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.SecurityContextTokenOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.SecurityHeaderOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.SecurityHeaderReorderProcessor;
 import org.apache.wss4j.stax.impl.processor.output.SignatureConfirmationOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.TimestampOutputProcessor;
 import org.apache.wss4j.stax.impl.processor.output.UsernameTokenOutputProcessor;
-import org.apache.wss4j.stax.impl.processor.output.WSSSignatureOutputProcessor;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
@@ -234,7 +233,6 @@ public class OutboundWSSec {
             outputProcessor.addAfterProcessor(SignatureConfirmationOutputProcessor.class);
             outputProcessor.addAfterProcessor(CustomTokenOutputProcessor.class);
             outputProcessor.addAfterProcessor(BinarySecurityTokenOutputProcessor.class);
-            outputProcessor.addAfterProcessor(SAMLTokenOutputProcessor.class);
         }
         outputProcessor.setXMLSecurityProperties(securityProperties);
         outputProcessor.setAction(action, actionOrder);
@@ -706,7 +704,7 @@ public class OutboundWSSec {
                     new BinarySecurityTokenOutputProcessor();
                 initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action, -1);
 
-                final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                final OutputProcessor samlTokenOutputProcessor = securityProperties.getOutputProcessor(WSSConstants.SAML_TOKEN_SIGNED);
                 initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action, -1);
 
                 final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
@@ -721,7 +719,7 @@ public class OutboundWSSec {
                 }
 
             } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
-                final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                final OutputProcessor samlTokenOutputProcessor = securityProperties.getOutputProcessor(WSSConstants.SAML_TOKEN_SIGNED);
                 initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action, -1);
 
                 if (securityProperties.getDocumentCreator() == null) {

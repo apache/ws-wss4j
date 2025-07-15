@@ -16,12 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl.processor.output;
+package org.apache.wss4j.api.stax.processor;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.api.stax.processor.OutputProcessorUtils;
 import org.apache.wss4j.api.stax.SecurityHeaderOrder;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
@@ -49,10 +48,9 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
     private SignedInfoProcessor signedInfoProcessor;
 
-    public WSSSignatureEndingOutputProcessor(WSSSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+    WSSSignatureEndingOutputProcessor(WSSSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(signatureOutputProcessor);
         this.addAfterProcessor(WSSSignatureOutputProcessor.class);
-        this.addAfterProcessor(UsernameTokenOutputProcessor.class);
     }
 
     @Override

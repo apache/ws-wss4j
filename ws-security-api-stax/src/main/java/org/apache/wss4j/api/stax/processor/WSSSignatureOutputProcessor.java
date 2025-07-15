@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl.processor.output;
+package org.apache.wss4j.api.stax.processor;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -40,7 +40,6 @@ import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurePart;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
@@ -60,6 +59,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSSignatureOutputProcessor.class);
+    private static final String ATTACHMENT = "attachment";
 
     public WSSSignatureOutputProcessor() throws XMLSecurityException {
         super();
@@ -209,8 +209,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         Transformer transformer = buildTransformerChain(digestOutputStream, signaturePartDef, null);
 
                         Map<String, Object> transformerProperties = new HashMap<>(2);
-                        transformerProperties.put(
-                                AttachmentContentSignatureTransform.ATTACHMENT, attachment);
+                        transformerProperties.put(ATTACHMENT, attachment);
                         transformer.setProperties(transformerProperties);
                         transformer.transform(inputStream);
                         transformer.doFinal();

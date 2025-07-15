@@ -71,6 +71,13 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- TODO remove when tests move to SAML module -->
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-stax-saml</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-common</artifactId>

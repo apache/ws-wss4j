@@ -25,6 +25,8 @@ import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.api.stax.processor.OutputProcessorUtils;
+import org.apache.wss4j.api.stax.processor.WSSSignatureEndingOutputProcessor;
+import org.apache.wss4j.api.stax.processor.WSSSignatureOutputProcessor;
 import org.apache.wss4j.stax.impl.securityToken.OutboundUsernameSecurityToken;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -50,6 +52,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
     public UsernameTokenOutputProcessor() throws XMLSecurityException {
         super();
         addBeforeProcessor(WSSSignatureOutputProcessor.class);
+        addBeforeProcessor(WSSSignatureEndingOutputProcessor.class);
         addBeforeProcessor(EncryptOutputProcessor.class);
     }
 
