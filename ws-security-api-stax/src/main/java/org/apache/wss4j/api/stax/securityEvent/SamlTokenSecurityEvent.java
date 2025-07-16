@@ -19,7 +19,6 @@
 package org.apache.wss4j.api.stax.securityEvent;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
 
@@ -35,6 +34,6 @@ public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent<SamlSecurit
     }
 
     public SamlAssertionWrapper getSamlAssertionWrapper() throws WSSecurityException {
-        return (SamlAssertionWrapper)((SAMLTokenPrincipal)getSecurityToken().getPrincipal()).getToken();
+        return getSecurityToken().getSamlAssertionWrapper();
     }
 }
