@@ -258,7 +258,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     }
 
     @Override
-    public SamlAssertionWrapper getSamlAssertionWrapper() {
+    public Object getSamlAssertion() {
         return samlAssertionWrapper;
     }
 

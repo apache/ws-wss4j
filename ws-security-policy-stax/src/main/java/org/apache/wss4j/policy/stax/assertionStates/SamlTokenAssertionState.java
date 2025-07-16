@@ -96,7 +96,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             }
         }
         if (samlToken.getSamlTokenType() != null) {
-            final SamlAssertionWrapper samlAssertionWrapper = samlTokenSecurityEvent.getSamlAssertionWrapper();
+            final SamlAssertionWrapper samlAssertionWrapper = (SamlAssertionWrapper)samlTokenSecurityEvent.getSamlAssertion();
             switch (samlToken.getSamlTokenType()) {
                 case WssSamlV11Token10:
                     if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {

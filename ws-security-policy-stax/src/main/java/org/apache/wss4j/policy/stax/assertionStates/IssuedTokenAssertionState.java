@@ -140,7 +140,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
             }
             if ("TokenType".equals(child.getLocalName())) {
                 String content = child.getTextContent();
-                final SAMLVersion samlVersion = samlTokenSecurityEvent.getSamlAssertionWrapper().getSamlVersion();
+                final SAMLVersion samlVersion = ((SamlAssertionWrapper)samlTokenSecurityEvent.getSamlAssertion()).getSamlVersion();
                 if (WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(content)
                         && samlVersion != SAMLVersion.VERSION_11) {
                     return "Policy enforces SAML V1.1 token but got " + samlVersion.toString();
@@ -216,7 +216,8 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                 String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
 
                 if (claimTypeOptional.length() == 0 || !Boolean.parseBoolean(claimTypeOptional)) {
-                    String errorMsg = findClaimInAssertion(samlTokenSecurityEvent.getSamlAssertionWrapper(), URI.create(claimTypeUri));
+                    String errorMsg = findClaimInAssertion((SamlAssertionWrapper)samlTokenSecurityEvent.getSamlAssertion(), 
+                        URI.create(claimTypeUri));
                     if (errorMsg != null) {
                         return errorMsg;
                     }
