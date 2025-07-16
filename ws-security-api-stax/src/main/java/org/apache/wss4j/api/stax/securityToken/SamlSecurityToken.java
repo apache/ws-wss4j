@@ -23,4 +23,6 @@ import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 public interface SamlSecurityToken extends SubjectAndPrincipalSecurityToken {
 
     SamlAssertionWrapper getSamlAssertionWrapper();
+
+    String getIssuerName();
 }

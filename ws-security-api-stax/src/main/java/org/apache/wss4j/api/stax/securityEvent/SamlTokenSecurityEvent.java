@@ -30,7 +30,7 @@ public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent<SamlSecurit
 
     @Override
     public String getIssuerName() throws WSSecurityException {
-        return getSamlAssertionWrapper().getIssuerString();
+        return getSecurityToken().getIssuerName();
     }
 
     public SamlAssertionWrapper getSamlAssertionWrapper() throws WSSecurityException {
