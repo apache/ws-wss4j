@@ -54,12 +54,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-ws-security-dom-saml</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <scope>runtime</scope>
@@ -74,10 +68,17 @@
         <!-- TODO remove when tests move to SAML module -->
         <dependency>
             <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-dom-saml</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-stax-saml</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- to here -->
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-common</artifactId>

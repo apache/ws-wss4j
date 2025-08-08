@@ -34,7 +34,7 @@ import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.opensaml.saml.common.SAMLVersion;
 
-public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
+public class SamlTokenValidatorImpl implements SamlTokenValidator {
 
     private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenValidatorImpl.class);

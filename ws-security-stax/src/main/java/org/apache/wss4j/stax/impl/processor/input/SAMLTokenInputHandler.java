@@ -134,7 +134,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
             }
 
-            samlTokenValidator.validate(sigSecurityToken, wssSecurityProperties);
+            try {
+                sigSecurityToken.verify();
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            }
 
             BasicCredential credential = null;
             if (sigSecurityToken.getX509Certificates() != null) {
