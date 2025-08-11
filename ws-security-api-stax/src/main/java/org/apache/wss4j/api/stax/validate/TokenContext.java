@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.validate;
+package org.apache.wss4j.api.stax.validate;
 
 import org.apache.wss4j.api.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;

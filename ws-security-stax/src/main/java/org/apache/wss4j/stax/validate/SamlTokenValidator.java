@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.validate;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.wss4j.api.stax.validate.Validator;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 

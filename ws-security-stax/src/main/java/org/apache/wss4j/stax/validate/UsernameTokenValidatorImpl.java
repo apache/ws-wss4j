@@ -33,6 +33,7 @@ import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;

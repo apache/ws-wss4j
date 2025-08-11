@@ -31,6 +31,7 @@ import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.X509V3SecurityTokenImpl;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
 import org.apache.xml.security.binding.xop.Include;

@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.api.stax.utils.WSSUtils;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;

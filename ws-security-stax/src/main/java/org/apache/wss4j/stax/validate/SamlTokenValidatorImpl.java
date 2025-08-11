@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.opensaml.saml.common.SAMLVersion;
 
