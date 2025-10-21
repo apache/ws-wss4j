@@ -75,7 +75,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        mvn clean compile -Pnochecks
+        mvn clean install -Pnochecks
     #   make bootstrap
     #   make release
 
