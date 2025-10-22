@@ -32,7 +32,7 @@
     <url>https://ws.apache.org/wss4j/</url>
 
     <properties>
-        <bcprov.version>1.80</bcprov.version>
+        <bcprov.version>1.82</bcprov.version>
         <bc.fips.version>2.1.1</bc.fips.version>
         <commons.compress.version>1.27.1</commons.compress.version>
         <cryptacular.version>1.2.7</cryptacular.version>
