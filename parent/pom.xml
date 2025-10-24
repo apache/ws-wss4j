@@ -57,7 +57,7 @@
         <wss4j.osgi.export>org.apache.wss4j.*</wss4j.osgi.export>
         <wss4j.osgi.dynamic.import />
         <wss4j.manifest.location>${project.build.outputDirectory}/META-INF/MANIFEST.MF</wss4j.manifest.location>
-        <xml.bind.api.version>4.0.2</xml.bind.api.version>
+        <xml.bind.api.version>4.0.4</xml.bind.api.version>
     </properties>
 
     <dependencyManagement>
