@@ -50,7 +50,7 @@
         <woodstox.version>7.1.1</woodstox.version>
         <xz.version>1.10</xz.version>
         <xmlsec.version>4.0.4</xmlsec.version>
-        <xmlunit.version>2.10.4</xmlunit.version>
+        <xmlunit.version>2.11.0</xmlunit.version>
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
         <wss4j.osgi.symbolic.name>${project.groupId}.${project.artifactId}</wss4j.osgi.symbolic.name>
