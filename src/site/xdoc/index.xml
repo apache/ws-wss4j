@@ -93,6 +93,11 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>November 2025</b> - 
+The Apache WSS4J team are pleased to announce the release of version 4.0.1 and 3.0.5. 
+</p>
+</li>
+<li>
 <p><b>February 2025</b> - 
 The Apache WSS4J team are pleased to announce the release of version 4.0.0. This is a major new release that features upgrades to OpenSAML v5, XML Security 4.0.0, with JDK 17 as a minimum supported version.
 </p>
