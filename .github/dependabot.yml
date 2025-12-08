@@ -18,6 +18,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 5
     ignore:
       - dependency-name: "org.apache.maven.plugins:maven-source-plugin"
         versions:
@@ -28,3 +30,5 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 5
