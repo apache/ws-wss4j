@@ -306,7 +306,7 @@ public class EncryptedKeyProcessor implements Processor {
 
             publicKey = keyValue.getPublicKey();
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e, "unsupportedKeyInfo");
         }
         return publicKey;
     }
