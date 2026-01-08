@@ -801,11 +801,10 @@ public class EncryptionTest {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
         /*
          * Encrypt the parts (Body), create EncryptedData elements that reference
@@ -871,11 +870,10 @@ public class EncryptionTest {
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
         builder.encrypt(symmetricKey);
 

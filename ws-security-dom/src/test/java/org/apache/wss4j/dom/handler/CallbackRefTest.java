@@ -66,8 +66,6 @@ public class CallbackRefTest {
         );
         reqData.setMsgContext(messageContext);
 
-        final java.util.List<Integer> actions = new java.util.ArrayList<>();
-        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.UT);
@@ -102,8 +100,6 @@ public class CallbackRefTest {
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
 
-        final java.util.List<Integer> actions = new java.util.ArrayList<>();
-        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);

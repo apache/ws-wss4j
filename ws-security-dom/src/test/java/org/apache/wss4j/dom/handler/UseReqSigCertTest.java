@@ -211,8 +211,6 @@ public class UseReqSigCertTest {
         config.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
         reqData.setMsgContext(config);
 
-        final List<Integer> actions = new ArrayList<>();
-        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         // Send message
