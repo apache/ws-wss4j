@@ -105,8 +105,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <targetJdk>11</targetJdk>
-        <maven.compiler.target>11</maven.compiler.target>
+        <javaVersion>11</javaVersion>
+        <maven.compiler.target>${javaVersion}</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
         <maven-owasp-plugin-version>12.2.0</maven-owasp-plugin-version>
         <project.build.outputTimestamp>2025-10-28T15:13:45Z</project.build.outputTimestamp>
@@ -140,8 +140,7 @@
                     <linkXRef>false</linkXRef>
                     <verbose>true</verbose>
                     <includeTests>false</includeTests>
-                    <!-- TODO <targetJdk>${targetJdk}</targetJdk>-->
-                    <targetJdk>1.8</targetJdk>
+                    <targetJdk>${javaVersion}</targetJdk>
                     <excludeRoots>
                         <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                     </excludeRoots>
@@ -212,8 +211,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.14.1</version>
                     <configuration>
-                        <source>${targetJdk}</source>
-                        <target>${targetJdk}</target>
+                        <source>${javaVersion}</source>
+                        <target>${javaVersion}</target>
                         <compilerArgs>
                             <arg>-XDcompilePolicy=simple</arg>
                         </compilerArgs>
