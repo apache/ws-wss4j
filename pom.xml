@@ -108,7 +108,7 @@
         <targetJdk>11</targetJdk>
         <maven.compiler.target>11</maven.compiler.target>
         <buildtools.dir>${basedir}/build-tools</buildtools.dir>
-        <maven-owasp-plugin-version>12.1.9</maven-owasp-plugin-version>
+        <maven-owasp-plugin-version>12.2.0</maven-owasp-plugin-version>
         <project.build.outputTimestamp>2025-10-28T15:13:45Z</project.build.outputTimestamp>
     </properties>
 
