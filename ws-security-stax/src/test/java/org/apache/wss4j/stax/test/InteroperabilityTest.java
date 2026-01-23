@@ -1304,7 +1304,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             } catch (XMLStreamException ex) {
                 int k = 0;
                 Throwable t = ex.getCause();
-                while (t != null && k < 100) {
+                while (t != null && k++ < 100) {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
