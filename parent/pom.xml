@@ -35,7 +35,7 @@
         <bcprov.version>1.83</bcprov.version>
         <bc.fips.version>2.1.2</bc.fips.version>
         <commons.compress.version>1.28.0</commons.compress.version>
-        <cryptacular.version>1.2.7</cryptacular.version>
+        <cryptacular.version>1.3.0</cryptacular.version>
         <ehcache.version>3.11.1</ehcache.version>
         <hamcrest.version>3.0</hamcrest.version>
         <jakarta.mail.api.version>2.1.5</jakarta.mail.api.version>
