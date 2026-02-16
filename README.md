@@ -22,7 +22,7 @@ provides an implementation of the following WS-Security standards:
 Apache WSS4J, Apache, and the Apache feather logo are trademarks of The Apache
 Software Foundation. 
 
-The master link to WSS4J: http://ws.apache.org/wss4j/
+The master link to WSS4J: https://ws.apache.org/wss4j/
 
 Crypto Notice
 ======================
@@ -33,7 +33,7 @@ Crypto Notice
    encryption software.  BEFORE using any encryption software, please
    check your country's laws, regulations and policies concerning the
    import, possession, or use, and re-export of encryption software, to
-   see if this is permitted.  See <http://www.wassenaar.org/> for more
+   see if this is permitted.  See <https://www.wassenaar.org/> for more
    information.
 
    The U.S. Government Department of Commerce, Bureau of Industry and
@@ -49,9 +49,9 @@ Crypto Notice
    The following provides more details on the included cryptographic
    software:
 
-   Apache Santuario : http://santuario.apache.org/
-   Apache WSS4J     : http://ws.apache.org/wss4j/
-   Bouncycastle     : http://www.bouncycastle.org/
+   Apache Santuario : https://santuario.apache.org/
+   Apache WSS4J     : https://ws.apache.org/wss4j/
+   Bouncycastle     : https://www.bouncycastle.org/
 
 Test Requirements
 ======================
@@ -63,4 +63,4 @@ Oracle's JDK download page[1] *must* be installed for the tests to work. If
 you get errors about invalid key lengths, the Unlimited Strength files are not
 installed.
 
-[1] http://www.oracle.com/technetwork/java/javase/downloads/index.html
+[1] https://www.oracle.com/technetwork/java/javase/downloads/index.html
