@@ -113,29 +113,48 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
         krbCtx.setGssContext(secContext);
         krbCtx.setKerberosToken(returnedToken);
 
+        Key key = null;
+        if (IS_IBM_VENDOR) {
+            try {
+                key = getKey(secContext, IBM_JGSS_INQUIRE_TYPE_CLASS, IBM_JGSS_EXT_GSSCTX_CLASS);
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
+                // may be Semeru which doesn't have the IBM branded classes. Try the Sun ones instead
+                try {
+                    key = getKey(secContext, SUN_JGSS_INQUIRE_TYPE_CLASS, SUN_JGSS_EXT_GSSCTX_CLASS);
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
+                    WSSecurityException exception = new WSSecurityException(ErrorCode.FAILURE, e1, "kerberosServiceTicketError");
+                    exception.addSuppressed(e2);
+                    throw exception;
+                }
+            }
+        }
+
         try {
-            @SuppressWarnings("rawtypes")
-            Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS
-                : SUN_JGSS_INQUIRE_TYPE_CLASS);
-
-            @SuppressWarnings("rawtypes")
-            Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS
-                : SUN_JGSS_EXT_GSSCTX_CLASS);
-
-            @SuppressWarnings("unchecked")
-            Method inquireSecContext = extendedGSSContext.getMethod("inquireSecContext", inquireType);
-
-            @SuppressWarnings("unchecked")
-            Key key = (Key) inquireSecContext.invoke(secContext, Enum.valueOf(inquireType, "KRB5_GET_SESSION_KEY"));
-
-            krbCtx.setSecretKey(key);
+            key = getKey(secContext, SUN_JGSS_INQUIRE_TYPE_CLASS, SUN_JGSS_EXT_GSSCTX_CLASS);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
             | InvocationTargetException e) {
             throw new WSSecurityException(
                 ErrorCode.FAILURE, e, "kerberosServiceTicketError"
             );
         }
+        krbCtx.setSecretKey(key);
 
         return krbCtx;
+    }
+
+    private static Key getKey(GSSContext secContext, String inquireClass, String contextClass) throws ClassNotFoundException, 
+        NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        @SuppressWarnings("rawtypes")
+        Class inquireType = Class.forName(inquireClass);
+
+        @SuppressWarnings("rawtypes")
+        Class extendedGSSContext = Class.forName(contextClass);
+
+        @SuppressWarnings("unchecked")
+        Method inquireSecContext = extendedGSSContext.getMethod("inquireSecContext", inquireType);
+
+        @SuppressWarnings("unchecked")
+        Key key = (Key) inquireSecContext.invoke(secContext, Enum.valueOf(inquireType, "KRB5_GET_SESSION_KEY"));
+        return key;
     }
 }
