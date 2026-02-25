@@ -78,8 +78,6 @@ public class NameConstraintsTest {
 
     private static final Pattern SUBJ_PATTERN = Pattern.compile(".*OU=wss4j,O=apache");
 
-    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
-
     @BeforeEach
     public void setup() throws Exception {
         WSProviderConfig.init();
@@ -126,8 +124,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraints() throws Exception {
-        assumeFalse(isIBMJdK);
-
         Merlin merlin = new Merlin();
         X509Certificate[] certificates = getTestCertificateChain(INTERMEDIATE_SIGNED);
 
@@ -146,8 +142,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlin() throws Exception {
-        assumeFalse(isIBMJdK);
-
         withKeyStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 new Merlin());
@@ -161,8 +155,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlin() throws Exception {
-        assumeFalse(isIBMJdK);
-
         withTrustStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 new Merlin());
@@ -176,8 +168,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAki() throws Exception {
-        assumeFalse(isIBMJdK);
-
         withKeyStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 new MerlinAKI());
@@ -191,7 +181,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinAki() throws Exception {
-        assumeFalse(isIBMJdK);
 
         withTrustStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
@@ -206,7 +195,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinBc() throws Exception {
-        assumeFalse(isIBMJdK);
 
         withKeyStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
@@ -221,7 +209,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinBc() throws Exception {
-        assumeFalse(isIBMJdK);
 
         withTrustStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
@@ -236,7 +223,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAkiBc() throws Exception {
-        assumeFalse(isIBMJdK);
 
         withKeyStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
@@ -251,7 +237,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinAkiBc() throws Exception {
-        assumeFalse(isIBMJdK);
 
         withTrustStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
@@ -272,8 +257,6 @@ public class NameConstraintsTest {
      */
     @Test
     public void testTrustAnchorsForCertificatesWithoutNameConstraints() throws Exception {
-        assumeFalse(isIBMJdK);
-
         Merlin merlin = merlinHandlingNameConstraints();
         Set<TrustAnchor> anchors = new HashSet<>();
 
@@ -288,8 +271,6 @@ public class NameConstraintsTest {
      */
     @Test
     public void testTrustAnchorsRetainNameConstraints() throws Exception {
-        assumeFalse(isIBMJdK);
-
         Merlin merlin = merlinHandlingNameConstraints();
         Set<TrustAnchor> anchors = new HashSet<>();
 
@@ -310,7 +291,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinBreaking() throws Exception {
-        assumeFalse(isIBMJdK);
 
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
@@ -328,7 +308,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAkiBreaking() throws Exception {
-        assumeFalse(isIBMJdK);
 
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
@@ -346,7 +325,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsUsingCertificateStore() throws Exception {
-        assumeFalse(isIBMJdK);
 
         usingCertificateStore(getSelfKeyStore(), getTestCertificateChain(SELF_SIGNED));
         usingCertificateStore(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED));

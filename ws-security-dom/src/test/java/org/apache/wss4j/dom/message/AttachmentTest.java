@@ -77,8 +77,6 @@ public class AttachmentTest {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
 
-    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
-
     public AttachmentTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
@@ -488,8 +486,6 @@ public class AttachmentTest {
 
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
-        assumeFalse(isIBMJdK);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
