@@ -77,6 +77,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <scope>test</scope>
+            <exclusions>
+              <!-- We want it from XML Sec instead --> 
+              <exclusion>
+                  <groupId>commons-codec</groupId>
+                  <artifactId>commons-codec</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.tukaani</groupId>
