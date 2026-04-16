@@ -69,6 +69,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.Reference;
@@ -1412,6 +1413,59 @@ public class SamlTokenTest {
         }
 
         cipher.doFinal(document, elementToEncrypt, content);
+    }
+
+    /**
+     * Test that processing an unsigned SAML 2 assertion with no SAML validator configured
+     * does NOT set a principal in the result. This guards against identity impersonation
+     * via attacker-controlled unsigned assertions.
+     */
+    @Test
+    public void testUnsignedSAML2NoPrincipalWithoutValidator() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("attacker.example.com");
+        callbackHandler.setSubjectName("admin@example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        // Use a fresh engine with SAML validators explicitly removed.
+        // WSSConfig registers SamlAssertionValidator for SAML_TOKEN and SAML2_TOKEN by default,
+        // so they must be cleared to simulate a deployment without a configured validator.
+        WSSConfig configNoValidator = WSSConfig.getNewInstance();
+        configNoValidator.setValidator(WSConstants.SAML_TOKEN, (Validator) null);
+        configNoValidator.setValidator(WSConstants.SAML2_TOKEN, (Validator) null);
+        WSSecurityEngine engineNoValidator = new WSSecurityEngine();
+        engineNoValidator.setWssConfig(configNoValidator);
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+
+        WSHandlerResult results = engineNoValidator.processSecurityHeader(unsignedDoc, requestData);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        assertNotNull(actionResult);
+
+        // The assertion must be present but not validated
+        SamlAssertionWrapper receivedAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedAssertion);
+        assertFalse(receivedAssertion.isSigned());
+
+        // No validator => no principal and validated-token flag is false
+        assertNull(actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL),
+            "No principal should be set when no SAML validator is configured");
+        assertFalse((Boolean)actionResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN),
+            "TAG_VALIDATED_TOKEN must not be set when no validator is configured");
     }
 
     private WSHandlerResult createAndVerifyMessage( //NOPMD - It incorrectly thinks this method isn't called
