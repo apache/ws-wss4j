@@ -288,7 +288,19 @@ public class EncryptedKeyProcessor implements Processor {
         return X509Util.getSecretKey(keyInfoChildElement, algorithmURI, data.getCallbackHandler());
     }
 
-    private static byte[] getAsymmetricDecryptedBytes(
+    /**
+     * Initializes the cipher decrypting the encryptedEphemeralKey as indicated by the encryptedKeyTransportMethod
+     * @param data
+     * @param wsDocInfo
+     * @param encryptedKeyTransportMethod
+     * @param encryptedEphemeralKey
+     * @param refList
+     * @param encryptedKeyElement
+     * @param privateKey
+     * @return the decrypted key or, in case of an exception during the decryption, a randomKey
+     * @throws WSSecurityException
+     */
+    protected byte[] getAsymmetricDecryptedBytes(
         RequestData data,
         WSDocInfo wsDocInfo,
         String encryptedKeyTransportMethod,
@@ -373,7 +385,7 @@ public class EncryptedKeyProcessor implements Processor {
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
      */
-    private static byte[] getRandomKey(Element refList, WSDocInfo wsDocInfo) throws WSSecurityException {
+    protected static byte[] getRandomKey(Element refList, WSDocInfo wsDocInfo) throws WSSecurityException {
         try {
             String alg = "AES";
             int size = 16;
