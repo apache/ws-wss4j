@@ -6,7 +6,12 @@
                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never"
                             wsp:Ignorable="true">
                 <sp:IssuerName>issuerName</sp:IssuerName>
-                <sp:RequestSecurityTokenTemplate TrustVersion="http://trust/sowieso"/>
+                <sp:RequestSecurityTokenTemplate>
+                    <wst:RequestSecurityToken xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512">
+                        <wst:TokenType>tokenType</wst:TokenType>
+                        <wst:RequestType>requestType</wst:RequestType>
+                    </wst:RequestSecurityToken>
+                </sp:RequestSecurityTokenTemplate>
                 <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
                     <wsp:ExactlyOne>
                         <wsp:All>
