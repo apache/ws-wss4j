@@ -50,9 +50,11 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.jupiter.api.Test;
@@ -62,6 +64,7 @@ import org.w3c.dom.NodeList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -147,6 +150,60 @@ public class AttachmentTest {
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         assertEquals("text/xml", responseAttachment.getMimeType());
+    }
+
+    /**
+     * The WSDataRef of a signed attachment must be flagged as an attachment and carry the
+     * synthesised SwA "attachment" element. Attachment References are not cached during
+     * validation, so this is derived from the Reference's Transform algorithm.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testXMLAttachmentContentSignatureDataRef() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
+
+        final String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+
+        builder.setAttachmentCallbackHandler(
+            new AttachmentCallbackHandler(Collections.singletonList(attachment)));
+        Document signedDoc = builder.build(crypto);
+
+        WSHandlerResult results =
+            verify(signedDoc, new AttachmentCallbackHandler(Collections.singletonList(attachment)));
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        List<WSDataRef> refs =
+            (List<WSDataRef>)actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertEquals(2, refs.size());
+
+        WSDataRef attachmentRef = null;
+        for (WSDataRef ref : refs) {
+            if (ref.isAttachment()) {
+                attachmentRef = ref;
+            }
+        }
+        assertNotNull(attachmentRef);
+        assertEquals("cid:" + attachmentId, attachmentRef.getWsuId());
+        Element protectedElement = attachmentRef.getProtectedElement();
+        assertEquals("attachment", protectedElement.getLocalName());
+        assertEquals("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1",
+                     protectedElement.getNamespaceURI());
+        assertTrue(attachmentRef.getTransformAlgorithms()
+                   .contains(WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS));
     }
 
     @Test
