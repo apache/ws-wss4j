@@ -21,23 +21,38 @@ package org.apache.wss4j.common.crypto;
 
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
+/**
+ * Parses X.509 key identifier extensions. The historical class name is retained for binary
+ * compatibility, but the implementation is provider-neutral.
+ */
 public final class BouncyCastleUtils {
+
+    private static final int TYPE_CONTEXT_SPECIFIC_0 = 0x80;
 
     private BouncyCastleUtils() {
         // complete
     }
 
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static byte[] getAuthorityKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.35"); //NOPMD
         if (extensionValue != null) {
-            byte[] octets = ASN1OctetString.getInstance(extensionValue).getOctets();
-            AuthorityKeyIdentifier authorityKeyIdentifier =
-                AuthorityKeyIdentifier.getInstance(octets);
-            return authorityKeyIdentifier.getKeyIdentifier();
+            try {
+                DERDecoder extension = unwrapExtensionValue(extensionValue);
+                extension.expect(DERDecoder.TYPE_SEQUENCE);
+                DERDecoder authorityKeyIdentifier =
+                    new DERDecoder(extension.getBytes(extension.getLength()));
+                if (!authorityKeyIdentifier.hasRemaining()
+                    || !authorityKeyIdentifier.test((byte)TYPE_CONTEXT_SPECIFIC_0)) {
+                    return null;
+                }
+                authorityKeyIdentifier.expect(TYPE_CONTEXT_SPECIFIC_0);
+                return authorityKeyIdentifier.getBytes(authorityKeyIdentifier.getLength());
+            } catch (WSSecurityException ex) {
+                throw new IllegalArgumentException("Invalid AuthorityKeyIdentifier extension", ex);
+            }
         }
         return new byte[0];
     }
@@ -45,15 +60,20 @@ public final class BouncyCastleUtils {
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.14"); //NOPMD
         if (extensionValue != null) {
-            byte[] subjectOctets =
-                ASN1OctetString.getInstance(extensionValue).getOctets();
-            SubjectKeyIdentifier subjectKeyIdentifier =
-                SubjectKeyIdentifier.getInstance(subjectOctets);
-            return subjectKeyIdentifier.getKeyIdentifier();
+            try {
+                DERDecoder subjectKeyIdentifier = unwrapExtensionValue(extensionValue);
+                subjectKeyIdentifier.expect(DERDecoder.TYPE_OCTET_STRING);
+                return subjectKeyIdentifier.getBytes(subjectKeyIdentifier.getLength());
+            } catch (WSSecurityException ex) {
+                throw new IllegalArgumentException("Invalid SubjectKeyIdentifier extension", ex);
+            }
         }
         return new byte[0];
     }
 
+    private static DERDecoder unwrapExtensionValue(byte[] extensionValue) throws WSSecurityException {
+        DERDecoder extension = new DERDecoder(extensionValue);
+        extension.expect(DERDecoder.TYPE_OCTET_STRING);
+        return new DERDecoder(extension.getBytes(extension.getLength()));
+    }
 }
-
-

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test for extracting AuthorityKeyIdentifier/SubjectKeyIdentifier information from
- * the certs using BouncyCastle.
+ * the certs using the provider-neutral DER decoder.
  */
 public class AuthorityKeyIdentifierTest {
 

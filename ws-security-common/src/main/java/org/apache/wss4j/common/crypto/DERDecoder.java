@@ -48,7 +48,7 @@ public class DERDecoder {
     /** DER type identifier for ASN.1 "OBJECT IDENTIFIER" value. */
     public static final byte TYPE_OBJECT_IDENTIFIER = 0x06;
 
-    private byte[] arr;
+    private final byte[] arr;
     private int pos;
 
     /**
@@ -78,13 +78,22 @@ public class DERDecoder {
     }
 
     /**
+     * Return whether unread bytes remain in this decoder.
+     *
+     * @return true if at least one byte remains.
+     */
+    public boolean hasRemaining() {
+        return pos < arr.length;
+    }
+
+    /**
      * Advance the current position by the given number of bytes.
      *
      * @param length the number of bytes to skip.
-     * @throws WSSecurityException if length is negative.
+     * @throws WSSecurityException if length is negative or exceeds the remaining data.
      */
     public void skip(int length) throws WSSecurityException {
-        if (length < 0) {
+        if (length < 0 || length > arr.length - pos) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
@@ -175,16 +184,25 @@ public class DERDecoder {
             len = arr[pos++];
         } else {
             int nbytes = arr[pos++] & 0x7F;
-            if (pos + nbytes > arr.length) {
+            if (nbytes == 0) {
+                return -1;
+            }
+            if (nbytes > 4 || nbytes > arr.length - pos) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                        "noSKIHandling",
-                        new Object[] {"Invalid DER format"}
+                        "noSKIHandling", new Object[] {"Unsupported DER format"}
                 );
             }
             byte[] lenBytes = new byte[nbytes];
             System.arraycopy(arr, pos, lenBytes, 0, lenBytes.length);
-            len = new BigInteger(1, lenBytes).intValue();
+            BigInteger bigLength = new BigInteger(1, lenBytes);
+            if (bigLength.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
+                        "noSKIHandling", new Object[] {"Unsupported DER format"}
+                );
+            }
+            len = bigLength.intValue();
             pos += nbytes;
         }
         return len;
@@ -201,18 +219,16 @@ public class DERDecoder {
      *         length is negative.
      */
     public byte[] getBytes(int length) throws WSSecurityException {
-        if (pos + length > arr.length) {
+        if (length < 0) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[] {"Invalid DER format"}
-             );
-        } else if (length < 0) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                    "noSKIHandling",
-                    new Object[] {"Unsupported DER format"}
+                    "noSKIHandling", new Object[] {"Unsupported DER format"}
             );
+        } else if (length > arr.length - pos) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling", new Object[] {"Invalid DER format"}
+             );
         }
         byte[] value = new byte[length];
         System.arraycopy(arr, pos, value, 0, length);
