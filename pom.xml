@@ -513,12 +513,15 @@
             </snapshots>
         </repository>
         <repository>
-            <id>B_shibboleth</id>
-            <name>OpenSAML</name>
-            <url>https://build.shibboleth.net/maven/releases</url>
+            <id>B_jboss</id>
+            <name>JBoss (For OpenSAML)</name>
+            <url>https://repository.jboss.org/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
