@@ -88,7 +88,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
                     if (length == 0) {
-                        length = KeyUtils.getKeyLength(getSecurityProperties().getSignatureAlgorithm()) / 8;
+                        // KeyUtils.getKeyLength already returns a length in bytes
+                        length = KeyUtils.getKeyLength(getSecurityProperties().getSignatureAlgorithm());
                     }
                 }
             } else if (WSSConstants.ENCRYPTION_WITH_DERIVED_KEY.equals(action)) {
@@ -97,7 +98,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
                     if (length == 0) {
-                        length = KeyUtils.getKeyLength(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
+                        // KeyUtils.getKeyLength already returns a length in bytes
+                        length = KeyUtils.getKeyLength(getSecurityProperties().getEncryptionSymAlgorithm());
                     }
                 }
             }
