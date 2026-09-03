@@ -24,6 +24,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 
 public final class DerivedKeyUtils {
 
+    /**
+     * The minimum length in bytes of a derived key (128 bits). The wsc:Length value is
+     * attacker-controlled message content: a shorter derived key (e.g. Length=1) reduces
+     * an HMAC signature key to a trivially brute-forceable keyspace. No standard
+     * WS-SecurityPolicy algorithm suite derives keys shorter than 128 bits, so this is
+     * enforced as a hard engine-level floor, independent of any configured AlgorithmSuite.
+     */
+    public static final int MINIMUM_DERIVED_KEY_LENGTH = 16;
+
     private DerivedKeyUtils() {
         // complete
     }
@@ -54,6 +63,13 @@ public final class DerivedKeyUtils {
         long keyLength = length;
         if (keyLength <= 0) {
             keyLength = 32L;
+        }
+        if (keyLength < MINIMUM_DERIVED_KEY_LENGTH) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "unsupportedKeyId",
+                new Object[] {"Requested derived key length of " + keyLength
+                    + " byte(s) is less than the minimum allowed ("
+                    + MINIMUM_DERIVED_KEY_LENGTH + " bytes)"});
         }
         return algo.createKey(secret, seed, offset, keyLength);
     }
