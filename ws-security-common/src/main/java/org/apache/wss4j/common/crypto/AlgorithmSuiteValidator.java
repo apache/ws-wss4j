@@ -312,32 +312,38 @@ public class AlgorithmSuiteValidator {
     }
 
     /**
-     * Check Signature Derived Key length (in bytes)
+     * Check the Signature Derived Key length. The supplied key length is denominated in
+     * bytes (the denomination of the wsc:Length element of a DerivedKeyToken), whereas
+     * the AlgorithmSuite requirement is denominated in bits.
      */
     public void checkSignatureDerivedKeyLength(
         int derivedKeyLength
     ) throws WSSecurityException {
         int requiredKeyLength = algorithmSuite.getSignatureDerivedKeyLength();
-        if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
+        if (requiredKeyLength > 0 && (derivedKeyLength * 8) != requiredKeyLength) {
             LOG.warn(
-                "The signature derived key length of " + derivedKeyLength + " does not match"
-                + " the requirement of " + requiredKeyLength
+                "The signature derived key length of " + (derivedKeyLength * 8) + " bits does not match"
+                + " the requirement of " + requiredKeyLength + " bits"
             );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
 
     /**
-     * Check Encryption Derived Key length (in bytes)
+     * Check the Encryption Derived Key length. The supplied key length is denominated in
+     * bytes (the denomination of the wsc:Length element of a DerivedKeyToken), whereas
+     * the AlgorithmSuite requirement is denominated in bits.
      */
     public void checkEncryptionDerivedKeyLength(
         int derivedKeyLength
     ) throws WSSecurityException {
         int requiredKeyLength = algorithmSuite.getEncryptionDerivedKeyLength();
-        if (requiredKeyLength > 0 && (derivedKeyLength / 8) != requiredKeyLength) {
+        if (requiredKeyLength > 0 && (derivedKeyLength * 8) != requiredKeyLength) {
             LOG.warn(
-                "The encryption derived key length of " + derivedKeyLength + " does not match"
-                + " the requirement of " + requiredKeyLength
+                "The encryption derived key length of " + (derivedKeyLength * 8) + " bits does not match"
+                + " the requirement of " + requiredKeyLength + " bits"
             );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
 
