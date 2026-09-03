@@ -376,7 +376,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding =
                     (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
                 assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, policyAsserter, true));
-                assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, policyAsserter, true));
+                assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, policyAsserter, true, soap12));
                 if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
                     //initialized with asserted=true because we do negative matching
                     assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, policyAsserter,
