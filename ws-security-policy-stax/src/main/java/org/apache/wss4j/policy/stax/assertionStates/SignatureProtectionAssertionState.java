@@ -54,21 +54,34 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     private final List<List<QName>> elementPaths = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
+    /**
+     * @deprecated use the constructor taking a soap12 argument instead - this constructor
+     *             only matches SOAP 1.1 element paths, so sp:EncryptSignature is never
+     *             enforced for SOAP 1.2 messages
+     */
+    @Deprecated
     public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion,
                                              PolicyAsserter policyAsserter,
                                              boolean asserted) {
-        super(assertion, asserted);
-        List<QName> signature11Path = new LinkedList<>();
-        signature11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-        signature11Path.add(WSSConstants.TAG_WSSE_SECURITY);
-        signature11Path.add(WSSConstants.TAG_dsig_Signature);
-        elementPaths.add(signature11Path);
+        this(assertion, policyAsserter, asserted, false);
+    }
 
-        List<QName> signatureConfirmation11Path = new LinkedList<>();
-        signatureConfirmation11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-        signatureConfirmation11Path.add(WSSConstants.TAG_WSSE_SECURITY);
-        signatureConfirmation11Path.add(WSSConstants.TAG_WSSE11_SIG_CONF);
-        elementPaths.add(signatureConfirmation11Path);
+    public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion,
+                                             PolicyAsserter policyAsserter,
+                                             boolean asserted,
+                                             boolean soap12) {
+        super(assertion, asserted);
+        List<QName> signaturePath = new LinkedList<>();
+        signaturePath.addAll(soap12 ? WSSConstants.SOAP_12_HEADER_PATH : WSSConstants.SOAP_11_HEADER_PATH);
+        signaturePath.add(WSSConstants.TAG_WSSE_SECURITY);
+        signaturePath.add(WSSConstants.TAG_dsig_Signature);
+        elementPaths.add(signaturePath);
+
+        List<QName> signatureConfirmationPath = new LinkedList<>();
+        signatureConfirmationPath.addAll(soap12 ? WSSConstants.SOAP_12_HEADER_PATH : WSSConstants.SOAP_11_HEADER_PATH);
+        signatureConfirmationPath.add(WSSConstants.TAG_WSSE_SECURITY);
+        signatureConfirmationPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
+        elementPaths.add(signatureConfirmationPath);
 
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
