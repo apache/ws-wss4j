@@ -103,6 +103,10 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                                 ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                             continue;
                         }
+                            if (responsibleSecurityHeaderFound) {
+                                LOG.debug("Two or more security headers have the same actor name");
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                            }
                         responsibleSecurityHeaderFound = true;
 
                     } else if (documentLevel == 4 && responsibleSecurityHeaderFound
@@ -132,14 +136,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 case XMLStreamConstants.END_ELEMENT:
                     XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
                     documentLevel = xmlSecEndElement.getDocumentLevel();
-                    if (documentLevel == 3 && responsibleSecurityHeaderFound
-                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_WSSE_SECURITY)) {
-
-                        return finalizeHeaderProcessing(
-                                inputProcessorChain, subInputProcessorChain,
-                                internalSecurityHeaderBufferProcessor, xmlSecEventList);
-
-                    } else if (documentLevel == 4 && responsibleSecurityHeaderFound
+                    if (documentLevel == 4 && responsibleSecurityHeaderFound
                             && WSSUtils.isInSecurityHeader(xmlSecEndElement,
                             ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //we are in the security header and the depth is +1, so every child
@@ -168,11 +165,13 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 && xmlSecEvent.asStartElement().getName().getNamespaceURI().equals(
                 WSSUtils.getSOAPMessageVersionNamespace(xmlSecEvent.asStartElement()))
         ));
-        //if we reach this state we didn't find a security header
-        //issue a security event to notify about this fact:
-        NoSecuritySecurityEvent noSecuritySecurityEvent = new NoSecuritySecurityEvent();
-        noSecuritySecurityEvent.setCorrelationID(IDGenerator.generateID(null));
-        inputProcessorChain.getSecurityContext().registerSecurityEvent(noSecuritySecurityEvent);
+        if (!responsibleSecurityHeaderFound) {
+            //if we reach this state we didn't find a security header
+            //issue a security event to notify about this fact:
+            NoSecuritySecurityEvent noSecuritySecurityEvent = new NoSecuritySecurityEvent();
+            noSecuritySecurityEvent.setCorrelationID(IDGenerator.generateID(null));
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(noSecuritySecurityEvent);
+        }
 
         return finalizeHeaderProcessing(
                 inputProcessorChain, subInputProcessorChain,
