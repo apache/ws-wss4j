@@ -190,7 +190,14 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                     }
                     parserResult.setSecretKey(secretKey);
                 } else {
-                    byte[] secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
+                    java.security.PrivateKey privateKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler());
+                    // HSM-backed keys are often non-extractable and return a null encoding
+                    byte[] secretKey = privateKey == null ? null : privateKey.getEncoded();
+                    if (secretKey == null || secretKey.length == 0) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
+                            new Object[] {uri});
+                    }
                     parserResult.setSecretKey(secretKey);
                 }
             }
