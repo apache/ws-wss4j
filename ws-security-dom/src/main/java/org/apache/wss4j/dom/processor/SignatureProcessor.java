@@ -419,12 +419,15 @@ public class SignatureProcessor implements Processor {
     }
 
     /**
-     * Equivalent to XMLSignature.validate(context), except that Reference caching is turned off
-     * for SwA attachment References. Caching a Reference makes Santuario retain every octet fed
-     * to the digest, which for an attachment is the whole attachment - and the only consumer of
-     * that copy is Reference.getDigestInputStream(), which WSS4J never calls. The dereferenced
-     * Data of an attachment Reference is not needed either, as buildProtectedRefs recognises
-     * attachment References by their Transform algorithm.
+     * Validates the SignatureValue and then every SignedInfo Reference, as XMLSignature.validate(context)
+     * does, but with Reference caching turned off for SwA attachment References. Unlike
+     * XMLSignature.validate(context), ds:Manifest References are not validated and the result is not
+     * memoised on the XMLSignature.
+     *
+     * Caching a Reference makes Santuario retain every octet fed to the digest, which for an attachment
+     * is the whole attachment - and the only consumer of that copy is Reference.getDigestInputStream(),
+     * which WSS4J never calls. The dereferenced Data of an attachment Reference is not needed either,
+     * as buildProtectedRefs recognises attachment References by their Transform algorithm.
      */
     private boolean validateSignature(XMLSignature xmlSignature, XMLValidateContext context)
         throws XMLSignatureException {

@@ -154,8 +154,10 @@ public class AttachmentTest {
 
     /**
      * The WSDataRef of a signed attachment must be flagged as an attachment and carry the
-     * synthesised SwA "attachment" element. Attachment References are not cached during
-     * validation, so this is derived from the Reference's Transform algorithm.
+     * synthesised SwA "attachment" element. buildProtectedRefs derives this from the Reference's
+     * Transform algorithm rather than from the dereferenced Data, so these assertions hold whether
+     * or not the attachment Reference was cached during validation. Non-caching itself is not
+     * verified here: its only observable effect is heap usage.
      */
     @Test
     @SuppressWarnings("unchecked")
