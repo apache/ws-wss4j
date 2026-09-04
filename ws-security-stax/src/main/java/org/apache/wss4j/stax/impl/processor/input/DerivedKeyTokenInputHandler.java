@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.math.BigInteger;
 import java.security.Key;
 import java.util.Deque;
 import java.util.List;
@@ -133,10 +134,12 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         byte[] keyBytes = DerivedKeyUtils.deriveKey(
                                 derivedKeyAlgorithm,
                                 derivedKeyTokenType.getLabel(),
-                                derivedKeyTokenType.getLength().intValue(),
+                                getDerivedKeyParameter(derivedKeyTokenType.getLength(),
+                                                       DerivedKeyUtils.MAXIMUM_DERIVED_KEY_LENGTH, "length"),
                                 secret,
                                 nonce,
-                                derivedKeyTokenType.getOffset().intValue()
+                                getDerivedKeyParameter(derivedKeyTokenType.getOffset(),
+                                                       DerivedKeyUtils.MAXIMUM_DERIVED_KEY_OFFSET, "offset")
                         );
                         XMLSecurityConstants.AlgorithmUsage derivedKeyAlgorithmUsage;
                         if (WSSConstants.Enc.equals(algorithmUsage)) {
@@ -182,5 +185,20 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
         derivedKeyTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         derivedKeyTokenSecurityEvent.setCorrelationID(derivedKeyTokenType.getId());
         inputProcessorChain.getSecurityContext().registerSecurityEvent(derivedKeyTokenSecurityEvent);
+    }
+
+    static int getDerivedKeyParameter(BigInteger value, int maximum, String name) throws WSSecurityException {
+        if (value == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "unsupportedKeyId",
+                new Object[] {"Missing derived key " + name});
+        }
+        if (value.signum() < 0 || value.compareTo(BigInteger.valueOf(maximum)) > 0) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "unsupportedKeyId",
+                new Object[] {"Requested derived key " + name + " of " + value
+                    + " bytes is outside the allowed range [0, " + maximum + "]"});
+        }
+        return value.intValue();
     }
 }
