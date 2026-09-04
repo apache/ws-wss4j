@@ -33,6 +33,18 @@ public final class DerivedKeyUtils {
      */
     public static final int MINIMUM_DERIVED_KEY_LENGTH = 16;
 
+    /**
+     * The maximum length in bytes of a derived key. wsc:Length and wsc:Offset are
+     * attacker-controlled message content, and the P_SHA-1 derivation allocates
+     * offset+length bytes and performs one HMAC operation per 20 output bytes.
+     */
+    public static final int MAXIMUM_DERIVED_KEY_LENGTH = 512;
+
+    /**
+     * The maximum value in bytes of the wsc:Offset of a derived key.
+     */
+    public static final int MAXIMUM_DERIVED_KEY_OFFSET = 4096;
+
     private DerivedKeyUtils() {
         // complete
     }
@@ -70,6 +82,20 @@ public final class DerivedKeyUtils {
                 new Object[] {"Requested derived key length of " + keyLength
                     + " byte(s) is less than the minimum allowed ("
                     + MINIMUM_DERIVED_KEY_LENGTH + " bytes)"});
+        }
+        if (keyLength > MAXIMUM_DERIVED_KEY_LENGTH) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "unsupportedKeyId",
+                new Object[] {"Requested derived key length of " + keyLength
+                    + " bytes exceeds the maximum allowed ("
+                    + MAXIMUM_DERIVED_KEY_LENGTH + " bytes)"});
+        }
+        if (offset < 0 || offset > MAXIMUM_DERIVED_KEY_OFFSET) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "unsupportedKeyId",
+                new Object[] {"Requested derived key offset of " + offset
+                    + " bytes is outside the allowed range [0, "
+                    + MAXIMUM_DERIVED_KEY_OFFSET + "]"});
         }
         return algo.createKey(secret, seed, offset, keyLength);
     }

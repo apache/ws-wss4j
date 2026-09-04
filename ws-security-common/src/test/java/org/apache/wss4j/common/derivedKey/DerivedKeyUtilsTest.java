@@ -56,6 +56,69 @@ class DerivedKeyUtilsTest {
     }
 
     @Test
+    void rejectsDerivedKeyLengthAboveMaximum() {
+        WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
+            () -> DerivedKeyUtils.deriveKey(
+                ConversationConstants.DerivationAlgorithm.P_SHA_1,
+                null,
+                DerivedKeyUtils.MAXIMUM_DERIVED_KEY_LENGTH + 1,
+                SECRET,
+                NONCE,
+                0));
+
+        Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
+    }
+
+    @Test
+    void rejectsDerivedKeyOffsetOutsideMaximum() {
+        WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
+            () -> DerivedKeyUtils.deriveKey(
+                ConversationConstants.DerivationAlgorithm.P_SHA_1,
+                null,
+                DerivedKeyUtils.MINIMUM_DERIVED_KEY_LENGTH,
+                SECRET,
+                NONCE,
+                DerivedKeyUtils.MAXIMUM_DERIVED_KEY_OFFSET + 1));
+
+        Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
+    }
+
+    @Test
+    void rejectsNegativeDerivedKeyOffset() {
+        WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
+            () -> DerivedKeyUtils.deriveKey(
+                ConversationConstants.DerivationAlgorithm.P_SHA_1,
+                null,
+                DerivedKeyUtils.MINIMUM_DERIVED_KEY_LENGTH,
+                SECRET,
+                NONCE,
+                -1));
+
+        Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
+    }
+
+    @Test
+    void acceptsNonDefaultDerivedKeyLengthAndOffset() throws Exception {
+        byte[] key = DerivedKeyUtils.deriveKey(
+            ConversationConstants.DerivationAlgorithm.P_SHA_1,
+            null,
+            24,
+            SECRET,
+            NONCE,
+            32);
+        byte[] keyWithDefaultOffset = DerivedKeyUtils.deriveKey(
+            ConversationConstants.DerivationAlgorithm.P_SHA_1,
+            null,
+            24,
+            SECRET,
+            NONCE,
+            0);
+
+        Assertions.assertEquals(24, key.length);
+        Assertions.assertFalse(java.util.Arrays.equals(keyWithDefaultOffset, key));
+    }
+
+    @Test
     void preservesDefaultDerivedKeyLength() throws Exception {
         byte[] key = DerivedKeyUtils.deriveKey(
             ConversationConstants.DerivationAlgorithm.P_SHA_1,
