@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.xml.namespace.QName;
 
@@ -791,6 +792,71 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     public void doFinal() throws WSSPolicyException {
         verifyPolicy();
+    }
+
+    /**
+     * Returns true if any configured operation policy contains a UsernameToken assertion
+     * that explicitly allows password-less tokens (sp:NoPassword). Used to decide whether
+     * the engine's hardened default (rejecting password-less UsernameTokens) may be
+     * relaxed in policy mode.
+     */
+    public boolean isUsernameTokenNoPasswordAllowedByPolicy() {
+        for (OperationPolicy operationPolicy : operationPolicies) {
+            org.apache.neethi.Policy policy = operationPolicy.getPolicy();
+            if (policy != null && policyContains(policy,
+                assertion -> assertion instanceof UsernameToken
+                    && ((UsernameToken)assertion).getPasswordType()
+                        == UsernameToken.PasswordType.NoPassword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if any configured operation policy contains an AlgorithmSuite whose
+     * asymmetric key wrap is RSA v1.5. Used to decide whether the engine's hardened
+     * default (rejecting rsa-1_5 key transport) may be relaxed in policy mode.
+     */
+    public boolean isRSA15KeyTransportAllowedByPolicy() {
+        for (OperationPolicy operationPolicy : operationPolicies) {
+            org.apache.neethi.Policy policy = operationPolicy.getPolicy();
+            if (policy != null && policyContains(policy, assertion -> {
+                if (!(assertion instanceof AlgorithmSuite)) {
+                    return false;
+                }
+                AlgorithmSuite.AlgorithmSuiteType algorithmSuiteType =
+                    ((AlgorithmSuite)assertion).getAlgorithmSuiteType();
+                return algorithmSuiteType != null
+                    && SPConstants.KW_RSA15.equals(algorithmSuiteType.getAsymmetricKeyWrap());
+            })) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean policyContains(PolicyComponent policyComponent, Predicate<Assertion> predicate) {
+        if (policyComponent instanceof PolicyOperator) {
+            for (PolicyComponent childComponent
+                    : ((PolicyOperator) policyComponent).getPolicyComponents()) {
+                if (policyContains(childComponent, predicate)) {
+                    return true;
+                }
+            }
+        } else if (policyComponent instanceof Assertion) {
+            Assertion assertion = (Assertion) policyComponent;
+            if (predicate.test(assertion)) {
+                return true;
+            }
+            if (assertion instanceof PolicyContainingAssertion) {
+                Policy nestedPolicy = ((PolicyContainingAssertion) assertion).getPolicy();
+                if (nestedPolicy != null && policyContains(nestedPolicy, predicate)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
