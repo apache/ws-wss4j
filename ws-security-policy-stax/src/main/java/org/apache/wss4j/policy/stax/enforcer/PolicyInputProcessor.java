@@ -248,8 +248,20 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             this.initDone = true;
             this.transportSecurityActive =
                 Boolean.TRUE.equals(inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE));
-            inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
-            inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());
+            // These two properties relax hardened engine defaults (rejection of rsa-1_5
+            // key transport and of password-less UsernameTokens) so that the corresponding
+            // policy assertions can take over enforcement. They used to be set
+            // unconditionally, which silently reversed both defaults even when the
+            // configured policy contained no assertion that re-imposes the check. Only
+            // relax an engine default when the policy actually covers it.
+            if (policyEnforcer.isRSA15KeyTransportAllowedByPolicy()) {
+                inputProcessorChain.getSecurityContext().put(
+                    WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
+            }
+            if (policyEnforcer.isUsernameTokenNoPasswordAllowedByPolicy()) {
+                inputProcessorChain.getSecurityContext().put(
+                    WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());
+            }
         }
     }
 }
