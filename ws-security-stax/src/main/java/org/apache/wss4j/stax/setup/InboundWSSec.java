@@ -28,6 +28,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.xml.secure.SecureXMLInputFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.DocumentCreatorImpl;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -60,7 +61,7 @@ public class InboundWSSec {
     protected static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(InboundWSSec.class);
 
-    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+    private static final XMLInputFactory XML_INPUT_FACTORY = SecureXMLInputFactory.newInstance();
 
     static {
         XML_INPUT_FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);

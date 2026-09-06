@@ -32,6 +32,7 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -72,7 +73,7 @@ public class SignaturePrefixListTest {
         Document doc = null;
         try (InputStream inputStream =
             Loader.getResource("org/apache/wss4j/dom/message/SignaturePrefixListMessage.xml").openStream()) {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(inputStream);

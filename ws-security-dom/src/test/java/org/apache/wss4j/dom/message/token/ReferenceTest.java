@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 
@@ -155,7 +156,7 @@ public class ReferenceTest {
                 ).getBytes()
             );
         final javax.xml.parsers.DocumentBuilderFactory factory =
-            javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            SecureDocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(in);

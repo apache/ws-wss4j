@@ -28,6 +28,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -58,7 +59,7 @@ public class CustomTokenTest {
     @Test
     public void testCustomTokenTimestamp() throws Exception {
         // Create a Timestamp manually
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document timestampDoc = dbf.newDocumentBuilder().newDocument();
 

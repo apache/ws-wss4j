@@ -24,6 +24,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
+
 /**
  * A default (inefficient) implementation of DocumentCreator which creates a new DocumentBuilderFactory
  * implementation per-instance of this class. CXF instead uses a lambda to call the CXF DomUtils class
@@ -34,7 +36,7 @@ public class DocumentCreatorImpl implements DocumentCreator {
     private final DocumentBuilderFactory documentBuilderFactory;
 
     public DocumentCreatorImpl() throws ParserConfigurationException {
-        documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory = SecureDocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);

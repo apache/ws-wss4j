@@ -34,6 +34,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
@@ -202,7 +203,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
         } else if (statement == Statement.ATTR) {
             // Build a new Document
             DocumentBuilderFactory docBuilderFactory =
-                    DocumentBuilderFactory.newInstance();
+                    SecureDocumentBuilderFactory.newInstance();
             docBuilderFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document doc = docBuilder.newDocument();

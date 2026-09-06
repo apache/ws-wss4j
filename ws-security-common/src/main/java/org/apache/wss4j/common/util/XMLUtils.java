@@ -44,7 +44,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
 import org.xml.sax.InputSource;
+
+import org.apache.commons.xml.secure.SecureTransformerFactory;
 
 public final class XMLUtils {
 
@@ -140,7 +143,7 @@ public final class XMLUtils {
         DOMSource source = new DOMSource(element);
         StreamResult result = new StreamResult(out);
 
-        TransformerFactory transFactory = TransformerFactory.newInstance();
+        TransformerFactory transFactory = SecureTransformerFactory.newInstance();
         transFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         try {
             transFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");

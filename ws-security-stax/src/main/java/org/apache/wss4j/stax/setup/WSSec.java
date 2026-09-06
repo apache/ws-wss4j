@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.commons.xml.secure.SecureSchemaFactory;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -461,7 +462,7 @@ public class WSSec {
     }
 
     public static Schema loadWSSecuritySchemas() throws SAXException {
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        SchemaFactory schemaFactory = SecureSchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
         schemaFactory.setResourceResolver(new LSResourceResolver() {
             @Override

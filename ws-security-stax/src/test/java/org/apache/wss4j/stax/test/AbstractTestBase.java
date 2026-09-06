@@ -48,6 +48,10 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
+import org.apache.commons.xml.secure.SecureTransformerFactory;
+import org.apache.commons.xml.secure.SecureXMLInputFactory;
+import org.apache.commons.xml.secure.SecureXPathFactory;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -90,8 +94,8 @@ public abstract class AbstractTestBase {
     //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
     //transformer.transform(new StreamSource(new ByteArrayInputStream(baos.toByteArray())), new StreamResult(System.out));
 
-    protected static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-    protected static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    protected static final XMLInputFactory xmlInputFactory = SecureXMLInputFactory.newInstance();
+    protected static final TransformerFactory TRANSFORMER_FACTORY = SecureTransformerFactory.newInstance();
     protected DocumentBuilderFactory documentBuilderFactory;
 
     protected static final String SECURED_DOCUMENT = "securedDocument";
@@ -103,7 +107,7 @@ public abstract class AbstractTestBase {
     }
 
     public AbstractTestBase() {
-        documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory = SecureDocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setIgnoringComments(false);
         documentBuilderFactory.setCoalescing(false);
@@ -311,7 +315,7 @@ public abstract class AbstractTestBase {
     }
 
     protected XPathExpression getXPath(String expression) throws XPathExpressionException {
-        XPathFactory xPathFactory = XPathFactory.newInstance();
+        XPathFactory xPathFactory = SecureXPathFactory.newInstance();
         XPath xPath = xPathFactory.newXPath();
         xPath.setNamespaceContext(
                 new NamespaceContext() {
