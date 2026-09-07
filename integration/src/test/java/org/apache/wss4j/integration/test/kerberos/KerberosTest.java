@@ -138,8 +138,7 @@ public class KerberosTest {
             runTests = false;
         }
 
-        dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        dbf = SecureDocumentBuilderFactory.newNSInstance();
         dbf.setIgnoringComments(false);
         dbf.setCoalescing(false);
         dbf.setIgnoringElementContentWhitespace(false);
