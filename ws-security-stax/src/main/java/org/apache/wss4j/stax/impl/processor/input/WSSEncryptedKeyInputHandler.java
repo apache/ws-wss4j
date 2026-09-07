@@ -63,6 +63,20 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             }
         }
 
+        // Reject RSA v1.5 key transport before key resolution or unwrap.
+        if (encryptionMethodType != null
+            && WSSConstants.NS_XENC_RSA15.equals(encryptionMethodType.getAlgorithm())
+            && !((WSSSecurityProperties) securityProperties).isAllowRSA15KeyTransportAlgorithm()) {
+            final WSInboundSecurityContext wsInboundSecurityContext =
+                (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
+            Boolean allowRSA15 =
+                wsInboundSecurityContext.get(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
+            if (allowRSA15 == null || !allowRSA15) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK,
+                                              WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
+            }
+        }
+
         super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
     }
 
