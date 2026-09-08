@@ -116,6 +116,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
@@ -191,6 +192,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             actions.add(WSSConstants.ENCRYPTION);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
@@ -293,6 +295,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             actions.add(WSSConstants.SIGNATURE);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 

@@ -522,20 +522,17 @@ public class EncryptedKeyProcessor implements Processor {
      */
     protected static byte[] getRandomKey(Element refList, WSDocInfo wsDocInfo) throws WSSecurityException {
         try {
-            String alg = "AES";
-            int size = 16;
+            String algorithmURI = WSConstants.AES_128;
             String uri = getFirstDataRefURI(refList);
 
             if (uri != null) {
                 Element ee =
                     EncryptionUtils.findEncryptedDataElement(wsDocInfo, uri);
-                String algorithmURI = X509Util.getEncAlgo(ee);
-                alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                size = KeyUtils.getKeyLength(algorithmURI);
+                algorithmURI = X509Util.getEncAlgo(ee);
             }
-            KeyGenerator kgen = KeyGenerator.getInstance(alg);
-            kgen.init(size * 8);
-            SecretKey k = kgen.generateKey();
+            // The key must have exactly the length required by the algorithm, otherwise it is
+            // rejected later on, which would reveal that the key decryption failed.
+            SecretKey k = KeyUtils.getKeyGenerator(algorithmURI).generateKey();
             return k.getEncoded();
         } catch (Throwable ex) {
             // Fallback to just using AES to avoid attacks on EncryptedData algorithms
