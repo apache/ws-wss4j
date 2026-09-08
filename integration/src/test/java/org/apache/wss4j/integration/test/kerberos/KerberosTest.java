@@ -1122,7 +1122,8 @@ public class KerberosTest {
             bst.setID("Id-" + bst.hashCode());
 
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
-            builder.setSymmetricEncAlgorithm(WSConstants.AES_256);
+            // Must match the length of the Kerberos session key issued by the KDC (aes128)
+            builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             SecretKey secretKey = bst.getSecretKey();
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
