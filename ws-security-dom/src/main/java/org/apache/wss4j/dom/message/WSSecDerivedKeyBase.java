@@ -369,7 +369,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         this.crypto = crypto;
     }
 
-    protected SecretKey getDerivedKey(String algorithm) {
+    protected SecretKey getDerivedKey(String algorithm) throws WSSecurityException {
         return KeyUtils.prepareSecretKey(algorithm, derivedKeyBytes);
     }
 

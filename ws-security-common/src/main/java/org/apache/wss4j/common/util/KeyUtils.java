@@ -86,8 +86,22 @@ public final class KeyUtils {
 
     /**
      * Convert the raw key bytes into a SecretKey object of type algorithm.
+     *
+     * @throws WSSecurityException if the raw key length does not match the key length required by
+     *         the algorithm or exceeds maximum allowed size
      */
-    public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey) {
+    public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey) throws WSSecurityException {
+        if (rawKey == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        if (rawKey.length > MAX_SYMMETRIC_KEY_SIZE) {
+            // Prevent a possible attack where a huge secret key is specified
+            LOG.warn("The provided key has a length of {} bytes, which exceeds the maximum allowed length of {} bytes",
+                rawKey.length, MAX_SYMMETRIC_KEY_SIZE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
         // Do an additional check on the keysize required by the encryption algorithm
         int size = 0;
         try {
@@ -97,22 +111,17 @@ public final class KeyUtils {
             LOG.debug(e.getMessage());
         }
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
-        SecretKeySpec keySpec;
-        if (size > 0 && !algorithm.endsWith("gcm") && !algorithm.contains("hmac-")) {
-            keySpec =
-                new SecretKeySpec(
-                    rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
-                );
-        } else if (rawKey.length > MAX_SYMMETRIC_KEY_SIZE) {
-            // Prevent a possible attack where a huge secret key is specified
-            keySpec =
-                new SecretKeySpec(
-                    rawKey, 0, MAX_SYMMETRIC_KEY_SIZE, keyAlgorithm
-                );
-        } else {
-            keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
+
+        // For fixed-length symmetric ciphers (e.g. AES-CBC, AES-GCM, 3DES, AES KeyWrap),
+        // strictly verify that the provided key length matches the declared algorithm's key length.
+        // Refuse to truncate or mismatch key material to prevent cross-algorithm key-reuse attacks.
+        if (size > 0 && (algorithm == null || !algorithm.contains("hmac-")) && rawKey.length != size) {
+            LOG.warn("The provided key has a length of {} bytes, which does not match the length of"
+                + " {} bytes required by {}", rawKey.length, size, algorithm);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        return keySpec;
+
+        return new SecretKeySpec(rawKey, keyAlgorithm);
     }
 
     public static KeyGenerator getKeyGenerator(String algorithm) throws WSSecurityException {
