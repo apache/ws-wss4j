@@ -63,6 +63,9 @@ import java.util.List;
 
 public class AbstractPolicyTestBase extends AbstractTestBase {
 
+    protected static final QName WSDL_DEFINITIONS =
+        new QName("http://schemas.xmlsoap.org/wsdl/", "definitions");
+
     @BeforeAll
     public static void setUp() throws Exception {
         WSProviderConfig.init();

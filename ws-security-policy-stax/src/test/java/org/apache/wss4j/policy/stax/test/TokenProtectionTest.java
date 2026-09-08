@@ -140,7 +140,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         }
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -213,7 +213,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         }
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
@@ -257,7 +257,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -303,7 +303,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -350,7 +350,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -428,7 +428,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         }
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         } catch (WSSecurityException e) {
@@ -489,7 +489,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         }
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -562,7 +562,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         policyEnforcer.doFinal();
@@ -629,7 +629,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -706,7 +706,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
         policyEnforcer.doFinal();
