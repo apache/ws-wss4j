@@ -44,19 +44,19 @@ import java.util.List;
  */
 public class SignedElementsAssertionState extends AssertionState implements Assertable {
 
-    private final List<List<QName>> pathElements = new ArrayList<>();
+    private final List<PolicyUtils.ElementPath> pathElements = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
     public SignedElementsAssertionState(AbstractSecurityAssertion assertion,
                                         PolicyAsserter policyAsserter,
-                                        boolean asserted) {
+                                        boolean asserted) throws WSSPolicyException {
         super(assertion, asserted);
 
         if (assertion instanceof SignedElements) {
             SignedElements signedElements = (SignedElements) assertion;
             for (int i = 0; i < signedElements.getXPaths().size(); i++) {
                 XPath xPath = signedElements.getXPaths().get(i);
-                List<QName> elements = PolicyUtils.getElementPath(xPath);
+                PolicyUtils.ElementPath elements = PolicyUtils.getElementPathDescriptor(xPath);
                 pathElements.add(elements);
             }
         }
@@ -80,17 +80,17 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
     }
 
     public void addElement(List<QName> pathElement) {
-        this.pathElements.add(pathElement);
+        this.pathElements.add(PolicyUtils.absoluteElementPath(pathElement));
     }
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         AbstractSecuredElementSecurityEvent signedSecurityEvent = (AbstractSecuredElementSecurityEvent) securityEvent;
 
-        Iterator<List<QName>> pathElementIterator = pathElements.iterator();
+        Iterator<PolicyUtils.ElementPath> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
-            List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, signedSecurityEvent.getElementPath())) {
+            PolicyUtils.ElementPath pathElement = pathElementIterator.next();
+            if (pathElement.matches(signedSecurityEvent.getElementPath())) {
                 if (signedSecurityEvent.isSigned()) {
                     setAsserted(true);
                     policyAsserter.assertPolicy(getAssertion());

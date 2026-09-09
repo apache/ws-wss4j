@@ -33,8 +33,6 @@ import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.utils.WSSUtils;
 
-import javax.xml.namespace.QName;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,18 +42,18 @@ import java.util.List;
  */
 public class ContentEncryptedElementsAssertionState extends AssertionState implements Assertable {
 
-    private final List<List<QName>> pathElements = new ArrayList<>();
+    private final List<PolicyUtils.ElementPath> pathElements = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
     public ContentEncryptedElementsAssertionState(AbstractSecurityAssertion assertion,
                                                   PolicyAsserter policyAsserter,
-                                                  boolean asserted) {
+                                                  boolean asserted) throws WSSPolicyException {
         super(assertion, asserted);
 
         ContentEncryptedElements contentEncryptedElements = (ContentEncryptedElements) assertion;
         for (int i = 0; i < contentEncryptedElements.getXPaths().size(); i++) {
             XPath xPath = contentEncryptedElements.getXPaths().get(i);
-            List<QName> elements = PolicyUtils.getElementPath(xPath);
+            PolicyUtils.ElementPath elements = PolicyUtils.getElementPathDescriptor(xPath);
             pathElements.add(elements);
         }
 
@@ -80,10 +78,10 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
 
-        Iterator<List<QName>> pathElementIterator = pathElements.iterator();
+        Iterator<PolicyUtils.ElementPath> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
-            List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, contentEncryptedElementSecurityEvent.getElementPath())) {
+            PolicyUtils.ElementPath pathElement = pathElementIterator.next();
+            if (pathElement.matches(contentEncryptedElementSecurityEvent.getElementPath())) {
                 if (contentEncryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
                     policyAsserter.assertPolicy(getAssertion());
