@@ -72,7 +72,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -123,7 +123,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -178,7 +178,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -232,7 +232,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, protectionOrder);

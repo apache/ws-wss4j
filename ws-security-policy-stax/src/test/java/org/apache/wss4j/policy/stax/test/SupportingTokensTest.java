@@ -79,7 +79,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -108,7 +108,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             fail("Exception expected");
@@ -149,7 +149,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -185,7 +185,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -225,7 +225,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -261,7 +261,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -305,7 +305,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -349,7 +349,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -397,7 +397,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -441,7 +441,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -477,7 +477,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -513,7 +513,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -553,7 +553,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -589,7 +589,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -624,7 +624,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -659,7 +659,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -698,7 +698,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -733,7 +733,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -768,7 +768,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -803,7 +803,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -842,7 +842,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -877,7 +877,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -912,7 +912,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -947,7 +947,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -986,7 +986,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1021,7 +1021,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1056,7 +1056,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1091,7 +1091,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -1130,7 +1130,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1165,7 +1165,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1211,7 +1211,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1257,7 +1257,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -1310,7 +1310,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1359,7 +1359,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1393,7 +1393,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1427,7 +1427,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -1465,7 +1465,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1499,7 +1499,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1533,7 +1533,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1567,7 +1567,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
@@ -1605,7 +1605,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -1639,7 +1639,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();

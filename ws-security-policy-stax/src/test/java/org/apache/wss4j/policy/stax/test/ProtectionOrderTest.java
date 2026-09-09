@@ -57,7 +57,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -102,7 +102,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -128,7 +128,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -163,7 +163,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -209,7 +209,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -236,7 +236,7 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();

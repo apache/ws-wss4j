@@ -203,6 +203,17 @@ public class PolicyEnforcer implements SecurityEventListener {
         return noNamespaceOperation;
     }
 
+    private boolean matchesPolicyOperation(QName policyOperationName, QName soapOperationName) {
+        if (policyOperationName == null || soapOperationName == null) {
+            return true;
+        }
+        if (policyOperationName.equals(soapOperationName)) {
+            return true;
+        }
+        return (policyOperationName.getNamespaceURI() == null || policyOperationName.getNamespaceURI().length() == 0)
+            && soapOperationName.getLocalPart().equals(policyOperationName.getLocalPart());
+    }
+
     /**
      * Precondition: Policy _must_ be normalized!
      */
@@ -754,7 +765,20 @@ public class PolicyEnforcer implements SecurityEventListener {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies,
                                                                 operationSecurityEvent.getOperation());
                 if (effectivePolicy == null) {
-                    //no policy to the operation given
+                    //No policy found for the operation: fail closed, explicitly. The
+                    //previous behaviour built an empty "NoPolicyFoundForOperation" policy
+                    //here and relied on the empty-alternatives guard in verifyPolicy()
+                    //(three calls away) to reject the message - correct, but emergent
+                    //rather than intentional, and the queued security events were still
+                    //processed before that rejection. Keep the deliberate allowance for
+                    //an initiator receiving an unsecured fault; reject everything else
+                    //up front.
+                    if (!(initiator && faultOccurred && noSecurityHeader)) {
+                        LOG.warn("No policy found for operation {}; rejecting the message",
+                                 operationSecurityEvent.getOperation());
+                        securityEventQueue.clear();
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                    }
                     effectivePolicy = new OperationPolicy(new QName(null, "NoPolicyFoundForOperation"));
                     effectivePolicy.setPolicy(new Policy());
                 }
@@ -764,6 +788,27 @@ public class PolicyEnforcer implements SecurityEventListener {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
             }
+
+            //A policy preselected by SOAPAction must still agree with the actual Body operation.
+            if (!matchesPolicyOperation(effectivePolicy.getOperationName(), operationSecurityEvent.getOperation())
+                && !(initiator && faultOccurred && noSecurityHeader)) {
+                String soapAction = effectivePolicy.getOperationAction();
+                String message;
+                if (soapAction != null && !soapAction.isEmpty()) {
+                    message = "SOAPAction (" + soapAction + ") does not match with the current Operation: "
+                        + operationSecurityEvent.getOperation();
+                } else {
+                    message = "Policy operation " + effectivePolicy.getOperationName()
+                        + " does not match with the current Operation: "
+                        + operationSecurityEvent.getOperation();
+                }
+                LOG.warn("{}; rejecting the message", message);
+                securityEventQueue.clear();
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY,
+                        new IllegalArgumentException(message));
+            }
+
             try {
                 Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
                 while (securityEventIterator.hasNext()) {

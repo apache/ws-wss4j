@@ -105,7 +105,7 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -172,7 +172,7 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             fail("Exception expected");

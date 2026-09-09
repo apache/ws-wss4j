@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -38,6 +39,7 @@ import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcerFactory;
 import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -47,6 +49,7 @@ import org.w3c.dom.Element;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -101,6 +104,24 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             "{http://schemas.xmlsoap.org/wsdl/}definitions");
             assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
+    }
+
+    @Test
+    public void testSOAPActionMismatchFailsClosed() throws Exception {
+        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(
+                this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
+        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("goodPolicy", false, null, 0, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://example.com/evil", "notGood"));
+
+        WSSecurityException ex = assertThrows(WSSecurityException.class,
+                () -> policyEnforcer.registerSecurityEvent(operationSecurityEvent));
+
+        assertEquals("SOAPAction (goodPolicy) does not match with the current Operation: " +
+                        "{http://example.com/evil}notGood",
+                ex.getCause().getMessage());
+        assertEquals(WSSecurityException.INVALID_SECURITY, ex.getFaultCode());
     }
 
     @Test
