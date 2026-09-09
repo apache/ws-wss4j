@@ -44,7 +44,7 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
@@ -71,7 +71,7 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();

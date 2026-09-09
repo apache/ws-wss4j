@@ -59,7 +59,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -81,7 +81,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);

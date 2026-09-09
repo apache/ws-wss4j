@@ -195,7 +195,7 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(signedBSTElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
         inboundWSSecurityContext.registerSecurityEvent(operationSecurityEvent);
 
         return securityEventList;
@@ -507,7 +507,7 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(header2EncryptedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
         inboundWSSecurityContext.registerSecurityEvent(operationSecurityEvent);
         return securityEventList;
     }
@@ -723,7 +723,7 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(bodyEncryptedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
         inboundWSSecurityContext.registerSecurityEvent(operationSecurityEvent);
         return securityEventList;
     }
