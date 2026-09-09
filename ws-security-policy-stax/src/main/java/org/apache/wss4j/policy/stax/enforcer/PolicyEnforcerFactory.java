@@ -28,7 +28,9 @@ import java.util.Map;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
+import javax.wsdl.Message;
 import javax.wsdl.Operation;
+import javax.wsdl.Part;
 import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
@@ -235,8 +237,30 @@ public class PolicyEnforcerFactory {
 
                     Operation operation = bindingOperation.getOperation();
 
-                    OperationPolicy operationPolicy =
-                        new OperationPolicy(new QName(null, operation.getName()));
+                    //Where determinable (document/literal style), register the operation
+                    //under the QName of its input element - the QName that will actually
+                    //appear as the SOAP Body child and be reported in the
+                    //OperationSecurityEvent - so that exact QName matching in
+                    //PolicyEnforcer#findPolicyBySOAPOperationName works. A local-name-only
+                    //registration relies entirely on the local-part fallback, which lets a
+                    //Body child in ANY namespace with a colliding local part select this
+                    //operation's policy. For rpc style (no single input element part) the
+                    //previous local-name-only registration is retained.
+                    QName operationName = null;
+                    if (operation.getInput() != null && operation.getInput().getMessage() != null) {
+                        Message inputMessage = operation.getInput().getMessage();
+                        Map<?, ?> parts = inputMessage.getParts();
+                        if (parts != null && parts.size() == 1) {
+                            Object part = parts.values().iterator().next();
+                            if (part instanceof Part && ((Part) part).getElementName() != null) {
+                                operationName = ((Part) part).getElementName();
+                            }
+                        }
+                    }
+                    if (operationName == null) {
+                        operationName = new QName(null, operation.getName());
+                    }
+                    OperationPolicy operationPolicy = new OperationPolicy(operationName);
                     operationPolicyList.add(operationPolicy);
 
                     @SuppressWarnings("unchecked")

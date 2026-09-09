@@ -106,7 +106,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
@@ -152,7 +152,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             fail("Exception expected");
@@ -198,7 +198,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             fail("Exception expected");
@@ -256,7 +256,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             fail("Exception expected");
@@ -319,7 +319,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
+        operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
