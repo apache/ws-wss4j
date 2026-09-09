@@ -21,8 +21,6 @@ package org.apache.wss4j.policy.stax.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
