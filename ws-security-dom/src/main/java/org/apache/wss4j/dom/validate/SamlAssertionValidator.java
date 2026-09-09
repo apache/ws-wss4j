@@ -268,8 +268,6 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             } else {
                 replayCache.add(identifier);
             }
-
-            replayCache.add(identifier);
         }
     }
 
