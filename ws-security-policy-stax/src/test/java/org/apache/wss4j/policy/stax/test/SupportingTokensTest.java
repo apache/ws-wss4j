@@ -21,8 +21,6 @@ package org.apache.wss4j.policy.stax.test;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.xml.namespace.QName;
-
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;

@@ -21,8 +21,6 @@ package org.apache.wss4j.policy.stax.test;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;

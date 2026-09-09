@@ -34,8 +34,6 @@ import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurit
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.namespace.QName;
-
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;

@@ -31,8 +31,6 @@ import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurit
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.namespace.QName;
-
 import java.util.LinkedList;
 import java.util.List;
 
