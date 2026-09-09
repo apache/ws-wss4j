@@ -54,6 +54,18 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 /**
  * Inbound Streaming-WebService-Security
  * An instance of this class can be retrieved over the WSSec class
+ *
+ * <p><b>Security note - streaming hands out content before verification completes:</b>
+ * the XMLStreamReader returned by {@code processInMessage} delivers decrypted content and
+ * the events of signed elements to the application as they are read from the wire. The
+ * digest of a signed part is only compared when the corresponding END element is
+ * reached, and message-level verdicts (for example the WS-SecurityPolicy decision at the
+ * operation event) also complete only as the stream is consumed. This is inherent to
+ * streaming XML security. Applications MUST therefore treat all message content as
+ * unverified until the returned stream has been consumed to completion without a
+ * security exception: buffer-then-dispatch (as, for example, Apache CXF does), and never
+ * commit side effects (database writes, outbound calls, acknowledgements) incrementally
+ * while the stream is still being read.</p>
  */
 public class InboundWSSec {
 
@@ -173,7 +185,10 @@ public class InboundWSSec {
      *
      * @param xmlStreamReader       The original XMLStreamReader
      * @param securityEventListeners A list of SecurityEventListeners to receive security-relevant events.
-     * @return A new XMLStreamReader which does transparently the security processing.
+     * @return A new XMLStreamReader which does transparently the security processing. Note
+     *         that content read from it is only fully verified once the stream has been
+     *         consumed to completion without a security exception - do not commit side
+     *         effects based on partially-read content (see the class-level security note).
      * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException
      */
