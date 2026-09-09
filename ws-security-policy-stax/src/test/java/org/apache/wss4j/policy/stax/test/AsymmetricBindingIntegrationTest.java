@@ -2716,20 +2716,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:SignedParts>\n" +
-                        "                <sp:SignedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:SignedElements>\n" +
                         "                <sp:EncryptedParts>\n" +
                         "                    <sp:Body/>\n" +
                         "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:EncryptedParts>\n" +
-                        "                <sp:EncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:EncryptedElements>\n" +
-                        "                <sp:ContentEncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
-                        "                </sp:ContentEncryptedElements>\n" +
                         "            </wsp:All>\n" +
                         "        </wsp:ExactlyOne>";
 
@@ -2830,20 +2821,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:SignedParts>\n" +
-                        "                <sp:SignedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:SignedElements>\n" +
                         "                <sp:EncryptedParts>\n" +
                         "                    <sp:Body/>\n" +
                         "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:EncryptedParts>\n" +
-                        "                <sp:EncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
-                        "                </sp:EncryptedElements>\n" +
-                        "                <sp:ContentEncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
-                        "                </sp:ContentEncryptedElements>\n" +
                         "            </wsp:All>\n" +
                         "        </wsp:ExactlyOne>";
 

@@ -45,19 +45,19 @@ import java.util.Map;
  */
 public class RequiredElementsAssertionState extends AssertionState implements Assertable {
 
-    private final Map<List<QName>, Boolean> pathElements = new HashMap<>();
+    private final Map<PolicyUtils.ElementPath, Boolean> pathElements = new HashMap<>();
     private PolicyAsserter policyAsserter;
 
     public RequiredElementsAssertionState(AbstractSecurityAssertion assertion,
                                           PolicyAsserter policyAsserter,
-                                          boolean asserted) {
+                                          boolean asserted) throws WSSPolicyException {
         super(assertion, asserted);
 
         if (assertion instanceof RequiredElements) {
             RequiredElements requiredElements = (RequiredElements) assertion;
             for (int i = 0; i < requiredElements.getXPaths().size(); i++) {
                 XPath xPath = requiredElements.getXPaths().get(i);
-                List<QName> elements = PolicyUtils.getElementPath(xPath);
+                PolicyUtils.ElementPath elements = PolicyUtils.getElementPathDescriptor(xPath);
                 pathElements.put(elements, Boolean.FALSE);
             }
         }
@@ -73,7 +73,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     }
 
     public void addElement(List<QName> pathElement) {
-        this.pathElements.put(pathElement, Boolean.FALSE);
+        this.pathElements.put(PolicyUtils.absoluteElementPath(pathElement), Boolean.FALSE);
     }
 
     @Override
@@ -87,11 +87,11 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         RequiredElementSecurityEvent requiredElementSecurityEvent = (RequiredElementSecurityEvent) securityEvent;
 
-        Iterator<Map.Entry<List<QName>, Boolean>> elementMapIterator = pathElements.entrySet().iterator();
+        Iterator<Map.Entry<PolicyUtils.ElementPath, Boolean>> elementMapIterator = pathElements.entrySet().iterator();
         while (elementMapIterator.hasNext()) {
-            Map.Entry<List<QName>, Boolean> next = elementMapIterator.next();
-            List<QName> qNameList = next.getKey();
-            if (WSSUtils.pathMatches(qNameList, requiredElementSecurityEvent.getElementPath())) {
+            Map.Entry<PolicyUtils.ElementPath, Boolean> next = elementMapIterator.next();
+            PolicyUtils.ElementPath pathElement = next.getKey();
+            if (pathElement.matches(requiredElementSecurityEvent.getElementPath())) {
                 next.setValue(Boolean.TRUE);
                 break;
             }
@@ -104,11 +104,11 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     @Override
     public boolean isAsserted() {
         clearErrorMessage();
-        Iterator<Map.Entry<List<QName>, Boolean>> elementMapIterator = pathElements.entrySet().iterator();
+        Iterator<Map.Entry<PolicyUtils.ElementPath, Boolean>> elementMapIterator = pathElements.entrySet().iterator();
         while (elementMapIterator.hasNext()) {
-            Map.Entry<List<QName>, Boolean> next = elementMapIterator.next();
+            Map.Entry<PolicyUtils.ElementPath, Boolean> next = elementMapIterator.next();
             if (Boolean.FALSE.equals(next.getValue())) {
-                setErrorMessage("Element " + WSSUtils.pathAsString(next.getKey()) + " must be present");
+                setErrorMessage("Element " + WSSUtils.pathAsString(next.getKey().getPath()) + " must be present");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
