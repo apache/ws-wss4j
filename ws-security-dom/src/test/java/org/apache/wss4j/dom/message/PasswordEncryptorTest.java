@@ -45,6 +45,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
@@ -64,6 +66,18 @@ public class PasswordEncryptorTest {
     private PasswordEncryptor passwordEncryptor =
         new JasyptPasswordEncryptor("this-is-a-secret");
     private Crypto crypto;
+
+    // The ENC() value in crypto_enc.properties was encrypted under the previous default
+    // algorithm (PBEWithMD5AndTripleDES), so opt in to the legacy default for this class
+    @BeforeAll
+    public static void setUpLegacyDefaultAlgorithm() {
+        System.setProperty(JasyptPasswordEncryptor.USE_LEGACY_DEFAULT_ALGORITHM_PROPERTY, "true");
+    }
+
+    @AfterAll
+    public static void tearDownLegacyDefaultAlgorithm() {
+        System.clearProperty(JasyptPasswordEncryptor.USE_LEGACY_DEFAULT_ALGORITHM_PROPERTY);
+    }
 
     public PasswordEncryptorTest() throws Exception {
         WSSConfig.init();
