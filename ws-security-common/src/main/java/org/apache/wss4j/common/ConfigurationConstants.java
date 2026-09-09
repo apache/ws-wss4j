@@ -564,9 +564,12 @@ public class ConfigurationConstants {
     /**
      * Whether to search for and expand xop:Include Elements for encryption and signature (on the outbound
      * side) or for signature verification (on the inbound side). The default is false on the outbound
-     * side and true on the inbound side. What this means on the inbound side, is that the relevant attachment
-     * bytes are BASE-64 encoded and inserted into the Element. This ensures that the actual bytes are signed,
-     * and not just the reference.
+     * side. On the inbound side, the default is true when this configuration is processed via WSHandler
+     * (e.g. Axis/CXF interceptors); if a RequestData is instead passed directly to the DOM security engine
+     * without going through WSHandler, RequestData.expandXopInclude defaults to false and this property has
+     * no effect unless RequestData.setExpandXopInclude(true) is called explicitly. What "true" means on the
+     * inbound side, is that the relevant attachment bytes are BASE-64 encoded and inserted into the Element.
+     * This ensures that the actual bytes are signed, and not just the reference.
      */
     public static final String EXPAND_XOP_INCLUDE = "expandXOPInclude";
 
