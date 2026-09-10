@@ -45,6 +45,7 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.BootstrapPolicy;
 import org.apache.wss4j.policy.model.ContentEncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
@@ -127,6 +128,16 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcer.class);
+
+    /**
+     * System property controlling how policy assertions which this enforcer cannot enforce
+     * are handled. The default ("false") logs a warning and skips the assertion (the
+     * historical behaviour). When set to "true", building the assertion state map fails
+     * with a WSSPolicyException instead, so that the server cannot silently enforce less
+     * than the policy it advertises.
+     */
+    public static final String FAIL_ON_UNSUPPORTED_ASSERTIONS_PROPERTY =
+        "org.apache.wss4j.policy.failOnUnsupportedAssertions";
 
     private static final QName SOAP11_FAULT = new QName(WSSConstants.NS_SOAP11, "Fault");
     private static final QName SOAP12_FAULT = new QName(WSSConstants.NS_SOAP12, "Fault");
@@ -231,7 +242,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 if (policyOperator instanceof ExactlyOne) {
                     assertionStateMap.add(new HashMap<SecurityEventConstants.Event,
                                           Map<Assertion, List<Assertable>>>());
-                    buildAssertionStateMap(curPolicyComponent, assertionStateMap, alternative++);
+                    buildAssertionStateMap(curPolicyComponent, assertionStateMap, alternative++, false);
                 } else {
                     buildAssertionStateMap(curPolicyComponent, assertionStateMap);
                 }
@@ -246,7 +257,8 @@ public class PolicyEnforcer implements SecurityEventListener {
             PolicyComponent policyComponent,
             List<Map<SecurityEventConstants.Event,
             Map<Assertion, List<Assertable>>>> assertionStateMap,
-            int alternative
+            int alternative,
+            boolean nestedPolicy
     ) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
@@ -254,7 +266,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             Iterator<PolicyComponent> policyComponentIterator = policyComponents.iterator();
             while (policyComponentIterator.hasNext()) {
                 PolicyComponent curPolicyComponent = policyComponentIterator.next();
-                buildAssertionStateMap(curPolicyComponent, assertionStateMap, alternative);
+                buildAssertionStateMap(curPolicyComponent, assertionStateMap, alternative, nestedPolicy);
             }
         } else if (policyComponent instanceof AbstractSecurityAssertion) {
             AbstractSecurityAssertion abstractSecurityAssertion = (AbstractSecurityAssertion) policyComponent;
@@ -278,12 +290,44 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
             if (abstractSecurityAssertion instanceof PolicyContainingAssertion) {
                 buildAssertionStateMap(((PolicyContainingAssertion) abstractSecurityAssertion).getPolicy(),
-                                       assertionStateMap, alternative);
+                                       assertionStateMap, alternative, true);
             }
-        } else if (!(policyComponent instanceof PrimitiveAssertion)) {
+        } else if (policyComponent instanceof PrimitiveAssertion) {
+            if (!nestedPolicy) {
+                // A top-level PrimitiveAssertion is an assertion which no registered builder
+                // converted into a security policy model object - a namespace typo, an SP
+                // version mismatch, or a custom/unknown assertion. It cannot be enforced by
+                // this layer: the server would silently enforce less than the policy it
+                // advertises. Warn by default; fail if configured to do so.
+                handleUnknownAssertion(((PrimitiveAssertion) policyComponent).getName().toString());
+            }
+            // Inside a PolicyContainingAssertion's nested policy the remaining
+            // PrimitiveAssertions are the standard leaves (e.g. sp:Basic256, sp:Strict,
+            // sp:IncludeTimestamp, sp:WssX509V3Token10) which the parent model's
+            // parseNestedPolicy already consumed by name and which are enforced through the
+            // parent's assertion state. They are not unknown, so they are deliberately
+            // skipped here (the historical behaviour).
+        } else {
             throw new WSSPolicyException("Unsupported PolicyComponent: " + policyComponent
                                          + " type: " + policyComponent.getType());
         }
+    }
+
+    /**
+     * Handle a policy assertion which this enforcer cannot enforce. By default a warning is
+     * logged and the assertion is skipped (the historical behaviour). If the
+     * {@link #FAIL_ON_UNSUPPORTED_ASSERTIONS_PROPERTY} system property is set to "true", a
+     * WSSPolicyException is thrown instead, so that a policy advertising more than the
+     * enforcer can verify is rejected at build time rather than silently under-enforced.
+     */
+    private void handleUnknownAssertion(String assertionName) throws WSSPolicyException {
+        String msg = "Policy assertion " + assertionName
+            + " is unknown to the PolicyEnforcer and will NOT be enforced";
+        if (Boolean.parseBoolean(System.getProperty(FAIL_ON_UNSUPPORTED_ASSERTIONS_PROPERTY, "false"))) {
+            throw new WSSPolicyException(msg);
+        }
+        LOG.warn("{}. Set the {} system property to \"true\" to reject unsupported assertions instead.",
+                 msg, FAIL_ON_UNSUPPORTED_ASSERTIONS_PROPERTY);
     }
 
     private void addAssertionState(Map<Assertion, List<Assertable>> assertables,
@@ -502,14 +546,13 @@ public class PolicyEnforcer implements SecurityEventListener {
                     policyAsserter.assertPolicy(new QName(namespace, SPConstants.SCOPE_POLICY_15));
                 }
             }
+        } else if (abstractSecurityAssertion instanceof PolicyContainingAssertion
+            || abstractSecurityAssertion instanceof BootstrapPolicy) {
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
         } else {
+            handleUnknownAssertion(abstractSecurityAssertion.getName().toString());
             policyAsserter.assertPolicy(abstractSecurityAssertion);
         }
-
-        /*else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
-        } else if (abstractSecurityAssertion instanceof SymmetricBinding) {
-        } else if (abstractSecurityAssertion instanceof TransportBinding) {
-        } */
 
         return assertableList;
     }
