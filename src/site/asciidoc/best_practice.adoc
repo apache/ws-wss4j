@@ -87,7 +87,11 @@ When not using WS-SecurityPolicy (see point above about favouring the WS-Securit
 approach), you should specify a signature algorithm to use on the receiving side. This
 can be done via WSHandlerConstants.SIG_ALGO ("signatureAlgorithm"). Setting this property
 to (e.g.) "http://www.w3.org/2000/09/xmldsig#rsa-sha1" will ensure that the signature
-algorithm allowed is RSA-SHA1 and not (e.g.) HMAC-SHA1. This latter point requires the
-web services stack to set this property on the Request (it is known that Apache CXF does 
-this). See also the previous point about setting the key encryption transport algorithm.
+algorithm allowed is RSA-SHA1 and not (e.g.) HMAC-SHA1. WSHandler itself never calls
+`decodeAlgorithmSuite` internally, so this property only takes effect on the receiving
+side if the web services stack explicitly invokes `WSHandler.decodeAlgorithmSuite` (or
+otherwise sets an `AlgorithmSuite` on the `RequestData`) before processing the security
+header -- Apache CXF's `WSS4JInInterceptor` does this. Stacks that call the WSS4J engine
+directly without doing so get no enforcement from this property. See also the previous
+point about setting the key encryption transport algorithm.
 
