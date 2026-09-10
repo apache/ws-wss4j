@@ -191,13 +191,16 @@ exist in the request.
 Transport algorithm for encryption. The default is mgfsha1.
  * VALIDATOR_MAP (validatorMap) - A map of QName, Object (Validator) instances to be used to validate
 tokens identified by their QName.
- * NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. The default
-instance that is used is the EHCacheReplayCache.
- * TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. The default
-instance that is used is the EHCacheReplayCache.
+ * NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. WSS4J core does not
+create a default ReplayCache. Integrations such as Apache CXF configure an EHCacheReplayCache by default for inbound recipient
+messages; applications using WSS4J directly must configure a ReplayCache to enable replay detection.
+ * TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. WSS4J core
+does not create a default ReplayCache. Integrations such as Apache CXF configure an EHCacheReplayCache by default for inbound
+recipient messages; applications using WSS4J directly must configure a ReplayCache to enable replay detection.
  * SAML_ONE_TIME_USE_CACHE_INSTANCE (samlOneTimeUseCacheInstance) - A ReplayCache instance used to cache SAML2 Token Identifier Strings (if
-the token contains a OneTimeUse Condition). The default instance that is used
-is the EHCacheReplayCache.
+the token contains a OneTimeUse Condition). WSS4J core does not create a default ReplayCache. Integrations such as Apache CXF
+configure an EHCacheReplayCache by default for inbound recipient messages; applications using WSS4J directly must configure a
+ReplayCache to enable replay detection.
  * PASSWORD_ENCRYPTOR_INSTANCE (passwordEncryptorInstance) - A PasswordEncryptor instance used to decrypt encrypted passwords in Crypto
 properties files. The default is the JasyptPasswordEncryptor.
  * DERIVED_TOKEN_REFERENCE (derivedTokenReference) - This controls how deriving tokens are referenced.
