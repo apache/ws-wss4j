@@ -40,6 +40,7 @@ import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
@@ -378,7 +379,7 @@ public class SignatureProcessor implements Processor {
 
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo);
 
-            boolean signatureOk = xmlSignature.validate(context);
+            boolean signatureOk = validateSignature(xmlSignature, context);
             if (signatureOk) {
                 return xmlSignature;
             }
@@ -394,6 +395,11 @@ public class SignatureProcessor implements Processor {
                     xmlSignature.getSignedInfo().getReferences().iterator();
                 while (referenceIterator.hasNext()) {
                     Reference reference = (Reference)referenceIterator.next();
+                    // References that validateSignature did not reach are validated here for the
+                    // first time - all of them when the SignatureValue itself failed - so keep
+                    // attachment caching off for those too
+                    context.setProperty("javax.xml.crypto.dsig.cacheReference",
+                                        !isAttachmentReference(reference));
                     boolean referenceValidationCheck = reference.validate(context);
                     String id = reference.getId();
                     if (id == null) {
@@ -410,6 +416,48 @@ public class SignatureProcessor implements Processor {
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+    }
+
+    /**
+     * Validates the SignatureValue and then every SignedInfo Reference, as XMLSignature.validate(context)
+     * does, but with Reference caching turned off for SwA attachment References. Unlike
+     * XMLSignature.validate(context), ds:Manifest References are not validated and the result is not
+     * memoised on the XMLSignature.
+     *
+     * Caching a Reference makes Santuario retain every octet fed to the digest, which for an attachment
+     * is the whole attachment - and the only consumer of that copy is Reference.getDigestInputStream(),
+     * which WSS4J never calls. The dereferenced Data of an attachment Reference is not needed either,
+     * as buildProtectedRefs recognises attachment References by their Transform algorithm.
+     */
+    private boolean validateSignature(XMLSignature xmlSignature, XMLValidateContext context)
+        throws XMLSignatureException {
+        if (!xmlSignature.getSignatureValue().validate(context)) {
+            return false;
+        }
+        try {
+            for (Object referenceObject : xmlSignature.getSignedInfo().getReferences()) {
+                Reference reference = (Reference)referenceObject;
+                context.setProperty("javax.xml.crypto.dsig.cacheReference",
+                                    !isAttachmentReference(reference));
+                if (!reference.validate(context)) {
+                    return false;
+                }
+            }
+            return true;
+        } finally {
+            context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+        }
+    }
+
+    private static boolean isAttachmentReference(Reference reference) {
+        for (Object transformObject : reference.getTransforms()) {
+            String algorithm = ((Transform)transformObject).getAlgorithm();
+            if (WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
+                || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -531,6 +579,13 @@ public class SignatureProcessor implements Processor {
                 Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
                 boolean attachment = false;
+                if (se == null && isAttachmentReference(siRef)) {
+                    // Attachment References are not cached, so recognise them by their
+                    // Transform algorithm rather than by their dereferenced Data
+                    se = doc.createElementNS("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1",
+                                             "attachment");
+                    attachment = true;
+                }
                 if (se == null) {
                     Data dereferencedData = siRef.getDereferencedData();
                     if (dereferencedData instanceof NodeSetData) {
