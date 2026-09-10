@@ -101,19 +101,32 @@ public class SignatureSTRParser implements STRParser {
     /**
      * A method to create a Principal from a SAML Assertion
      * @param samlAssertion An SamlAssertionWrapper object
+     * @param secretKey the raw secret key (if any) taken from the assertion's Subject KeyInfo,
+     *                  which is only a meaningful proof-of-possession credential for the
+     *                  holder-of-key confirmation method
      * @return A principal
      */
     private Principal createPrincipalFromSAML(
-        SamlAssertionWrapper samlAssertion, STRParserResult parserResult
-    ) {
+        SamlAssertionWrapper samlAssertion, STRParserResult parserResult, byte[] secretKey
+    ) throws WSSecurityException {
         SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
         String confirmMethod = null;
         List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && samlAssertion.isSigned()) {
+        boolean holderOfKey = OpenSAMLUtil.isMethodHolderOfKey(confirmMethod);
+        if (holderOfKey && samlAssertion.isSigned()) {
             parserResult.setTrustedCredential(true);
+        } else if (!holderOfKey && secretKey != null && secretKey.length > 0) {
+            // A raw secret key from the Subject KeyInfo of a non-holder-of-key assertion (e.g.
+            // sender-vouches) has no defined proof-of-possession semantics, and no trust anchor is
+            // ever checked for it (SignatureTrustValidator only validates certs / public keys). Using
+            // such a key to "verify" a signature is a self-referential no-op that an attacker can
+            // trivially satisfy by embedding their own key in an unsigned assertion, so reject it.
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLsecurity"
+            );
         }
         return samlPrincipal;
     }
@@ -145,7 +158,7 @@ public class SignatureSTRParser implements STRParser {
             }
             secretKey = samlKi.getSecret();
             parserResult.setPublicKey(samlKi.getPublicKey());
-            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult));
+            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult, secretKey));
         }
         parserResult.setSecretKey(secretKey);
     }
@@ -313,7 +326,7 @@ public class SignatureSTRParser implements STRParser {
             }
             parserResult.setSecretKey(keyInfo.getSecret());
             parserResult.setPublicKey(keyInfo.getPublicKey());
-            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult));
+            parserResult.setPrincipal(createPrincipalFromSAML(samlAssertion, parserResult, keyInfo.getSecret()));
         }
 
         REFERENCE_TYPE referenceType = getReferenceType(secRef);
@@ -391,7 +404,7 @@ public class SignatureSTRParser implements STRParser {
                         parserResult.setCerts(new X509Certificate[]{foundCerts[0]});
                     }
                     secretKey = keyInfo.getSecret();
-                    principal = createPrincipalFromSAML(samlAssertion, parserResult);
+                    principal = createPrincipalFromSAML(samlAssertion, parserResult, secretKey);
                 } else if (el.equals(WSConstants.ENCRYPTED_KEY)) {
                     STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
                     Processor proc = data.getWssConfig().getProcessor(WSConstants.ENCRYPTED_KEY);
