@@ -301,7 +301,7 @@ subset:
 | `ENABLE_REVOCATION` | `false` *(documented)* | optional CRL checking | inbound certificate revocation |
 | `ENABLE_SIGNATURE_CONFIRMATION` | `false` *(documented)* | tunable | enables WS-Security SignatureConfirmation flow |
 | `VALIDATE_SAML_SUBJECT_CONFIRMATION` | `true` *(documented)* | hardened | inbound SAML SubjectConfirmation validation |
-| `NONCE_CACHE_INSTANCE` / `TIMESTAMP_CACHE_INSTANCE` / `SAML_ONE_TIME_USE_CACHE_INSTANCE` | `EHCacheReplayCache` *(documented)* | replay protection on by default | replay cache for UsernameToken nonces, Timestamps, SAML OneTimeUse |
+| `NONCE_CACHE_INSTANCE` / `TIMESTAMP_CACHE_INSTANCE` / `SAML_ONE_TIME_USE_CACHE_INSTANCE` | No WSS4J-core default; `EHCacheReplayCache` supplied by integrations such as CXF *(documented)* | replay protection on by default for CXF inbound recipient messages; direct WSS4J callers must configure a cache | replay cache for UsernameToken nonces, Timestamps, SAML OneTimeUse |
 | `PASSWORD_ENCRYPTOR_INSTANCE` | `JasyptPasswordEncryptor` *(documented)* | tunable | decryption of encrypted passwords in Crypto properties files |
 | `merlin.keystore.password` | `"security"` *(documented: `src/site/asciidoc/config.adoc`)* | **maintainer ruling required** — this is a *default for the property file*; production deployments override *(inferred — §14 Q12)* | Merlin keystore password |
 | `merlin.truststore.password` | `"changeit"` *(documented)* | dev default | Merlin truststore password |
@@ -437,7 +437,7 @@ on each is captured in §14 Q10–Q11.
 
 ### P5 — Replay protection on inbound UsernameToken nonces, Timestamps, and SAML2 OneTimeUse assertions
 
-- **Condition**: replay-cache is enabled (default `EHCacheReplayCache`);
+- **Condition**: replay-cache is enabled (for example, the CXF inbound recipient default `EHCacheReplayCache`);
   inbound message carries the required `wsu:Created` / `Nonce` /
   SAML2 `OneTimeUse` condition.
 - **Violation symptom**: an inbound envelope identical to one already
