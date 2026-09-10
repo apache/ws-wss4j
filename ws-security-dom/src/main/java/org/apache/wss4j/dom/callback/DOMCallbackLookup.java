@@ -96,6 +96,14 @@ public class DOMCallbackLookup implements CallbackLookup {
         Element foundElement =
             XMLUtils.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
+            // Reject a Body-named element found elsewhere in the document that is not the
+            // live SOAP Body, to prevent a signature wrapping attack that relocates a signed
+            // Body and resolves the reference to the stale copy instead of the real one
+            if (bodyElement != null && foundElement != bodyElement
+                && WSConstants.ELEM_BODY.equals(foundElement.getLocalName())
+                && bodyElement.getNamespaceURI().equals(foundElement.getNamespaceURI())) {
+                return null;
+            }
             if (context != null) {
                 if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
                     && idToMatch.equals(foundElement.getAttributeNS(WSConstants.WSU_NS, "Id"))) {

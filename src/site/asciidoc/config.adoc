@@ -302,13 +302,16 @@ verification of the certificate chain associated with the certificate.
 SIG_SUBJECT_CERT_CONSTRAINTS and SIG_ISSUER_CERT_CONSTRAINTS configuration tags. The default is ",".
  * *WSS4J 2.0.0* VALIDATOR_MAP (validatorMap) - A map of QName, Object (Validator) instances to be used to validate
 tokens identified by their QName.
- * *WSS4J 2.0.0* NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. The default
-instance that is used is the EHCacheReplayCache.
- * *WSS4J 2.0.0* TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. The default
-instance that is used is the EHCacheReplayCache.
+ * *WSS4J 2.0.0* NONCE_CACHE_INSTANCE (nonceCacheInstance) - A ReplayCache instance used to cache UsernameToken nonces. WSS4J core
+does not create a default ReplayCache. Integrations such as Apache CXF configure an EHCacheReplayCache by default for inbound
+recipient messages; applications using WSS4J directly must configure a ReplayCache to enable replay detection.
+ * *WSS4J 2.0.0* TIMESTAMP_CACHE_INSTANCE (timestampCacheInstance) - A ReplayCache instance used to cache Timestamp Created Strings. WSS4J core
+does not create a default ReplayCache. Integrations such as Apache CXF configure an EHCacheReplayCache by default for inbound
+recipient messages; applications using WSS4J directly must configure a ReplayCache to enable replay detection.
  * *WSS4J 2.0.0* SAML_ONE_TIME_USE_CACHE_INSTANCE (samlOneTimeUseCacheInstance) - A ReplayCache instance used to cache SAML2 Token Identifier Strings (if
-the token contains a OneTimeUse Condition). The default instance that is used
-is the EHCacheReplayCache.
+the token contains a OneTimeUse Condition). WSS4J core does not create a default ReplayCache. Integrations such as Apache CXF
+configure an EHCacheReplayCache by default for inbound recipient messages; applications using WSS4J directly must configure a
+ReplayCache to enable replay detection.
  * *WSS4J 2.0.0* PASSWORD_ENCRYPTOR_INSTANCE (passwordEncryptorInstance) - A PasswordEncryptor instance used to decrypt encrypted passwords in Crypto
 properties files. The default is the JasyptPasswordEncryptor.
  * *WSS4J 2.0.0* DERIVED_TOKEN_REFERENCE (derivedTokenReference) - This controls how deriving tokens are referenced.
