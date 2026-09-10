@@ -41,6 +41,8 @@ import org.apache.wss4j.stax.setup.OutboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,6 +59,18 @@ import static org.junit.jupiter.api.Assertions.fail;
  * password
  */
 public class PasswordEncryptorTest extends AbstractTestBase {
+
+    // The ENC() value in transmitter-crypto-enc.properties was encrypted under the previous
+    // default algorithm (PBEWithMD5AndTripleDES), so opt in to the legacy default for this class
+    @BeforeAll
+    public static void setUpLegacyDefaultAlgorithm() {
+        System.setProperty(JasyptPasswordEncryptor.USE_LEGACY_DEFAULT_ALGORITHM_PROPERTY, "true");
+    }
+
+    @AfterAll
+    public static void tearDownLegacyDefaultAlgorithm() {
+        System.clearProperty(JasyptPasswordEncryptor.USE_LEGACY_DEFAULT_ALGORITHM_PROPERTY);
+    }
 
     @Test
     public void testSignatureCryptoPropertiesOutbound() throws Exception {
