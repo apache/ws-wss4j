@@ -47,7 +47,7 @@
         <opensaml.version>5.2.3</opensaml.version>
         <slf4j.version>2.0.18</slf4j.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
-        <woodstox.version>7.1.1</woodstox.version>
+        <woodstox.version>7.2.2</woodstox.version>
         <xz.version>1.12</xz.version>
         <xmlsec.version>4.0.4</xmlsec.version>
         <xmlunit.version>2.13.0</xmlunit.version>
