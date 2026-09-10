@@ -704,6 +704,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         //this means that if we have a compact policy only the first alternative is visible
         //in contrary to a normalized policy where just one alternative exists
         if (alternatives.hasNext()) {
+            boolean c14nSeen = false;
             List<Assertion> assertions = alternatives.next();
             for (Assertion assertion : assertions) {
                 String assertionName = assertion.getName().getLocalPart();
@@ -728,6 +729,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 }
                 C14NType c14NType = C14NType.lookUp(assertionName);
                 if (c14NType != null) {
+                    // Reject duplicate C14N assertions instead of letting the last one win,
+                    // consistent with the sibling SOAPNorm/STR/XPath branches below
+                    if (c14nSeen) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    c14nSeen = true;
                     algorithmSuite.setC14n(c14NType);
                     continue;
                 }
