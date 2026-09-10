@@ -74,26 +74,33 @@ guard against replay attacks for the following scenarios:
  * SAML OneTimeUse Assertions
 
 However, replay attack detection was not "switched on" by default in WSS4J
-1.6.x. In WSS4J 2.0.x, replay attack detection is enabled by default using
-an implementation of the "ReplayCache" interface based on EhCache. The 
-following configuration tags can be used to configure caching:
+1.6.x. In WSS4J 2.0.x integrations such as Apache CXF enable replay attack
+detection by default using an implementation of the "ReplayCache" interface
+based on EhCache. WSS4J core does not create ReplayCache instances itself.
+Integrations such as
+Apache CXF enable replay attack detection by default for inbound recipient
+messages and provide a ReplayCache. Applications using WSS4J directly must
+configure a ReplayCache. The following configuration tags can be used to
+configure caching:
 
  * ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE ("timestampCacheInstance"):
 This holds a reference to a ReplayCache instance used to cache Timestamp
-Created Strings. The default instance that is used is the EHCacheReplayCache.
+Created Strings. WSS4J core does not create a default instance; integrations
+such as Apache CXF provide one for inbound recipient messages.
  * ConfigurationConstants.ENABLE_TIMESTAMP_CACHE ("enableTimestampCache"):
 Whether to cache Timestamp Created Strings (these are only cached in
 conjunction with a message Signature). The default value is "true".
  * ConfigurationConstants.NONCE_CACHE_INSTANCE ("nonceCacheInstance"): This
 holds a reference to a ReplayCache instance used to cache UsernameToken
-nonces. The default instance that is used is the EHCacheReplayCache.
+nonces. WSS4J core does not create a default instance; integrations such as
+Apache CXF provide one for inbound recipient messages.
  * ConfigurationConstants.ENABLE_NONCE_CACHE ("enableNonceCache"): Whether to
 cache UsernameToken nonces. The default value is "true".
  * ConfigurationConstants. SAML_ONE_TIME_USE_CACHE_INSTANCE
 ("samlOneTimeUseCacheInstance"): This holds a reference to a ReplayCache
 instance used to cache SAML2 Token Identifier Strings (if the token contains a
-OneTimeUse Condition). The default instance that is used is the
-EHCacheReplayCache.
+OneTimeUse Condition). WSS4J core does not create a default instance;
+integrations such as Apache CXF provide one for inbound recipient messages.
  * ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE
 ("enableSamlOneTimeUseCache"):  Whether to cache SAML2 Token Identifiers, if
 the token contains a "OneTimeUse" Condition. The default value is "true".
