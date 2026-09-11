@@ -90,6 +90,12 @@ public final class EncryptionUtils {
             while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
                 child = child.getNextSibling();
             }
+            if (child == null || !"EncryptedData".equals(child.getLocalName())
+                || !WSConstants.ENC_NS.equals(child.getNamespaceURI())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef",
+                    new Object[] {dataRefURI});
+            }
             return (Element)child;
         }
         return encryptedDataElement;
@@ -218,7 +224,22 @@ public final class EncryptionUtils {
             || parent.getLocalName().equals(WSConstants.ENCRYPED_ASSERTION_LN)
             && parent.getNamespaceURI().equals(WSConstants.SAML2_NS)) {
 
-            Node decryptedHeader = parent.getFirstChild();
+            // The decrypted node sits where the EncryptedData was, which is not necessarily
+            // the wrapper's first child - anything else there was never encrypted.
+            Node decryptedHeader = decryptedNode;
+            if (decryptedHeader == null) {
+                if (content) {
+                    decryptedHeader = encData;
+                } else if (previousSibling == null) {
+                    decryptedHeader = parent.getFirstChild();
+                } else {
+                    decryptedHeader = previousSibling.getNextSibling();
+                }
+            }
+            if (decryptedHeader == null || Node.ELEMENT_NODE != decryptedHeader.getNodeType()) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            }
+
             Node soapHeader = parent.getParentNode();
             soapHeader.replaceChild(decryptedHeader, parent);
 
