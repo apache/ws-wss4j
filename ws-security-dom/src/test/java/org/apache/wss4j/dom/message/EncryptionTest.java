@@ -62,6 +62,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -90,6 +91,53 @@ public class EncryptionTest {
 
     public EncryptionTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
+    }
+
+    @Test
+    public void testEncryptedHeaderWithUnencryptedFirstChild() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        Element soapHeader = (Element)doc.getElementsByTagNameNS(
+            WSConstants.URI_SOAP11_ENV, "Header").item(0);
+        Element header = doc.createElementNS("urn:test", "test:header");
+        header.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:test", "urn:test");
+        soapHeader.appendChild(header);
+
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.getParts().add(new WSEncryptionPart("header", "urn:test", "Header"));
+
+        Document encryptedDoc = builder.build(crypto, key);
+        Element encryptedHeader = (Element)encryptedDoc.getElementsByTagNameNS(
+            WSConstants.WSSE11_NS, WSConstants.ENCRYPTED_HEADER).item(0);
+        Node encryptedData = encryptedHeader.getFirstChild();
+        while (encryptedData != null && encryptedData.getNodeType() != Node.ELEMENT_NODE) {
+            encryptedData = encryptedData.getNextSibling();
+        }
+        Element unencryptedHeader = encryptedDoc.createElementNS(
+            "urn:attacker", "attacker:header");
+        unencryptedHeader.setAttributeNS(
+            WSConstants.XMLNS_NS, "xmlns:attacker", "urn:attacker");
+        encryptedHeader.insertBefore(unencryptedHeader, encryptedData);
+
+        WSHandlerResult results = secEngine.processSecurityHeader(
+            encryptedDoc, null, keystoreCallbackHandler, crypto);
+
+        Element promotedHeader = (Element)encryptedDoc.getElementsByTagNameNS(
+            "urn:test", "header").item(0);
+        assertNotNull(promotedHeader);
+        assertEquals("urn:test", promotedHeader.getNamespaceURI());
+        assertEquals("header", promotedHeader.getLocalName());
+        assertEquals(0, encryptedDoc.getElementsByTagNameNS(
+            "urn:attacker", "header").getLength());
+
+        @SuppressWarnings("unchecked")
+        java.util.List<WSDataRef> dataRefs = (java.util.List<WSDataRef>)results.getActionResults()
+            .get(WSConstants.ENCR).get(0).get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertEquals(1, dataRefs.size());
+        assertEquals(promotedHeader, dataRefs.get(0).getProtectedElement());
     }
 
     /**
