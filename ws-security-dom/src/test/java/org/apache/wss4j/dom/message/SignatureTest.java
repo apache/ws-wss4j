@@ -1033,8 +1033,7 @@ public class SignatureTest {
 
         // Create the KeyInfo
         DocumentBuilderFactory docBuilderFactory =
-            SecureDocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
+            SecureDocumentBuilderFactory.newNSInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document keyInfoDoc = docBuilder.newDocument();
 

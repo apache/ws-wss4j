@@ -83,8 +83,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     protected PolicyEnforcer buildAndStartPolicyEngine(
             String policyString, boolean replacePolicyElement, List<AssertionBuilder<Element>> customAssertionBuilders)
             throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
-        DocumentBuilderFactory documentBuilderFactory = SecureDocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilderFactory documentBuilderFactory = SecureDocumentBuilderFactory.newNSInstance();
         documentBuilderFactory.setValidating(false);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(

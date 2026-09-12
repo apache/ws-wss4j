@@ -107,13 +107,11 @@ public abstract class AbstractTestBase {
     }
 
     public AbstractTestBase() {
-        documentBuilderFactory = SecureDocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory = SecureDocumentBuilderFactory.newNSInstance();
         documentBuilderFactory.setIgnoringComments(false);
         documentBuilderFactory.setCoalescing(false);
         documentBuilderFactory.setIgnoringElementContentWhitespace(false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         //xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 

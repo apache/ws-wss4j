@@ -73,8 +73,7 @@ public class SignaturePrefixListTest {
         Document doc = null;
         try (InputStream inputStream =
             Loader.getResource("org/apache/wss4j/dom/message/SignaturePrefixListMessage.xml").openStream()) {
-            DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
+            DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newNSInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(inputStream);
         }

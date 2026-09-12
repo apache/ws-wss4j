@@ -121,8 +121,7 @@ public class CryptoProviderTest {
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "EMAILADDRESS=Werner@example.com");
 
-        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         InputStream is = new ByteArrayInputStream(outputString.getBytes());
         Document parsedDoc = dbf.newDocumentBuilder().parse(is);
         verify(parsedDoc);
@@ -149,8 +148,7 @@ public class CryptoProviderTest {
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "E=Werner@example.com");
 
-        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         InputStream is = new ByteArrayInputStream(outputString.getBytes());
         Document parsedDoc = dbf.newDocumentBuilder().parse(is);
         verify(parsedDoc);

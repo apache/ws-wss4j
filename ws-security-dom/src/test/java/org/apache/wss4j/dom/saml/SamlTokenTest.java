@@ -1030,8 +1030,7 @@ public class SamlTokenTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         Document doc = dbf.newDocumentBuilder().newDocument();
         String assertionString = DOM2Writer.nodeToString(samlAssertion.toDOM(doc));
 
@@ -1060,8 +1059,7 @@ public class SamlTokenTest {
         // Convert String to DOM + into an assertionWrapper
         InputStream in = new ByteArrayInputStream(assertionString.getBytes());
 
-        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         Document newDoc = dbf.newDocumentBuilder().parse(in);
 
         SamlAssertionWrapper newAssertion =

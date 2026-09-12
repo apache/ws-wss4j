@@ -59,8 +59,7 @@ public class CustomTokenTest {
     @Test
     public void testCustomTokenTimestamp() throws Exception {
         // Create a Timestamp manually
-        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         Document timestampDoc = dbf.newDocumentBuilder().newDocument();
 
         WSSecTimestamp timestamp = new WSSecTimestamp(timestampDoc);

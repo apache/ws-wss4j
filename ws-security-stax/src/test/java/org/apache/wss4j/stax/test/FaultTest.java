@@ -103,8 +103,7 @@ public class FaultTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/soap-fault.xml");
-            DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
+            DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newNSInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document securedDocument = builder.parse(sourceDocument);
 

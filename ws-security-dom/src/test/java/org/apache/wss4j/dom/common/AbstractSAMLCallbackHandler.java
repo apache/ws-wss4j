@@ -236,8 +236,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         } else if (statement == Statement.ATTR) {
             // Build a new Document
             DocumentBuilderFactory docBuilderFactory =
-                SecureDocumentBuilderFactory.newInstance();
-            docBuilderFactory.setNamespaceAware(true);
+                SecureDocumentBuilderFactory.newNSInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document doc = docBuilder.newDocument();
 

@@ -82,8 +82,7 @@ public class AssertionSigningTest {
         input.close();
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
 
-        dbf = SecureDocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        dbf = SecureDocumentBuilderFactory.newNSInstance();
     }
 
     /**

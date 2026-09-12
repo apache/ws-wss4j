@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.stax.ext;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -36,10 +35,7 @@ public class DocumentCreatorImpl implements DocumentCreator {
     private final DocumentBuilderFactory documentBuilderFactory;
 
     public DocumentCreatorImpl() throws ParserConfigurationException {
-        documentBuilderFactory = SecureDocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        documentBuilderFactory = SecureDocumentBuilderFactory.newNSInstance();
     }
 
     public Document newDocument() throws ParserConfigurationException {

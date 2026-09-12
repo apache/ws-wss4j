@@ -156,8 +156,7 @@ public class ReferenceTest {
                 ).getBytes()
             );
         final javax.xml.parsers.DocumentBuilderFactory factory =
-            SecureDocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
+            SecureDocumentBuilderFactory.newNSInstance();
         final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(in);
     }

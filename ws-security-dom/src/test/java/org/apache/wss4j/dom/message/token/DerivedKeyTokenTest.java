@@ -95,8 +95,7 @@ public class DerivedKeyTokenTest {
                 template.replaceFirst("PLACEHOLDER1", placeholder1)
                         .replaceFirst("PLACEHOLDER2", placeholder2).getBytes());
         final javax.xml.parsers.DocumentBuilderFactory factory = SecureDocumentBuilderFactory
-                .newInstance();
-        factory.setNamespaceAware(true);
+                .newNSInstance();
         final javax.xml.parsers.DocumentBuilder builder = factory
                 .newDocumentBuilder();
         return builder.parse(in);
