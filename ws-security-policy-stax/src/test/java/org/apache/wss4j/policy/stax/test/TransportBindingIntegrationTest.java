@@ -29,10 +29,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.xml.secure.SecureTransformerFactory;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
@@ -145,7 +145,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -248,7 +248,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -370,7 +370,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -485,7 +485,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -586,7 +586,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -708,7 +708,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -816,7 +816,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -948,7 +948,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -1069,7 +1069,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -1187,7 +1187,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -1307,7 +1307,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override
@@ -1424,7 +1424,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = SecureTransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(
                     new OutputStream() {
                         @Override

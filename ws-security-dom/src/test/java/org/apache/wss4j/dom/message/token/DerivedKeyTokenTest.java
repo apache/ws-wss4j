@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 
 
@@ -93,9 +94,8 @@ public class DerivedKeyTokenTest {
         final java.io.InputStream in = new java.io.ByteArrayInputStream(
                 template.replaceFirst("PLACEHOLDER1", placeholder1)
                         .replaceFirst("PLACEHOLDER2", placeholder2).getBytes());
-        final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory
-                .newInstance();
-        factory.setNamespaceAware(true);
+        final javax.xml.parsers.DocumentBuilderFactory factory = SecureDocumentBuilderFactory
+                .newNSInstance();
         final javax.xml.parsers.DocumentBuilder builder = factory
                 .newDocumentBuilder();
         return builder.parse(in);
