@@ -51,7 +51,7 @@ public class SOAPUtil {
         try {
             saajFactory = MessageFactory.newInstance();
         } catch (Exception e) {
-            LOG.debug("can't create SAAJ MessageFactory", e);
+            LOG.debug("Can't create SAAJ MessageFactory", e);
         }
     }
 
