@@ -44,11 +44,10 @@ public class SOAPUtil {
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
 
-    private static DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newInstance();
+    private static DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newNSInstance();
     private static MessageFactory saajFactory = null;
 
     static {
-        factory.setNamespaceAware(true);
         try {
             saajFactory = MessageFactory.newInstance();
         } catch (Exception e) {
