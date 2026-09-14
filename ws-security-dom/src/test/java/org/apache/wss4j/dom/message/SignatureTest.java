@@ -35,6 +35,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -1032,8 +1033,7 @@ public class SignatureTest {
 
         // Create the KeyInfo
         DocumentBuilderFactory docBuilderFactory =
-            DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
+            SecureDocumentBuilderFactory.newNSInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document keyInfoDoc = docBuilder.newDocument();
 

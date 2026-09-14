@@ -26,6 +26,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -75,7 +76,7 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
 
         SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newInstance();
         return samlAssertionWrapper.toDOM(factory.newDocumentBuilder().newDocument());
     }
 

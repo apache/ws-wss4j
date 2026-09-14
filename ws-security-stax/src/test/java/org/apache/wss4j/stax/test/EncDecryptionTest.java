@@ -48,6 +48,7 @@ import javax.xml.xpath.XPathExpression;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.xml.secure.SecureTransformerFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -1634,7 +1635,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             assertEquals(nodeList.getLength(), 1);
 
             //move ReferenceList...
-            TransformerFactory transFact = TransformerFactory.newInstance();
+            TransformerFactory transFact = SecureTransformerFactory.newInstance();
             Transformer trans = transFact.newTransformer(new StreamSource(this.getClass().getClassLoader().getResourceAsStream("xsl/testDecryptionReferenceListOutsideEncryptedKey.xsl")));
             baos.reset();
             trans.transform(new DOMSource(document), new StreamResult(baos));

@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -85,8 +86,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     protected PolicyEnforcer buildAndStartPolicyEngine(
             String policyString, boolean replacePolicyElement, List<AssertionBuilder<Element>> customAssertionBuilders)
             throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilderFactory documentBuilderFactory = SecureDocumentBuilderFactory.newNSInstance();
         documentBuilderFactory.setValidating(false);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(

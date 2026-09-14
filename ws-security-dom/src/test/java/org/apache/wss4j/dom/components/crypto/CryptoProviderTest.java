@@ -24,6 +24,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -120,8 +121,7 @@ public class CryptoProviderTest {
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "EMAILADDRESS=Werner@example.com");
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         InputStream is = new ByteArrayInputStream(outputString.getBytes());
         Document parsedDoc = dbf.newDocumentBuilder().parse(is);
         verify(parsedDoc);
@@ -148,8 +148,7 @@ public class CryptoProviderTest {
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "E=Werner@example.com");
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         InputStream is = new ByteArrayInputStream(outputString.getBytes());
         Document parsedDoc = dbf.newDocumentBuilder().parse(is);
         verify(parsedDoc);
