@@ -784,10 +784,10 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
@@ -870,6 +870,138 @@ public class AttachmentTest extends AbstractTestBase {
         }
     }
 
+    // Regression test for CWE-345: a wire attacker cannot forge the delivered MIME type of an
+    // Attachment-Complete encrypted attachment by tampering with the unauthenticated
+    // xenc:EncryptedData/@MimeType attribute - the MIME type must be sourced from the
+    // encrypted (protected) Content-Type header instead.
+    @Test
+    public void testXMLAttachmentCompleteEncryptionTamperedMimeTypeAttributeIgnored() throws Exception {
+
+        final String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.ENCRYPTION);
+            securityProperties.setActions(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
+            securityProperties.addEncryptionPart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+        }
+
+        // Simulate a wire attacker rewriting the unauthenticated @MimeType attribute
+        Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+        NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
+        Element attachmentEncData = null;
+        for (int i = 0; i < encDatas.getLength(); i++) {
+            Element encData = (Element) encDatas.item(i);
+            if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(encData.getAttributeNS(null, "Type"))) {
+                attachmentEncData = encData;
+                break;
+            }
+        }
+        assertFalse(attachmentEncData == null);
+        attachmentEncData.setAttributeNS(null, "MimeType", "application/malicious");
+        encryptedAttachments.get(0).getHeaders().put("X-Attacker-Controlled", "forged");
+
+        ByteArrayOutputStream tamperedBaos = new ByteArrayOutputStream();
+        javax.xml.transform.TransformerFactory.newInstance().newTransformer()
+            .transform(new DOMSource(securedDoc), new StreamResult(tamperedBaos));
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(tamperedBaos.toByteArray())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+        }
+
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
+        assertFalse(responseAttachment.getHeaders().containsKey("TestHeader"));
+        assertFalse(responseAttachment.getHeaders().containsKey("X-Attacker-Controlled"));
+    }
+
+    // Regression test for CWE-345: if the protected header block (inside the ciphertext) does
+    // not contain a Content-Type header, decryption of an Attachment-Complete attachment must
+    // fail closed rather than falling back to the unauthenticated MimeType attribute.
+    @Test
+    public void testXMLAttachmentCompleteEncryptionMissingProtectedContentType() throws Exception {
+
+        final String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        Map<String, String> headers = getHeaders(attachmentId);
+        headers.remove(AttachmentUtils.MIME_HEADER_CONTENT_TYPE);
+        attachment.addHeaders(headers);
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.ENCRYPTION);
+            securityProperties.setActions(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
+            securityProperties.addEncryptionPart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+        }
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        try {
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            fail("Expected a WSSecurityException due to the missing protected Content-Type header");
+        } catch (XMLStreamException e) {
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ((WSSecurityException) e.getCause()).getErrorCode());
+        }
+    }
+
     @Test
     public void testMultipleAttachmentCompleteEncryption() throws Exception {
 
@@ -928,17 +1060,17 @@ public class AttachmentTest extends AbstractTestBase {
 
         byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
         Map<String, String> att1Headers = responseAttachment.getHeaders();
-        assertEquals(6, att1Headers.size());
+        assertEquals(5, att1Headers.size());
 
         responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
 
         byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/plain", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
         Map<String, String> att2Headers = responseAttachment.getHeaders();
-        assertEquals(6, att2Headers.size());
+        assertEquals(5, att2Headers.size());
     }
 
     @Test
@@ -1036,10 +1168,10 @@ public class AttachmentTest extends AbstractTestBase {
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", attachment[0].getMimeType());
+        assertEquals("text/xml; charset=UTF-8", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
@@ -1111,7 +1243,7 @@ public class AttachmentTest extends AbstractTestBase {
                         List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
 
-                        if (attachment[0].getHeaders().size() == 6) {
+                        if (attachment[0].getHeaders().size() == 5) {
                             //signature callback
                             attachment[0].addHeader(AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION, "Kaputt");
                         }
@@ -1230,10 +1362,10 @@ public class AttachmentTest extends AbstractTestBase {
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", attachment[0].getMimeType());
+        assertEquals("text/xml; charset=UTF-8", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
