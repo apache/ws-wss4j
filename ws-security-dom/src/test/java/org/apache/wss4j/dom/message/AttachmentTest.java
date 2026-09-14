@@ -725,10 +725,10 @@ public class AttachmentTest {
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
@@ -785,6 +785,112 @@ public class AttachmentTest {
         assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
+    // Regression test for CWE-345: a wire attacker cannot forge the delivered MIME type of an
+    // Attachment-Complete encrypted attachment by tampering with the unauthenticated
+    // xenc:EncryptedData/@MimeType attribute - the MIME type must be sourced from the
+    // encrypted (protected) Content-Type header instead.
+    @Test
+    public void testXMLAttachmentCompleteEncryptionTamperedMimeTypeAttributeIgnored() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
+
+        String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
+
+        // Simulate a wire attacker rewriting the unauthenticated @MimeType attribute
+        NodeList encDatas = encryptedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
+        Element attachmentEncData = null;
+        for (int i = 0; i < encDatas.getLength(); i++) {
+            Element encData = (Element) encDatas.item(i);
+            if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(encData.getAttributeNS(null, "Type"))) {
+                attachmentEncData = encData;
+                break;
+            }
+        }
+        assertFalse(attachmentEncData == null);
+        attachmentEncData.setAttributeNS(null, "MimeType", "application/malicious");
+        encryptedAttachments.get(0).getHeaders().put("X-Attacker-Controlled", "forged");
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
+
+        assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
+        assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
+        assertFalse(responseAttachment.getHeaders().containsKey("TestHeader"));
+        assertFalse(responseAttachment.getHeaders().containsKey("X-Attacker-Controlled"));
+    }
+
+    // Regression test for CWE-345: if the protected header block (inside the ciphertext) does
+    // not contain a Content-Type header, decryption of an Attachment-Complete attachment must
+    // fail closed rather than falling back to the unauthenticated @MimeType attribute.
+    @Test
+    public void testXMLAttachmentCompleteEncryptionMissingProtectedContentType() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
+
+        String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        Map<String, String> headers = getHeaders(attachmentId);
+        headers.remove(AttachmentUtils.MIME_HEADER_CONTENT_TYPE);
+        attachment.addHeaders(headers);
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        Document encryptedDoc = encrypt.build(crypto, symmetricKey);
+
+        final AttachmentCallbackHandler finalAttachmentCallbackHandler =
+            new AttachmentCallbackHandler(encryptedAttachments);
+        WSSecurityException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            WSSecurityException.class, () -> verify(encryptedDoc, finalAttachmentCallbackHandler));
+        assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, exception.getErrorCode());
+    }
+
     @Test
     public void testMultipleAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -835,17 +941,17 @@ public class AttachmentTest {
 
         byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
         Map<String, String> att1Headers = responseAttachment.getHeaders();
-        assertEquals(6, att1Headers.size());
+        assertEquals(5, att1Headers.size());
 
         responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
         byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/plain", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
 
         Map<String, String> att2Headers = responseAttachment.getHeaders();
-        assertEquals(6, att2Headers.size());
+        assertEquals(5, att2Headers.size());
     }
 
     @Test
@@ -909,10 +1015,10 @@ public class AttachmentTest {
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
@@ -998,7 +1104,7 @@ public class AttachmentTest {
                         List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
 
-                        if (attachment[0].getHeaders().size() == 6) {
+                        if (attachment[0].getHeaders().size() == 5) {
                             //signature callback
                             attachment[0].addHeader(AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION, "Kaputt");
                         }
@@ -1077,10 +1183,10 @@ public class AttachmentTest {
 
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        assertEquals("text/xml", responseAttachment.getMimeType());
+        assertEquals("text/xml; charset=UTF-8", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
-        assertEquals(6, attHeaders.size());
+        assertEquals(5, attHeaders.size());
     }
 
     @Test
