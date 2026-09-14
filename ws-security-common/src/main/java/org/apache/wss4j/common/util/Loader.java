@@ -25,9 +25,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Locale;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
@@ -36,6 +39,21 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * <p/>
  */
 public final class Loader {
+
+    /**
+     * System property holding a comma-separated list of URL schemes that
+     * {@link #loadInputStream(ClassLoader, String)} is allowed to open when a resource
+     * string parses as a URL. The default is "file,jar": remote fetching of configured
+     * resources (keystores, truststores, CRLs, properties files) over e.g. http is not
+     * enabled unless explicitly configured. For a nested-URL scheme such as "jar"
+     * (<code>jar:&lt;url&gt;!/&lt;entry&gt;</code>), the embedded URL must use an allowed
+     * scheme as well: "jar:file:..." is permitted by default, "jar:http://..." is not.
+     */
+    public static final String ALLOWED_URL_SCHEMES_PROPERTY =
+        "org.apache.wss4j.loader.allowedUrlSchemes";
+
+    private static final String DEFAULT_ALLOWED_URL_SCHEMES = "file,jar";
+
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(Loader.class);
 
@@ -43,31 +61,36 @@ public final class Loader {
         // complete
     }
 
+    /**
+     * Load a resource as a stream. The resolution order is:
+     * <ol>
+     * <li>the file system - an existing file wins, so that a path configured by the
+     * operator cannot be shadowed by a same-named classpath resource;</li>
+     * <li>a URL, if the resource string parses as one and its scheme is in the allowed
+     * list (see {@link #ALLOWED_URL_SCHEMES_PROPERTY}; "file" and "jar" by default) -
+     * for a nested-URL scheme such as "jar", the embedded URL's scheme must also be in
+     * the allowed list;</li>
+     * <li>the classpath.</li>
+     * </ol>
+     * Note: prior to the introduction of this ordering, URLs (any scheme) and the
+     * classpath were consulted before the file system.
+     */
     public static InputStream loadInputStream(ClassLoader loader, String resource)
         throws WSSecurityException, IOException {
         InputStream is = null;
         if (resource != null) {
-            URL url = null;
-            // First see if it's a URL
+            //
+            // First look on the file system
+            //
+            Path path = null;
             try {
-                url = new URL(resource);
-            } catch (MalformedURLException ex) { //NOPMD
-                // skip
+                path = Paths.get(resource);
+            } catch (InvalidPathException ex) { //NOPMD
+                // skip - not a valid file system path
             }
-            // If not a URL, then try to load the resource
-            if (url == null) {
-                url = Loader.getResource(loader, resource);
-            }
-            if (url != null) {
-                is = url.openStream();
-            }
-
-            //
-            // If we don't find it, then look on the file system.
-            //
-            if (is == null) {
+            if (path != null && Files.exists(path)) {
                 try {
-                    is = Files.newInputStream(Paths.get(resource));
+                    return Files.newInputStream(path);
                 } catch (Exception e) {
                     LOG.debug(e.getMessage(), e);
                     throw new WSSecurityException(
@@ -75,8 +98,81 @@ public final class Loader {
                     );
                 }
             }
+
+            // Next see if it's a URL with an allowed scheme
+            URL url = null;
+            try {
+                url = new URL(resource);
+            } catch (MalformedURLException ex) { //NOPMD
+                // skip
+            }
+            String disallowedScheme = url == null ? null : findDisallowedScheme(url);
+            if (disallowedScheme != null) {
+                LOG.warn("Not loading resource [" + resource + "]: URL scheme \"" + disallowedScheme
+                    + "\" is not allowed. Set the " + ALLOWED_URL_SCHEMES_PROPERTY
+                    + " system property to permit additional schemes.");
+                url = null;
+            }
+            // If not a (permitted) URL, then try to load the resource from the classpath
+            if (url == null) {
+                url = Loader.getResource(loader, resource);
+            }
+            if (url != null) {
+                is = url.openStream();
+            }
+
+            if (is == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[] {resource}
+                );
+            }
         }
         return is;
+    }
+
+    /**
+     * Return the scheme that prevents <code>url</code> from being opened, or null if the
+     * URL only uses allowed schemes. For a nested-URL scheme such as "jar"
+     * (<code>jar:&lt;url&gt;!/&lt;entry&gt;</code>), the embedded URL is validated
+     * recursively, so e.g. "jar:http://..." is refused unless "http" is itself allowed.
+     * A nested part that is missing or does not parse as a URL is refused (fail closed).
+     */
+    private static String findDisallowedScheme(URL url) {
+        String scheme = url.getProtocol();
+        if (!isAllowedUrlScheme(scheme)) {
+            return scheme;
+        }
+        if ("jar".equals(scheme.toLowerCase(Locale.ROOT))) {
+            // A jar URL nests another URL: everything after "jar:" and before "!/" is
+            // itself a URL that a JarURLConnection would fetch (an outbound request for
+            // e.g. jar:http://...). Validate the nested URL's scheme as well.
+            String spec = url.getFile();
+            int separator = spec.indexOf("!/");
+            if (separator < 0) {
+                return scheme;
+            }
+            URL nestedUrl;
+            try {
+                nestedUrl = new URL(spec.substring(0, separator).trim());
+            } catch (MalformedURLException ex) { //NOPMD
+                return scheme;
+            }
+            return findDisallowedScheme(nestedUrl);
+        }
+        return null;
+    }
+
+    private static boolean isAllowedUrlScheme(String scheme) {
+        if (scheme == null) {
+            return false;
+        }
+        String allowedSchemes = System.getProperty(ALLOWED_URL_SCHEMES_PROPERTY, DEFAULT_ALLOWED_URL_SCHEMES);
+        for (String allowed : allowedSchemes.split(",")) {
+            if (scheme.toLowerCase(Locale.ROOT).equals(allowed.trim().toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
