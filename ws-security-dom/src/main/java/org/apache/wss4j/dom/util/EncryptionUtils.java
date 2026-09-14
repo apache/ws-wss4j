@@ -54,7 +54,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class EncryptionUtils {
 
@@ -349,14 +351,21 @@ public final class EncryptionUtils {
 
             Attachment resultAttachment = new Attachment();
             resultAttachment.setId(attachment.getId());
-            resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
             resultAttachment.setSourceStream(attachmentInputStream);
-            resultAttachment.addHeaders(attachment.getHeaders());
 
             String typeStr = encData.getAttributeNS(null, "Type");
             if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr)) {
-                AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
-                        resultAttachment.getHeaders(), attachmentInputStream);
+                Map<String, String> protectedHeaders = new HashMap<>();
+                AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(protectedHeaders, attachmentInputStream);
+                String contentType = protectedHeaders.get(AttachmentUtils.MIME_HEADER_CONTENT_TYPE);
+                if (contentType == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                resultAttachment.setMimeType(contentType);
+                resultAttachment.addHeaders(protectedHeaders);
+            } else {
+                resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
+                resultAttachment.addHeaders(attachment.getHeaders());
             }
 
             AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
