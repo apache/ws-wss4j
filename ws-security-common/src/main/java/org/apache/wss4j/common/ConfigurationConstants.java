@@ -848,6 +848,15 @@ public class ConfigurationConstants {
      * of regular expressions which will be applied to the subject DN of the certificate used for signature
      * validation, after trust verification of the certificate chain associated with the
      * certificate.
+     * <p/>
+     * The use-case this is intended for is where a CA certificate is configured in the truststore,
+     * and so every certificate issued by that CA would otherwise be accepted for signature
+     * validation. The constraints restrict this to the subject DNs that are actually expected.
+     * <p/>
+     * It follows that these constraints are only applied when a certificate chain has been
+     * constructed and validated for the certificate. They are not applied to a certificate that is
+     * trusted directly, in other words one that is itself stored in the keystore or truststore, as
+     * in that case trust has already been established for that individual certificate.
      */
     public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
 
