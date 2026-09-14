@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -359,17 +360,24 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
             Attachment resultAttachment = new Attachment();
             resultAttachment.setId(attachment.getId());
-            resultAttachment.setMimeType(encryptedDataType.getMimeType());
             resultAttachment.setSourceStream(attachmentInputStream);
-            resultAttachment.addHeaders(attachment.getHeaders());
 
             if (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(encryptedDataType.getType())) {
+                Map<String, String> protectedHeaders = new HashMap<>();
                 try {
-                    AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
-                        resultAttachment.getHeaders(), attachmentInputStream);
+                    AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(protectedHeaders, attachmentInputStream);
                 } catch (IOException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
+                String contentType = protectedHeaders.get(AttachmentUtils.MIME_HEADER_CONTENT_TYPE);
+                if (contentType == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
+                resultAttachment.setMimeType(contentType);
+                resultAttachment.addHeaders(protectedHeaders);
+            } else {
+                resultAttachment.setMimeType(encryptedDataType.getMimeType());
+                resultAttachment.addHeaders(attachment.getHeaders());
             }
 
             AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
