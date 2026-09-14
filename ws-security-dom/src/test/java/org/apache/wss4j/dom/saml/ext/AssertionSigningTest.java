@@ -24,6 +24,7 @@ import java.security.KeyStore;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -81,8 +82,7 @@ public class AssertionSigningTest {
         input.close();
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
 
-        dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        dbf = SecureDocumentBuilderFactory.newNSInstance();
     }
 
     /**

@@ -21,7 +21,10 @@ package org.apache.wss4j.common.util;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import jakarta.xml.soap.MessageFactory;
+
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -41,15 +44,14 @@ public class SOAPUtil {
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SOAPUtil.class);
 
-    private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    private static DocumentBuilderFactory factory = SecureDocumentBuilderFactory.newNSInstance();
     private static MessageFactory saajFactory = null;
 
     static {
-        factory.setNamespaceAware(true);
         try {
             saajFactory = MessageFactory.newInstance();
         } catch (Exception e) {
-            LOG.debug("can't create SAAJ MessageFactory", e);
+            LOG.debug("Can't create SAAJ MessageFactory", e);
         }
     }
 

@@ -35,6 +35,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -1029,8 +1030,7 @@ public class SamlTokenTest {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         Document doc = dbf.newDocumentBuilder().newDocument();
         String assertionString = DOM2Writer.nodeToString(samlAssertion.toDOM(doc));
 
@@ -1059,8 +1059,7 @@ public class SamlTokenTest {
         // Convert String to DOM + into an assertionWrapper
         InputStream in = new ByteArrayInputStream(assertionString.getBytes());
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        DocumentBuilderFactory dbf = SecureDocumentBuilderFactory.newNSInstance();
         Document newDoc = dbf.newDocumentBuilder().parse(in);
 
         SamlAssertionWrapper newAssertion =

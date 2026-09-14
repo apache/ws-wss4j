@@ -202,6 +202,11 @@
                  <artifactId>jakarta.xml.bind-api</artifactId>
                  <version>${xml.bind.api.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-secure-xml</artifactId>
+                <version>1.0.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

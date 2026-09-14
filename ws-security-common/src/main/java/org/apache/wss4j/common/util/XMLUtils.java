@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -44,7 +43,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
 import org.xml.sax.InputSource;
+
+import org.apache.commons.xml.secure.SecureTransformerFactory;
 
 public final class XMLUtils {
 
@@ -139,16 +141,7 @@ public final class XMLUtils {
         throws TransformerException {
         DOMSource source = new DOMSource(element);
         StreamResult result = new StreamResult(out);
-
-        TransformerFactory transFactory = TransformerFactory.newInstance();
-        transFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        try {
-            transFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            transFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-        } catch (IllegalArgumentException ex) { //NOPMD
-            // ignore
-        }
-
+        TransformerFactory transFactory = SecureTransformerFactory.newInstance();
         Transformer transformer = transFactory.newTransformer();
         transformer.transform(source, result);
     }

@@ -42,6 +42,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
+import org.apache.commons.xml.secure.SecureTransformerFactory;
+import org.apache.commons.xml.secure.SecureXMLInputFactory;
 import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
@@ -90,8 +93,8 @@ public class KerberosTest {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosTest.class);
 
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    private static final XMLInputFactory xmlInputFactory = SecureXMLInputFactory.newInstance();
+    private static final TransformerFactory TRANSFORMER_FACTORY = SecureTransformerFactory.newInstance();
     private static DocumentBuilderFactory dbf;
 
     private static boolean runTests = true;
@@ -135,8 +138,7 @@ public class KerberosTest {
             runTests = false;
         }
 
-        dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+        dbf = SecureDocumentBuilderFactory.newNSInstance();
         dbf.setIgnoringComments(false);
         dbf.setCoalescing(false);
         dbf.setIgnoringElementContentWhitespace(false);
