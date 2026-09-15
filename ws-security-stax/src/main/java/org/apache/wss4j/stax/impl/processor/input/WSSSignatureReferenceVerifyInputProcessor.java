@@ -77,6 +77,7 @@ import org.apache.xml.security.utils.UnsyncBufferedOutputStream;
 
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
+    private InternalSignatureReferenceVerifier completedReferenceVerifier;
     private boolean replayChecked = false;
 
     public WSSSignatureReferenceVerifyInputProcessor(InputProcessorChain inputProcessorChain,
@@ -276,8 +277,15 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     protected void processElementPath(List<QName> elementPath, InputProcessorChain inputProcessorChain,
                                       XMLSecEvent xmlSecEvent, ReferenceType referenceType)
             throws XMLSecurityException {
-        //fire a SecurityEvent:
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
+        if (completedReferenceVerifier != null) {
+            //The verifier never joined the chain, so it won't remove its own "in signed content" marker:
+            //drop it (re-registering first, in case none was) or isInSignedContent() stays true forever.
+            documentContext.setIsInSignedContent(-1, completedReferenceVerifier);
+            documentContext.unsetIsInSignedContent(completedReferenceVerifier);
+            completedReferenceVerifier = null;
+        }
+        //fire a SecurityEvent:
         if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)
                 || elementPath.size() == 2 && WSSUtils.isInSOAPBody(elementPath)) {
             SignedPartSecurityEvent signedPartSecurityEvent =
@@ -417,9 +425,12 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
             }
             SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
-            //todo analyse and fix me: the following statement could be problematic
-            int index = inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier);
-            inputProcessorChain.getDocumentContext().setIsInSignedContent(index, internalSignatureReferenceVerifier);
+            //We are called from the constructor of the verifier, so it is not part of the processor
+            //chain yet and indexOf() returns -1. The marker is only registered so that the verifier
+            //has something to remove again when it is done with the buffered events below.
+            inputProcessorChain.getDocumentContext().setIsInSignedContent(
+                    inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier),
+                    internalSignatureReferenceVerifier);
             XMLSecStartElement xmlSecStartElement = securityTokenReference.getXmlSecEvents().getLast().asStartElement();
             internalSignatureReferenceVerifier.setStartElement(xmlSecStartElement);
             Iterator<XMLSecEvent> xmlSecEventIterator = securityTokenReference.getXmlSecEvents().descendingIterator();
@@ -429,6 +440,11 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 }
             } catch (XMLStreamException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            if (internalSignatureReferenceVerifier.isFinished()) {
+                // Verified from the buffered events above, so the verifier never joins the chain.
+                // Remember it for processElementPath(), which drops the marker registered for it.
+                completedReferenceVerifier = internalSignatureReferenceVerifier;
             }
         }
         return parentTransformer;
