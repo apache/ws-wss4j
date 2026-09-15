@@ -21,11 +21,12 @@ package org.apache.wss4j.common.crypto;
 
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 public final class BouncyCastleUtils {
+    private static final byte TYPE_CONTEXT_SPECIFIC_0 = (byte)0x80;
+    private static final byte TYPE_CONTEXT_SPECIFIC_1 = (byte)0xA1;
+    private static final byte TYPE_CONTEXT_SPECIFIC_2 = (byte)0x82;
 
     private BouncyCastleUtils() {
         // complete
@@ -33,27 +34,68 @@ public final class BouncyCastleUtils {
 
     public static byte[] getAuthorityKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.35"); //NOPMD
-        if (extensionValue != null) {
-            byte[] octets = ASN1OctetString.getInstance(extensionValue).getOctets();
-            AuthorityKeyIdentifier authorityKeyIdentifier =
-                AuthorityKeyIdentifier.getInstance(octets);
-            return authorityKeyIdentifier.getKeyIdentifier();
+        if (extensionValue == null) {
+            return new byte[0];
         }
-        return new byte[0];
+        return getAuthorityKeyIdentifierBytes(extensionValue);
     }
 
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.14"); //NOPMD
-        if (extensionValue != null) {
-            byte[] subjectOctets =
-                ASN1OctetString.getInstance(extensionValue).getOctets();
-            SubjectKeyIdentifier subjectKeyIdentifier =
-                SubjectKeyIdentifier.getInstance(subjectOctets);
-            return subjectKeyIdentifier.getKeyIdentifier();
+        if (extensionValue == null) {
+            return new byte[0];
         }
-        return new byte[0];
+        return getSubjectKeyIdentifierBytes(extensionValue);
+    }
+
+    static byte[] getAuthorityKeyIdentifierBytes(byte[] extensionValue) {
+        try {
+            byte[] extensionBytes = readExtensionValue(extensionValue, DERDecoder.TYPE_SEQUENCE);
+            if (extensionBytes.length == 0) {
+                return null; //NOPMD - AuthorityKeyIdentifier#getKeyIdentifier returns null when absent
+            }
+            DERDecoder authorityKeyIdentifier = new DERDecoder(extensionBytes);
+            byte[] keyIdentifier = readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_0);
+            readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_1);
+            readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_2);
+            authorityKeyIdentifier.expectEnd();
+            return keyIdentifier;
+        } catch (WSSecurityException ex) {
+            throw new IllegalArgumentException("Invalid AuthorityKeyIdentifier extension", ex);
+        }
+    }
+
+    static byte[] getSubjectKeyIdentifierBytes(byte[] extensionValue) {
+        try {
+            return readExtensionValue(extensionValue, DERDecoder.TYPE_OCTET_STRING);
+        } catch (WSSecurityException ex) {
+            throw new IllegalArgumentException("Invalid SubjectKeyIdentifier extension", ex);
+        }
+    }
+
+    private static byte[] readExtensionValue(byte[] extensionValue, byte extensionType)
+        throws WSSecurityException {
+        DERDecoder extension = new DERDecoder(extensionValue);
+        extension.expect(DERDecoder.TYPE_OCTET_STRING);
+        int extensionLength = extension.getLength();
+        byte[] extensionBytes = extension.getBytes(extensionLength);
+        extension.expectEnd();
+
+        DERDecoder extensionContents = new DERDecoder(extensionBytes);
+        extensionContents.expect(extensionType);
+        int extensionContentsLength = extensionContents.getLength();
+        byte[] contents = extensionContents.getBytes(extensionContentsLength);
+        extensionContents.expectEnd();
+        return contents;
+    }
+
+    private static byte[] readOptionalValue(DERDecoder decoder, byte type) throws WSSecurityException {
+        if (!decoder.hasRemaining() || !decoder.test(type)) {
+            return null; //NOPMD - an absent optional value is distinct from an empty value
+        }
+        decoder.expect(type);
+        int length = decoder.getLength();
+        return decoder.getBytes(length);
     }
 
 }
-
-
