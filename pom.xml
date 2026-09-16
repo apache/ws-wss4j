@@ -216,6 +216,7 @@
                         <compilerArgs>
                             <arg>-XDcompilePolicy=simple</arg>
                         </compilerArgs>
+                        <!-- TODO Re-enable once we pick up Java 21+
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>com.google.errorprone</groupId>
@@ -223,6 +224,7 @@
                                 <version>2.38.0</version>
                             </path>
                         </annotationProcessorPaths>
+                        -->
                     </configuration>
                 </plugin>
                 <plugin>
