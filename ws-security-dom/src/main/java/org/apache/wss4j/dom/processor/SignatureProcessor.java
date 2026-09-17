@@ -19,15 +19,19 @@
 
 package org.apache.wss4j.dom.processor;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -374,12 +378,21 @@ public class SignatureProcessor implements Processor {
             }
 
             // Test for replay attacks
-            testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
+            ReplayCacheEntry replayCacheEntry =
+                testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
 
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo);
 
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
+                // Only now that the signature has actually been validated may the identifier be
+                // added to the replay cache. Adding it beforehand lets an attacker poison the
+                // cache with the identifier of a message whose signature does not verify - by
+                // replaying a genuine message with a tampered payload, for example - so that the
+                // genuine message is subsequently rejected as a replay.
+                if (replayCacheEntry != null) {
+                    replayCacheEntry.add();
+                }
                 return xmlSignature;
             }
             //
@@ -625,16 +638,18 @@ public class SignatureProcessor implements Processor {
     }
 
     /**
-     * Test for a replayed message. The cache key is the Timestamp Created String, the signature
+     * Test for a replayed message. The cache key is the Timestamp Created value, the signature
      * value, and the encoded value of the signing key.
      * @param signatureElement
      * @param signatureValue
      * @param key
      * @param requestData
      * @param wsDocInfo
+     * @return a pending ReplayCacheEntry, to be added to the cache once the signature has been
+     *         validated, or null if no replay checking was performed
      * @throws WSSecurityException
      */
-    private void testMessageReplay(
+    private ReplayCacheEntry testMessageReplay(
         Element signatureElement,
         byte[] signatureValue,
         Key key,
@@ -643,7 +658,7 @@ public class SignatureProcessor implements Processor {
     ) throws WSSecurityException {
         ReplayCache replayCache = requestData.getTimestampReplayCache();
         if (replayCache == null) {
-            return;
+            return null;
         }
 
         // Find the Timestamp
@@ -665,12 +680,21 @@ public class SignatureProcessor implements Processor {
             timeStamp = (Timestamp)foundResults.get(0).get(WSSecurityEngineResult.TAG_TIMESTAMP);
         }
         if (timeStamp == null) {
-            return;
+            return null;
         }
 
-        // Test for replay attacks
-        String identifier = timeStamp.getCreatedString() + "" + Arrays.hashCode(signatureValue)
-            + "" + Arrays.hashCode(key.getEncoded());
+        // Test for replay attacks. The identifier is a digest over the full Timestamp Created
+        // value, signature value and encoded signing key, rather than over the 32-bit hashCodes
+        // of the latter two, which are trivially collidable.
+        //
+        // The parsed Created value is used rather than the raw element text, so that two Created
+        // Strings denoting the same instant - a trailing ".000", or a "+00:00" offset written in
+        // place of "Z" - cannot produce two different identifiers. Where the Timestamp is not
+        // itself covered by the Signature that rewriting is attacker-controlled, and would
+        // otherwise be enough to slip a replayed message past the cache.
+        Instant created = timeStamp.getCreated();
+        String identifier =
+            createIdentifier(created != null ? created.toString() : "", signatureValue, key);
 
         if (replayCache.contains(identifier)) {
             throw new WSSecurityException(
@@ -679,11 +703,60 @@ public class SignatureProcessor implements Processor {
                 new Object[] {"A replay attack has been detected"});
         }
 
-        // Store the Timestamp/SignatureValue/Key combination in the cache
-        if (timeStamp.getExpires() != null) {
-            replayCache.add(identifier, timeStamp.getExpires());
-        } else {
-            replayCache.add(identifier);
+        // Return the Timestamp/SignatureValue/Key combination so that it can be stored in the
+        // cache once the signature has been validated
+        return new ReplayCacheEntry(replayCache, identifier, timeStamp.getExpires());
+    }
+
+    /**
+     * Create the replay cache identifier for the given Timestamp Created value, signature value
+     * and signing key. The values are separated by a '|', which can appear in neither a Created
+     * value nor Base64, so that they cannot run together into an ambiguous identifier.
+     */
+    private static String createIdentifier(
+        String createdString, byte[] signatureValue, Key key
+    ) throws WSSecurityException {
+        // getEncoded() returns null for a key whose material cannot be extracted, for example one
+        // held in a hardware token. The signature value alone still identifies the message then.
+        byte[] keyBytes = key.getEncoded();
+        String identifier = createdString
+            + "|" + encode(signatureValue)
+            + "|" + encode(keyBytes);
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return encode(digest.digest(identifier.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
+    }
+
+    private static String encode(byte[] value) {
+        return value == null ? "" : Base64.getEncoder().encodeToString(value);
+    }
+
+    /**
+     * A pending replay cache addition: the Timestamp/SignatureValue/Key identifier of the current
+     * message, to be added to the ReplayCache only once the signature it was derived from has
+     * been successfully validated.
+     */
+    private static final class ReplayCacheEntry {
+        private final ReplayCache replayCache;
+        private final String identifier;
+        private final Instant expires;
+
+        ReplayCacheEntry(ReplayCache replayCache, String identifier, Instant expires) {
+            this.replayCache = replayCache;
+            this.identifier = identifier;
+            this.expires = expires;
+        }
+
+        void add() {
+            if (expires != null) {
+                replayCache.add(identifier, expires);
+            } else {
+                replayCache.add(identifier);
+            }
         }
     }
 
