@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -50,6 +51,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -110,6 +112,97 @@ public class ReplayTest extends AbstractTestBase {
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+                assertEquals("The message has expired", e.getCause().getMessage());
+            }
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * A message whose Signature fails to verify must not leave its identifier in the replay
+     * cache. Otherwise an attacker can take a genuine message, tamper with a signed part of it so
+     * that a Reference no longer verifies, and send that first: the tampered message is rejected,
+     * but it has claimed the genuine message's identifier - the Timestamp and SignatureValue are
+     * untouched - so the genuine message is then rejected as a replay when it arrives.
+     */
+    @Test
+    public void testReplayCacheNotPoisonedByInvalidSignature() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS,
+                    "{Element}{" + WSConstants.WSU_NS + "}Timestamp;"
+                    + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        String genuineMessage = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+
+        // Alter a signed part of the SOAP Body. The Timestamp and the SignatureValue - which
+        // together are the whole replay cache identifier - are left exactly as they are in the
+        // genuine message.
+        String tamperedMessage =
+                genuineMessage.replace("comprehensive types test", "comprehensive types TEST");
+        assertNotEquals(genuineMessage, tamperedMessage, "The signed SOAP Body was not modified");
+
+        ReplayCache replayCache = createCache("wss4j.timestamp.cache-");
+
+        //the tampered message must be rejected, as one of its References no longer verifies
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setTimestampReplayCache(replayCache);
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(tamperedMessage.getBytes(StandardCharsets.UTF_8))));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+            }
+        }
+
+        //...and it must not have cached the genuine message's identifier on its way out
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setTimestampReplayCache(replayCache);
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(genuineMessage.getBytes(StandardCharsets.UTF_8))));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(),
+                                                                WSSConstants.TAG_dsig_Signature.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+        }
+
+        //replay detection must still work for the genuine message itself
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setTimestampReplayCache(replayCache);
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(genuineMessage.getBytes(StandardCharsets.UTF_8))));
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

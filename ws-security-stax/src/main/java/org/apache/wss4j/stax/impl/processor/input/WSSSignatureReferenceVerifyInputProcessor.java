@@ -22,9 +22,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,6 +81,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
     private InternalSignatureReferenceVerifier completedReferenceVerifier;
     private boolean replayChecked = false;
+    private ReplayCacheEntry pendingReplayCacheEntry;
 
     public WSSSignatureReferenceVerifyInputProcessor(InputProcessorChain inputProcessorChain,
             SignatureType signatureType, InboundSecurityToken inboundSecurityToken,
@@ -268,9 +271,29 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         //this is the earliest possible point to check for an replay attack
         if (!replayChecked) {
             replayChecked = true;
-            detectReplayAttack(inputProcessorChain);
+            pendingReplayCacheEntry = detectReplayAttack(inputProcessorChain);
         }
         return super.processEvent(inputProcessorChain);
+    }
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        super.doFinal(inputProcessorChain);
+
+        // Every Reference digest has been verified by the time super.doFinal() returns, so this is
+        // the first point at which the signature is known to be good as a whole. Only now may the
+        // identifier be added to the replay cache: adding it while the content was still streaming
+        // let an attacker poison the cache with the identifier of a message whose references do
+        // not verify, so that the genuine message was afterwards rejected as a replay.
+        if (pendingReplayCacheEntry == null) {
+            // A Timestamp that follows the Signature in the security header had not been processed
+            // yet when the check first ran, but it has been by now.
+            pendingReplayCacheEntry = detectReplayAttack(inputProcessorChain);
+        }
+        if (pendingReplayCacheEntry != null) {
+            pendingReplayCacheEntry.add();
+            pendingReplayCacheEntry = null;
+        }
     }
 
     @Override
@@ -312,25 +335,70 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 inputProcessorChain, referenceType, startElement);
     }
 
-    private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
+    /**
+     * Test for a replayed message. Returns a pending ReplayCacheEntry, to be added to the cache
+     * once every Reference has been verified, or null if no replay checking was performed.
+     */
+    private ReplayCacheEntry detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
         TimestampSecurityEvent timestampSecurityEvent =
                 inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
         ReplayCache replayCache =   //NOPMD
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
-        if (timestampSecurityEvent != null && replayCache != null) {
-            final String cacheKey =
-                    timestampSecurityEvent.getCreated().get(ChronoField.MILLI_OF_SECOND)
-                    + "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
-            if (replayCache.contains(cacheKey)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
-            }
+        if (timestampSecurityEvent == null || replayCache == null) {
+            return null;
+        }
 
-            // Store the Timestamp/SignatureValue combination in the cache
-            Instant expires = timestampSecurityEvent.getExpires();
+        final String cacheKey = createIdentifier(timestampSecurityEvent.getCreated(),
+                                                 getSignatureType().getSignatureValue().getValue());
+        if (replayCache.contains(cacheKey)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
+
+        // Return the Timestamp/SignatureValue combination so that it can be stored in the cache
+        // once the signature has been verified
+        return new ReplayCacheEntry(replayCache, cacheKey, timestampSecurityEvent.getExpires());
+    }
+
+    /**
+     * Create the replay cache identifier for the given Timestamp Created value and signature
+     * value. The two are separated by a '|', which can appear in neither a Created value nor
+     * Base64, so that they cannot run together into an ambiguous identifier.
+     */
+    private static String createIdentifier(Instant created, byte[] signatureValue) throws WSSecurityException {
+        String identifier = (created != null ? created.toString() : "") + "|" + encode(signatureValue);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return encode(digest.digest(identifier.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
+    }
+
+    private static String encode(byte[] value) {
+        return value == null ? "" : Base64.getEncoder().encodeToString(value);
+    }
+
+    /**
+     * A pending replay cache addition: the Timestamp/SignatureValue identifier of the current
+     * message, to be added to the ReplayCache only once the signature it was derived from has
+     * been successfully verified.
+     */
+    private static final class ReplayCacheEntry {
+        private final ReplayCache replayCache;
+        private final String identifier;
+        private final Instant expires;
+
+        ReplayCacheEntry(ReplayCache replayCache, String identifier, Instant expires) {
+            this.replayCache = replayCache;
+            this.identifier = identifier;
+            this.expires = expires;
+        }
+
+        void add() {
             if (expires != null) {
-                replayCache.add(cacheKey, expires);
+                replayCache.add(identifier, expires);
             } else {
-                replayCache.add(cacheKey);
+                replayCache.add(identifier);
             }
         }
     }
