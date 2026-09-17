@@ -144,10 +144,16 @@ public class UsernameTokenProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
 
-        // Test for replay attacks
-        ReplayCache replayCache = data.getNonceReplayCache();
+        // Test for replay attacks. The cache is keyed on the canonical form of the Nonce rather
+        // than on its raw element text: the Nonce is base64 and is decoded before it is used to
+        // verify the password digest, so a replayed token whose Nonce has merely been rewritten
+        // into an equivalent encoding would otherwise miss the cache and be accepted again.
+        ReplayCache replayCache = data.getNonceReplayCache();   //NOPMD
+        String nonceIdentifier = null;
+        Instant nonceExpiry = null;
         if (replayCache != null && ut.getNonce() != null) {
-            if (replayCache.contains(ut.getNonce())) {
+            nonceIdentifier = UsernameTokenUtil.getCanonicalNonce(ut.getNonce());
+            if (replayCache.contains(nonceIdentifier)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badUsernameToken",
@@ -159,17 +165,26 @@ public class UsernameTokenProcessor implements Processor {
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
             Instant created = ut.getCreatedDate();
-            if (created == null || utTTL <= 0) {
-                replayCache.add(ut.getNonce());
-            } else {
-                replayCache.add(ut.getNonce(), Instant.now().plusSeconds(utTTL));
+            if (created != null && utTTL > 0) {
+                nonceExpiry = Instant.now().plusSeconds(utTTL);
             }
         }
 
         Credential credential = new Credential();
         credential.setUsernametoken(ut);
         if (validator != null) {
-            return validator.validate(credential, data);
+            credential = validator.validate(credential, data);
+        }
+
+        // Only cache the Nonce once the token has actually been validated. Caching it beforehand
+        // lets an attacker poison the cache with the Nonce of a token whose password does not
+        // verify, so that the genuine token is subsequently rejected as a replay.
+        if (nonceIdentifier != null) {
+            if (nonceExpiry != null) {
+                replayCache.add(nonceIdentifier, nonceExpiry);
+            } else {
+                replayCache.add(nonceIdentifier);
+            }
         }
         return credential;
     }
