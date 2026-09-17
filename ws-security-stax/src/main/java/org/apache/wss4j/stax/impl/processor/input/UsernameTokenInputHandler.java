@@ -26,6 +26,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -79,10 +80,16 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();  //NOPMD
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
+        String nonceIdentifier = null;
+        Instant nonceExpiry = null;
         if (encodedNonce != null && replayCache != null) {
-            // Check for replay attacks
-            String nonce = encodedNonce.getValue();
-            if (replayCache.contains(nonce)) {
+            // Check for replay attacks. The cache is keyed on the canonical form of the Nonce
+            // rather than on its raw element text: the Nonce is base64 and is decoded before it is
+            // used to verify the password digest, so a replayed token whose Nonce has merely been
+            // rewritten into an equivalent encoding would otherwise miss the cache and be accepted
+            // again.
+            nonceIdentifier = UsernameTokenUtil.getCanonicalNonce(encodedNonce.getValue());
+            if (replayCache.contains(nonceIdentifier)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
 
@@ -90,10 +97,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
             int utTTL = wssSecurityProperties.getUtTTL();
-            if (created == null || utTTL <= 0) {
-                replayCache.add(nonce);
-            } else {
-                replayCache.add(nonce, Instant.now().plusSeconds(utTTL));
+            if (created != null && utTTL > 0) {
+                nonceExpiry = Instant.now().plusSeconds(utTTL);
             }
         }
 
@@ -111,6 +116,17 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
         final UsernameSecurityToken usernameSecurityToken =
                 usernameTokenValidator.validate(usernameTokenType, tokenContext);
+
+        // Only cache the Nonce once the token has actually been validated. Caching it beforehand
+        // lets an attacker poison the cache with the Nonce of a token whose password does not
+        // verify, so that the genuine token is subsequently rejected as a replay.
+        if (nonceIdentifier != null) {
+            if (nonceExpiry != null) {
+                replayCache.add(nonceIdentifier, nonceExpiry);
+            } else {
+                replayCache.add(nonceIdentifier);
+            }
+        }
 
         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
                 new SecurityTokenProvider<InboundSecurityToken>() {

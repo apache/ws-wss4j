@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -201,5 +202,31 @@ public final class UsernameTokenUtil {
             );
         }
         return pwCb.getPassword();
+    }
+
+    /**
+     * Get the canonical form of the given Nonce, for use as a replay cache key.
+     *
+     * The Nonce is base64, and every other part of the stack decodes it before use, so two Nonces
+     * that decode to the same bytes are the same Nonce however they happen to be written. The
+     * decoder ignores whitespace and any other character outside the base64 alphabet, and does not
+     * reject non-zero unused trailing bits, so one Nonce has many valid encodings. Keying the
+     * replay cache on the raw element text would let a replayed message escape detection simply by
+     * rewriting its Nonce into an equivalent encoding.
+     *
+     * @param nonce the Nonce exactly as it appeared in the message
+     * @return the same Nonce re-encoded in canonical base64
+     * @throws WSSecurityException if the Nonce is not valid base64
+     */
+    public static String getCanonicalNonce(String nonce) throws WSSecurityException {
+        try {
+            return Base64.getEncoder().encodeToString(
+                org.apache.xml.security.utils.XMLUtils.decode(nonce));
+        } catch (IllegalArgumentException ex) {
+            LOG.debug(ex.getMessage(), ex);
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY, ex, "badUsernameToken",
+                new Object[] {"The Nonce is not valid Base-64"});
+        }
     }
 }
