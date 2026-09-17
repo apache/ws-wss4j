@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.message;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -55,6 +57,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -549,6 +552,121 @@ public class ReplayTest {
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
+    /**
+     * The Nonce replay cache must be keyed on the decoded Nonce, not on the raw text of the Nonce
+     * element. Base64 decoding ignores whitespace, so a replayed token whose Nonce has merely been
+     * line-wrapped still authenticates - the password digest is computed over the decoded bytes -
+     * and must still be detected as a replay.
+     */
+    @Test
+    public void testReplayedUsernameTokenWithEquivalentNonceEncoding() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document signedDoc = builder.build();
+
+        String genuineMessage = XMLUtils.prettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(genuineMessage);
+        }
+
+        Matcher matcher = Pattern.compile("(<[^>]*Nonce[^>]*>)([^<]*)(</)").matcher(genuineMessage);
+        assertTrue(matcher.find(), "No Nonce element was found");
+        String nonce = matcher.group(2);
+
+        // Wrap the Nonce across two lines. Base64 decoding ignores the newline, so this Nonce
+        // decodes to exactly the same bytes and the password digest still verifies.
+        String equivalentNonce = nonce.substring(0, 4) + "\n" + nonce.substring(4);
+        assertNotEquals(nonce, equivalentNonce);
+        assertArrayEquals(org.apache.xml.security.utils.XMLUtils.decode(nonce),
+                          org.apache.xml.security.utils.XMLUtils.decode(equivalentNonce),
+                          "The rewritten Nonce must decode to the same bytes");
+
+        String replayedMessage = genuineMessage.substring(0, matcher.start(2))
+            + equivalentNonce + genuineMessage.substring(matcher.end(2));
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setCallbackHandler(new UsernamePasswordCallbackHandler());
+        data.setWssConfig(wssConfig);
+        data.setNonceReplayCache(new MemoryReplayCache());
+
+        // Successfully verify the genuine UsernameToken
+        verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+
+        // The rewritten Nonce decodes to the same bytes, so this is a replay
+        try {
+            verify(SOAPUtil.toSOAPPart(replayedMessage), wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+        }
+    }
+
+    /**
+     * A UsernameToken whose password fails to verify must not leave its Nonce in the replay cache.
+     * Otherwise an attacker can replay a genuine token with a corrupted Password and send that
+     * first: it is rejected, but it has claimed the genuine token's Nonce, so the genuine token is
+     * then rejected as a replay when it arrives.
+     */
+    @Test
+    public void testNonceCacheNotPoisonedByInvalidPassword() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document signedDoc = builder.build();
+
+        String genuineMessage = XMLUtils.prettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(genuineMessage);
+        }
+
+        // Corrupt the password digest, leaving the Nonce - the whole cache key - untouched
+        Matcher matcher =
+            Pattern.compile("(<[^>]*Password[^>]*>)([^<]*)(</)").matcher(genuineMessage);
+        assertTrue(matcher.find(), "No Password element was found");
+        String password = matcher.group(2);
+        String corruptedPassword =
+            (password.charAt(0) == 'A' ? "B" : "A") + password.substring(1);
+
+        String tamperedMessage = genuineMessage.substring(0, matcher.start(2))
+            + corruptedPassword + genuineMessage.substring(matcher.end(2));
+        assertNotEquals(genuineMessage, tamperedMessage);
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setCallbackHandler(new UsernamePasswordCallbackHandler());
+        data.setWssConfig(wssConfig);
+        data.setNonceReplayCache(new MemoryReplayCache());
+
+        // The tampered token must be rejected, as its password digest no longer verifies
+        try {
+            verify(SOAPUtil.toSOAPPart(tamperedMessage), wssConfig, data);
+            fail("Expected failure on a tampered UsernameToken");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, ex.getErrorCode());
+        }
+
+        // ...and it must not have cached the genuine token's Nonce on its way out
+        verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+
+        // Replay detection must still work for the genuine token itself
+        try {
+            verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
         }
     }
 
