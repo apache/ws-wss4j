@@ -55,6 +55,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -127,6 +129,137 @@ public class ReplayTest {
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
+    /**
+     * A message whose Signature fails to validate must not leave its identifier in the replay
+     * cache. Otherwise an attacker can take a genuine message, tamper with a signed part of it so
+     * that the Signature no longer validates, and send that first: the tampered message is
+     * rejected, but it has claimed the genuine message's replay cache identifier - the Timestamp,
+     * SignatureValue and signing key are untouched - so the genuine message is then rejected as a
+     * replay when it arrives.
+     */
+    @Test
+    public void testReplayCacheNotPoisonedByInvalidSignature() throws Exception {
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        // Sign the Timestamp and the SOAP Body. The Body is what gets tampered with below; the
+        // Timestamp, SignatureValue and signing key - the values the replay cache identifier is
+        // derived from - are left exactly as they are in the genuine message.
+        builder.getParts().add(new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, ""));
+        builder.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(createdDoc));
+
+        builder.prepare(crypto);
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
+            builder.addReferencesToSign(builder.getParts());
+
+        builder.computeSignature(referenceList, false, null);
+
+        String genuineMessage = XMLUtils.prettyDocumentToString(createdDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(genuineMessage);
+        }
+
+        String tamperedMessage = genuineMessage.replace(">15<", ">16<");
+        assertNotEquals(genuineMessage, tamperedMessage, "The signed SOAP Body was not modified");
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        data.setTimestampReplayCache(new MemoryReplayCache());
+
+        // The tampered message must be rejected, as its Signature no longer validates
+        try {
+            verify(SOAPUtil.toSOAPPart(tamperedMessage), wssConfig, data);
+            fail("Expected failure on a tampered message");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, ex.getErrorCode());
+        }
+
+        // ...and it must not have cached the genuine message's identifier on its way out
+        verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+
+        // Replay detection must still work for the genuine message itself
+        try {
+            verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+        }
+    }
+
+    /**
+     * The replay cache identifier must be derived from the parsed Created value, not from the raw
+     * text of the Created element. "Z" and "+00:00" denote the same instant, so a message whose
+     * Created value has merely been rewritten from one to the other is a replay, and must be
+     * rejected as one. Where the Signature does not cover the Timestamp - as here, only the SOAP
+     * Body is signed - that rewriting costs an attacker nothing.
+     */
+    @Test
+    public void testReplayedTimestampWithEquivalentCreatedValue() throws Exception {
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        // Sign the SOAP Body only, leaving the Timestamp unprotected
+        builder.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(createdDoc));
+
+        builder.prepare(crypto);
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
+            builder.addReferencesToSign(builder.getParts());
+
+        builder.computeSignature(referenceList, false, null);
+
+        String genuineMessage = XMLUtils.prettyDocumentToString(createdDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(genuineMessage);
+        }
+
+        // Rewrite the Created value's trailing "Z" as the equivalent "+00:00" offset. The
+        // Signature still validates, as it does not cover the Timestamp.
+        String replayedMessage =
+            genuineMessage.replaceFirst("(<[^>]*Created[^>]*>[^<]*)Z(</)", "$1+00:00$2");
+        assertNotEquals(genuineMessage, replayedMessage, "The Created value was not rewritten");
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        data.setTimestampReplayCache(new MemoryReplayCache());
+
+        // Successfully verify the genuine message
+        verify(SOAPUtil.toSOAPPart(genuineMessage), wssConfig, data);
+
+        // The rewritten message denotes the same Created instant, so it is a replay
+        try {
+            verify(SOAPUtil.toSOAPPart(replayedMessage), wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
         }
     }
 
