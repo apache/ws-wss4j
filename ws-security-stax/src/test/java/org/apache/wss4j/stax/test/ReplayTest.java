@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -50,6 +52,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -258,6 +261,82 @@ public class ReplayTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+            }
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * The Nonce replay cache must be keyed on the decoded Nonce, not on the raw text of the Nonce
+     * element. Base64 decoding ignores whitespace, so a replayed token whose Nonce has merely been
+     * line-wrapped still authenticates - the password digest is computed over the decoded bytes -
+     * and must still be detected as a replay.
+     */
+    @Test
+    public void testReplayedUsernameTokenWithEquivalentNonceEncoding() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.USERNAME_TOKEN;
+            Properties properties = new Properties();
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        String genuineMessage = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+
+        Matcher matcher = Pattern.compile("(<[^>]*Nonce[^>]*>)([^<]*)(</)").matcher(genuineMessage);
+        assertTrue(matcher.find(), "No Nonce element was found");
+        String nonce = matcher.group(2);
+
+        // Wrap the Nonce across two lines. Base64 decoding ignores the newline, so this Nonce
+        // decodes to exactly the same bytes and the password digest still verifies.
+        String equivalentNonce = nonce.substring(0, 4) + "\n" + nonce.substring(4);
+        assertNotEquals(nonce, equivalentNonce);
+        assertArrayEquals(org.apache.xml.security.utils.XMLUtils.decode(nonce),
+                          org.apache.xml.security.utils.XMLUtils.decode(equivalentNonce),
+                          "The rewritten Nonce must decode to the same bytes");
+
+        String replayedMessage = genuineMessage.substring(0, matcher.start(2))
+            + equivalentNonce + genuineMessage.substring(matcher.end(2));
+
+        ReplayCache replayCache = createCache("wss4j.nonce.cache-");
+
+        //the genuine UsernameToken must verify
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setNonceReplayCache(replayCache);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(genuineMessage.getBytes(StandardCharsets.UTF_8))));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(),
+                                                                WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
+            assertEquals(nodeList.getLength(), 1);
+        }
+
+        //the rewritten Nonce decodes to the same bytes, so this is a replay
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setNonceReplayCache(replayCache);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(replayedMessage.getBytes(StandardCharsets.UTF_8))));
 
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
