@@ -546,12 +546,21 @@ public class UsernameToken {
     }
 
     /**
-     * Returns the string representation of the token.
+     * Returns the string representation of the token, with the content of any wsse:Password
+     * redacted.
      *
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString(element);
+        Element redacted = (Element)element.cloneNode(true);
+        Element passwordElement =
+            XMLUtils.getDirectChildElement(
+                redacted, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
+            );
+        if (passwordElement != null) {
+            passwordElement.setTextContent("***");
+        }
+        return DOM2Writer.nodeToString(redacted);
     }
 
     /**
