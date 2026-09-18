@@ -26,12 +26,15 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.jupiter.api.Test;
+import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -43,9 +46,11 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A set of tests for using a derived key for encryption/signature.
@@ -407,6 +412,122 @@ public class DerivedKeyTest {
      * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
+    /**
+     * A derived key signature verified against an AlgorithmSuite that states a signature key
+     * derivation length. The requirement is denominated in bits and the wsc:Length of the
+     * DerivedKeyToken in bytes, and the two must agree exactly: 24 bytes satisfies the 192 bit
+     * requirement of the Basic256, Basic192 and TripleDes suites.
+     */
+    @Test
+    public void testSignatureAlgorithmSuiteDerivedKeyLength() throws Exception {
+        Document doc = signWithDerivedKey(24);
+
+        AlgorithmSuite algorithmSuite = createAlgorithmSuite();
+        algorithmSuite.setSignatureDerivedKeyLength(192);
+
+        verify(doc, algorithmSuite);
+    }
+
+    @Test
+    public void testSignatureAlgorithmSuiteDerivedKeyLengthMismatch() throws Exception {
+        Document doc = signWithDerivedKey(24);
+
+        AlgorithmSuite algorithmSuite = createAlgorithmSuite();
+        algorithmSuite.setSignatureDerivedKeyLength(256);
+
+        try {
+            verify(doc, algorithmSuite);
+            fail("Expected failure as the derived key length does not match the AlgorithmSuite");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+        }
+    }
+
+    /**
+     * Unless it is told otherwise, WSSecDKSign derives a key of KeyUtils.getKeyLength(sigAlgo)
+     * bytes, which for HMAC-SHA1 is 20 bytes - 160 bits. No standard WS-SecurityPolicy algorithm
+     * suite derives a 160 bit signature key: Basic128 requires 128 bits, and Basic192, Basic256
+     * and TripleDes all require 192. A message built with the default length is therefore
+     * rejected by a receiver enforcing any of them, and a sender under such a policy has to set
+     * the length from the suite in use (as Apache CXF does). This test pins that trap down rather
+     * than endorsing it - the derived key length is only checked at all once an AlgorithmSuite
+     * states a requirement, which WSHandler.decodeAlgorithmSuite never does.
+     */
+    @Test
+    public void testSignatureAlgorithmSuiteDefaultDerivedKeyLengthIsRejected() throws Exception {
+        for (int requiredKeyLength : new int[] {128, 192, 256}) {
+            Document doc = signWithDerivedKey(0);
+
+            AlgorithmSuite algorithmSuite = createAlgorithmSuite();
+            algorithmSuite.setSignatureDerivedKeyLength(requiredKeyLength);
+
+            try {
+                verify(doc, algorithmSuite);
+                fail("Expected the default 160 bit derived key to be rejected by a "
+                     + requiredKeyLength + " bit requirement");
+            } catch (WSSecurityException ex) {
+                assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+            }
+        }
+    }
+
+    /**
+     * Sign the SOAP Body with a key derived from an EncryptedKey.
+     *
+     * @param derivedKeyLength the wsc:Length to request, in bytes, or 0 to leave the builder's
+     *                         own default in place
+     */
+    private Document signWithDerivedKey(int derivedKeyLength) throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
+        encrKeyBuilder.setUserInfo("wss40");
+        encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKeyBuilder.prepare(crypto, symmetricKey);
+
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
+        sigBuilder.setTokenIdentifier(encrKeyBuilder.getId());
+        sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        if (derivedKeyLength > 0) {
+            sigBuilder.setDerivedKeyLength(derivedKeyLength);
+        }
+        sigBuilder.build(symmetricKey.getEncoded());
+
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(XMLUtils.prettyDocumentToString(doc));
+        }
+
+        return doc;
+    }
+
+    /**
+     * An AlgorithmSuite that constrains nothing but what each test sets on it. Empty algorithm
+     * sets are permissive, and the asymmetric bound is widened for the test key.
+     */
+    private AlgorithmSuite createAlgorithmSuite() {
+        AlgorithmSuite algorithmSuite = new AlgorithmSuite();
+        algorithmSuite.setMinimumAsymmetricKeyLength(512);
+        return algorithmSuite;
+    }
+
+    private WSHandlerResult verify(Document doc, AlgorithmSuite algorithmSuite) throws Exception {
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        data.setDecCrypto(crypto);
+        data.setCallbackHandler(callbackHandler);
+        data.setAlgorithmSuite(algorithmSuite);
+
+        return secEngine.processSecurityHeader(doc, data);
+    }
+
     private WSHandlerResult verify(Document doc) throws Exception {
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
