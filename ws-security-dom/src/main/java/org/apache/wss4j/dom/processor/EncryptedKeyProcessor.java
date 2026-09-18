@@ -521,8 +521,8 @@ public class EncryptedKeyProcessor implements Processor {
      * first DataReference URI
      */
     protected static byte[] getRandomKey(Element refList, WSDocInfo wsDocInfo) throws WSSecurityException {
+        String algorithmURI = WSConstants.AES_128;
         try {
-            String algorithmURI = WSConstants.AES_128;
             String uri = getFirstDataRefURI(refList);
 
             if (uri != null) {
@@ -530,6 +530,19 @@ public class EncryptedKeyProcessor implements Processor {
                     EncryptionUtils.findEncryptedDataElement(wsDocInfo, uri);
                 algorithmURI = X509Util.getEncAlgo(ee);
             }
+        } catch (Throwable ex) {    //NOPMD
+            // Carry on with the default algorithm. The point of the key is only that it has a
+            // plausible length, and getRandomKey(String) falls back to AES anyway.
+            LOG.debug(ex.getMessage(), ex);
+        }
+        return getRandomKey(algorithmURI);
+    }
+
+    /**
+     * Generate a random secret key of exactly the length required by the given algorithm.
+     */
+    protected static byte[] getRandomKey(String algorithmURI) throws WSSecurityException {
+        try {
             // The key must have exactly the length required by the algorithm, otherwise it is
             // rejected later on, which would reveal that the key decryption failed.
             SecretKey k = KeyUtils.getKeyGenerator(algorithmURI).generateKey();
@@ -756,6 +769,17 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "badEncAlgo",
                 new Object[] {symEncAlgo});
+        } catch (WSSecurityException ex) {
+            // The key recovered from the EncryptedKey is not of the length this algorithm
+            // requires. Rejecting the message here would tell the sender that the private key
+            // operation yielded a well formed plaintext of some other length - exactly the signal
+            // a Bleichenbacher attack on the key transport is looking for, and one the attacker
+            // can provoke at will by choosing the EncryptedData algorithm, since a decryption
+            // that fails produces a random key of precisely the right length (see getRandomKey).
+            // Carry on with such a random key instead, so that both outcomes are the same
+            // outcome: the data does not decrypt.
+            LOG.debug("The key recovered from the EncryptedKey does not match {}", symEncAlgo);
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, getRandomKey(symEncAlgo));
         }
 
         // Check for compliance against the defined AlgorithmSuite
