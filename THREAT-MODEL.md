@@ -564,6 +564,21 @@ matching disclaimer.
 - **`enableSignatureConfirmation` does not authenticate the *responder*
   to the original requester** beyond the signature it confirms. It is
   a replay-style defense, not an extra factor.
+- **A verified XML Signature does not authenticate the sender when the
+  verification key is a *symmetric* key.** Under a symmetric binding the
+  signing key typically reaches the recipient as an `xenc:EncryptedKey`
+  addressed to the recipient's certificate — and that certificate is
+  public, so any unauthenticated sender can provision such a key and sign
+  with it. The resulting `SIGN` result establishes the integrity of the
+  signed parts (P2) and nothing whatsoever about who sent them; it does
+  not carry P1. Authentication has to come from a token that carries an
+  identity — a UsernameToken, a SAML assertion, an X.509 signature — which
+  is exactly what WS-SecurityPolicy's supporting-token requirements
+  express. A result of this shape carries `TAG_SECRET` with no
+  `TAG_X509_CERTIFICATES` / `TAG_PUBLIC_KEY`, and its
+  `TAG_VALIDATED_TOKEN` is `FALSE` *(documented:
+  `WSSecurityEngineResult.TAG_VALIDATED_TOKEN` javadoc;
+  `SignatureTrustValidator`)*.
 - **A successful X.509 trust chain validation does not authenticate the
   *holder of the private key* to be the *expected* principal unless
   `SIG_SUBJECT_CERT_CONSTRAINTS` (or equivalent) is set.** Any cert from
@@ -696,6 +711,14 @@ The embedding SOAP stack / application **must**:
 - **Mixing the action-based and WS-SecurityPolicy approaches in the
   same handler chain.** The behavior across both is documented but
   rarely tested.
+- **Reading a `SIGN` result as proof of sender identity without looking
+  at what keyed it.** With the action-based approach, `action="Signature
+  Encrypt"` is satisfied by a signature keyed from an inbound
+  `EncryptedKey` — `checkReceiverResultsAnyOrder` deliberately skips a
+  bare `ENCR` result that protects no data. A caller that needs the
+  sender authenticated must require a token that authenticates them, or
+  check that the signature was keyed by a certificate / public key rather
+  than by `TAG_SECRET`. See the symmetric-key false-friend entry in §9.
 
 ## §11a Known non-findings (recurring false positives)
 
@@ -758,6 +781,25 @@ model, the section that licenses the call.
   stack does. → `OUT-OF-MODEL: trusted-input` per §3 item 2.
 - **"`InputStream.close()` not in finally."** Code-quality finding,
   not a security one. → `OUT-OF-MODEL: out-of-layer`.
+- **"An unauthenticated sender can wrap a symmetric key under the
+  service's published certificate (`xenc:EncryptedKey`), sign the SOAP
+  body with that key, and WSS4J reports a valid signature without
+  invoking `SignatureTrustValidator`."** Accurate as a description, but
+  it is the WS-SecurityPolicy symmetric binding working as specified:
+  the signature carries integrity (P2), authentication comes from a
+  supporting token, and a raw symmetric key has no trust anchor for a
+  `Validator` to check in the first place. The DOM engine reports what
+  happened; deciding whether an authenticating token was *also* required
+  belongs to the policy layer — Apache CXF's
+  `AsymmetricBindingPolicyValidator.checkInitiatorTokens` rejects such a
+  signature wherever the policy names an `X509Token`, and
+  `AbstractSupportingTokenPolicyValidator.checkSignatureOrEncryptionResult`
+  binds a supporting token to the signature by comparing the actual key
+  material. → `BY-DESIGN: property-disclaimed` per §9, with the
+  false-friend entry in §9 as the statement of what is and is not
+  claimed. (The `TAG_VALIDATED_TOKEN` flag on such a result is a separate,
+  now-fixed defect: it used to read `TRUE` merely because a `Validator`
+  was registered for the Signature action, even when no validation ran.)
 
 ## §12 Conditions that would change this model
 

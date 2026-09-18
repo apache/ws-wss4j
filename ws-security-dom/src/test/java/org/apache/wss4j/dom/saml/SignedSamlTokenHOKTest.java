@@ -178,6 +178,11 @@ public class SignedSamlTokenHOKTest {
         refs = (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
 
+        // The key comes from a signed holder-of-key assertion, so the credential carries its
+        // own trust and is reported as validated even though no separate Validator call ran
+        assertTrue((Boolean)actionResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN),
+            "A signature keyed by a signed holder-of-key assertion must be reported as validated");
+
         wsDataRef = refs.get(0);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
