@@ -153,11 +153,13 @@ public class UsernameToken {
             if (iter != null) {
                 try {
                     iteration = Integer.parseInt(iter);
-                    if (iteration < 0 || iteration > 10000) {
+                    if (iteration < 0 || iteration > UsernameTokenUtil.MAX_ITERATION) {
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                             "badUsernameToken",
-                            new Object[] {"Iteration is missing"}
+                            new Object[] {"Iteration of " + iteration
+                                          + " is outside the allowed range [0, "
+                                          + UsernameTokenUtil.MAX_ITERATION + "]"}
                         );
                     }
                 } catch (NumberFormatException ex) {
