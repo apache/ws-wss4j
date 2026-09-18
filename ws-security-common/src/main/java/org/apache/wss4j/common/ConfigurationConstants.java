@@ -903,21 +903,27 @@ public class ConfigurationConstants {
     public static final String VALIDATOR_MAP = "validatorMap";
 
     /**
-     * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces. The
-     * default instance that is used is the EHCacheReplayCache.
+     * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces.
+     * WSS4J core does not create a default ReplayCache: integrations such as Apache CXF configure
+     * an EHCacheReplayCache for inbound recipient messages, and applications using WSS4J directly
+     * must configure one themselves for replay detection to take place at all.
      */
     public static final String NONCE_CACHE_INSTANCE = "nonceCacheInstance";
 
     /**
-     * This holds a reference to a ReplayCache instance used to cache Timestamp Created Strings. The
-     * default instance that is used is the EHCacheReplayCache.
+     * This holds a reference to a ReplayCache instance used to cache Timestamp Created Strings.
+     * WSS4J core does not create a default ReplayCache: integrations such as Apache CXF configure
+     * an EHCacheReplayCache for inbound recipient messages, and applications using WSS4J directly
+     * must configure one themselves for replay detection to take place at all.
      */
     public static final String TIMESTAMP_CACHE_INSTANCE = "timestampCacheInstance";
 
     /**
      * This holds a reference to a ReplayCache instance used to cache SAML2 Token Identifier
-     * Strings (if the token contains a OneTimeUse Condition). The default instance that is
-     * used is the EHCacheReplayCache.
+     * Strings (if the token contains a OneTimeUse Condition). WSS4J core does not create a default
+     * ReplayCache: integrations such as Apache CXF configure an EHCacheReplayCache for inbound
+     * recipient messages, and applications using WSS4J directly must configure one themselves for
+     * replay detection to take place at all.
      */
     public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = "samlOneTimeUseCacheInstance";
 
