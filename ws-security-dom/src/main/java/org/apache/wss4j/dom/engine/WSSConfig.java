@@ -476,6 +476,15 @@ public final class WSSConfig {
      *
      * Please note that the Validator object does NOT get class-loaded per invocation, and so
      * it is up to the implementing class to ensure that it is thread-safe.
+     *
+     * Note for WSConstants.BINARY_TOKEN: registering any Validator for this QName - including
+     * one registered only to inspect or transform the token, or a NoOpValidator - marks the
+     * token as validated, and a Signature referencing that token is then treated as a trusted
+     * credential, so the Signature Validator (SignatureTrustValidator by default) does not
+     * run for it. This is how Kerberos and other opaque BinarySecurityTokens obtain direct
+     * trust, but it applies equally to a Validator that verifies nothing. Register a Validator
+     * here only if it verifies the token itself, or accept that signatures referencing that
+     * token are not trust-checked.
      */
     public Class<?> setValidator(QName el, Validator validator) {
         Object result = validatorMap.put(el, validator);
