@@ -711,6 +711,23 @@ The embedding SOAP stack / application **must**:
 - **Mixing the action-based and WS-SecurityPolicy approaches in the
   same handler chain.** The behavior across both is documented but
   rarely tested.
+- **Registering a `Validator` for `WSConstants.BINARY_TOKEN` in order to
+  inspect or transform a BinarySecurityToken.** Registering *any*
+  Validator for that QName marks the token as validated, and
+  `SignatureSTRParser` then treats a Signature referencing that token as
+  a trusted credential, so the Signature Validator
+  (`SignatureTrustValidator` by default) never runs for it — a
+  certificate the truststore does not trust is accepted. This is
+  long-standing intentional behaviour, and is how Kerberos and other
+  opaque BinarySecurityTokens obtain their direct trust
+  *(`ValidatorTest.testValidatedBSTSignature` pins it)*. The trap is that
+  a Validator registered for an unrelated purpose — or a
+  `NoOpValidator` — disables signature trust verification just as
+  effectively, with nothing to signal it. Register a Validator for this
+  QName only if it verifies the token itself, or accept that signatures
+  referencing that token are not trust-checked. No BinarySecurityToken
+  Validator is registered by default, so the default configuration is
+  unaffected *(documented: `WSSConfig.setValidator` javadoc)*.
 - **Reading a `SIGN` result as proof of sender identity without looking
   at what keyed it.** With the action-based approach, `action="Signature
   Encrypt"` is satisfied by a signature keyed from an inbound
