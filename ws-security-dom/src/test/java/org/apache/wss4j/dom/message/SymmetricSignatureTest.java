@@ -37,6 +37,7 @@ import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -45,10 +46,15 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 /**
@@ -251,20 +257,71 @@ public class SymmetricSignatureTest implements CallbackHandler {
 
 
     /**
+     * A signature verified with a symmetric key that arrived in an EncryptedKey establishes
+     * the integrity of the signed parts, but it does not authenticate the sender: anybody
+     * holding this service's certificate can wrap a key of their choosing and sign with it.
+     * No trust decision is taken on such a credential - a symmetric key carries no identity
+     * for a Validator to check - so the result must not advertise itself as a validated
+     * token, even though a Validator is registered for the Signature action by default.
+     */
+    @Test
+    public void testSymmetricSignatureIsNotReportedAsValidated() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
+        encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrKey.setUserInfo("wss40", "security");
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_192);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrKey.prepare(crypto, symmetricKey);
+
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        sign.setCustomTokenId(encrKey.getId());
+        sign.setSecretKey(symmetricKey.getEncoded());
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+
+        Document signedDoc = sign.build(crypto);
+        encrKey.prependToHeader();
+
+        WSHandlerResult results = verify(signedDoc);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertNotNull(actionResult);
+
+        // The signature was keyed by the symmetric key, not by a certificate or public key
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_SECRET));
+        assertNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES));
+        assertNull(actionResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY));
+
+        assertFalse((Boolean)actionResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN),
+            "A signature keyed by an EncryptedKey secret must not be reported as a "
+            + "validated token: no trust decision was taken on the key");
+    }
+
+    /**
      * Verifies the soap envelope
      * <p/>
      *
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results =
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString =
                 XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        return results;
     }
 
     public void handle(Callback[] callbacks)

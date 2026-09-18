@@ -120,6 +120,10 @@ public class SignatureTest {
         REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
+
+        // Trust in the signing certificate was established by the Signature Validator
+        assertTrue((Boolean)actionResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN),
+            "An X.509 signature that passed trust validation must be reported as validated");
     }
 
     @Test

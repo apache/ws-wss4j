@@ -110,6 +110,15 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      * and so this is not set. Note that this is set for the NoOpValidator if it is
      * configured.
      *
+     * For a Signature result this tag is only set when a trust decision was actually taken
+     * on the signing credential: either a Validator was invoked on it, or the credential
+     * carries its own trust (for example the key of a signed holder-of-key SAML assertion,
+     * or a previously validated BinarySecurityToken). It is deliberately NOT set when the
+     * signature was verified with a symmetric key, because a symmetric key carries no
+     * identity that a Validator could check. Such a signature establishes the integrity of
+     * the signed parts, not the identity of the sender - see the "False-friend properties"
+     * section of THREAT-MODEL.md.
+     *
      * The value under this tag is a Boolean instance.
      */
     public static final String TAG_VALIDATED_TOKEN = "validated-token";
