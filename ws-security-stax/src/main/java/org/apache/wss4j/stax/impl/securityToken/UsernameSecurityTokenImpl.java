@@ -115,6 +115,21 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
      */
     protected byte[] generateDerivedKey(WSInboundSecurityContext wsInboundSecurityContext) throws WSSecurityException {
 
+        // Guard against a malicious user sending a bogus iteration value. The derivation performs
+        // one SHA-1 round per iteration, so an unbounded value turns a small request into an
+        // arbitrary amount of CPU work on the receiver. The DOM code rejects anything outside this
+        // range while parsing the token (see UsernameToken); this is the streaming equivalent.
+        //
+        // The bound is applied to the Long before it is narrowed to an int, so that a value larger
+        // than Integer.MAX_VALUE cannot wrap round into a small, acceptable-looking iteration count.
+        if (iteration != null && (iteration < 0 || iteration > UsernameTokenUtil.MAX_ITERATION)) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
+                "badUsernameToken",
+                new Object[] {"Iteration of " + iteration + " is outside the allowed range [0, "
+                              + UsernameTokenUtil.MAX_ITERATION + "]"});
+        }
+
         if (wsInboundSecurityContext != null) {
             if (salt == null || salt.length == 0) {
                 wsInboundSecurityContext.handleBSPRule(BSPRule.R4217);

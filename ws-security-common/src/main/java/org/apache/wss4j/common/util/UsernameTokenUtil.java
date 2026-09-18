@@ -36,6 +36,14 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 public final class UsernameTokenUtil {
     public static final int DEFAULT_ITERATION = 1000;
 
+    /**
+     * The maximum number of hash rounds that an inbound UsernameToken may request through its
+     * wsse11:Iteration element. The Iteration value is attacker-controlled message content and
+     * the key derivation below performs one SHA-1 round per iteration, so leaving it unbounded
+     * lets a small request buy an arbitrary amount of CPU time on the receiver.
+     */
+    public static final int MAX_ITERATION = 10000;
+
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(UsernameTokenUtil.class);
 
