@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -47,9 +48,12 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -838,6 +842,42 @@ public class UTDerivedKeyTest {
         newEngine.processSecurityHeader(encryptedDoc, data);
     }
 
+
+    /**
+     * The wsse11:Iteration value is attacker-controlled message content and the key derivation
+     * performs one SHA-1 round per iteration, so the parser bounds it. Regression test for the
+     * bound itself, which is shared with the streaming engine
+     * (see UsernameTokenUtil.MAX_ITERATION).
+     */
+    @Test
+    public void testIterationAboveMaximumIsRejected() throws Exception {
+        Element tokenElement = buildDerivedKeyTokenElement(UsernameTokenUtil.MAX_ITERATION + 1);
+
+        WSSecurityException exception = assertThrows(WSSecurityException.class,
+            () -> new UsernameToken(tokenElement, false, new BSPEnforcer(true)));
+        assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, exception.getErrorCode());
+    }
+
+    @Test
+    public void testMaximumIterationIsAccepted() throws Exception {
+        Element tokenElement = buildDerivedKeyTokenElement(UsernameTokenUtil.MAX_ITERATION);
+
+        UsernameToken token = new UsernameToken(tokenElement, false, new BSPEnforcer(true));
+        assertEquals(UsernameTokenUtil.MAX_ITERATION, token.getIteration());
+    }
+
+    private Element buildDerivedKeyTokenElement(int iteration) throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("bob", "security");
+        builder.addDerivedKey(iteration);
+        builder.prepare(UsernameTokenUtil.generateSalt(false));
+
+        return builder.getUsernameTokenElement();
+    }
 
     /**
      * Verifies the soap envelope.
