@@ -127,6 +127,48 @@ public class SignatureTest {
             "An X.509 signature that passed trust validation must be reported as validated");
     }
 
+    /**
+     * A Signature with no KeyInfo at all. The signing certificate is then not supplied by the
+     * sender, but taken from the receiver's own signature verification keystore under its
+     * configured default alias, so an attacker cannot influence which certificate the signature
+     * is verified against. That credential is trusted by construction and the result must be
+     * reported as validated - otherwise a consumer keying off TAG_VALIDATED_TOKEN treats a
+     * signature by the operator's own configured identity as untrusted.
+     */
+    @Test
+    public void testX509SignatureNoKeyInfo() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        Document signedDoc = builder.build(crypto);
+
+        // Strip the KeyInfo. It is not referenced by the SignedInfo, so the signature still
+        // verifies, and the receiver falls back to the default certificate of its own keystore -
+        // which crypto.properties configures to the certificate used above.
+        Element signature =
+            XMLUtils.findElement(signedDoc.getDocumentElement(), "Signature", WSConstants.SIG_NS);
+        assertNotNull(signature);
+        Element keyInfo = XMLUtils.getDirectChildElement(signature, "KeyInfo", WSConstants.SIG_NS);
+        assertNotNull(keyInfo);
+        signature.removeChild(keyInfo);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(XMLUtils.prettyDocumentToString(signedDoc));
+        }
+
+        WSHandlerResult results = verify(signedDoc);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertTrue((Boolean)actionResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN),
+            "A signature verified against the receiver's own default certificate must be "
+            + "reported as validated");
+    }
+
     @Test
     public void testX509SignatureISAttached() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
