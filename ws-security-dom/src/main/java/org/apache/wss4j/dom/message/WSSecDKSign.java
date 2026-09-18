@@ -300,6 +300,20 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return derivedKeyLength > 0 ? derivedKeyLength : KeyUtils.getKeyLength(sigAlgo);
     }
 
+    /**
+     * Set the length of the derived key, in bytes, which is written out as the wsc:Length of the
+     * DerivedKeyToken. When left unset the length defaults to the key length of the signature
+     * algorithm, which is 20 bytes (160 bits) for HMAC-SHA1.
+     * <p/>
+     * Under a WS-SecurityPolicy AlgorithmSuite the length is not a free choice: the suite states
+     * the signature key derivation length, a receiver enforcing the suite requires the wsc:Length
+     * to match it exactly, and no standard suite derives a 160 bit signature key (Basic128
+     * requires 128 bits; Basic192, Basic256 and TripleDes require 192). A sender operating under
+     * such a policy must therefore set the length from the suite in use rather than rely on the
+     * default.
+     *
+     * @param keyLength the length of the derived key in bytes
+     */
     public void setDerivedKeyLength(int keyLength) {
         derivedKeyLength = keyLength;
     }
