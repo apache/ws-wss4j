@@ -136,6 +136,11 @@ public class SignatureProcessor implements Processor {
         REFERENCE_TYPE referenceType = null;
 
         Credential credential = new Credential();
+        // Whether trust in the signing credential was actually established: either a
+        // Validator ran on it, or the credential carries its own trust (a signed
+        // holder-of-key SAML assertion, a previously validated BST). Only then may the
+        // result advertise TAG_VALIDATED_TOKEN.
+        boolean trustEstablished = false;
         Validator validator = data.getValidator(WSConstants.SIGNATURE);
         if (keyInfoElement == null) {
             certs = getDefaultCerts(data.getSigVerCrypto());
@@ -165,6 +170,7 @@ public class SignatureProcessor implements Processor {
                     principal = new PublicKeyPrincipalImpl(publicKey);
                     credential.setPrincipal(principal);
                     credential = validator.validate(credential, data);
+                    trustEstablished = true;
                 }
             } else {
                 STRParserParameters parameters = new STRParserParameters();
@@ -182,15 +188,17 @@ public class SignatureProcessor implements Processor {
                 secretKey = parserResult.getSecretKey();
                 referenceType = parserResult.getCertificatesReferenceType();
 
-                boolean trusted = parserResult.isTrustedCredential();
-                if (trusted) {
+                trustEstablished = parserResult.isTrustedCredential();
+                if (trustEstablished) {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }
-                if (!trusted && (publicKey != null || (certs != null && certs.length > 0)) && validator != null) {
+                if (!trustEstablished && (publicKey != null || (certs != null && certs.length > 0))
+                    && validator != null) {
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
                     credential.setPrincipal(principal);
                     credential = validator.validate(credential, data);
+                    trustEstablished = true;
                 }
             }
         }
@@ -261,7 +269,11 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, elem);
-        if (validator != null) {
+        // The mere presence of a registered Validator establishes nothing: stamp the result
+        // as validated only when a trust decision was actually taken on this credential.
+        // In particular a signature verified with a symmetric key is not stamped, as a
+        // symmetric key carries no identity for a Validator to check.
+        if (validator != null && trustEstablished) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             if (credential != null) {
                 result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
