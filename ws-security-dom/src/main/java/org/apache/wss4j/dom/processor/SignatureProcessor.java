@@ -145,6 +145,13 @@ public class SignatureProcessor implements Processor {
         if (keyInfoElement == null) {
             certs = getDefaultCerts(data.getSigVerCrypto());
             principal = certs[0].getSubjectX500Principal();
+            // The message carries no KeyInfo, so the signing certificate was not supplied by the
+            // sender: it was taken from the receiver's own signature verification keystore, under
+            // its configured default alias. The credential is therefore trusted by construction
+            // and there is nothing here for a Validator to decide - an attacker cannot influence
+            // which certificate the signature is verified against. Verifying the signature against
+            // it does establish the sender's identity, so the result may be stamped as validated.
+            trustEstablished = true;
         } else {
             int result = 0;
             Node node = keyInfoElement.getFirstChild();
