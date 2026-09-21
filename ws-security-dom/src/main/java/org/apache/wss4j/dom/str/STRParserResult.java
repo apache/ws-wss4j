@@ -40,6 +40,8 @@ public class STRParserResult {
 
     private boolean trustedCredential;
 
+    private boolean secretKeyFromEncryptedKey;
+
     private REFERENCE_TYPE referenceType;
 
     /**
@@ -90,6 +92,17 @@ public class STRParserResult {
     }
 
     /**
+     * Get whether the secret key was recovered from an EncryptedKey, rather than taken from a
+     * token or supplied by the CallbackHandler. Such a key is the product of a private key
+     * operation on ciphertext the sender chose, so a caller must not let the sender tell from
+     * the response whether that operation succeeded.
+     * @return true if the secret key was recovered from an EncryptedKey
+     */
+    public boolean isSecretKeyFromEncryptedKey() {
+        return secretKeyFromEncryptedKey;
+    }
+
+    /**
      * Get how the certificates were referenced
      * @return how the certificates were referenced
      */
@@ -115,6 +128,10 @@ public class STRParserResult {
 
     public void setTrustedCredential(boolean trustedCredential) {
         this.trustedCredential = trustedCredential;
+    }
+
+    public void setSecretKeyFromEncryptedKey(boolean secretKeyFromEncryptedKey) {
+        this.secretKeyFromEncryptedKey = secretKeyFromEncryptedKey;
     }
 
     public void setReferenceType(REFERENCE_TYPE referenceType) {

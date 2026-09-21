@@ -29,6 +29,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -122,6 +123,68 @@ public class EncryptedKeyLengthOracleTest {
     }
 
     /**
+     * The same property where the EncryptedKey is embedded in the KeyInfo of the EncryptedData
+     * it keys, rather than standing alone in the security header. The key is then prepared by
+     * EncryptedDataProcessor rather than by the EncryptedKeyProcessor that produced it, and an
+     * embedded EncryptedKey has no ReferenceList of its own to say what length a random
+     * replacement key should be - so the two failures part company there unless that path takes
+     * the same care.
+     */
+    @Test
+    public void testWrongLengthPlaintextIsIndistinguishableForAnEmbeddedEncryptedKey() throws Exception {
+        assumeFalse(isIBMJdK);
+
+        WSSecurityException failedDecryption =
+            decryptWithEmbeddedEncryptedKey(forgeCiphertext(NON_CONFORMING_BLOCK_TYPE, 16));
+
+        WSSecurityException wrongLength =
+            decryptWithEmbeddedEncryptedKey(forgeCiphertext(BLOCK_TYPE, 24));
+
+        assertEquals(failedDecryption.getErrorCode(), wrongLength.getErrorCode(),
+            "A well formed plaintext of the wrong length must not be distinguishable from a "
+            + "plaintext that is not well formed");
+        assertEquals(failedDecryption.getMessage(), wrongLength.getMessage(),
+            "A well formed plaintext of the wrong length must not be distinguishable from a "
+            + "plaintext that is not well formed");
+    }
+
+    /**
+     * Build a message whose security header holds an EncryptedData - the encrypted Timestamp -
+     * that carries its EncryptedKey inline in its own KeyInfo, substitute the given bytes for
+     * that EncryptedKey's CipherValue, and process it.
+     */
+    private WSSecurityException decryptWithEmbeddedEncryptedKey(byte[] cipherValue) throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        timestamp.setTimeToLive(300);
+        timestamp.build();
+
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128_GCM);
+        SecretKey symmetricKey = keyGen.generateKey();
+        builder.prepare(crypto, symmetricKey);
+        builder.setEmbedEncryptedKey(true);
+        builder.prependBSTElementToHeader();
+
+        // Encrypting the Timestamp leaves the EncryptedData in the security header, where the
+        // engine reaches it directly. The ReferenceList that encrypt() returns is discarded, so
+        // the embedded EncryptedKey has none.
+        builder.getParts().add(new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, ""));
+        builder.encrypt(symmetricKey);
+
+        substituteCipherValue(doc, cipherValue);
+        return processExpectingFailure(doc);
+    }
+
+    /**
      * Build an rsa-1_5 / aes128-gcm encrypted message, substitute the given bytes for the
      * CipherValue of its EncryptedKey, and process it. The message never decrypts - the point is
      * only how it fails.
@@ -141,15 +204,26 @@ public class EncryptedKeyLengthOracleTest {
         SecretKey symmetricKey = keyGen.generateKey();
         Document encryptedDoc = builder.build(crypto, symmetricKey);
 
+        substituteCipherValue(encryptedDoc, cipherValue);
+        return processExpectingFailure(encryptedDoc);
+    }
+
+    /**
+     * Replace the CipherValue of the message's EncryptedKey, wherever it sits, with the given
+     * bytes.
+     */
+    private void substituteCipherValue(Document doc, byte[] cipherValue) {
         Element encryptedKey =
-            XMLUtils.findElement(encryptedDoc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
+            XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
         assertNotNull(encryptedKey);
         Element cipherValueElement =
             XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
         assertNotNull(cipherValueElement);
         cipherValueElement.setTextContent(
             org.apache.xml.security.utils.XMLUtils.encodeToString(cipherValue));
+    }
 
+    private WSSecurityException processExpectingFailure(Document doc) {
         RequestData data = new RequestData();
         data.setDecCrypto(crypto);
         data.setSigVerCrypto(crypto);
@@ -158,7 +232,7 @@ public class EncryptedKeyLengthOracleTest {
 
         WSSecurityEngine secEngine = new WSSecurityEngine();
         return assertThrows(WSSecurityException.class,
-            () -> secEngine.processSecurityHeader(encryptedDoc, data));
+            () -> secEngine.processSecurityHeader(doc, data));
     }
 
     /**
