@@ -33,8 +33,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -260,6 +262,50 @@ public class NameConstraintsTest {
         withTrustStoreUsingMerlinAKI(getRootKeyStore(),
                 getTestCertificateChain(INTERMEDIATE_SIGNED),
                 getMerlinAkiBc());
+    }
+
+    /**
+     * getNameConstraints reports "no constraints" as an empty array, but TrustAnchor reads an
+     * empty array as an undecodable extension and only accepts null. Most CA certificates carry
+     * no NameConstraints, so building anchors for them must still work with the
+     * cert.provider.nameconstraints property enabled.
+     */
+    @Test
+    public void testTrustAnchorsForCertificatesWithoutNameConstraints() throws Exception {
+        assumeFalse(isIBMJdK);
+
+        Merlin merlin = merlinHandlingNameConstraints();
+        Set<TrustAnchor> anchors = new HashSet<>();
+
+        merlin.addTrustAnchors(anchors, getSelfKeyStore());
+
+        assertThat(anchors.size(), equalTo(1));
+        assertNull(anchors.iterator().next().getNameConstraints());
+    }
+
+    /**
+     * The constraints of a certificate that does carry the extension must still reach the anchor.
+     */
+    @Test
+    public void testTrustAnchorsRetainNameConstraints() throws Exception {
+        assumeFalse(isIBMJdK);
+
+        Merlin merlin = merlinHandlingNameConstraints();
+        Set<TrustAnchor> anchors = new HashSet<>();
+
+        merlin.addTrustAnchors(anchors, getRootKeyStore());
+
+        assertThat(anchors.size(), equalTo(1));
+        TrustAnchor anchor = anchors.iterator().next();
+        assertNotNull(anchor.getNameConstraints());
+        assertThat("Tag byte is wrong", anchor.getNameConstraints()[0], is(DERDecoder.TYPE_SEQUENCE));
+    }
+
+    private Merlin merlinHandlingNameConstraints() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
+                "true");
+        return new Merlin(properties, this.getClass().getClassLoader(), null);
     }
 
     @Test
