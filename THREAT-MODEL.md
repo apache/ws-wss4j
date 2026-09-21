@@ -811,6 +811,19 @@ The embedding SOAP stack / application **must**:
   documented example) in production deployments.**
 - **Disabling BSP compliance via `IS_BSP_COMPLIANT=false` to "make
   interop work" with a non-conformant stack.**
+- **Choosing an AlgorithmSuite whose encryption key length disagrees
+  with the Kerberos encryption type the KDC issues session keys for.**
+  A Kerberos session key is whatever length the ticket's etype makes it
+  — 16 bytes for aes128-cts and rc4-hmac, 32 for aes256-cts, 24 for
+  des3-cbc-sha1 — and it is used directly as the symmetric key, so it is
+  the KDC, not the policy, that fixes the length. `KeyUtils`
+  `prepareSecretKey` rejects a length that does not match the declared
+  algorithm rather than truncating it, which is what stops the same
+  session key being used as both an AES-128 and an AES-256 key. The
+  deployment consequence is that the suite has to be chosen to match the
+  etype; signing is unaffected, as the HMAC algorithms take a key of any
+  length *(documented: `src/site/asciidoc/config.adoc`
+  ENCRYPTION_WITH_KERBEROS_TOKEN)*.
 - **Treating `PASSWORD_DIGEST` as offline-attack-resistant.** Combined
   with a weak password, the digest can be brute-forced offline
   *(documented: `src/site/asciidoc/config.adoc` and OASIS UT 1.1)*.

@@ -129,6 +129,14 @@ Note that for releases from 2.0.0 → 2.2.x, this configuration tag was called E
 * *WSS4J 2.0.0* SIGNATURE_WITH_KERBEROS_TOKEN (SignatureWithKerberosToken) - Perform a Signature action with a kerberos token. Only for StAX code.
  * *WSS4J 2.3.0* ENCRYPTION_WITH_KERBEROS_TOKEN (EncryptionWithKerberosToken) - Perform a Encryption action with a kerberos token. Only for StAX code.
 Note that for releases from 2.0.0 -> 2.2.x, this configuration tag was called ENCRYPT_WITH_KERBEROS_TOKEN (EncryptWithKerberosToken).
+When a Kerberos token supplies the symmetric key, the encryption algorithm must
+require a key of exactly the length of the session key that the KDC issued, which is
+fixed by the encryption type of the ticket: 16 bytes for aes128-cts and for rc4-hmac,
+32 bytes for aes256-cts, 24 bytes for des3-cbc-sha1. A key of any other length is
+rejected rather than silently truncated to fit, so, for example, an AlgorithmSuite of
+Basic256 cannot be used against a KDC that issues aes128 session keys. This applies to
+both stacks, and on both the sending and the receiving side. Signing with a Kerberos
+token is unaffected, because the HMAC algorithms accept a key of any length.
  * *WSS4J 2.0.0* KERBEROS_TOKEN (KerberosToken) - Add a kerberos token. Only for StAX code.
  * *WSS4J 2.0.0* CUSTOM_TOKEN (CustomToken) - Add a "Custom" token from a CallbackHandler
  * *WSS4J 1.6.x only* SIGN_WITH_UT_KEY (UsernameTokenSignature) - Perform a .NET specific signature using a Username Token action.
