@@ -242,6 +242,26 @@ public final class DOMSAMLUtil {
         return true;
     }
 
+
+    /**
+     * Whether a signature result identifies the sender that produced it, as opposed to merely
+     * proving possession of a key.
+     *
+     * @param signedResult a SIGN or UT_SIGN result
+     * @return true if a trust decision was taken on the signing credential, or the signature was
+     *         made with a key derived from a UsernameToken whose password was verified
+     */
+    private static boolean establishesSenderIdentity(WSSecurityEngineResult signedResult) {
+        if (Boolean.TRUE.equals(signedResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))) {
+            return true;
+        }
+
+        // A UsernameToken derived key is not stamped as a validated token - no Validator runs on
+        // the signing credential itself - but the token's password was verified before the key was
+        // derived from it, so the sender is authenticated all the same.
+        Integer action = (Integer)signedResult.get(WSSecurityEngineResult.TAG_ACTION);
+        return action != null && WSConstants.UT_SIGN == action.intValue();
+    }
     /**
      * Return true if there is a signature which references the Assertion and the SOAP Body.
      * @param assertionWrapper the SamlAssertionWrapper object
@@ -254,7 +274,22 @@ public final class DOMSAMLUtil {
         Element body,
         List<WSSecurityEngineResult> signed
     ) {
+        // A sender-vouches assertion is only worth as much as the identity of whoever vouched for
+        // it. An assertion that is itself signed carries that backing already - the signature was
+        // trust-verified against its issuer (see SamlAssertionValidator.verifySignedAssertion) -
+        // and the message signature merely binds it to this message, so any signature will do.
+        //
+        // An unsigned assertion has no such backing. The only party asserting it is whoever signed
+        // the message, so that signature has to have been made with a credential whose identity was
+        // actually established. A signature verified with a bare symmetric key - one taken from an
+        // EncryptedKey that the sender minted for itself, say - proves possession of that key and
+        // nothing whatsoever about who sent it, and so cannot vouch for anybody.
+        boolean vouchingIdentityRequired = !assertionWrapper.isSigned();
+
         for (WSSecurityEngineResult signedResult : signed) {
+            if (vouchingIdentityRequired && !establishesSenderIdentity(signedResult)) {
+                continue;
+            }
             @SuppressWarnings("unchecked")
             List<WSDataRef> sl =
                 (List<WSDataRef>)signedResult.get(
