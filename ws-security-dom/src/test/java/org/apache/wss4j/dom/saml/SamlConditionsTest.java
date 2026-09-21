@@ -283,6 +283,76 @@ public class SamlConditionsTest {
         verify(unsignedDoc);
     }
 
+    /**
+     * An assertion with no Conditions element at all has no NotOnOrAfter, so the TTL on the
+     * IssueInstant is the only bound on its lifetime that exists. It has to be applied, or such
+     * an assertion is good forever.
+     */
+    @Test
+    public void testSAML2StaleIssueInstantWithNoConditions() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        DateTime issueInstant = new DateTime().minusMinutes(31);
+        samlAssertion.getSaml2().setIssueInstant(issueInstant);
+        samlAssertion.getSaml2().setConditions(null);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString =
+                XMLUtils.prettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing a stale SAML Assertion");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+
+    /**
+     * The same assertion within the TTL is accepted: an assertion is not required to carry
+     * Conditions, only to be recent when it does not.
+     */
+    @Test
+    public void testSAML2FreshIssueInstantWithNoConditions() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        samlAssertion.getSaml2().setIssueInstant(new DateTime().minusSeconds(5));
+        samlAssertion.getSaml2().setConditions(null);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        verify(unsignedDoc);
+    }
+
     @Test
     public void testSAML1StaleIssueInstant() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -312,6 +382,40 @@ public class SamlConditionsTest {
                 XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
+
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing a stale SAML Assertion");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+
+    /**
+     * The SAML 1.1 counterpart: no Conditions element, so the IssueInstant TTL is the only
+     * bound there is.
+     */
+    @Test
+    public void testSAML1StaleIssueInstantWithNoConditions() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        DateTime issueInstant = new DateTime().minusMinutes(31);
+        samlAssertion.getSaml1().setIssueInstant(issueInstant);
+        samlAssertion.getSaml1().setConditions(null);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         try {
             verify(unsignedDoc);
