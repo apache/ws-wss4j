@@ -120,7 +120,12 @@ public class EncryptedDataProcessor implements Processor {
         } else if (encryptedKeyElement != null && data.getWssConfig() != null) {
             WSSConfig wssConfig = data.getWssConfig();
             Processor encrKeyProc = wssConfig.getProcessor(WSConstants.ENCRYPTED_KEY);
-            encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, data);
+            data.enterNestedToken();
+            try {
+                encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, data);
+            } finally {
+                data.exitNestedToken();
+            }
             byte[] symmKey =
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
             key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
@@ -191,8 +196,13 @@ public class EncryptedDataProcessor implements Processor {
                 Processor proc = data.getWssConfig().getProcessor(el);
                 if (proc != null) {
                     LOG.debug("Processing decrypted element with: {}", proc.getClass().getName());
-                    List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, data);
-                    completeResults.addAll(0, results);
+                    data.enterNestedToken();
+                    try {
+                        List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, data);
+                        completeResults.addAll(0, results);
+                    } finally {
+                        data.exitNestedToken();
+                    }
                     return completeResults;
                 }
             }
