@@ -87,6 +87,14 @@ nothing on its own. Check the effective policy if you rely on a nested
 assertion being enforced.
  * Where a compact policy offers several alternatives within a nested policy,
 only the first is read.
+ * A hardened engine default that WS-SecurityPolicy relaxes - accepting a
+password-less UsernameToken for an sp:NoPassword policy, or rsa-1_5 key transport
+for an AlgorithmSuite that asks for it - has to be decided while the security
+header is read, before the Body says which operation the message invokes. Where
+SOAPAction has already selected the operation only that operation's policy is
+consulted. Otherwise the relaxation is granted across the endpoint's operations
+and reimposed once the operation is known, which rejects the message but, for
+rsa-1_5, only after the key has been unwrapped.
  * The REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS ("requireSignedEncryptedDataElements")
 configuration tag is not read by the streaming code and is not enforced by it.
 The tag is shared between both stacks, and the streaming ConfigurationConverter

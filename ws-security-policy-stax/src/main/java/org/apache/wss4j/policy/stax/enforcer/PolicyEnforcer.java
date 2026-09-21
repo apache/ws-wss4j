@@ -104,8 +104,10 @@ import org.apache.wss4j.policy.stax.assertionStates.X509TokenAssertionState;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.NoSecuritySecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
@@ -156,6 +158,8 @@ public class PolicyEnforcer implements SecurityEventListener {
     private boolean faultOccurred;
     private final PolicyAsserter policyAsserter;
     private boolean soap12;
+    private boolean usernameTokenNoPasswordRelaxedForAllOperations;
+    private boolean rsa15KeyTransportRelaxedForAllOperations;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
                           String actorOrRole, int attachmentCount, PolicyAsserter policyAsserter, boolean soap12
@@ -892,6 +896,11 @@ public class PolicyEnforcer implements SecurityEventListener {
                         new IllegalArgumentException(message));
             }
 
+            //The operation is known now, so an engine default relaxed on the strength of
+            //the whole policy set can be reimposed where this operation's policy does not
+            //ask for it.
+            verifyRelaxedEngineDefaults();
+
             try {
                 Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
                 while (securityEventIterator.hasNext()) {
@@ -923,18 +932,25 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     /**
-     * Returns true if any configured operation policy contains a UsernameToken assertion
-     * that explicitly allows password-less tokens (sp:NoPassword). Used to decide whether
-     * the engine's hardened default (rejecting password-less UsernameTokens) may be
-     * relaxed in policy mode.
+     * Returns true if the policy that governs this message contains a UsernameToken
+     * assertion that explicitly allows password-less tokens (sp:NoPassword). Used to
+     * decide whether the engine's hardened default (rejecting password-less
+     * UsernameTokens) may be relaxed in policy mode.
+     *
+     * This is asked while the security header is being read, so the operation is known
+     * only where SOAPAction already selected its policy. Failing that the question can be
+     * answered across the configured operations and no more, which relaxes the default for
+     * a message that may turn out to invoke an operation whose own policy does not allow
+     * it. Record that, so that verifyRelaxedEngineDefaults() can reimpose the default once
+     * the operation is known.
      */
     public boolean isUsernameTokenNoPasswordAllowedByPolicy() {
+        if (effectivePolicy != null) {
+            return allowsUsernameTokenNoPassword(effectivePolicy);
+        }
         for (OperationPolicy operationPolicy : operationPolicies) {
-            org.apache.neethi.Policy policy = operationPolicy.getPolicy();
-            if (policy != null && policyContains(policy,
-                assertion -> assertion instanceof UsernameToken
-                    && ((UsernameToken)assertion).getPasswordType()
-                        == UsernameToken.PasswordType.NoPassword)) {
+            if (allowsUsernameTokenNoPassword(operationPolicy)) {
+                usernameTokenNoPasswordRelaxedForAllOperations = true;
                 return true;
             }
         }
@@ -942,26 +958,90 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     /**
-     * Returns true if any configured operation policy contains an AlgorithmSuite whose
-     * asymmetric key wrap is RSA v1.5. Used to decide whether the engine's hardened
-     * default (rejecting rsa-1_5 key transport) may be relaxed in policy mode.
+     * Returns true if the policy that governs this message contains an AlgorithmSuite whose
+     * asymmetric key wrap is RSA v1.5. Used to decide whether the engine's hardened default
+     * (rejecting rsa-1_5 key transport) may be relaxed in policy mode. Scoped to the
+     * operation, and recorded when it cannot be, exactly as above.
      */
     public boolean isRSA15KeyTransportAllowedByPolicy() {
+        if (effectivePolicy != null) {
+            return allowsRSA15KeyTransport(effectivePolicy);
+        }
         for (OperationPolicy operationPolicy : operationPolicies) {
-            org.apache.neethi.Policy policy = operationPolicy.getPolicy();
-            if (policy != null && policyContains(policy, assertion -> {
-                if (!(assertion instanceof AlgorithmSuite)) {
-                    return false;
-                }
-                AlgorithmSuite.AlgorithmSuiteType algorithmSuiteType =
-                    ((AlgorithmSuite)assertion).getAlgorithmSuiteType();
-                return algorithmSuiteType != null
-                    && SPConstants.KW_RSA15.equals(algorithmSuiteType.getAsymmetricKeyWrap());
-            })) {
+            if (allowsRSA15KeyTransport(operationPolicy)) {
+                rsa15KeyTransportRelaxedForAllOperations = true;
                 return true;
             }
         }
         return false;
+    }
+
+    private static boolean allowsUsernameTokenNoPassword(OperationPolicy operationPolicy) {
+        Policy policy = operationPolicy.getPolicy();
+        return policy != null && policyContains(policy,
+            assertion -> assertion instanceof UsernameToken
+                && ((UsernameToken)assertion).getPasswordType()
+                    == UsernameToken.PasswordType.NoPassword);
+    }
+
+    private static boolean allowsRSA15KeyTransport(OperationPolicy operationPolicy) {
+        Policy policy = operationPolicy.getPolicy();
+        return policy != null && policyContains(policy, assertion -> {
+            if (!(assertion instanceof AlgorithmSuite)) {
+                return false;
+            }
+            AlgorithmSuite.AlgorithmSuiteType algorithmSuiteType =
+                ((AlgorithmSuite)assertion).getAlgorithmSuiteType();
+            return algorithmSuiteType != null
+                && SPConstants.KW_RSA15.equals(algorithmSuiteType.getAsymmetricKeyWrap());
+        });
+    }
+
+    /**
+     * An engine default that was relaxed on the strength of the whole set of operation
+     * policies - because the operation was not yet known when the security header was read
+     * - must still hold for the operation the message turned out to invoke. Otherwise one
+     * operation that asks for sp:NoPassword or for rsa-1_5 lowers the engine's floor for
+     * every other operation of the endpoint, and whether that is caught depends on whether
+     * the effective policy happens to carry an assertion that rejects what was accepted: a
+     * password-less UsernameToken is not examined at all by a policy that names no
+     * UsernameToken.
+     */
+    private void verifyRelaxedEngineDefaults() throws WSSecurityException {
+        if (usernameTokenNoPasswordRelaxedForAllOperations
+            && !allowsUsernameTokenNoPassword(effectivePolicy)) {
+            for (SecurityEvent securityEvent : securityEventQueue) {
+                if (securityEvent instanceof UsernameTokenSecurityEvent
+                    && ((UsernameTokenSecurityEvent)securityEvent).getSecurityToken() != null
+                    && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE
+                        == ((UsernameTokenSecurityEvent)securityEvent).getUsernameTokenPasswordType()) {
+                    rejectRelaxedEngineDefault("a UsernameToken with no password");
+                }
+            }
+        }
+        if (rsa15KeyTransportRelaxedForAllOperations
+            && !allowsRSA15KeyTransport(effectivePolicy)) {
+            for (SecurityEvent securityEvent : securityEventQueue) {
+                if (securityEvent instanceof AlgorithmSuiteSecurityEvent) {
+                    AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent =
+                        (AlgorithmSuiteSecurityEvent)securityEvent;
+                    if (WSSConstants.Asym_Key_Wrap.equals(algorithmSuiteSecurityEvent.getAlgorithmUsage())
+                        && WSSConstants.NS_XENC_RSA15.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                        rejectRelaxedEngineDefault("rsa-1_5 key transport");
+                    }
+                }
+            }
+        }
+    }
+
+    private void rejectRelaxedEngineDefault(String what) throws WSSecurityException {
+        String message = "The message uses " + what + ", which the policy for operation "
+            + effectivePolicy.getOperationName() + " does not allow";
+        LOG.warn("{}; rejecting the message", message);
+        securityEventQueue.clear();
+        throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                new IllegalArgumentException(message));
     }
 
     private static boolean policyContains(PolicyComponent policyComponent, Predicate<Assertion> predicate) {

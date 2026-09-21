@@ -254,11 +254,23 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             // unconditionally, which silently reversed both defaults even when the
             // configured policy contained no assertion that re-imposes the check. Only
             // relax an engine default when the policy actually covers it.
-            if (policyEnforcer.isRSA15KeyTransportAllowedByPolicy()) {
+            // Where the caller has already relaxed a default itself there is nothing to
+            // grant, and asking would arm a re-check against a policy the caller has
+            // deliberately overruled, so leave that case alone. The properties are
+            // optional on this processor - a caller may construct it with none - and then
+            // the caller has relaxed nothing.
+            XMLSecurityProperties properties = getSecurityProperties();
+            WSSSecurityProperties securityProperties =
+                properties instanceof WSSSecurityProperties ? (WSSSecurityProperties) properties : null;
+            boolean callerAllowsRSA15 =
+                securityProperties != null && securityProperties.isAllowRSA15KeyTransportAlgorithm();
+            boolean callerAllowsNoPassword =
+                securityProperties != null && securityProperties.isAllowUsernameTokenNoPassword();
+            if (!callerAllowsRSA15 && policyEnforcer.isRSA15KeyTransportAllowedByPolicy()) {
                 inputProcessorChain.getSecurityContext().put(
                     WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
             }
-            if (policyEnforcer.isUsernameTokenNoPasswordAllowedByPolicy()) {
+            if (!callerAllowsNoPassword && policyEnforcer.isUsernameTokenNoPasswordAllowedByPolicy()) {
                 inputProcessorChain.getSecurityContext().put(
                     WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());
             }

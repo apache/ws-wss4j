@@ -573,6 +573,33 @@ on each is captured in §14 Q10–Q11.
 - *(documented:
   `ws-security-policy-stax/src/test/java/.../VulnerabliltyVectorsTest.java`)*
 
+### P12 — An engine default relaxed by policy is scoped to the operation the message invokes (StAX policy mode)
+
+- **Condition**: streaming engine in policy mode (`PolicyInputProcessor`),
+  where the caller has not itself set `AllowUsernameTokenNoPassword` or
+  `AllowRSA15KeyTransportAlgorithm`. Those are explicit overrides by the
+  caller and are left alone.
+- **Violation symptom**: one operation of an endpoint asks for
+  `sp:NoPassword`, or for an AlgorithmSuite whose asymmetric key wrap is
+  rsa-1_5, and the engine's corresponding hardened default is thereby
+  lowered for every other operation of that endpoint — so a
+  password-less UsernameToken is accepted for an operation whose policy
+  names no UsernameToken at all, and is examined by no assertion.
+- **Mechanism**: the relaxation is decided while the security header is
+  read, before the Body names the operation. It is therefore scoped to
+  the operation's own policy where SOAPAction already selected it, and
+  otherwise granted across the policy set and reimposed once the
+  operation is known.
+- **Residual**: an rsa-1_5 unwrap granted across the policy set is
+  performed before the operation is known. The message is rejected, but
+  the unwrap has happened, so the oracle surface of §8 P4 is reachable
+  for an operation whose own policy forbids rsa-1_5. Only a
+  SOAPAction-selected operation avoids that.
+- **Severity**: **security-critical** for the UsernameToken case;
+  `VALID-HARDENING` for the rsa-1_5 case.
+- *(documented:
+  `ws-security-policy-stax/src/test/java/.../ScopedEngineDefaultsTest.java`)*
+
 ## §9 Security properties the project does *not* provide
 
 State each plainly so a triager can route an inbound report to the
