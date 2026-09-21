@@ -27,6 +27,8 @@ import java.security.PublicKey;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
@@ -181,6 +183,17 @@ public class CertificateStore extends CryptoBase {
             // to ensure against phony DNs (compare encoded form including signature)
             //
             if (foundCerts != null && foundCerts.length > 0 && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
+                // A directly trusted certificate still has to be within its validity period. The
+                // CertPathValidator enforces that on every other path through this method, so
+                // without this check an expired certificate would be accepted here and nowhere
+                // else.
+                try {
+                    certs[0].checkValidity();
+                } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
+                    );
+                }
                 LOG.debug(
                     "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
                 );

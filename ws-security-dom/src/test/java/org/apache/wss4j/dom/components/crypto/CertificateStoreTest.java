@@ -33,6 +33,7 @@ import org.apache.wss4j.common.crypto.CertificateStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -44,9 +45,11 @@ import org.w3c.dom.Document;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -305,5 +308,38 @@ public class CertificateStoreTest {
         return results;
     }
 
+
+
+    /**
+     * A certificate that the CertificateStore holds directly is still only trusted while it is
+     * within its validity period. Every other path through verifyTrust runs the certificate
+     * through a CertPathValidator, which enforces that; the direct-trust shortcut has to enforce
+     * it itself.
+     */
+    @Test
+    public void testExpiredCertificateIsNotDirectlyTrusted() throws Exception {
+        Properties properties = new Properties();
+        properties.put("org.apache.wss4j.crypto.provider",
+                       "org.apache.wss4j.common.crypto.Merlin");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.type", "jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40exp");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40exp.jks");
+        Crypto expiredCrypto = new Merlin(properties, this.getClass().getClassLoader(), null);
+
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40exp");
+        X509Certificate[] certChain = expiredCrypto.getX509Certificates(cryptoType);
+        assertNotNull(certChain);
+        // Only the leaf, so that the direct-trust shortcut in verifyTrust is the path taken
+        X509Certificate[] expiredCerts = new X509Certificate[] {certChain[0]};
+
+        Crypto certificateStore = new CertificateStore(expiredCerts);
+
+        WSSecurityException ex =
+            assertThrows(WSSecurityException.class,
+                () -> certificateStore.verifyTrust(expiredCerts, false, null, null));
+        assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, ex.getErrorCode());
+    }
 
 }
