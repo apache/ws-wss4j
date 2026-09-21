@@ -28,13 +28,16 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test for extracting AuthorityKeyIdentifier/SubjectKeyIdentifier information from
- * the certs using BouncyCastle.
+ * certificates.
  */
 public class AuthorityKeyIdentifierTest {
 
@@ -68,6 +71,53 @@ public class AuthorityKeyIdentifierTest {
         assertNotNull(subjectKeyIdentifierBytes);
 
         assertTrue(Arrays.equals(keyIdentifierBytes, subjectKeyIdentifierBytes));
+    }
+
+    @Test
+    public void testExtractKeyIdentifiersFromDer() {
+        byte[] expectedKeyIdentifier = {1, 2, 3};
+        byte[] authorityKeyIdentifier = {4, 7, 48, 5, (byte)0x80, 3, 1, 2, 3};
+        byte[] subjectKeyIdentifier = {4, 5, 4, 3, 1, 2, 3};
+
+        assertArrayEquals(
+            expectedKeyIdentifier,
+            BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier)
+        );
+        assertArrayEquals(
+            expectedKeyIdentifier,
+            BouncyCastleUtils.getSubjectKeyIdentifierBytes(subjectKeyIdentifier)
+        );
+    }
+
+    @Test
+    public void testAuthorityKeyIdentifierWithoutKeyIdentifier() {
+        byte[] authorityKeyIdentifier = {4, 5, 48, 3, (byte)0x82, 1, 1};
+        byte[] authorityIssuerAndSerial = {4, 10, 48, 8, (byte)0xA1, 3, 48, 1, 0, (byte)0x82, 1, 1};
+        byte[] emptyAuthorityKeyIdentifier = {4, 2, 48, 0};
+
+        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier));
+        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityIssuerAndSerial));
+        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(emptyAuthorityKeyIdentifier));
+    }
+
+    @Test
+    public void testRejectMalformedKeyIdentifiers() {
+        byte[] truncatedSubjectKeyIdentifier = {4, 5, 4, 3, 1, 2};
+        byte[] trailingAuthorityKeyIdentifier = {4, 7, 48, 5, (byte)0x80, 3, 1, 2, 3, 0};
+        byte[] indefiniteLengthSubjectKeyIdentifier = {4, (byte)0x80, 4, 0, 0, 0};
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> BouncyCastleUtils.getSubjectKeyIdentifierBytes(truncatedSubjectKeyIdentifier)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> BouncyCastleUtils.getAuthorityKeyIdentifierBytes(trailingAuthorityKeyIdentifier)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> BouncyCastleUtils.getSubjectKeyIdentifierBytes(indefiniteLengthSubjectKeyIdentifier)
+        );
     }
 
     @Test
