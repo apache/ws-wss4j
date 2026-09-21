@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -96,11 +97,11 @@ public class SignatureConfirmationTest {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures =
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        Set<String> savedSignatures =
+            (Set<String>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        Integer signatureValue = savedSignatures.iterator().next();
-        assertTrue(signatureValue != null && signatureValue != 0);
+        String signatureValue = savedSignatures.iterator().next();
+        assertTrue(signatureValue != null && !signatureValue.isEmpty());
     }
 
 
@@ -137,8 +138,8 @@ public class SignatureConfirmationTest {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures =
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        Set<String> savedSignatures =
+            (Set<String>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertNull(savedSignatures);
     }
 
@@ -176,11 +177,11 @@ public class SignatureConfirmationTest {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures =
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        Set<String> savedSignatures =
+            (Set<String>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        Integer signatureValue = savedSignatures.iterator().next();
-        assertTrue(signatureValue != null && signatureValue != 0);
+        String signatureValue = savedSignatures.iterator().next();
+        assertTrue(signatureValue != null && !signatureValue.isEmpty());
 
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
@@ -208,6 +209,94 @@ public class SignatureConfirmationTest {
         assertTrue(outputString.contains("Value"));
     }
 
+
+    /**
+     * A SignatureConfirmation whose Value is not the signature value of the request, but merely
+     * collides with it under Arrays.hashCode, must be rejected. Such a collision is trivial to
+     * construct - the hash is 32 bits wide and its recurrence is linear - so matching on it would
+     * let any responder satisfy the confirmation with a value it never computed.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void
+    testSignatureConfirmationHashCollisionRejected() throws Exception {
+        final RequestData reqData = new RequestData();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
+        msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
+        reqData.setMsgContext(msgContext);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
+        handler.send(doc, reqData, Collections.singletonList(action), true);
+
+        //
+        // Verify the inbound request, and create a response with a Signature Confirmation
+        //
+        WSHandlerResult results = verify(doc);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        List<WSHandlerResult> receivedResults = new ArrayList<>();
+        receivedResults.add(results);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
+        handler.send(
+            doc, reqData, Collections.singletonList(new HandlerAction(WSConstants.NO_SECURITY)),
+            false
+        );
+
+        //
+        // Replace the SignatureConfirmation Value with a different byte sequence that has the
+        // same Arrays.hashCode, as a hostile responder would.
+        //
+        Element sigConfElement =
+            XMLUtils.findElement(
+                doc.getDocumentElement(), WSConstants.SIGNATURE_CONFIRMATION_LN, WSConstants.WSSE11_NS
+            );
+        assertNotNull(sigConfElement);
+        byte[] genuineValue =
+            org.apache.xml.security.utils.XMLUtils.decode(
+                sigConfElement.getAttributeNS(null, SignatureConfirmation.SC_VALUE_ATTR));
+        byte[] collidingValue = hashCodeCollision(genuineValue);
+        assertFalse(Arrays.equals(genuineValue, collidingValue));
+        assertEquals(Arrays.hashCode(genuineValue), Arrays.hashCode(collidingValue));
+        sigConfElement.setAttributeNS(
+            null, SignatureConfirmation.SC_VALUE_ATTR,
+            org.apache.xml.security.utils.XMLUtils.encodeToString(collidingValue));
+
+        results = verify(doc);
+        WSSecurityEngineResult scResult =
+            results.getActionResults().get(WSConstants.SC).get(0);
+        assertNotNull(scResult);
+        assertNotNull(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION));
+
+        try {
+            handler.signatureConfirmation(reqData, results);
+            fail("Failure expected on a SignatureConfirmation that only collides with the "
+                 + "signature value");
+        } catch (WSSecurityException ex) {
+            assertEquals(WSSecurityException.ErrorCode.FAILURE, ex.getErrorCode());
+        }
+    }
+
+    /**
+     * Return a byte array that differs from the argument but has the same Arrays.hashCode.
+     * Arrays.hashCode is h = 31*h + b, so adding one to a byte and subtracting 31 from the byte
+     * after it leaves the result unchanged.
+     */
+    private static byte[] hashCodeCollision(byte[] value) {
+        for (int i = 0; i < value.length - 1; i++) {
+            if (value[i] < Byte.MAX_VALUE && value[i + 1] >= Byte.MIN_VALUE + 31) {
+                byte[] collision = value.clone();
+                collision[i]++;
+                collision[i + 1] -= 31;
+                return collision;
+            }
+        }
+        throw new IllegalStateException("No collision could be constructed for this value");
+    }
 
     /**
      * Test to see that a signature confirmation response is correctly processed.
