@@ -380,6 +380,20 @@ on each is captured in §14 Q10–Q11.
   bound on signed-data compression
   *(documented: `ws-security-stax/.../wss-config-compression.xml`,
   exercised by `VulnerabliltyVectorsDecompressedBytesTest`)*.
+- The shared derived-key derivation bounds the `wsc:Length` of a
+  DerivedKeyToken to between `MINIMUM_DERIVED_KEY_LENGTH` (16 bytes) and
+  `MAXIMUM_DERIVED_KEY_LENGTH` (512), and its `wsc:Offset` to at most
+  `MAXIMUM_DERIVED_KEY_OFFSET` (4096) *(`DerivedKeyUtils`, exercised by
+  `DerivedKeyUtilsTest`)*. Both values are attacker-controlled message
+  content: without a ceiling the derivation is an amplifier, and without a
+  floor a one-byte HMAC key is a forgeable signature (CVE-2026-85532).
+- A UsernameToken's `wsse11:Iteration` is capped at
+  `UsernameTokenUtil.MAX_ITERATION` (10000) in both engines, the
+  derivation performing one SHA-1 round per iteration *(`UsernameToken`
+  for DOM, `UsernameSecurityTokenImpl` for StAX)*.
+- Transported symmetric key material is capped at 1024 bytes, and must
+  otherwise match exactly the length its algorithm requires
+  *(`KeyUtils.prepareSecretKey`)*.
 - The DOM engine bounds how deeply a message may nest tokens inside
   tokens. A processor that uncovers a security structure inside the one
   it is processing hands it to the processor for that structure, which
