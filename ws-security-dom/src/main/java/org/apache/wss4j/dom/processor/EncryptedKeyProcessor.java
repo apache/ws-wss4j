@@ -382,6 +382,35 @@ public class EncryptedKeyProcessor implements Processor {
     }
 
     /**
+     * Prepare the symmetric key that an EncryptedKey yielded, without telling the sender
+     * whether it yielded anything.
+     *
+     * A key recovered from an EncryptedKey is the product of a private key operation on
+     * ciphertext the sender chose, and a decryption that fails produces a random key of
+     * whatever length the EncryptedKey's own ReferenceList implies - which need not be the
+     * length the EncryptedData being decrypted requires. Rejecting the message on that
+     * mismatch would tell the sender that the private key operation yielded a well formed
+     * plaintext of some other length: exactly the signal a Bleichenbacher attack on the key
+     * transport is looking for, and one the sender can provoke at will by choosing the
+     * EncryptedData algorithm. Carry on with a random key of the right length instead, so
+     * that both outcomes are the same outcome: the data does not decrypt.
+     *
+     * This belongs only to a key that came from an EncryptedKey. A key taken from a token
+     * or supplied by the CallbackHandler - a Kerberos session key, say - carries no such
+     * signal, and a length that does not match is a configuration error there, so it is
+     * reported rather than hidden behind a decryption failure.
+     */
+    static SecretKey prepareSecretKeyFromEncryptedKey(String symEncAlgo, byte[] secretKey)
+        throws WSSecurityException {
+        try {
+            return KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+        } catch (WSSecurityException ex) {
+            LOG.debug("The key recovered from the EncryptedKey does not match {}", symEncAlgo);
+            return KeyUtils.prepareSecretKey(symEncAlgo, getRandomKey(symEncAlgo));
+        }
+    }
+
+    /**
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
      */
@@ -601,22 +630,11 @@ public class EncryptedKeyProcessor implements Processor {
 
         SecretKey symmetricKey = null;
         try {
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
+            symmetricKey = prepareSecretKeyFromEncryptedKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "badEncAlgo",
                 new Object[] {symEncAlgo});
-        } catch (WSSecurityException ex) {
-            // The key recovered from the EncryptedKey is not of the length this algorithm
-            // requires. Rejecting the message here would tell the sender that the private key
-            // operation yielded a well formed plaintext of some other length - exactly the signal
-            // a Bleichenbacher attack on the key transport is looking for, and one the attacker
-            // can provoke at will by choosing the EncryptedData algorithm, since a decryption
-            // that fails produces a random key of precisely the right length (see getRandomKey).
-            // Carry on with such a random key instead, so that both outcomes are the same
-            // outcome: the data does not decrypt.
-            LOG.debug("The key recovered from the EncryptedKey does not match {}", symEncAlgo);
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, getRandomKey(symEncAlgo));
         }
 
         // Check for compliance against the defined AlgorithmSuite

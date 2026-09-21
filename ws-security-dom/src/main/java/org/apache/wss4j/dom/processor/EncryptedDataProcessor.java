@@ -115,7 +115,9 @@ public class EncryptedDataProcessor implements Processor {
             STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
             byte[] secretKey = parserResult.getSecretKey();
             principal = parserResult.getPrincipal();
-            key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+            key = parserResult.isSecretKeyFromEncryptedKey()
+                ? EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, secretKey)
+                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
             encrKeyResults = new ArrayList<>();
         } else if (encryptedKeyElement != null && data.getWssConfig() != null) {
             WSSConfig wssConfig = data.getWssConfig();
@@ -128,7 +130,10 @@ public class EncryptedDataProcessor implements Processor {
             }
             byte[] symmKey =
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
-            key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
+            //An EncryptedKey inline in this KeyInfo carries no ReferenceList of its own, so a
+            //failed decryption yields a random key of the default length rather than of the
+            //length this EncryptedData needs. Do not let that difference be visible.
+            key = EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, symmKey);
         } else if (retrievalMethodElement != null
             && "http://www.w3.org/2001/04/xmlenc#EncryptedKey".equals(
                 retrievalMethodElement.getAttributeNS(null, "Type"))) {
@@ -137,7 +142,9 @@ public class EncryptedDataProcessor implements Processor {
             WSSecurityEngineResult result = data.getWsDocInfo().getResult(uri);
             if (result != null) {
                 byte[] symmKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
+                //The RetrievalMethod states that this is an EncryptedKey, and the key it
+                //yielded need not be of the length this EncryptedData needs.
+                key = EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, symmKey);
             }
         } else {
             throw new WSSecurityException(
