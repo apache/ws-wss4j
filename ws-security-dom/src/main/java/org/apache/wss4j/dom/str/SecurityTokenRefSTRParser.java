@@ -122,6 +122,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
+            parserResult.setSecretKeyFromEncryptedKey(true);
         } else if (action != null && WSConstants.DKT == action.intValue()) {
             DerivedKeyToken dkt =
                 (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
