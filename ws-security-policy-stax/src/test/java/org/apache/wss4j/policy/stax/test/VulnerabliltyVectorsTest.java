@@ -32,8 +32,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
+import org.apache.neethi.Policy;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.policy.stax.OperationPolicy;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcerFactory;
 import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
@@ -122,6 +124,133 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                         "{http://example.com/evil}notGood",
                 ex.getCause().getMessage());
         assertEquals(WSSecurityException.INVALID_SECURITY, ex.getFaultCode());
+    }
+
+    /**
+     * An operation whose policy is registered without a namespace is matched on its local name
+     * alone, which accepts a Body element in any namespace. That is only tenable while the
+     * local name identifies one operation: once a second operation shares it, the local name no
+     * longer says which of the two the SOAP stack will dispatch to, and the policy of the one
+     * could be enforced for a message that invokes the other. Fail closed instead.
+     */
+    @Test
+    public void testAmbiguousNoNamespaceOperationNameDoesNotMatchAnyNamespace() throws Exception {
+        List<OperationPolicy> operationPolicies =
+                List.of(operationPolicy(new QName(null, "getBalance"), null),
+                        operationPolicy(new QName("http://www.example.net/secure", "getBalance"), null));
+
+        PolicyEnforcer policyEnforcer =
+                new PolicyEnforcer(operationPolicies, "", false, null, 0, null, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://www.example.net/other", "getBalance"));
+
+        WSSecurityException ex = assertThrows(WSSecurityException.class,
+                () -> policyEnforcer.registerSecurityEvent(operationSecurityEvent));
+
+        assertEquals(WSSecurityException.INVALID_SECURITY, ex.getFaultCode());
+    }
+
+    /**
+     * The same ambiguity on the SOAPAction path: the SOAPAction header selects the policy of the
+     * operation registered without a namespace, while the Body element dispatches to the other
+     * operation of that name. The cross-check added for SOAPAction spoofing must reject this.
+     */
+    @Test
+    public void testAmbiguousNoNamespaceOperationNameDoesNotSatisfyTheSOAPActionCheck() throws Exception {
+        List<OperationPolicy> operationPolicies =
+                List.of(operationPolicy(new QName(null, "getBalance"), "urn:getBalanceUnsecured"),
+                        operationPolicy(new QName("http://www.example.net/secure", "getBalance"), "urn:getBalance"));
+
+        PolicyEnforcer policyEnforcer =
+                new PolicyEnforcer(operationPolicies, "urn:getBalanceUnsecured", false, null, 0, null, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://www.example.net/secure", "getBalance"));
+
+        WSSecurityException ex = assertThrows(WSSecurityException.class,
+                () -> policyEnforcer.registerSecurityEvent(operationSecurityEvent));
+
+        assertEquals("SOAPAction (urn:getBalanceUnsecured) does not match with the current Operation: "
+                        + "{http://www.example.net/secure}getBalance",
+                ex.getCause().getMessage());
+        assertEquals(WSSecurityException.INVALID_SECURITY, ex.getFaultCode());
+    }
+
+    /**
+     * An operation name that carries a namespace is matched exactly, so the policy of the
+     * namespace-less operation of the same name is not selected for it.
+     */
+    @Test
+    public void testNamespacedOperationNameSelectsItsOwnPolicy() throws Exception {
+        List<OperationPolicy> operationPolicies =
+                List.of(operationPolicy(new QName(null, "getBalance"), null),
+                        operationPolicy(new QName("http://www.example.net/secure", "getBalance"), null));
+
+        PolicyEnforcer policyEnforcer =
+                new PolicyEnforcer(operationPolicies, "", false, null, 0, null, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://www.example.net/secure", "getBalance"));
+
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+    }
+
+    /**
+     * Where the local name is unambiguous the fallback is kept, so an integrator that registers
+     * its operations without a namespace keeps working.
+     */
+    @Test
+    public void testUnambiguousNoNamespaceOperationNameStillMatches() throws Exception {
+        List<OperationPolicy> operationPolicies =
+                List.of(operationPolicy(new QName(null, "getBalance"), null));
+
+        PolicyEnforcer policyEnforcer =
+                new PolicyEnforcer(operationPolicies, "", false, null, 0, null, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://www.example.net/other", "getBalance"));
+
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+    }
+
+    /**
+     * An rpc style operation is registered under the QName that will actually appear as the Body
+     * child element - the operation name qualified with the namespace from soap:body - and so is
+     * matched exactly rather than on its local name alone.
+     */
+    @Test
+    public void testRpcOperationIsBoundToItsSOAPBodyNamespace() throws Exception {
+        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(
+                this.getClass().getClassLoader().getResource("testdata/wsdl/rpcOperation.wsdl"));
+        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("", false, null, 0, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://www.example.net/rpc", "getBalance"));
+
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+    }
+
+    @Test
+    public void testRpcOperationInAnotherNamespaceIsRejected() throws Exception {
+        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(
+                this.getClass().getClassLoader().getResource("testdata/wsdl/rpcOperation.wsdl"));
+        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("", false, null, 0, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("http://example.com/evil", "getBalance"));
+
+        WSSecurityException ex = assertThrows(WSSecurityException.class,
+                () -> policyEnforcer.registerSecurityEvent(operationSecurityEvent));
+
+        assertEquals(WSSecurityException.INVALID_SECURITY, ex.getFaultCode());
+    }
+
+    private static OperationPolicy operationPolicy(QName operationName, String soapAction) {
+        OperationPolicy operationPolicy = new OperationPolicy(operationName);
+        operationPolicy.setPolicy(new Policy().normalize(true));
+        operationPolicy.setOperationAction(soapAction);
+        return operationPolicy;
     }
 
     @Test

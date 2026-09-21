@@ -128,6 +128,12 @@ A finding is in-model only if it reaches a row marked **yes**.
    spoofing should be left to the SOAP stack" — *(documented:
    `ws-security-policy-stax/src/test/java/org/apache/wss4j/policy/stax/test/VulnerabliltyVectorsTest.java`*)
    are out of model. → `OUT-OF-MODEL: adversary-not-in-scope`.
+   WSS4J does, however, refuse to enforce a policy that does not belong
+   to the operation named by the Body element (§8 P11). That is a
+   consistency check on its own policy selection, not SOAPAction
+   enforcement: it does not tell the stack which operation to dispatch,
+   it only declines to apply one operation's policy to another's
+   message.
 2. **A SOAP parser.** WSS4J does not parse SOAP from bytes — it receives a
    `Document` (DOM engine) or `XMLStreamReader` (StAX engine) from the
    caller. XXE / DTD / billion-laughs defenses on the *XML-bytes-to-DOM*
@@ -543,6 +549,29 @@ on each is captured in §14 Q10–Q11.
   *(inferred — §14 Q15)*.
 - *(documented:
   `ws-security-stax/src/test/java/.../VulnerabliltyVectorsDecompressedBytesTest.java`)*
+
+### P11 — The enforced policy belongs to the operation the message invokes (StAX policy mode)
+
+- **Condition**: streaming engine with `PolicyInputProcessor` /
+  `PolicyEnforcer`; the operation policies were built from a WSDL by
+  `PolicyEnforcerFactory`, or supplied by the integrator under the QName
+  of the SOAP Body child element.
+- **Violation symptom**: a message whose Body element names operation A
+  is checked against the policy of operation B — by naming B in the
+  SOAPAction header, or by sending A's local name in a namespace the
+  WSDL does not declare — so the weaker of two policies is enforced for
+  an operation the SOAP stack dispatches under the stronger one.
+- **Mechanism**: a policy is selected by the exact QName of the Body
+  child element, and a policy preselected by SOAPAction must agree with
+  it. A policy operation name that carries no namespace can only be
+  compared on its local name; that comparison is accepted only while the
+  local name belongs to exactly one operation, and the message is
+  rejected otherwise.
+- **Severity**: **security-critical** where two operations of the same
+  local name carry different policies; `VALID-HARDENING` otherwise,
+  since the SOAP stack dispatches on the full QName (§3 item 1).
+- *(documented:
+  `ws-security-policy-stax/src/test/java/.../VulnerabliltyVectorsTest.java`)*
 
 ## §9 Security properties the project does *not* provide
 
@@ -1065,7 +1094,7 @@ documented sources are the AsciiDoc pages under `src/site/asciidoc/`
 | `ws-security-stax/src/main/java/org/apache/wss4j/stax/setup/WSSec.java` | `SchemaFactory.setFeature(FEATURE_SECURE_PROCESSING, true)` for bundled schema load | §5 environment |
 | `ws-security-common/src/main/java/org/apache/wss4j/common/cache/EHCacheReplayCache.java` | EHCache-backed replay defense | §5a, §8 P5, §10 item 8 |
 | `ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java` + `ws-security-dom/.../RequestData.java` | configuration-tag definitions and defaults | §5a |
-| `ws-security-policy-stax/src/test/java/.../VulnerabliltyVectorsTest.java` | SOAPAction spoofing is out of scope; signed-body-relocation is a `VALID` regression test | §3 item 1, §8 P2 |
+| `ws-security-policy-stax/src/test/java/.../VulnerabliltyVectorsTest.java` | SOAPAction spoofing is out of scope; signed-body-relocation is a `VALID` regression test; the policy selected for an operation must belong to it | §3 item 1, §8 P2, §8 P11 |
 | `ws-security-stax/src/test/java/.../VulnerabliltyVectorsDecompressedBytesTest.java` | "Maximum byte count … reached" enforced on signed compressed payloads | §8 P10, §10 item 8 |
 | `ChangeLog.txt` WSS-677 (2.3.1) | "Comparison in validate class is vulnerable to timing side channels" | §8 P8 |
 | `ChangeLog.txt` WSS-694 (3.0.0) | Move wss4j to native jakarta namespace | §5 environment |
