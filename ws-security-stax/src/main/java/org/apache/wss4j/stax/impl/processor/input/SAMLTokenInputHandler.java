@@ -527,6 +527,40 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * which can not be done until the whole soap-header is processed and we know that the whole soap-body
      * is signed.
      */
+    /**
+     * Whether a security token identifies the sender that signed with it, as opposed to merely
+     * proving possession of a key.
+     *
+     * A certificate or a public key was checked against the receiver's own truststore when the
+     * token was verified - see X509SecurityTokenImpl#verify and
+     * RsaKeyValueSecurityTokenImpl#verify, both of which call Crypto#verifyTrust. A bare symmetric
+     * key was not, and could not be: an EncryptedKey that the sender minted for itself under the
+     * receiver's public certificate proves possession of a key the sender chose, and nothing
+     * whatsoever about who sent it.
+     *
+     * Two symmetric cases do carry an identity. A key derived from a UsernameToken required the
+     * password to derive, and a Kerberos session key came out of a ticket the KDC issued to a
+     * named client. These are the streaming counterparts of the results the DOM engine stamps
+     * with TAG_VALIDATED_TOKEN, plus its UT_SIGN case - see DOMSAMLUtil#establishesSenderIdentity.
+     *
+     * The token is resolved to the root of its key wrapping chain first, so that a
+     * DerivedKeyToken is judged on whatever it was derived from.
+     */
+    static boolean establishesSenderIdentity(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
+
+        X509Certificate[] x509Certificates = rootToken.getX509Certificates();
+        if (x509Certificates != null && x509Certificates.length > 0) {
+            return true;
+        }
+        if (rootToken.getPublicKey() != null) {
+            return true;
+        }
+
+        return WSSecurityTokenConstants.USERNAME_TOKEN.equals(rootToken.getTokenType())
+            || WSSecurityTokenConstants.KERBEROS_TOKEN.equals(rootToken.getTokenType());
+    }
+
     static class SAMLTokenVerifierInputProcessor extends AbstractInputProcessor implements SecurityEventListener {
 
         private SamlAssertionWrapper samlAssertionWrapper;
@@ -710,10 +744,20 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                                 samlTokenSignedElementSecurityEvent = signedElementSecurityEvent;
                             }
                         }
+                        // A sender-vouches assertion is only worth as much as the identity of
+                        // whoever vouched for it. An assertion that is itself signed carries that
+                        // backing already, and the message signature merely binds it to this
+                        // message, so any signature will do. An unsigned assertion has no such
+                        // backing: the only party asserting it is whoever signed the message, so
+                        // that signature has to have been made with a credential whose identity
+                        // was actually established.
                         if (bodySignedPartSecurityEvent != null
                             && samlTokenSignedElementSecurityEvent != null
                             && bodySignedPartSecurityEvent.getSecurityToken()
-                                == samlTokenSignedElementSecurityEvent.getSecurityToken()) {
+                                == samlTokenSignedElementSecurityEvent.getSecurityToken()
+                            && (samlAssertionWrapper.isSigned()
+                                || establishesSenderIdentity(
+                                    bodySignedPartSecurityEvent.getSecurityToken()))) {
                             return;
                         }
                         methodNotSatisfied = true;
