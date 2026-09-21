@@ -233,6 +233,61 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         }
     }
 
+    /**
+     * The proof-of-possession check for a holder-of-key assertion used to be triggered by the
+     * first element inside the SOAP Body. A Body with no element child of its own produces no
+     * such event, so the check never ran and an assertion whose subject key the sender does not
+     * hold was accepted.
+     */
+    @Test
+    public void testHOKEmptyBodyInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+            callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+            callbackHandler.setIssuer("www.example.com");
+            // The assertion itself is signed, so it gets past the subject confirmation method
+            // check; what it does not carry is any proof that the sender holds the subject key.
+            callbackHandler.setSignAssertion(true);
+
+            InputStream sourceDocument =
+                this.getClass().getClassLoader().getResourceAsStream("testdata/empty-body-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            // The Body must have stayed empty, or the test is not exercising what it claims to
+            NodeList bodies =
+                securedDocument.getElementsByTagNameNS(
+                    "http://schemas.xmlsoap.org/soap/envelope/", "Body");
+            assertEquals(1, bodies.getLength());
+            assertEquals(0, ((Element)bodies.item(0)).getElementsByTagName("*").getLength());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(
+                this.getClass().getClassLoader().getResource("saml/issuer.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
+            XMLStreamReader xmlStreamReader =
+                wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("XMLStreamException expected");
+            } catch (XMLStreamException e) {
+                assertNotNull(e.getCause());
+            }
+        }
+    }
+
     @Test
     public void testSAML2TrustFailureInbound() throws Exception {
 

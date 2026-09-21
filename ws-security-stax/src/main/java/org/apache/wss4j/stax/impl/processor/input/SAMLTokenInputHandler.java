@@ -69,6 +69,7 @@ import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
+import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
@@ -601,6 +602,17 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
                 List<QName> elementPath = xmlSecStartElement.getElementPath();
                 if (elementPath.size() == 3 && WSSUtils.isInSOAPBody(elementPath)) {
+                    inputProcessorChain.removeProcessor(this);
+                    checkPossessionOfKey(inputProcessorChain, samlAssertionWrapper, subjectSecurityToken);
+                }
+            } else if (xmlSecEvent.getEventType() == XMLStreamConstants.END_ELEMENT) {
+                // A Body with no element child of its own never produces the event above, so
+                // without this the subject confirmation of the assertion would go unchecked for
+                // such a message. The Body end element is the last point at which the check can
+                // still be made, and every Signature covering the Body has been seen by then.
+                XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                List<QName> elementPath = xmlSecEndElement.getElementPath();
+                if (elementPath.size() == 2 && WSSUtils.isInSOAPBody(elementPath)) {
                     inputProcessorChain.removeProcessor(this);
                     checkPossessionOfKey(inputProcessorChain, samlAssertionWrapper, subjectSecurityToken);
                 }
