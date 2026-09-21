@@ -331,6 +331,7 @@ subset:
 | `ENABLE_REVOCATION` | `false` *(documented)* | optional CRL checking | inbound certificate revocation |
 | `ENABLE_SIGNATURE_CONFIRMATION` | `false` *(documented)* | tunable | enables WS-Security SignatureConfirmation flow |
 | `VALIDATE_SAML_SUBJECT_CONFIRMATION` | `true` *(documented)* | hardened | inbound SAML SubjectConfirmation validation |
+| SAML audience restrictions | empty — no configuration tag; set through `RequestData.setAudienceRestrictions` or `WSSSecurityProperties.setAudienceRestrictions` *(documented: `src/site/asciidoc/best_practice.adoc` §"Restrict the audience of a SAML assertion")* | strongly recommended; an empty list means an `AudienceRestriction` condition is not checked at all | which audience URIs an inbound assertion may name |
 | `NONCE_CACHE_INSTANCE` / `TIMESTAMP_CACHE_INSTANCE` / `SAML_ONE_TIME_USE_CACHE_INSTANCE` | No WSS4J-core default; `EHCacheReplayCache` supplied by integrations such as CXF *(documented)* | replay protection on by default for CXF inbound recipient messages; direct WSS4J callers must configure a cache | replay cache for UsernameToken nonces, Timestamps, SAML OneTimeUse |
 | `PASSWORD_ENCRYPTOR_INSTANCE` | `JasyptPasswordEncryptor` *(documented)* | tunable | decryption of encrypted passwords in Crypto properties files |
 | `merlin.keystore.password` | `"security"` *(documented: `src/site/asciidoc/config.adoc`)* | **maintainer ruling required** — this is a *default for the property file*; production deployments override *(inferred — §14 Q12)* | Merlin keystore password |
@@ -837,6 +838,18 @@ The embedding SOAP stack / application **must**:
   `SIG_SUBJECT_CERT_CONSTRAINTS`.** Any cert any CA in the truststore
   issued is admitted *(documented:
   `src/site/asciidoc/best_practice.adoc`)*.
+- **Accepting a SAML assertion without stating which audience the
+  service will accept.** `SamlAssertionWrapper.checkAudienceRestrictions`
+  returns without checking anything when the supplied list is empty, and
+  it is empty unless the caller sets it — there is no configuration tag,
+  only `RequestData.setAudienceRestrictions` and
+  `WSSSecurityProperties.setAudienceRestrictions`. Any assertion the
+  configured issuer signed is then accepted, including one minted for a
+  different service. Apache CXF sets the list by default for SOAP
+  endpoints, to the request URL and the service QName, so this bites a
+  deployment that drives the WSS4J engine itself *(documented:
+  `src/site/asciidoc/best_practice.adoc` §"Restrict the audience of a
+  SAML assertion")*.
 - **Re-enabling RSA v1.5 (`ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM=true`)
   for interop with a legacy peer.** Re-introduces the Bleichenbacher
   oracle path even though WSS4J's own defense exists.

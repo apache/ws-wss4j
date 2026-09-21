@@ -109,6 +109,26 @@ certificate of this issuer will pass trust validation. See
 http://coheigea.blogspot.ie/2012/08/subject-dn-certificate-constraint.html[here]
 for more information. 
 
+=== Restrict the audience of a SAML assertion
+
+A SAML assertion says who the subject is, not who it was meant for. An assertion
+that one of your services issued, or accepted, is a perfectly valid assertion
+anywhere else that trusts the same issuer, so a service that does not state which
+audience it is willing to accept will honour an assertion minted for a different
+one. Where the assertion carries an AudienceRestriction condition, WSS4J checks it
+against the list of audience URIs the receiving side supplies - and only against
+that list. The list is empty unless it is set, and an empty list means the
+condition is not checked at all.
+
+There is no configuration tag for this: set it programmatically, with
+RequestData.setAudienceRestrictions for the DOM code or
+WSSSecurityProperties.setAudienceRestrictions for the streaming code. A web
+services stack may do it for you - Apache CXF supplies the request URL and the
+service QName by default for SOAP endpoints, through
+SecurityConstants.AUDIENCE_RESTRICTIONS, and validates against them unless
+security.validate.audience-restriction is turned off - but a deployment calling
+the WSS4J engine directly gets nothing unless it sets the list itself.
+
 === Specify signature algorithm on receiving side
 
 When not using WS-SecurityPolicy (see point above about favouring the WS-SecurityPolicy
