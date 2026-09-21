@@ -817,14 +817,19 @@ public class SamlAssertionWrapper {
         Instant issueInstant = null;
         Instant validTill = null;
 
-        if (getSamlVersion().equals(SAMLVersion.VERSION_20)
-            && getSaml2().getConditions() != null) {
-            validTill = getSaml2().getConditions().getNotOnOrAfter();
+        // The IssueInstant is read whether or not the assertion carries any Conditions at all.
+        // It is the fallback bound on the assertion's lifetime, so reading it only when there
+        // are Conditions would skip that bound in precisely the case it exists for.
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             issueInstant = getSaml2().getIssueInstant();
-        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
-            && getSaml1().getConditions() != null) {
-            validTill = getSaml1().getConditions().getNotOnOrAfter();
+            if (getSaml2().getConditions() != null) {
+                validTill = getSaml2().getConditions().getNotOnOrAfter();
+            }
+        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)) {
             issueInstant = getSaml1().getIssueInstant();
+            if (getSaml1().getConditions() != null) {
+                validTill = getSaml1().getConditions().getNotOnOrAfter();
+            }
         }
 
         // Check the IssueInstant is not in the future, subject to the future TTL
