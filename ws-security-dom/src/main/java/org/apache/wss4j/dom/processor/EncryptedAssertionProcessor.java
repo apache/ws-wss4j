@@ -70,7 +70,12 @@ public class EncryptedAssertionProcessor implements Processor {
                               ((Element)currentChild).getLocalName());
                 Processor proc = request.getWssConfig().getProcessor(el);
                 if (proc != null) {
-                    completeResults.addAll(proc.handleToken((Element)currentChild, request));
+                    request.enterNestedToken();
+                    try {
+                        completeResults.addAll(proc.handleToken((Element)currentChild, request));
+                    } finally {
+                        request.exitNestedToken();
+                    }
                 }
             }
         }
@@ -92,8 +97,14 @@ public class EncryptedAssertionProcessor implements Processor {
                             Processor proc = request.getWssConfig().getProcessor(el);
                             if (proc != null) {
                                 LOG.debug("Processing decrypted element with: {}", proc.getClass().getName());
-                                List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, request);
-                                completeResults.addAll(0, results);
+                                request.enterNestedToken();
+                                try {
+                                    List<WSSecurityEngineResult> results =
+                                        proc.handleToken(decryptedElem, request);
+                                    completeResults.addAll(0, results);
+                                } finally {
+                                    request.exitNestedToken();
+                                }
                                 return completeResults;
                             }
                         }
@@ -119,7 +130,12 @@ public class EncryptedAssertionProcessor implements Processor {
         Processor proc = request.getWssConfig().getProcessor(el);
         if (proc != null) {
             LOG.debug("Processing decrypted element with: {}", proc.getClass().getName());
-            return proc.handleToken(encryptedDataElement, request);
+            request.enterNestedToken();
+            try {
+                return proc.handleToken(encryptedDataElement, request);
+            } finally {
+                request.exitNestedToken();
+            }
         }
 
         return Collections.emptyList();
