@@ -71,6 +71,34 @@ WSS4J has support for "gcm" mode algorithms as well. This can be specified via
 WSHandlerConstants.ENC_SYM_ALGO ("encryptionSymAlgorithm"), for example to 
 "http://www.w3.org/2009/xmlenc11#aes128-gcm".
 
+=== Specify the symmetric encryption algorithm on the receiving side
+
+Choosing "gcm" for what you send is only half of it. An EncryptedData element states
+its own algorithm, and nothing in the message binds the content encryption key to the
+algorithm it was meant for, so the sender of a message - or anyone who can modify one
+in flight - decides which algorithm the recipient uses to decrypt it. Relabelling an
+aes256-gcm EncryptedData as aes256-cbc leaves a key of exactly the length either
+algorithm requires, so the key length check does not notice, and the recipient
+decrypts in an unauthenticated mode whose padding is a known oracle.
+
+Tell the receiving side what to expect, and it will reject anything else:
+
+ * WS-SecurityPolicy states it in the AlgorithmSuite, which is the reason to prefer
+that approach.
+ * For the streaming code, WSSSecurityProperties.setEncryptionSymAlgorithm.
+ * For the DOM code, WSHandlerConstants.ENC_SYM_ALGO ("encryptionSymAlgorithm") - the
+same property that chooses the outbound algorithm. As with the signature and key
+transport algorithms below, it only takes effect on the receiving side where the web
+services stack sets an AlgorithmSuite on the RequestData: Apache CXF's
+WSS4JInInterceptor does, a stack calling the engine directly does not.
+
+Where the expected algorithm genuinely is not known in advance, sign the EncryptedData
+elements instead: a signature covers the Algorithm attribute, so a relabelled element
+no longer verifies. On the DOM code
+WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS
+("requireSignedEncryptedDataElements") requires every EncryptedData to sit in a signed
+subtree. The streaming code does not implement that tag.
+
 === Use Subject DN regular expressions with chain trust
 
 WSS4J 1.6.7 introduced the ability to specify regular expressions on the Subject DN of a 

@@ -636,6 +636,27 @@ matching disclaimer.
   enforce security requirements")*. The action-based API requires the
   caller to specify which parts must be signed; failing to specify them
   produces a working but insecure deployment.
+- **No binding between a content encryption key and the algorithm it is
+  used with.** An `EncryptedData` states its own algorithm, and XML
+  Encryption gives the recipient nothing that ties the key delivered in
+  the `EncryptedKey` to it, so whoever sends — or alters — the message
+  chooses the algorithm the recipient decrypts under. The key length
+  check in `KeyUtils.prepareSecretKey` refuses a key of the wrong length
+  for the declared algorithm, which rules out a relabel across key
+  sizes, but not one within a size: `aes256-gcm` relabelled as
+  `aes256-cbc` presents a 32-byte key either way, and turns an
+  authenticated mode into one whose padding is a known oracle. WSS4J
+  enforces the algorithm it has been told to expect — an AlgorithmSuite
+  from WS-SecurityPolicy, `ENC_SYM_ALGO` where the stack sets an
+  AlgorithmSuite on the `RequestData`, or
+  `setEncryptionSymAlgorithm` on the streaming engine — and accepts what
+  it is sent where it has been told nothing, since it has no basis for
+  preferring one algorithm over another and the library's own outbound
+  default is CBC. Signing the `EncryptedData` covers the Algorithm
+  attribute and is the alternative where the expected algorithm is not
+  known in advance *(documented:
+  `src/site/asciidoc/best_practice.adoc` §"Specify the symmetric
+  encryption algorithm on the receiving side")*.
 - **No `REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS` enforcement in the
   streaming engine.** The tag is defined in the shared
   `ConfigurationConstants` and read only by the DOM processors
