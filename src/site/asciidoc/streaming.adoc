@@ -87,4 +87,14 @@ nothing on its own. Check the effective policy if you rely on a nested
 assertion being enforced.
  * Where a compact policy offers several alternatives within a nested policy,
 only the first is read.
+ * The REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS ("requireSignedEncryptedDataElements")
+configuration tag is not read by the streaming code and is not enforced by it.
+The tag is shared between both stacks, and the streaming ConfigurationConverter
+takes only the tags it implements, so setting it on a streaming endpoint has no
+effect and reports nothing. A deployment that switches from the DOM interceptors
+to the streaming ones therefore loses the requirement that every EncryptedData
+element sits in a signed subtree. Use WS-SecurityPolicy SignedParts and
+EncryptedParts to state what must be signed and encrypted, and note that they
+constrain the parts the policy names rather than forbidding an additional
+EncryptedData elsewhere in the message.
 

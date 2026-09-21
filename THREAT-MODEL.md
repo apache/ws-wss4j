@@ -597,6 +597,20 @@ matching disclaimer.
   enforce security requirements")*. The action-based API requires the
   caller to specify which parts must be signed; failing to specify them
   produces a working but insecure deployment.
+- **No `REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS` enforcement in the
+  streaming engine.** The tag is defined in the shared
+  `ConfigurationConstants` and read only by the DOM processors
+  (`EncryptedDataProcessor`, `ReferenceListProcessor`,
+  `EncryptedKeyProcessor`). The StAX `ConfigurationConverter` takes only
+  the tags it implements and silently ignores the rest, so a streaming
+  endpoint that sets it is not protected and is not told. The streaming
+  documentation states that the two stacks are "configured in mostly the
+  same way (via configuration tags that are shared between both
+  stacks)", which makes this an easy loss on migration. → documented as
+  a limitation in `src/site/asciidoc/streaming.adoc` and marked DOM-only
+  in `src/site/asciidoc/config.adoc`; a report of it is
+  `VALID-HARDENING` against the streaming engine, not a silent-failure
+  bug in the DOM one.
 - **No defense against an authenticated peer who is *also* authorized
   to do the operation.** WSS4J authenticates the peer and validates the
   signature; whether the peer is allowed to do what the SOAP body says
