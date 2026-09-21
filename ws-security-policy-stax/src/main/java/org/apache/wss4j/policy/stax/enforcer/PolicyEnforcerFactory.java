@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.wsdl.Binding;
+import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
 import javax.wsdl.Message;
@@ -38,7 +39,11 @@ import javax.wsdl.WSDLElement;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPOperation;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
+import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
@@ -258,7 +263,15 @@ public class PolicyEnforcerFactory {
                         }
                     }
                     if (operationName == null) {
-                        operationName = new QName(null, operation.getName());
+                        //For rpc style the Body child element is the operation name, qualified
+                        //with the namespace given on the soap:body of the binding input, so the
+                        //QName that will be reported in the OperationSecurityEvent is knowable
+                        //here too. Registering it keeps the operation out of the local-name-only
+                        //fallback in PolicyEnforcer, which matches a Body element in ANY
+                        //namespace. Where the namespace is not given we are no worse off than
+                        //before and still register the bare operation name.
+                        operationName = new QName(rpcStyleBodyNamespace(binding, bindingOperation),
+                                                  operation.getName());
                     }
                     OperationPolicy operationPolicy = new OperationPolicy(operationName);
                     operationPolicyList.add(operationPolicy);
@@ -286,6 +299,73 @@ public class PolicyEnforcerFactory {
             }
         }
         return operationPolicyList;
+    }
+
+    /**
+     * Returns the namespace that the SOAP Body child element carries for an rpc style
+     * operation - the namespace attribute of its soap:body - or null when the operation is
+     * not rpc style or when no namespace is given.
+     */
+    private String rpcStyleBodyNamespace(Binding binding, BindingOperation bindingOperation) {
+        if (!isRpcStyle(binding, bindingOperation)) {
+            return null;
+        }
+        BindingInput bindingInput = bindingOperation.getBindingInput();
+        if (bindingInput == null) {
+            return null;
+        }
+        List<?> extensibilityElements = bindingInput.getExtensibilityElements();
+        if (extensibilityElements == null) {
+            return null;
+        }
+        for (int i = 0; i < extensibilityElements.size(); i++) {
+            Object extensibilityElement = extensibilityElements.get(i);
+            String namespace = null;
+            if (extensibilityElement instanceof SOAPBody) {
+                namespace = ((SOAPBody) extensibilityElement).getNamespaceURI();
+            } else if (extensibilityElement instanceof SOAP12Body) {
+                namespace = ((SOAP12Body) extensibilityElement).getNamespaceURI();
+            }
+            if (namespace != null && namespace.length() > 0) {
+                return namespace;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The style is given either on the binding operation itself or, failing that, on the
+     * binding. The default in WSDL 1.1 is "document".
+     */
+    private boolean isRpcStyle(Binding binding, BindingOperation bindingOperation) {
+        String style = findStyle(bindingOperation.getExtensibilityElements());
+        if (style == null) {
+            style = findStyle(binding.getExtensibilityElements());
+        }
+        return "rpc".equals(style);
+    }
+
+    private String findStyle(List<?> extensibilityElements) {
+        if (extensibilityElements == null) {
+            return null;
+        }
+        for (int i = 0; i < extensibilityElements.size(); i++) {
+            Object extensibilityElement = extensibilityElements.get(i);
+            String style = null;
+            if (extensibilityElement instanceof SOAPOperation) {
+                style = ((SOAPOperation) extensibilityElement).getStyle();
+            } else if (extensibilityElement instanceof SOAP12Operation) {
+                style = ((SOAP12Operation) extensibilityElement).getStyle();
+            } else if (extensibilityElement instanceof SOAPBinding) {
+                style = ((SOAPBinding) extensibilityElement).getStyle();
+            } else if (extensibilityElement instanceof SOAP12Binding) {
+                style = ((SOAP12Binding) extensibilityElement).getStyle();
+            }
+            if (style != null && style.length() > 0) {
+                return style;
+            }
+        }
+        return null;
     }
 
     private Policy getPolicy(Service service, Port port, Binding binding,

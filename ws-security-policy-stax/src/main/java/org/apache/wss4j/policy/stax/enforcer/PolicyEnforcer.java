@@ -204,8 +204,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             if (operationName != null) {
                 if (soapOperationName.equals(operationName)) {
                     return operationPolicy;
-                } else if ((operationName.getNamespaceURI() == null || operationName.getNamespaceURI().length() == 0)
-                    && soapOperationName.getLocalPart().equals(operationName.getLocalPart())) {
+                } else if (matchesOnLocalPartAlone(operationName, soapOperationName)) {
                     noNamespaceOperation = operationPolicy;
                 }
             }
@@ -221,8 +220,49 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (policyOperationName.equals(soapOperationName)) {
             return true;
         }
-        return (policyOperationName.getNamespaceURI() == null || policyOperationName.getNamespaceURI().length() == 0)
-            && soapOperationName.getLocalPart().equals(policyOperationName.getLocalPart());
+        return matchesOnLocalPartAlone(policyOperationName, soapOperationName);
+    }
+
+    /**
+     * A policy operation name that carries no namespace can only be compared against the local
+     * part of the Body element - the namespace it should have is simply not known. That
+     * comparison is a last resort for operations whose QName could not be determined, and it
+     * accepts a Body element in ANY namespace.
+     *
+     * It is only defensible while that local part still identifies one operation. As soon as a
+     * second operation shares it, matching on the local part alone no longer says which of the
+     * two the SOAP stack will dispatch to, and an attacker can pick whichever of the two
+     * policies is the weaker by varying nothing but the namespace of the Body element - or, on
+     * the SOAPAction path, by naming the weaker operation in the SOAPAction header while the
+     * Body dispatches to the stronger one. Refuse the loose match in that case, so that the
+     * caller fails closed instead of enforcing a policy that belongs to another operation.
+     */
+    private boolean matchesOnLocalPartAlone(QName policyOperationName, QName soapOperationName) {
+        String policyNamespace = policyOperationName.getNamespaceURI();
+        if (policyNamespace != null && policyNamespace.length() > 0) {
+            return false;
+        }
+        String localPart = policyOperationName.getLocalPart();
+        if (!soapOperationName.getLocalPart().equals(localPart)) {
+            return false;
+        }
+        if (countOperationsNamed(localPart) > 1) {
+            LOG.warn("More than one operation is named {}; refusing to match the policy for it "
+                     + "against {} on the local name alone", localPart, soapOperationName);
+            return false;
+        }
+        return true;
+    }
+
+    private int countOperationsNamed(String localPart) {
+        int count = 0;
+        for (OperationPolicy operationPolicy : operationPolicies) {
+            QName operationName = operationPolicy.getOperationName();
+            if (operationName != null && localPart.equals(operationName.getLocalPart())) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
