@@ -250,16 +250,19 @@ public abstract class WSHandler {
         if (reqData.isEnableSignatureConfirmation()
             && isRequest && !reqData.getSignatureValues().isEmpty()) {
             @SuppressWarnings("unchecked")
-            Set<Integer> savedSignatures =
-                (Set<Integer>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            Set<String> savedSignatures =
+                (Set<String>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
                 savedSignatures = new HashSet<>();
                 setProperty(
                     reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
                 );
             }
+            // The full signature value is stored, rather than its 32-bit Arrays.hashCode, which
+            // is trivially collidable: a responder that did not process the request could
+            // otherwise satisfy the SignatureConfirmation check with a value it made up.
             for (byte[] signatureValue : reqData.getSignatureValues()) {
-                savedSignatures.add(Arrays.hashCode(signatureValue));
+                savedSignatures.add(encodeSignatureValue(signatureValue));
             }
         }
     }
@@ -434,8 +437,8 @@ public abstract class WSHandler {
         //
         // First get all Signature values stored during sending the request
         //
-        Set<Integer> savedSignatures =
-            (Set<Integer>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+        Set<String> savedSignatures =
+            (Set<String>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
         //
         // Now get all results that hold a SignatureConfirmation element from
         // the current run of receiver (we can have more than one run: if we
@@ -470,9 +473,9 @@ public abstract class WSHandler {
                             );
                         }
                     } else {
-                        Integer hash = Arrays.hashCode(sc.getSignatureValue());
-                        if (savedSignatures.contains(hash)) {
-                            savedSignatures.remove(hash);
+                        String encodedValue = encodeSignatureValue(sc.getSignatureValue());
+                        if (savedSignatures.contains(encodedValue)) {
+                            savedSignatures.remove(encodedValue);
                         } else {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                 new Object[] {"Received a SignatureConfirmation element, but there are no matching"
@@ -493,6 +496,16 @@ public abstract class WSHandler {
                                                         + " list is not empty"}
             );
         }
+    }
+
+    /**
+     * Encode a signature value for storage in, and lookup against, the set of signature values
+     * saved for SignatureConfirmation. The whole value is retained: a hash truncated to an int
+     * (as Arrays.hashCode produces) is trivially collidable, so matching on one would let any
+     * peer satisfy the confirmation with a value of its own choosing.
+     */
+    private static String encodeSignatureValue(byte[] signatureValue) {
+        return Base64.getEncoder().encodeToString(signatureValue);
     }
 
     protected void decodeUTParameter(RequestData reqData)

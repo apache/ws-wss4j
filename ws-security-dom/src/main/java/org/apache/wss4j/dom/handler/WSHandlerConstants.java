@@ -72,6 +72,12 @@ public final class WSHandlerConstants extends ConfigurationConstants {
     /**
      * internally used property names to store values inside the message context
      * that must have the same lifetime as a message (request/response model).
+     *
+     * The value stored under this key is a {@code Set<String>} holding the Base64 encoding of
+     * each outbound Signature value, which an inbound SignatureConfirmation is matched against.
+     * Before WSS4J 4.0.2 it held a {@code Set<Integer>} of {@code Arrays.hashCode} values; those
+     * are 32 bits wide and trivially collidable, so the confirmation they backed was not a
+     * binding to the request's signature.
      */
     public static final String SEND_SIGV = "_sendSignatureValues_";
 
