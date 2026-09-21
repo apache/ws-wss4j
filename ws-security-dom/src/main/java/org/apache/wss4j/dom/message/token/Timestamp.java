@@ -38,7 +38,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 /**
  * Timestamp according to SOAP Message Security 1.0,
@@ -79,7 +78,7 @@ public class Timestamp {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3225);
                         }
-                        createdString = ((Text)currentChildElement.getFirstChild()).getData();
+                        createdString = getRequiredText(currentChildElement);
                     } else {
                         // Test for multiple Created elements
                         bspEnforcer.handleBSPRule(BSPRule.R3203);
@@ -99,7 +98,7 @@ public class Timestamp {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3226);
                         }
-                        strExpires = ((Text)currentChildElement.getFirstChild()).getData();
+                        strExpires = getRequiredText(currentChildElement);
                     }
                 } else {
                     bspEnforcer.handleBSPRule(BSPRule.R3222);
@@ -154,6 +153,23 @@ public class Timestamp {
         }
     }
 
+
+    /**
+     * Return the text content of a Created / Expires element. The element's first child is not
+     * necessarily a Text node - it may be absent, or be a comment - and reading it as one turned
+     * wire-supplied content into an unchecked exception rather than an INVALID_SECURITY fault.
+     */
+    private static String getRequiredText(Element element) throws WSSecurityException {
+        String text = XMLUtils.getElementText(element);
+        if (text == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "invalidTimestamp",
+                new Object[] {"The " + element.getLocalName() + " element has no text content"}
+            );
+        }
+        return text;
+    }
 
     /**
      * Constructs a <code>Timestamp</code> object according

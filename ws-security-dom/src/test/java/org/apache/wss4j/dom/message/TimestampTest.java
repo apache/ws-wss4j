@@ -460,6 +460,71 @@ public class TimestampTest {
     }
 
     /**
+     * A "Created" element with no text content of its own must be rejected as an invalid
+     * Timestamp, not read as though its first child were a Text node.
+     */
+    @Test
+    public void testEmptyCreated() throws Exception {
+        Document doc = createTimestampWithCreatedContent(null);
+
+        try {
+            verify(doc);
+            fail("The timestamp validation should have failed on an empty Created element");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
+    /**
+     * The first child of a "Created" element need not be a Text node - here it is a comment,
+     * which c14n excludes from the signed bytes in any case.
+     */
+    @Test
+    public void testCreatedWithLeadingComment() throws Exception {
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        Document doc =
+            createTimestampWithCreatedContent(DateUtil.getDateTimeFormatter(true).format(now), true);
+
+        verify(doc);
+    }
+
+    private Document createTimestampWithCreatedContent(String createdText) throws Exception {
+        return createTimestampWithCreatedContent(createdText, false);
+    }
+
+    private Document createTimestampWithCreatedContent(
+        String createdText, boolean leadingComment
+    ) throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        Element timestampElement =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        if (leadingComment) {
+            elementCreated.appendChild(doc.createComment("a comment"));
+        }
+        if (createdText != null) {
+            elementCreated.appendChild(doc.createTextNode(createdText));
+        }
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(XMLUtils.prettyDocumentToString(doc));
+        }
+        return doc;
+    }
+
+    /**
      * This is a test for processing an Timestamp where it contains no "Created" element.
      * This Timestamp should be rejected.
      */
