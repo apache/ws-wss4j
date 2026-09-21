@@ -356,6 +356,15 @@ on each is captured in §14 Q10–Q11.
   bound on signed-data compression
   *(documented: `ws-security-stax/.../wss-config-compression.xml`,
   exercised by `VulnerabliltyVectorsDecompressedBytesTest`)*.
+- The DOM engine bounds how deeply a message may nest tokens inside
+  tokens. A processor that uncovers a security structure inside the one
+  it is processing hands it to the processor for that structure, which
+  may do so again; the chain is capped at
+  `RequestData.MAXIMUM_PROCESSOR_NESTING_DEPTH` (5). Unbounded it is a
+  `StackOverflowError` for a short message, since every level may point
+  its `KeyInfo` at one `EncryptedKey`, decrypted once and cached
+  *(exercised by `RequestDataNestingTest`)*. The bound is on depth, not
+  on how many tokens a message carries.
 - WSS4J has **no rate limiter** of its own — concurrent inbound
   message rate is whatever the SOAP stack admits.
 
