@@ -213,6 +213,30 @@ is in-model only if it maps to one of them.
   `SIGNATURE_PARTS` / `ENCRYPTION_PARTS` / `REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS`
   *(documented: `src/site/asciidoc/best_practice.adoc`,
   `src/site/asciidoc/config.adoc`)*.
+- **A policy is not a guarantee that every assertion in it is enforced.**
+  An assertion the `PolicyEnforcer` does not recognise is skipped, so a
+  server can enforce strictly less than the policy it advertises while
+  reporting success. The exposure is bounded but not closed:
+  - a *top-level* unrecognised assertion is logged at WARN naming the
+    assertion, and the system property
+    `org.apache.wss4j.policy.failOnUnsupportedAssertions=true` turns it
+    into a build-time rejection. The default is to warn and continue, so
+    that a policy carrying a vendor assertion keeps working;
+  - a *nested* assertion - inside a binding, a token, an AlgorithmSuite -
+    is dropped with no diagnostic at all, a misspelled name among them,
+    and none is available: a parent offers the same nested policy to every
+    parser in its inheritance chain (`AsymmetricBinding` then
+    `AbstractSymmetricAsymmetricBinding` then `AbstractBinding`), each
+    assertion matches exactly one of them, so "did not match here" carries
+    no information. Reporting it would mean tracking which parser in the
+    chain consumed each assertion;
+  - within a nested policy only the first alternative of a compact policy
+    is read.
+
+  An operator who depends on a specific assertion being enforced should
+  confirm it against the enforcer rather than assume the advertised policy
+  is the enforced one *(documented:
+  `src/site/asciidoc/streaming.adoc`)*.
 - **`ws-security-web`**: in-model insofar as the servlet entry point
   reaches WSS4J; the surrounding servlet container is out.
 - **JAXB bindings**: pure DTO objects, in-model only insofar as the

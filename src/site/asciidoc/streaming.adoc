@@ -74,4 +74,17 @@ supported.
  * Endorsing tokens don't work with Symmetric + Asymmetric binding on the
 client side, unless the endorsing token is a SAML or IssuedToken.
  * Derived Endorsing Tokens are not supported on the client side.
+ * A policy assertion that the PolicyEnforcer does not recognise is not
+enforced. A top-level assertion in that position is logged at WARN naming the
+assertion, and setting the system property
+"org.apache.wss4j.policy.failOnUnsupportedAssertions" to "true" rejects the
+policy outright instead of under-enforcing it. An assertion nested inside
+another - inside a binding, a token or an AlgorithmSuite - is dropped without
+any diagnostic at all, a misspelled name among them. No diagnostic is available
+for that case: an assertion is offered to every parser in its parent's
+inheritance chain and matches exactly one of them, so failing to match says
+nothing on its own. Check the effective policy if you rely on a nested
+assertion being enforced.
+ * Where a compact policy offers several alternatives within a nested policy,
+only the first is read.
 
