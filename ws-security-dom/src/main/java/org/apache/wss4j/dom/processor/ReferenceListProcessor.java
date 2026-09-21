@@ -167,7 +167,9 @@ public class ReferenceListProcessor implements Processor {
             STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
             byte[] secretKey = parserResult.getSecretKey();
             principal = parserResult.getPrincipal();
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+            symmetricKey = parserResult.isSecretKeyFromEncryptedKey()
+                ? EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, secretKey)
+                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         }
 
         // Check for compliance against the defined AlgorithmSuite

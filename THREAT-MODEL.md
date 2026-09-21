@@ -484,9 +484,21 @@ on each is captured in §14 Q10–Q11.
   / timing signal between "padding malformed" and "padding well-formed
   but plaintext rejected" that lets the attacker iteratively recover the
   symmetric key.
+- **Mechanism**: a decryption that fails yields a random key of the
+  length the algorithm requires, and a decryption that succeeds but
+  yields a key of some other length is answered with the same. The
+  length the attacker's message declares is theirs to choose, so this
+  has to hold wherever a key recovered from an EncryptedKey is prepared
+  — in `EncryptedKeyProcessor` for the EncryptedData its ReferenceList
+  names, and in `EncryptedDataProcessor` and `ReferenceListProcessor`
+  for an EncryptedKey embedded in a KeyInfo, named by a RetrievalMethod,
+  or reached through a SecurityTokenReference. It does not extend to a
+  key taken from a token or supplied by the CallbackHandler, which
+  carries no such signal.
 - **Severity**: **security-critical**, `VALID` per §13.
 - *(documented: CVE-2015-0226 advisory; `best_practice.adoc`
-  §"Use RSA-OAEP for the Key Transport Algorithm")*
+  §"Use RSA-OAEP for the Key Transport Algorithm";
+  `ws-security-dom/src/test/java/.../EncryptedKeyLengthOracleTest.java`)*
 
 ### P5 — Replay protection on inbound UsernameToken nonces, Timestamps, and SAML2 OneTimeUse assertions
 
