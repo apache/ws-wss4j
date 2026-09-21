@@ -84,6 +84,7 @@ public class RequestData {
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
     private boolean allowRSA15KeyTransportAlgorithm;
+    private int processorNestingDepth;
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
@@ -543,6 +544,46 @@ public class RequestData {
 
     public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
         this.disableBSPEnforcement = disableBSPEnforcement;
+    }
+
+    /**
+     * The maximum depth to which a processor may hand a token it has just uncovered to another
+     * processor. Decrypting an EncryptedData whose plaintext is itself a security structure does
+     * exactly that, and does it recursively, so a sender who nests those structures is choosing
+     * how much of the receiver's stack to consume. Each level costs very little to write - every
+     * one of them may point its KeyInfo at a single EncryptedKey, which is decrypted once and
+     * cached - so the chain has to be bounded.
+     * <p/>
+     * Real messages stay well inside this. An EncryptedAssertion reaches depth 2: the assertion's
+     * EncryptedData, then the decrypted Assertion handed to the SAML processor, which dispatches
+     * no further. Re-encrypting an already encrypted assertion reaches 3. Sibling tokens in the
+     * same header do not accumulate - each is entered and left in turn - so the bound constrains
+     * nesting only.
+     */
+    public static final int MAXIMUM_PROCESSOR_NESTING_DEPTH = 5;
+
+    /**
+     * Record that processing is about to descend into a token uncovered by another token, and
+     * refuse to go deeper than {@link #MAXIMUM_PROCESSOR_NESTING_DEPTH}. Every caller must pair
+     * this with {@link #exitNestedToken()} in a finally block.
+     *
+     * @throws WSSecurityException if the message nests tokens too deeply
+     */
+    public void enterNestedToken() throws WSSecurityException {
+        if (processorNestingDepth >= MAXIMUM_PROCESSOR_NESTING_DEPTH) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
+                new Object[] {"Tokens are nested more than "
+                              + MAXIMUM_PROCESSOR_NESTING_DEPTH + " deep"});
+        }
+        processorNestingDepth++;
+    }
+
+    /**
+     * Record that processing has come back out of a nested token.
+     */
+    public void exitNestedToken() {
+        processorNestingDepth--;
     }
 
     public boolean isAllowRSA15KeyTransportAlgorithm() {
