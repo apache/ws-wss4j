@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -54,7 +55,12 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
     public Data transform(Data data, XMLCryptoContext context, OutputStream os) throws TransformException {
 
         String attachmentUri = ((ApacheOctetStreamData) data).getURI();
-        String attachmentId = attachmentUri.substring(4);
+        String attachmentId;
+        try {
+            attachmentId = AttachmentUtils.getAttachmentId(attachmentUri);
+        } catch (WSSecurityException e) {
+            throw new TransformException(e);
+        }
 
         AttachmentTransformParameterSpec attachmentTransformParameterSpec = getAttachmentTransformParameterSpec();
 
