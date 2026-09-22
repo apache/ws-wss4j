@@ -154,7 +154,7 @@ public class ReferenceListProcessor implements Processor {
         if (secRefToken == null) {
             byte[] decryptedData =
                 X509Util.getSecretKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData, true);
         } else {
             STRParserParameters parameters = new STRParserParameters();
             parameters.setData(data);
@@ -169,7 +169,7 @@ public class ReferenceListProcessor implements Processor {
             principal = parserResult.getPrincipal();
             symmetricKey = parserResult.isSecretKeyFromEncryptedKey()
                 ? EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, secretKey)
-                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey, true);
         }
 
         // Check for compliance against the defined AlgorithmSuite

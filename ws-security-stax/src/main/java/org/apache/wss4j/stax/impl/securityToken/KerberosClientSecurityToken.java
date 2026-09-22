@@ -152,7 +152,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
 
         byte[] sk = this.secretKey.getEncoded();
 
-        key = KeyUtils.prepareSecretKey(algorithmURI, sk);
+        key = KeyUtils.prepareSecretKey(algorithmURI, sk, true);
         setSecretKey(algorithmURI, key);
         return key;
     }

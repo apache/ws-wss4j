@@ -41,7 +41,7 @@ class KeyUtilsTest {
         byte[] rawKey = new byte[32];
 
         WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
-            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey));
+            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey, true));
 
         Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
     }
@@ -51,7 +51,7 @@ class KeyUtilsTest {
         byte[] rawKey = new byte[8];
 
         WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
-            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey));
+            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey, true));
 
         Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
     }
@@ -70,7 +70,7 @@ class KeyUtilsTest {
         byte[] rawKey = new byte[32];
 
         WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
-            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128_GCM, rawKey));
+            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128_GCM, rawKey, true));
 
         Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
     }
@@ -80,7 +80,7 @@ class KeyUtilsTest {
         byte[] rawKey = new byte[8];
 
         WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
-            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128_GCM, rawKey));
+            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128_GCM, rawKey, true));
 
         Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
     }
@@ -120,6 +120,35 @@ class KeyUtilsTest {
     void rejectsNullRawKey() {
         WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
             () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, null));
+
+        Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
+    }
+
+    @Test
+    void allowsMismatchedKeyLengthWhenNotStrict() throws Exception {
+        byte[] rawKey = new byte[16];
+
+        SecretKey secretKey = KeyUtils.prepareSecretKey(WSS4JConstants.AES_256, rawKey);
+
+        // The key is not truncated or padded, just wrapped as it is
+        Assertions.assertArrayEquals(rawKey, secretKey.getEncoded());
+    }
+
+    @Test
+    void doesNotTruncateOversizedKeyWhenNotStrict() throws Exception {
+        byte[] rawKey = new byte[32];
+
+        SecretKey secretKey = KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey);
+
+        Assertions.assertArrayEquals(rawKey, secretKey.getEncoded());
+    }
+
+    @Test
+    void rejectsOversizedKeyWhenNotStrict() {
+        byte[] rawKey = new byte[1025];
+
+        WSSecurityException exception = Assertions.assertThrows(WSSecurityException.class,
+            () -> KeyUtils.prepareSecretKey(WSS4JConstants.AES_128, rawKey));
 
         Assertions.assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, exception.getErrorCode());
     }
