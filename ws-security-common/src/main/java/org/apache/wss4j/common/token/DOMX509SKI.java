@@ -20,7 +20,8 @@
 package org.apache.wss4j.common.token;
 
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.crypto.BouncyCastleUtils;
+import org.apache.wss4j.common.crypto.X509KeyIdentifierUtil;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.w3c.dom.Document;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -38,9 +39,19 @@ public final class DOMX509SKI {
 
     /**
      * Constructor.
+     *
+     * @throws WSSecurityException if the certificate's SubjectKeyIdentifier extension is present
+     *         but is not valid DER.
      */
-    public DOMX509SKI(Document doc, X509Certificate remoteCertificate) {
-        skiBytes = BouncyCastleUtils.getSubjectKeyIdentifierBytes(remoteCertificate);
+    public DOMX509SKI(Document doc, X509Certificate remoteCertificate) throws WSSecurityException {
+        try {
+            skiBytes = X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(remoteCertificate);
+        } catch (IllegalArgumentException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, ex, "noSKIHandling",
+                new Object[] {"Invalid SubjectKeyIdentifier certificate extension"}
+            );
+        }
 
         element = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SKI");
         element.setTextContent(

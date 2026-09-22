@@ -1,0 +1,67 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+
+=== Apache WSS4J 4.0.0 Migration Guide
+
+This section is a migration guide for helping Apache WSS4J 3.0.x users to migrate
+to the 4.0.x releases.
+
+==== Stricter DER decoding of X.509 key identifiers
+
+The SubjectKeyIdentifier (2.5.29.14) and AuthorityKeyIdentifier (2.5.29.35)
+extensions are no longer decoded with Bouncy Castle. WSS4J now decodes them
+itself, which removes the last compile-time dependency on the optional Bouncy
+Castle artifacts from these code paths.
+
+RFC 5280 requires certificate extensions to be DER encoded, and the WSS4J decoder
+enforces that. Bouncy Castle accepted the broader BER encoding, so a certificate
+that is not strictly DER encoded may now be rejected where it previously worked.
+The encodings that change behaviour are:
+
+* a length in long form where the short form would do (for example `81 03`
+  instead of `03`), or a length carrying a leading zero byte;
+* a SubjectKeyIdentifier encoded as a constructed OCTET STRING (tag `24`) whose
+  segments Bouncy Castle would have concatenated;
+* an AuthorityKeyIdentifier `keyIdentifier` encoded as a constructed
+  `[0]` (tag `A0`) rather than a primitive one (tag `80`);
+* an AuthorityKeyIdentifier SEQUENCE using indefinite length;
+* an AuthorityKeyIdentifier whose fields appear out of order, or which repeats
+  the `[0]` field.
+
+Such a certificate now causes an `IllegalArgumentException` from
+`BouncyCastleUtils.getSubjectKeyIdentifierBytes` and
+`BouncyCastleUtils.getAuthorityKeyIdentifierBytes`, and a `WSSecurityException`
+from `Crypto.getSKIBytesFromCert`. This surfaces when signing with an SKI key
+identifier (`DOMX509SKI`) and when establishing trust with `MerlinAKI`.
+
+If you hit this, the certificate is malformed and should be reissued. There is no
+configuration option to restore the previous tolerance.
+
+==== Crypto.getSKIBytesFromCert shares the key identifier decoder
+
+`CryptoBase.getSKIBytesFromCert` previously had its own SubjectKeyIdentifier
+decoder, which was more tolerant than the one used to emit an SKI key identifier.
+Both now use the same decoder, so the identifier WSS4J writes and the one it
+accepts agree. A certificate whose SubjectKeyIdentifier has trailing bytes after
+the extension value, or whose inner OCTET STRING is not exactly the length the
+wrapper declares, is now rejected with a `WSSecurityException` instead of being
+decoded on a best-effort basis.
+
+The behaviour for well formed certificates is unchanged, as is the SHA-1 fallback
+for certificates that carry no SubjectKeyIdentifier extension.
