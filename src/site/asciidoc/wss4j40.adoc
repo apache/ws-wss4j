@@ -17,10 +17,34 @@
 // under the License.
 //
 
-=== Apache WSS4J 4.0.0 Migration Guide
+=== Apache WSS4J 4.0.x Migration Guide
 
-This section is a migration guide for helping Apache WSS4J 3.0.x users to migrate
-to the 4.0.x releases.
+This section covers changes within the 4.0.x releases that may affect existing
+code. Everything described below was introduced in 4.0.2.
+
+==== BouncyCastleUtils renamed to X509KeyIdentifierUtil
+
+`org.apache.wss4j.common.crypto.BouncyCastleUtils` is now
+`org.apache.wss4j.common.crypto.X509KeyIdentifierUtil`. The class no longer uses
+Bouncy Castle, so the old name was misleading. Its two methods,
+`getSubjectKeyIdentifierBytes` and `getAuthorityKeyIdentifierBytes`, keep their
+names and signatures.
+
+`BouncyCastleUtils` is retained as a deprecated class that delegates to the new
+one, so code written against 4.0.1 and earlier keeps working. It is marked for
+removal and will be dropped in a later release, so move to
+`X509KeyIdentifierUtil` when convenient.
+
+==== DOMX509SKI signals a malformed SubjectKeyIdentifier
+
+`org.apache.wss4j.common.token.DOMX509SKI`'s
+`DOMX509SKI(Document, X509Certificate)` constructor now declares
+`throws WSSecurityException`, raised when the certificate's SubjectKeyIdentifier
+extension is present but will not decode. Previously it threw an unchecked
+exception from a constructor with no throws clause.
+
+Code constructing this class directly must handle or propagate the exception.
+This is a source compatibility change only; existing compiled callers still link.
 
 ==== Stricter DER decoding of X.509 key identifiers
 
@@ -45,10 +69,10 @@ The encodings that change behaviour are:
   the `[0]` field.
 
 Such a certificate now causes an `IllegalArgumentException` from
-`BouncyCastleUtils.getSubjectKeyIdentifierBytes` and
-`BouncyCastleUtils.getAuthorityKeyIdentifierBytes`, and a `WSSecurityException`
-from `Crypto.getSKIBytesFromCert`. This surfaces when signing with an SKI key
-identifier (`DOMX509SKI`) and when establishing trust with `MerlinAKI`.
+`X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes` and
+`X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes`, and a
+`WSSecurityException` from `Crypto.getSKIBytesFromCert`, from `DOMX509SKI` when
+signing with an SKI key identifier, and from `MerlinAKI` when establishing trust.
 
 If you hit this, the certificate is malformed and should be reissued. There is no
 configuration option to restore the previous tolerance.
