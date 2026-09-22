@@ -29,7 +29,7 @@ import java.security.cert.X509Certificate;
  *             4.0.1 and earlier, and delegates to the new class. Use
  *             {@link X509KeyIdentifierUtil} instead.
  */
-@Deprecated(since = "4.0.2", forRemoval = true)
+@Deprecated(since = "3.0.6", forRemoval = true)
 public final class BouncyCastleUtils {
 
     private BouncyCastleUtils() {
@@ -46,7 +46,7 @@ public final class BouncyCastleUtils {
      * @throws IllegalArgumentException if the extension is present but is not valid DER.
      * @deprecated use {@link X509KeyIdentifierUtil#getAuthorityKeyIdentifierBytes(X509Certificate)}
      */
-    @Deprecated(since = "4.0.2", forRemoval = true)
+    @Deprecated(since = "3.0.6", forRemoval = true)
     public static byte[] getAuthorityKeyIdentifierBytes(X509Certificate cert) {
         return X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(cert);
     }
@@ -60,7 +60,7 @@ public final class BouncyCastleUtils {
      * @throws IllegalArgumentException if the extension is present but is not valid DER.
      * @deprecated use {@link X509KeyIdentifierUtil#getSubjectKeyIdentifierBytes(X509Certificate)}
      */
-    @Deprecated(since = "4.0.2", forRemoval = true)
+    @Deprecated(since = "3.0.6", forRemoval = true)
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
         return X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(cert);
     }
