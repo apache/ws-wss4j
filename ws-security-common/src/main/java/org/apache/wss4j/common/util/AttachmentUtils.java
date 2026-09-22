@@ -645,9 +645,17 @@ public final class AttachmentUtils {
     }
 
     public static String getAttachmentId(String xopUri) throws WSSecurityException {
+        if (xopUri == null || !xopUri.startsWith("cid:")) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"Not an attachment reference: " + xopUri}
+            );
+        }
         try {
             return URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            // URLDecoder raises IllegalArgumentException for a malformed escape - "cid:%" say -
+            // which is unchecked, and so would otherwise leave WSS4J as one.
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY,
                 "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
