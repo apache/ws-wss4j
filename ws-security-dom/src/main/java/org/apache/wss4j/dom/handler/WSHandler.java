@@ -249,9 +249,12 @@ public abstract class WSHandler {
          */
         if (reqData.isEnableSignatureConfirmation()
             && isRequest && !reqData.getSignatureValues().isEmpty()) {
+            // The set is typed as Set<Object> rather than Set<String> because it may have been
+            // created by a subclass that stores the legacy Integer hashes - see
+            // removeSavedSignatureValue.
             @SuppressWarnings("unchecked")
-            Set<String> savedSignatures =
-                (Set<String>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            Set<Object> savedSignatures =
+                (Set<Object>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
                 savedSignatures = new HashSet<>();
                 setProperty(
@@ -437,8 +440,8 @@ public abstract class WSHandler {
         //
         // First get all Signature values stored during sending the request
         //
-        Set<String> savedSignatures =
-            (Set<String>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+        Set<Object> savedSignatures =
+            (Set<Object>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
         //
         // Now get all results that hold a SignatureConfirmation element from
         // the current run of receiver (we can have more than one run: if we
@@ -472,16 +475,11 @@ public abstract class WSHandler {
                                  + " signature values"}
                             );
                         }
-                    } else {
-                        String encodedValue = encodeSignatureValue(sc.getSignatureValue());
-                        if (savedSignatures.contains(encodedValue)) {
-                            savedSignatures.remove(encodedValue);
-                        } else {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                new Object[] {"Received a SignatureConfirmation element, but there are no matching"
-                                + " stored signature values"}
-                            );
-                        }
+                    } else if (!removeSavedSignatureValue(savedSignatures, sc.getSignatureValue())) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                            new Object[] {"Received a SignatureConfirmation element, but there are no matching"
+                            + " stored signature values"}
+                        );
                     }
                 }
             }
@@ -506,6 +504,32 @@ public abstract class WSHandler {
      */
     private static String encodeSignatureValue(byte[] signatureValue) {
         return Base64.getEncoder().encodeToString(signatureValue);
+    }
+
+    /**
+     * Remove from the saved signature values the entry matching the given received
+     * SignatureConfirmation value, returning whether one was found.
+     *
+     * Entries stored by this class are the Base64 encoding of the whole signature value. A
+     * subclass may populate {@link WSHandlerConstants#SEND_SIGV} itself, however, and before
+     * WSS4J 4.0.2 the representation was the {@code Arrays.hashCode} of the signature value, so
+     * Integer entries are matched against that hash as well. Matching on a 32-bit hash is weak -
+     * a colliding value is trivial to construct, so the confirmation is not bound to the
+     * signature of the request - and such subclasses should be changed to store the encoded
+     * value instead.
+     */
+    private static boolean removeSavedSignatureValue(Set<Object> savedSignatures, byte[] signatureValue) {
+        if (savedSignatures.remove(encodeSignatureValue(signatureValue))) {
+            return true;
+        }
+        if (savedSignatures.remove(Integer.valueOf(Arrays.hashCode(signatureValue)))) {
+            LOG.debug("Matched a SignatureConfirmation against a legacy Arrays.hashCode entry in "
+                      + WSHandlerConstants.SEND_SIGV + ". This match is on 32 bits only and is "
+                      + "trivially collidable: store the Base64 encoding of the signature value "
+                      + "instead.");
+            return true;
+        }
+        return false;
     }
 
     protected void decodeUTParameter(RequestData reqData)

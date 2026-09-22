@@ -77,7 +77,9 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      * each outbound Signature value, which an inbound SignatureConfirmation is matched against.
      * Before WSS4J 4.0.2 it held a {@code Set<Integer>} of {@code Arrays.hashCode} values; those
      * are 32 bits wide and trivially collidable, so the confirmation they backed was not a
-     * binding to the request's signature.
+     * binding to the request's signature. A handler that populates this property itself should
+     * store the Base64 encoding; Integer entries are still matched, against the old hash, so
+     * that such handlers keep working, but they get the weak check rather than the strong one.
      */
     public static final String SEND_SIGV = "_sendSignatureValues_";
 
