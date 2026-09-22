@@ -364,6 +364,68 @@ public class SignatureConfirmationTest {
 
 
     /**
+     * A handler that populates SEND_SIGV itself - rather than letting WSHandler.doSenderAction do
+     * it - may still store the pre-4.0.2 representation, the Arrays.hashCode of each signature
+     * value. Those entries must go on being matched, so that such a handler keeps working against
+     * an upgraded WSS4J. The match is the old weak one; the handler has to store the encoded
+     * value to get the strong one.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void
+    testSignatureConfirmationLegacyHashEntries() throws Exception {
+        final RequestData reqData = new RequestData();
+        java.util.Map<String, Object> msgContext = new java.util.TreeMap<>();
+        msgContext.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put("password", "security");
+        reqData.setMsgContext(msgContext);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
+        handler.send(doc, reqData, Collections.singletonList(action), true);
+
+        //
+        // Replace the saved signature values with the representation used before WSS4J 4.0.2.
+        //
+        msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
+        Set<String> savedSignatures =
+            (Set<String>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        assertNotNull(savedSignatures);
+        assertFalse(savedSignatures.isEmpty());
+        Set<Integer> legacySignatures = new HashSet<>();
+        for (String savedSignature : savedSignatures) {
+            legacySignatures.add(Arrays.hashCode(Base64.getDecoder().decode(savedSignature)));
+        }
+        msgContext.put(WSHandlerConstants.SEND_SIGV, legacySignatures);
+
+        //
+        // Verify the inbound request, and create a response with a Signature Confirmation
+        //
+        WSHandlerResult results = verify(doc);
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        List<WSHandlerResult> receivedResults = new ArrayList<>();
+        receivedResults.add(results);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
+        handler.send(doc, reqData, Collections.singletonList(action), false);
+
+        //
+        // Verify the SignatureConfirmation response
+        //
+        results = verify(doc);
+        WSSecurityEngineResult scResult =
+            results.getActionResults().get(WSConstants.SC).get(0);
+        assertNotNull(scResult);
+        assertNotNull(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION));
+        handler.signatureConfirmation(reqData, results);
+
+        assertTrue(legacySignatures.isEmpty());
+    }
+
+
+    /**
      * Test to see that a signature confirmation response that does not contain a wsu:Id fails
      * the BSP compliance is enabled.
      */
