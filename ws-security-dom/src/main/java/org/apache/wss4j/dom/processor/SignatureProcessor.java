@@ -94,6 +94,8 @@ public class SignatureProcessor implements Processor {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureProcessor.class);
 
+    private static final String CACHE_REFERENCE_PROPERTY = "javax.xml.crypto.dsig.cacheReference";
+
     private XMLSignatureFactory signatureFactory;
 
     public SignatureProcessor() {
@@ -374,7 +376,7 @@ public class SignatureProcessor implements Processor {
         }
 
         XMLValidateContext context = new DOMValidateContext(key, elem);
-        context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+        context.setProperty(CACHE_REFERENCE_PROPERTY, Boolean.TRUE);
         context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
@@ -430,8 +432,7 @@ public class SignatureProcessor implements Processor {
                     // References that validateSignature did not reach are validated here for the
                     // first time - all of them when the SignatureValue itself failed - so keep
                     // attachment caching off for those too
-                    context.setProperty("javax.xml.crypto.dsig.cacheReference",
-                                        !isAttachmentReference(reference));
+                    setReferenceCaching(context, reference);
                     boolean referenceValidationCheck = reference.validate(context);
                     String id = reference.getId();
                     if (id == null) {
@@ -469,16 +470,24 @@ public class SignatureProcessor implements Processor {
         try {
             for (Object referenceObject : xmlSignature.getSignedInfo().getReferences()) {
                 Reference reference = (Reference)referenceObject;
-                context.setProperty("javax.xml.crypto.dsig.cacheReference",
-                                    !isAttachmentReference(reference));
+                setReferenceCaching(context, reference);
                 if (!reference.validate(context)) {
                     return false;
                 }
             }
             return true;
         } finally {
-            context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+            context.setProperty(CACHE_REFERENCE_PROPERTY, Boolean.TRUE);
         }
+    }
+
+    /**
+     * Enables Reference caching for every Reference but a SwA attachment one - see
+     * validateSignature. The property is read per Reference when it is transformed, so it has to
+     * be set before each Reference.validate call rather than once on the context.
+     */
+    private static void setReferenceCaching(XMLValidateContext context, Reference reference) {
+        context.setProperty(CACHE_REFERENCE_PROPERTY, !isAttachmentReference(reference));
     }
 
     private static boolean isAttachmentReference(Reference reference) {
