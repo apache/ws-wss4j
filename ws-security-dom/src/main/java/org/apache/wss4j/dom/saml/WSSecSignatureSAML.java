@@ -492,7 +492,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (senderVouches) {
                 key = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPW);
             } else if (secretKey != null) {
-                key = KeyUtils.prepareSecretKey(getSignatureAlgorithm(), secretKey);
+                key = KeyUtils.prepareSecretKey(getSignatureAlgorithm(), secretKey, true);
             } else {
                 key = userCrypto.getPrivateKey(user, password);
             }

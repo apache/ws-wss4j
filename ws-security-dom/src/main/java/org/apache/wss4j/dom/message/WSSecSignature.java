@@ -574,7 +574,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             if (secretKey == null) {
                 key = crypto.getPrivateKey(user, password);
             } else {
-                key = KeyUtils.prepareSecretKey(sigAlgo, secretKey);
+                key = KeyUtils.prepareSecretKey(sigAlgo, secretKey, true);
             }
             SignatureMethod signatureMethod =
                 signatureFactory.newSignatureMethod(sigAlgo, null);

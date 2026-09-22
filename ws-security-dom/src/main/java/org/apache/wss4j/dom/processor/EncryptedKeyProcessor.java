@@ -403,10 +403,10 @@ public class EncryptedKeyProcessor implements Processor {
     static SecretKey prepareSecretKeyFromEncryptedKey(String symEncAlgo, byte[] secretKey)
         throws WSSecurityException {
         try {
-            return KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+            return KeyUtils.prepareSecretKey(symEncAlgo, secretKey, true);
         } catch (WSSecurityException ex) {
             LOG.debug("The key recovered from the EncryptedKey does not match {}", symEncAlgo);
-            return KeyUtils.prepareSecretKey(symEncAlgo, getRandomKey(symEncAlgo));
+            return KeyUtils.prepareSecretKey(symEncAlgo, getRandomKey(symEncAlgo), true);
         }
     }
 

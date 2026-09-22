@@ -362,7 +362,7 @@ public class SignatureProcessor implements Processor {
         } else if (publicKey != null) {
             key = publicKey;
         } else {
-            key = KeyUtils.prepareSecretKey(signatureMethod, secretKey);
+            key = KeyUtils.prepareSecretKey(signatureMethod, secretKey, true);
         }
 
         if (data.isExpandXopInclude()) {
