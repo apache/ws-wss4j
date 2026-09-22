@@ -208,7 +208,14 @@ public class MerlinAKI extends Merlin {
     private X509Certificate[] getX509CertificatesFromKeyIdentifier(
         byte[] keyIdentifierBytes
     ) throws WSSecurityException, NoSuchAlgorithmException, CertificateEncodingException {
-        if (keyIdentifierBytes == null) {
+        // A certificate with no AuthorityKeyIdentifier extension at all reads as an empty array,
+        // and one whose extension carries no keyIdentifier reads as null. Neither is an
+        // identifier: matching on the empty array made a certificate without the extension match
+        // every store entry that has no SubjectKeyIdentifier of its own, so an arbitrary entry
+        // was put forward as the issuer. This class looks the issuer up by that identifier and
+        // has no other way to find it, so without one there is nothing to search for.
+        if (keyIdentifierBytes == null || keyIdentifierBytes.length == 0) {
+            LOG.debug("The certificate carries no AuthorityKeyIdentifier to find its issuer by");
             return new X509Certificate[0];
         }
 
