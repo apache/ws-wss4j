@@ -23,15 +23,33 @@ import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
-public final class BouncyCastleUtils {
-    private static final byte TYPE_CONTEXT_SPECIFIC_0 = (byte)0x80;
-    private static final byte TYPE_CONTEXT_SPECIFIC_1 = (byte)0xA1;
-    private static final byte TYPE_CONTEXT_SPECIFIC_2 = (byte)0x82;
+/**
+ * Decodes the X.509 key identifier extensions.
+ */
+public final class X509KeyIdentifierUtil {
+    /** AuthorityKeyIdentifier keyIdentifier [0] IMPLICIT KeyIdentifier - primitive, context-specific 0. */
+    private static final byte TAG_KEY_IDENTIFIER = (byte)0x80;
+    /** AuthorityKeyIdentifier authorityCertIssuer [1] GeneralNames - constructed, context-specific 1. */
+    private static final byte TAG_AUTHORITY_CERT_ISSUER = (byte)0xA1;
+    /** AuthorityKeyIdentifier authorityCertSerialNumber [2] IMPLICIT CertificateSerialNumber -
+     *  primitive, context-specific 2. */
+    private static final byte TAG_AUTHORITY_CERT_SERIAL_NUMBER = (byte)0x82;
 
-    private BouncyCastleUtils() {
+    private X509KeyIdentifierUtil() {
         // complete
     }
 
+    /**
+     * Read the keyIdentifier of the AuthorityKeyIdentifier extension (2.5.29.35) of the
+     * given certificate.
+     * <p>
+     * X.509 extensions are required to use DER; BER encodings are rejected.
+     *
+     * @param cert the certificate to read the AuthorityKeyIdentifier from.
+     * @return an empty array if the certificate has no AuthorityKeyIdentifier extension, null if
+     *         the extension is present but carries no keyIdentifier, otherwise the keyIdentifier.
+     * @throws IllegalArgumentException if the extension is present but is not valid DER.
+     */
     public static byte[] getAuthorityKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.35"); //NOPMD
         if (extensionValue == null) {
@@ -40,6 +58,16 @@ public final class BouncyCastleUtils {
         return getAuthorityKeyIdentifierBytes(extensionValue);
     }
 
+    /**
+     * Read the SubjectKeyIdentifier extension (2.5.29.14) of the given certificate.
+     * <p>
+     * X.509 extensions are required to use DER; BER encodings are rejected.
+     *
+     * @param cert the certificate to read the SubjectKeyIdentifier from.
+     * @return an empty array if the certificate has no SubjectKeyIdentifier extension, otherwise
+     *         the key identifier.
+     * @throws IllegalArgumentException if the extension is present but is not valid DER.
+     */
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.14"); //NOPMD
         if (extensionValue == null) {
@@ -55,9 +83,10 @@ public final class BouncyCastleUtils {
                 return null; //NOPMD - AuthorityKeyIdentifier#getKeyIdentifier returns null when absent
             }
             DERDecoder authorityKeyIdentifier = new DERDecoder(extensionBytes);
-            byte[] keyIdentifier = readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_0);
-            readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_1);
-            readOptionalValue(authorityKeyIdentifier, TYPE_CONTEXT_SPECIFIC_2);
+            byte[] keyIdentifier = readOptionalValue(authorityKeyIdentifier, TAG_KEY_IDENTIFIER);
+            // The remaining fields are not used by WSS4J, but must still be well formed.
+            skipOptionalValue(authorityKeyIdentifier, TAG_AUTHORITY_CERT_ISSUER);
+            skipOptionalValue(authorityKeyIdentifier, TAG_AUTHORITY_CERT_SERIAL_NUMBER);
             authorityKeyIdentifier.expectEnd();
             return keyIdentifier;
         } catch (WSSecurityException ex) {
@@ -90,12 +119,25 @@ public final class BouncyCastleUtils {
     }
 
     private static byte[] readOptionalValue(DERDecoder decoder, byte type) throws WSSecurityException {
-        if (!decoder.hasRemaining() || !decoder.test(type)) {
+        if (!startsWith(decoder, type)) {
             return null; //NOPMD - an absent optional value is distinct from an empty value
         }
         decoder.expect(type);
         int length = decoder.getLength();
         return decoder.getBytes(length);
+    }
+
+    private static void skipOptionalValue(DERDecoder decoder, byte type) throws WSSecurityException {
+        if (!startsWith(decoder, type)) {
+            return;
+        }
+        decoder.expect(type);
+        int length = decoder.getLength();
+        decoder.skip(length);
+    }
+
+    private static boolean startsWith(DERDecoder decoder, byte type) throws WSSecurityException {
+        return decoder.hasRemaining() && decoder.test(type);
     }
 
 }

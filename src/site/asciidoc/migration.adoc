@@ -21,6 +21,7 @@
 
 Information about migrating to various new versions of WSS4J is provided in this section.
 
+include::wss4j40.adoc[]
 include::wss4j22.adoc[]
 include::wss4j21.adoc[]
 include::wss4j20.adoc[]

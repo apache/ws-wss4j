@@ -1429,13 +1429,38 @@ public class Merlin extends CryptoBase {
                     (X509Certificate) keyStore.getCertificate(alias);
             if (cert != null) {
                 if (certProviderHandlesNameConstraints) {
-                    TrustAnchor anchor = new TrustAnchor(cert, getNameConstraints(cert));
-                    set.add(anchor);
+                    set.add(createTrustAnchor(cert, alias));
                 } else {
                     TrustAnchor anchor = new TrustAnchor(cert, null);
                     set.add(anchor);
                 }
             }
+        }
+    }
+
+    /**
+     * Build a {@code TrustAnchor} carrying the certificate's NameConstraints.
+     * <p>
+     * {@code getNameConstraints} reports "no constraints" as an empty array, which
+     * {@code TrustAnchor} rejects; it wants null. It also signals constraints it cannot decode
+     * with an IllegalArgumentException, which would otherwise escape a method declared to throw
+     * WSSecurityException.
+     *
+     * @param cert  the certificate to anchor trust in
+     * @param alias the keystore alias it was read from, used to identify it in any error
+     */
+    private TrustAnchor createTrustAnchor(X509Certificate cert, String alias) throws WSSecurityException {
+        byte[] nameConstraints = getNameConstraints(cert);
+        if (nameConstraints != null && nameConstraints.length == 0) {
+            nameConstraints = null; //NOPMD - TrustAnchor reads null, not empty, as "unconstrained"
+        }
+        try {
+            return new TrustAnchor(cert, nameConstraints);
+        } catch (IllegalArgumentException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, ex, "certpath",
+                new Object[] {"Invalid NameConstraints extension on keystore entry " + alias}
+            );
         }
     }
 

@@ -124,8 +124,7 @@ public class MerlinAKI extends Merlin {
         String issuerString = certs[0].getIssuerX500Principal().getName();
         try {
             if (certs.length == 1) {
-                byte[] keyIdentifierBytes =
-                    BouncyCastleUtils.getAuthorityKeyIdentifierBytes(certs[0]);
+                byte[] keyIdentifierBytes = getAuthorityKeyIdentifier(certs[0]);
                 X509Certificate[] foundCerts = getX509CertificatesFromKeyIdentifier(keyIdentifierBytes);
 
                 // If the certs have not been found, the issuer is not in the keystore/truststore
@@ -248,7 +247,7 @@ public class MerlinAKI extends Merlin {
 
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
                     byte[] subjectKeyIdentifier =
-                        BouncyCastleUtils.getSubjectKeyIdentifierBytes((X509Certificate)certs[0]);
+                        getSubjectKeyIdentifier((X509Certificate)certs[0], alias);
                     if (subjectKeyIdentifier != null
                         && Arrays.equals(subjectKeyIdentifier, keyIdentifier)) {
                         return certs;
@@ -261,6 +260,40 @@ public class MerlinAKI extends Merlin {
             );
         }
         return new Certificate[]{};
+    }
+
+    /**
+     * Read the AuthorityKeyIdentifier of a received certificate.
+     * <p>
+     * The certificate is attacker supplied, so a malformed extension is reported as a
+     * WSSecurityException rather than the IllegalArgumentException the decoder raises. Otherwise
+     * an unchecked exception escapes a method declared to throw WSSecurityException.
+     */
+    private static byte[] getAuthorityKeyIdentifier(X509Certificate cert) throws WSSecurityException {
+        try {
+            return X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(cert);
+        } catch (IllegalArgumentException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, ex, "certpath",
+                new Object[] {"Invalid AuthorityKeyIdentifier certificate extension"}
+            );
+        }
+    }
+
+    /**
+     * Read the SubjectKeyIdentifier of a certificate held in the keystore or truststore.
+     * <p>
+     * A certificate we cannot decode cannot match the identifier we are looking for, so the entry
+     * is skipped rather than failing the whole lookup. Trust still fails if no other entry
+     * matches.
+     */
+    private static byte[] getSubjectKeyIdentifier(X509Certificate cert, String alias) {
+        try {
+            return X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(cert);
+        } catch (IllegalArgumentException ex) {
+            LOG.debug("Skipping alias {} with an invalid SubjectKeyIdentifier extension", alias, ex);
+            return null; //NOPMD - no usable identifier is distinct from an empty one
+        }
     }
 
 }

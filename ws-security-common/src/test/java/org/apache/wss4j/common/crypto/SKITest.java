@@ -19,16 +19,23 @@
 
 package org.apache.wss4j.common.crypto;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Security;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -80,6 +87,47 @@ public class SKITest {
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
         String knownBase64Encoding = "5LsTsLDSb7XxlaCffjNBHM5n+1A=";
         assertTrue(knownBase64Encoding.equals(org.apache.xml.security.utils.XMLUtils.encodeToString(skiBytes)));
+    }
+
+    /**
+     * A self-signed certificate whose SubjectKeyIdentifier extension declares a key identifier of
+     * Integer.MAX_VALUE bytes. The certificate itself is 442 bytes. Its extnValue is
+     * 04 09 04 84 7F FF FF FF 01 02 03: an OCTET STRING wrapping an OCTET STRING whose long-form
+     * length is 0x7FFFFFFF. Certificates reach this code path from an inbound
+     * wsse:BinarySecurityToken, so the declared length is attacker-controlled.
+     */
+    private static final String HOSTILE_SKI_CERT =
+          "MIIBtjCCAR+gAwIBAgIBATANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtob3N0aWxlLXNraTAe"
+        + "Fw0yNTAxMDEwMDAwMDBaFw0zNTAxMDEwMDAwMDBaMBYxFDASBgNVBAMMC2hvc3RpbGUtc2tpMIGf"
+        + "MA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrq6urq6urq6urq6urq6urq6urq6urq6urq6urq6ur"
+        + "q6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6ur"
+        + "q6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urq6urqwIDAQABoxQwEjAQBgNVHQ4E"
+        + "CQSEf////wECAzANBgkqhkiG9w0BAQsFAAOBgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+
+    /**
+     * An over-long declared length in the SubjectKeyIdentifier must produce a WSSecurityException,
+     * not a multi-gigabyte allocation and not an unchecked exception.
+     */
+    @Test
+    public void testSKIWithOverlongDeclaredLength() throws Exception {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert;
+        try (InputStream input = new ByteArrayInputStream(Base64.getDecoder().decode(HOSTILE_SKI_CERT))) {
+            cert = (X509Certificate)certificateFactory.generateCertificate(input);
+        }
+
+        byte[] extensionValue = cert.getExtensionValue(CryptoBase.SKI_OID);
+        // A JDK that rejects the malformed extension outright leaves nothing for us to decode
+        Assumptions.assumeTrue(extensionValue != null);
+        assertArrayEquals(
+            new byte[] {4, 9, 4, (byte)0x84, 0x7F, (byte)0xFF, (byte)0xFF, (byte)0xFF, 1, 2, 3},
+            extensionValue
+        );
+
+        Crypto crypto = new Merlin();
+        assertThrows(WSSecurityException.class, () -> crypto.getSKIBytesFromCert(cert));
     }
 
     @Test

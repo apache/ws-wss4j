@@ -208,6 +208,8 @@ public abstract class CryptoBase implements Crypto {
      *
      * @param cert The certificate to read SKI
      * @return The byte array containing the binary SKI data
+     * @throws WSSecurityException if the SubjectKeyIdentifier extension is present but is not
+     *         valid DER, or if no SKI extension is present and SHA-1 is unavailable
      */
     public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException {
         //
@@ -232,15 +234,18 @@ public abstract class CryptoBase implements Crypto {
         }
 
         //
-        // Strip away first (four) bytes from the DerValue (tag and length of
-        // ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
+        // Strip away the tag and length of the ExtensionValue OCTET STRING and of the
+        // KeyIdentifier OCTET STRING it wraps. X509KeyIdentifierUtil is the single decoder for
+        // this extension, so that the identifier we emit and the one we accept agree.
         //
-        DERDecoder extVal = new DERDecoder(derEncodedValue);
-        extVal.expect(DERDecoder.TYPE_OCTET_STRING);  // ExtensionValue OCTET STRING
-        extVal.getLength();
-        extVal.expect(DERDecoder.TYPE_OCTET_STRING);  // KeyIdentifier OCTET STRING
-        int keyIDLen = extVal.getLength();
-        return extVal.getBytes(keyIDLen);
+        try {
+            return X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(derEncodedValue);
+        } catch (IllegalArgumentException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, ex, "noSKIHandling",
+                new Object[] {"Invalid SubjectKeyIdentifier certificate extension"}
+            );
+        }
     }
 
     /**
@@ -387,8 +392,10 @@ public abstract class CryptoBase implements Crypto {
      * that it is a single byte comparison, the performance hit is negligible.
      *
      * @param cert the certificate to extract NameConstraints from
-     * @return the NameConstraints, or null if not present
-     * @throws WSSecurityException if a processing error occurs decoding the Octet String
+     * @return the DER-encoded NameConstraints sequence, or an empty array if the certificate
+     *         carries no NameConstraints extension
+     * @throws WSSecurityException if a processing error occurs decoding the Octet String, or if
+     *         the extension is tagged as something other than a SEQUENCE or an OCTET STRING
      */
     protected byte[] getNameConstraints(final X509Certificate cert) throws WSSecurityException {
         byte[] bytes = cert.getExtensionValue(NAME_CONSTRAINTS_OID);
@@ -405,8 +412,11 @@ public abstract class CryptoBase implements Crypto {
             case DERDecoder.TYPE_SEQUENCE:
                 return bytes;
             default:
-                throw new IllegalArgumentException(
-                        "Invalid type for NameConstraints; must be Sequence or OctetString-encoded Sequence");
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath",
+                    new Object[] {"Invalid type for NameConstraints; must be a SEQUENCE or an "
+                                  + "OCTET STRING-encoded SEQUENCE"}
+                );
         }
     }
 }

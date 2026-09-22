@@ -55,7 +55,7 @@ public class AuthorityKeyIdentifierTest {
         assertNotNull(cert);
 
         // Get AuthorityKeyIdentifier from the cert
-        byte[] keyIdentifierBytes = BouncyCastleUtils.getAuthorityKeyIdentifierBytes(cert);
+        byte[] keyIdentifierBytes = X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(cert);
         assertNotNull(keyIdentifierBytes);
 
         // Now load the CA cert
@@ -67,7 +67,7 @@ public class AuthorityKeyIdentifierTest {
 
         // Get SubjectKeyIdentifier from the CA cert
         byte[] subjectKeyIdentifierBytes =
-            BouncyCastleUtils.getSubjectKeyIdentifierBytes(caCert);
+            X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(caCert);
         assertNotNull(subjectKeyIdentifierBytes);
 
         assertTrue(Arrays.equals(keyIdentifierBytes, subjectKeyIdentifierBytes));
@@ -81,11 +81,11 @@ public class AuthorityKeyIdentifierTest {
 
         assertArrayEquals(
             expectedKeyIdentifier,
-            BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier)
+            X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier)
         );
         assertArrayEquals(
             expectedKeyIdentifier,
-            BouncyCastleUtils.getSubjectKeyIdentifierBytes(subjectKeyIdentifier)
+            X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(subjectKeyIdentifier)
         );
     }
 
@@ -95,9 +95,9 @@ public class AuthorityKeyIdentifierTest {
         byte[] authorityIssuerAndSerial = {4, 10, 48, 8, (byte)0xA1, 3, 48, 1, 0, (byte)0x82, 1, 1};
         byte[] emptyAuthorityKeyIdentifier = {4, 2, 48, 0};
 
-        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier));
-        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(authorityIssuerAndSerial));
-        assertNull(BouncyCastleUtils.getAuthorityKeyIdentifierBytes(emptyAuthorityKeyIdentifier));
+        assertNull(X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(authorityKeyIdentifier));
+        assertNull(X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(authorityIssuerAndSerial));
+        assertNull(X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(emptyAuthorityKeyIdentifier));
     }
 
     @Test
@@ -108,15 +108,15 @@ public class AuthorityKeyIdentifierTest {
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> BouncyCastleUtils.getSubjectKeyIdentifierBytes(truncatedSubjectKeyIdentifier)
+            () -> X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(truncatedSubjectKeyIdentifier)
         );
         assertThrows(
             IllegalArgumentException.class,
-            () -> BouncyCastleUtils.getAuthorityKeyIdentifierBytes(trailingAuthorityKeyIdentifier)
+            () -> X509KeyIdentifierUtil.getAuthorityKeyIdentifierBytes(trailingAuthorityKeyIdentifier)
         );
         assertThrows(
             IllegalArgumentException.class,
-            () -> BouncyCastleUtils.getSubjectKeyIdentifierBytes(indefiniteLengthSubjectKeyIdentifier)
+            () -> X509KeyIdentifierUtil.getSubjectKeyIdentifierBytes(indefiniteLengthSubjectKeyIdentifier)
         );
     }
 
