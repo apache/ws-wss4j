@@ -160,7 +160,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
         byte[] sk = getTGTSessionKey();
 
-        key = KeyUtils.prepareSecretKey(algorithmURI, sk);
+        key = KeyUtils.prepareSecretKey(algorithmURI, sk, true);
         setSecretKey(algorithmURI, key);
         return key;
     }

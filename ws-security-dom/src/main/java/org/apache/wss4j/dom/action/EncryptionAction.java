@@ -128,7 +128,7 @@ public class EncryptionAction implements Action {
 
         SecretKey symmetricKey;
         if (ephemeralKey != null) {
-            symmetricKey = KeyUtils.prepareSecretKey(wsEncrypt.getSymmetricEncAlgorithm(), ephemeralKey);
+            symmetricKey = KeyUtils.prepareSecretKey(wsEncrypt.getSymmetricEncAlgorithm(), ephemeralKey, true);
         } else {
             KeyGenerator keyGen = KeyUtils.getKeyGenerator(wsEncrypt.getSymmetricEncAlgorithm());
             symmetricKey = keyGen.generateKey();

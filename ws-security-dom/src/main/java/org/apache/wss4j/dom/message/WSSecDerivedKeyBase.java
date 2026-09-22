@@ -372,7 +372,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     }
 
     protected SecretKey getDerivedKey(String algorithm) throws WSSecurityException {
-        return KeyUtils.prepareSecretKey(algorithm, derivedKeyBytes);
+        return KeyUtils.prepareSecretKey(algorithm, derivedKeyBytes, true);
     }
 
     @Override

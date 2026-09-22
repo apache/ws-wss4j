@@ -87,10 +87,33 @@ public final class KeyUtils {
     /**
      * Convert the raw key bytes into a SecretKey object of type algorithm.
      *
-     * @throws WSSecurityException if the raw key length does not match the key length required by
-     *         the algorithm or exceeds maximum allowed size
+     * A mismatch between the length of the key and the length required by the algorithm is logged,
+     * but not rejected, as the given algorithm is not necessarily the algorithm that the key is
+     * going to be used with. This is the case for example when a key is created only to be wrapped
+     * in an EncryptedKey structure and handed over to a third party, as done by a STS. Use
+     * {@link #prepareSecretKey(String, byte[], boolean)} with "strictKeyLengthCheck" set to true
+     * when the key is about to be used with the given algorithm.
+     *
+     * @throws WSSecurityException if the raw key is null or exceeds the maximum allowed size
      */
     public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey) throws WSSecurityException {
+        return prepareSecretKey(algorithm, rawKey, false);
+    }
+
+    /**
+     * Convert the raw key bytes into a SecretKey object of type algorithm.
+     *
+     * @param algorithm the URI of the algorithm the key is associated with
+     * @param rawKey the raw key bytes
+     * @param strictKeyLengthCheck whether to reject a key whose length does not match the length
+     *        required by the algorithm. This must be set to true when the key is going to be used
+     *        with the given algorithm, so that key material is never truncated or re-used across
+     *        algorithms.
+     * @throws WSSecurityException if the raw key is null, exceeds the maximum allowed size, or (if
+     *         strictKeyLengthCheck is true) does not match the key length required by the algorithm
+     */
+    public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey, boolean strictKeyLengthCheck)
+        throws WSSecurityException {
         if (rawKey == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
@@ -113,12 +136,14 @@ public final class KeyUtils {
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
 
         // For fixed-length symmetric ciphers (e.g. AES-CBC, AES-GCM, 3DES, AES KeyWrap),
-        // strictly verify that the provided key length matches the declared algorithm's key length.
-        // Refuse to truncate or mismatch key material to prevent cross-algorithm key-reuse attacks.
+        // verify that the provided key length matches the declared algorithm's key length.
+        // Never truncate the key material, as this enables cross-algorithm key-reuse attacks.
         if (size > 0 && (algorithm == null || !algorithm.contains("hmac-")) && rawKey.length != size) {
             LOG.warn("The provided key has a length of {} bytes, which does not match the length of"
                 + " {} bytes required by {}", rawKey.length, size, algorithm);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            if (strictKeyLengthCheck) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            }
         }
 
         return new SecretKeySpec(rawKey, keyAlgorithm);

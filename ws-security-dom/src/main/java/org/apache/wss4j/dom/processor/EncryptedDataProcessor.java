@@ -117,7 +117,7 @@ public class EncryptedDataProcessor implements Processor {
             principal = parserResult.getPrincipal();
             key = parserResult.isSecretKeyFromEncryptedKey()
                 ? EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey(symEncAlgo, secretKey)
-                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+                : KeyUtils.prepareSecretKey(symEncAlgo, secretKey, true);
             encrKeyResults = new ArrayList<>();
         } else if (encryptedKeyElement != null && data.getWssConfig() != null) {
             WSSConfig wssConfig = data.getWssConfig();
