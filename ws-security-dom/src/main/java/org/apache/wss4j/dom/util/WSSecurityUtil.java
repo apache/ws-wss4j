@@ -653,7 +653,11 @@ public final class WSSecurityUtil {
                                          boolean removeAttachments) throws WSSecurityException {
         for (Element includeElement : includeElements) {
             String xopURI = includeElement.getAttributeNS(null, "href");
-            if (xopURI != null) {
+            // getAttributeNS answers an absent attribute with "", never null, so the old null
+            // check admitted an xop:Include carrying no href at all. Test for an attachment
+            // reference the way the other xop:Include call sites do, and leave anything else
+            // alone: an Include that names no attachment has no attachment bytes to inline.
+            if (xopURI.startsWith("cid:")) {
                 // Retrieve the attachment bytes
                 byte[] attachmentBytes =
                     WSSecurityUtil.getBytesFromAttachment(xopURI, attachmentCallbackHandler, removeAttachments);
