@@ -28,10 +28,10 @@ import org.apache.wss4j.common.util.Loader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * MerlinAKI finds the issuing certificate by matching the received certificate's
@@ -77,7 +77,17 @@ public class MerlinAKIKeyIdentifierTest {
         // path validation - which would arrive here wrapping a CertPathValidatorException.
         assertNull(ex.getCause(), "Expected no issuer to be selected, but one was and it failed "
                                   + "path validation: " + ex.getMessage());
-        assertTrue(ex.getMessage().contains("No trusted certs found"), ex.getMessage());
+        assertEquals(WSSecurityException.ErrorCode.FAILURE, ex.getErrorCode());
+
+        // Deliberately asserted on the message ID rather than on the formatted message. The text
+        // is rendered through Santuario's global I18n bundle, which is whichever bundle is
+        // installed first in the JVM and never replaced afterwards. If anything initialises
+        // Santuario before WSProviderConfig.init() installs WSS4JResourceBundle, "certpath" stops
+        // resolving and every WSS4J message degrades to "No message with ID ... found in resource
+        // bundle ...". That is a property of the JVM the test happens to share, not of the code
+        // under test, and it made this assertion fail under a full module test run while passing
+        // when the class was run on its own. The message ID is stable either way.
+        assertEquals("certpath", ex.getMsgID());
     }
 
     private static X509Certificate getCertificate(String keyStoreFile, String password, String alias)

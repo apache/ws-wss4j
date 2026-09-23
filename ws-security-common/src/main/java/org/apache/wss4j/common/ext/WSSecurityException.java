@@ -23,6 +23,10 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.xml.namespace.QName;
 
+import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 /**
  * Exception class for WS-Security.
  */
@@ -126,7 +130,58 @@ public class WSSecurityException extends XMLSecurityException {
         }
     }
 
+    /**
+     * The WSS4J message bundle, resolved directly rather than through Santuario's I18n.
+     * <p/>
+     * I18n holds a single static bundle for the whole JVM and both of its init methods return
+     * early once it has been set, so whichever library initialises it first owns it for the
+     * lifetime of the JVM. WSProviderConfig installs {@code WSS4JResourceBundle}, which knows
+     * both WSS4J's message ids and Santuario's, but it only gets the chance if nothing has
+     * initialised Santuario before it. When it loses that race - an application that uses XML
+     * Signature or OpenSAML before it uses WSS4J, for instance - none of the ids in
+     * wss4j_errors.properties resolve any more, and every WSS4J error degrades to
+     * 'No message with ID "..." found in resource bundle "..."'.
+     * <p/>
+     * Resolving our own ids ourselves makes the text independent of who won that race. Ids we
+     * do not own are left to I18n, so Santuario's messages keep working as before.
+     */
+    private static final ResourceBundle WSS4J_MESSAGES = loadMessages();
+
+    private static ResourceBundle loadMessages() {
+        try {
+            return ResourceBundle.getBundle("messages.wss4j_errors");
+        } catch (Exception ex) { //NOPMD
+            // Should not happen, the bundle ships with this jar. Deliberately broad: this runs in
+            // a static initializer of the exception class every WSS4J failure path goes through,
+            // so anything thrown here would surface as an ExceptionInInitializerError in place of
+            // the real error. Falling back to I18n is always safe.
+            return null;
+        }
+    }
+
+    /**
+     * Format the message for a WSS4J message id, or null if the id is not one of ours, in which
+     * case the message that XMLSecurityException already derived via I18n is used instead.
+     */
+    private static String formatMessage(String msgId, Object... arguments) {
+        if (WSS4J_MESSAGES == null || msgId == null) {
+            return null;
+        }
+        try {
+            return MessageFormat.format(WSS4J_MESSAGES.getString(msgId), arguments);
+        } catch (MissingResourceException ex) { //NOPMD
+            // Not a WSS4J message id - it is one of Santuario's, so leave it to I18n
+            return null;
+        }
+    }
+
     private ErrorCode errorCode;
+
+    /**
+     * The message resolved from WSS4J's own bundle, or null when the message id is not one of
+     * WSS4J's. Never read directly, see {@link #getMessage()}.
+     */
+    private final String wss4jMessage;
 
     public WSSecurityException(ErrorCode errorCode) {
         this(errorCode, errorCode.name());
@@ -135,26 +190,39 @@ public class WSSecurityException extends XMLSecurityException {
     public WSSecurityException(ErrorCode errorCode, String msgId) {
         super(msgId, new Object[]{});
         this.errorCode = errorCode;
+        this.wss4jMessage = formatMessage(msgId);
     }
 
     public WSSecurityException(ErrorCode errorCode, Exception exception) {
         super(exception);
         this.errorCode = errorCode;
+        // No message id involved, the message is the wrapped exception's own
+        this.wss4jMessage = null;
     }
 
     public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId) {
         super(exception, msgId);
         this.errorCode = errorCode;
+        // Mirrors I18n.getExceptionMessage(String, Exception), which formats the wrapped
+        // exception's message as the single argument
+        this.wss4jMessage = formatMessage(msgId, exception.getMessage());
     }
 
     public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId, Object[] arguments) {
         super(exception, msgId, arguments);
         this.errorCode = errorCode;
+        this.wss4jMessage = formatMessage(msgId, arguments);
     }
 
     public WSSecurityException(ErrorCode errorCode, String msgId, Object[] arguments) {
         super(msgId, arguments);
         this.errorCode = errorCode;
+        this.wss4jMessage = formatMessage(msgId, arguments);
+    }
+
+    @Override
+    public String getMessage() {
+        return wss4jMessage != null ? wss4jMessage : super.getMessage();
     }
 
     /**
