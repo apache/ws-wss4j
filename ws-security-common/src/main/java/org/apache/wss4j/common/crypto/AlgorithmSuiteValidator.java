@@ -28,9 +28,11 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.exceptions.DERDecodingException;
 import org.apache.xml.security.utils.DERDecoderUtils;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.apache.xml.security.utils.KeyUtils;
 
 /**
@@ -130,13 +132,23 @@ public class AlgorithmSuiteValidator {
         String keyWrapAlgorithm
     ) throws WSSecurityException {
         Set<String> keyWrapAlgorithms = algorithmSuite.getKeyWrapAlgorithms();
-        if (!keyWrapAlgorithms.isEmpty()
-            && !keyWrapAlgorithms.contains(keyWrapAlgorithm)) {
-            LOG.warn(
-                "The Key transport method does not match the requirement"
-            );
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        if (keyWrapAlgorithms.isEmpty() || keyWrapAlgorithms.contains(keyWrapAlgorithm)) {
+            return;
         }
+        // ML-KEM key transport is always wrapped in the Generic Hybrid Cipher structure on the
+        // wire (see SANTUARIO-633), even though the configured key-transport algorithm (e.g. via
+        // WSHandlerConstants.ENC_KEY_TRANSPORT) is still the specific ML-KEM URI - accept the GHC
+        // wire algorithm whenever an ML-KEM URI was configured.
+        if (EncryptionConstants.ALGO_ID_KEYTRANSPORT_GENERIC_HYBRID.equals(keyWrapAlgorithm)
+                && (keyWrapAlgorithms.contains(WSS4JConstants.KEYTRANSPORT_ML_KEM_512)
+                    || keyWrapAlgorithms.contains(WSS4JConstants.KEYTRANSPORT_ML_KEM_768)
+                    || keyWrapAlgorithms.contains(WSS4JConstants.KEYTRANSPORT_ML_KEM_1024))) {
+            return;
+        }
+        LOG.warn(
+            "The Key transport method does not match the requirement"
+        );
+        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
     }
 
     public void checkKeyAgreementMethodAlgorithm(
@@ -250,6 +262,17 @@ public class AlgorithmSuiteValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         } else {
+            String algo = publicKey.getAlgorithm();
+            // ML-DSA and ML-KEM keys have no classical bit-length; validate by security level.
+            if (algo != null && (algo.startsWith("ML-DSA-") || algo.startsWith("ML-KEM-"))) {
+                int level = pqcSecurityLevel(algo);
+                int required = pqcLevelFromMinKeyLength(algorithmSuite.getMinimumAsymmetricKeyLength());
+                if (level < required) {
+                    LOG.warn("PQC key security level {} is below required level {}", level, required);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
+                return;
+            }
             // Try with last supported key types EdEC and XDH
             int keySize = getEdECndXDHKeyLength(publicKey);
             if (keySize < algorithmSuite.getMinimumEllipticCurveKeyLength()
@@ -260,6 +283,25 @@ public class AlgorithmSuiteValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         }
+    }
+
+    private static int pqcSecurityLevel(String algo) {
+        return switch (algo) {
+            case "ML-DSA-44", "ML-KEM-512"  -> 1;
+            case "ML-DSA-65", "ML-KEM-768"  -> 3;
+            case "ML-DSA-87", "ML-KEM-1024" -> 5;
+            default -> 0;
+        };
+    }
+
+    private static int pqcLevelFromMinKeyLength(int minBits) {
+        if (minBits >= 7680) {
+            return 5;
+        }
+        if (minBits >= 3072) {
+            return 3;
+        }
+        return 1;
     }
 
     /**

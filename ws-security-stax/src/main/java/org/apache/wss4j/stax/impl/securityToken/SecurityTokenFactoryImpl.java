@@ -22,15 +22,18 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.x500.X500Principal;
 
@@ -43,6 +46,7 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.KeyValueSecurityToken;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
 import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
@@ -62,8 +66,10 @@ import org.apache.xml.security.stax.ext.SecurityContext;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.apache.xml.security.utils.XMLUtils;
@@ -112,6 +118,18 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     (WSSSecurityProperties)securityProperties
             );
         }
+
+        // Fallback for PQC and other cases where no KeyInfo was emitted:
+        // use the directly configured decryption key (e.g. ML-KEM private key via setDecryptionKey).
+        Key decryptionKey = securityProperties.getDecryptionKey();
+        if (decryptionKey instanceof PrivateKey) {
+            PQCKeyValueToken token = new PQCKeyValueToken(
+                    (InboundSecurityContext) inboundSecurityContext,
+                    IDGenerator.generateID(null));
+            token.setSecretKey("", (PrivateKey) decryptionKey);
+            return token;
+        }
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
     }
 
@@ -483,6 +501,18 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext, crypto,
                                                    callbackHandler, securityProperties);
         }
+
+        // Fallback for PQC and other key types not represented in KeyValue XML:
+        // use a directly configured decryption key (e.g. ML-KEM private key set via setDecryptionKey).
+        Key decryptionKey = securityProperties.getDecryptionKey();
+        if (decryptionKey instanceof PrivateKey) {
+            PQCKeyValueToken token = new PQCKeyValueToken(
+                    (InboundSecurityContext) securityContext,
+                    IDGenerator.generateID(null));
+            token.setSecretKey("", (PrivateKey) decryptionKey);
+            return token;
+        }
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }
 
@@ -528,5 +558,33 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             getImplementedInterfaces(anInterface, interfaceList);
         }
         getImplementedInterfaces(clazz.getSuperclass(), interfaceList);
+    }
+
+    /**
+     * Minimal security token for PQC key transport (ML-KEM) where no KeyInfo element is emitted.
+     * Implements {@link KeyValueSecurityToken} so that CXF's StaxSecurityContextInInterceptor
+     * can safely cast the token when processing KeyValueToken security events.
+     */
+    private static final class PQCKeyValueToken extends AbstractInboundSecurityToken
+            implements KeyValueSecurityToken {
+
+        PQCKeyValueToken(InboundSecurityContext ctx, String id) {
+            super(ctx, id, SecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
+        }
+
+        @Override
+        public SecurityTokenConstants.TokenType getTokenType() {
+            return SecurityTokenConstants.KeyValueToken;
+        }
+
+        @Override
+        public Subject getSubject() throws WSSecurityException {
+            return null;
+        }
+
+        @Override
+        public Principal getPrincipal() throws WSSecurityException {
+            return null;
+        }
     }
 }

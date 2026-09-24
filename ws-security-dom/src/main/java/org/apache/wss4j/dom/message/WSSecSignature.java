@@ -895,6 +895,12 @@ public class WSSecSignature extends WSSecSignatureBase {
                     sigAlgo = WSConstants.ED448;
                 } else if (pubKeyAlgo.equalsIgnoreCase("EdDSA")) {
                     sigAlgo = getSigAlgorithmForEdDSAKey(certs[0].getPublicKey());
+                } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-44")) {
+                    sigAlgo = WSS4JConstants.ML_DSA_44;
+                } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-65")) {
+                    sigAlgo = WSS4JConstants.ML_DSA_65;
+                } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-87")) {
+                    sigAlgo = WSS4JConstants.ML_DSA_87;
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,

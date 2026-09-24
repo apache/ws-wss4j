@@ -355,18 +355,21 @@ public class WSSec {
     }
 
     private static void checkOutboundEncryptionProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+        boolean hasRawPublicKey = securityProperties.getEncryptionTransportKey() instanceof java.security.PublicKey;
         if (securityProperties.getEncryptionUseThisCertificate() == null
             && securityProperties.getEncryptionKeyStore() == null
             && securityProperties.getEncryptionCryptoProperties() == null
             && !securityProperties.isUseReqSigCertForEncryption()
             && securityProperties.isEncryptSymmetricEncryptionKey()
-            && securityProperties.getEncryptionCrypto() == null) {
+            && securityProperties.getEncryptionCrypto() == null
+            && !hasRawPublicKey) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
         }
         if (securityProperties.getEncryptionUser() == null
             && securityProperties.getEncryptionUseThisCertificate() == null
             && !securityProperties.isUseReqSigCertForEncryption()
-            && securityProperties.isEncryptSymmetricEncryptionKey()) {
+            && securityProperties.isEncryptSymmetricEncryptionKey()
+            && !hasRawPublicKey) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
         }
         if (securityProperties.getEncryptionSymAlgorithm() == null) {
