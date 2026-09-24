@@ -198,6 +198,47 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
+        // PQC suites — minimumAsymmetricKeyLength is 0 because PQC keys have no classical
+        // bit-length; AlgorithmSuiteValidator uses security-level checks instead.
+        // Basic128MlDsa44: ML-DSA-44 + ML-KEM-512 + AES-128, NIST security level 1.
+        ALGORITHM_SUITE_TYPES.put("Basic128MlDsa44", new AlgorithmSuiteType(
+                "Basic128MlDsa44",
+                SPConstants.SHA256,
+                SPConstants.AES128,
+                SPConstants.KW_AES128,
+                SPConstants.KW_ML_KEM_512,
+                SPConstants.P_SHA1_L128,
+                SPConstants.P_SHA1_L128,
+                SPConstants.HMAC_SHA1,
+                SPConstants.ML_DSA_44,
+                128, 128, 128,
+                MAX_SKL, 0, 0));
+        // Basic256MlDsa65: ML-DSA-65 + ML-KEM-768 + AES-256, NIST security level 3.
+        ALGORITHM_SUITE_TYPES.put("Basic256MlDsa65", new AlgorithmSuiteType(
+                "Basic256MlDsa65",
+                SPConstants.SHA256,
+                SPConstants.AES256,
+                SPConstants.KW_AES256,
+                SPConstants.KW_ML_KEM_768,
+                SPConstants.P_SHA1_L256,
+                SPConstants.P_SHA1_L256,
+                SPConstants.HMAC_SHA1,
+                SPConstants.ML_DSA_65,
+                256, 256, 256,
+                MAX_SKL, 0, 0));
+        // Basic256MlDsa87: ML-DSA-87 + ML-KEM-1024 + AES-256, NIST security level 5.
+        ALGORITHM_SUITE_TYPES.put("Basic256MlDsa87", new AlgorithmSuiteType(
+                "Basic256MlDsa87",
+                SPConstants.SHA256,
+                SPConstants.AES256,
+                SPConstants.KW_AES256,
+                SPConstants.KW_ML_KEM_1024,
+                SPConstants.P_SHA1_L256,
+                SPConstants.P_SHA1_L256,
+                SPConstants.HMAC_SHA1,
+                SPConstants.ML_DSA_87,
+                256, 256, 256,
+                MAX_SKL, 0, 0));
     }
 
     public static final class AlgorithmSuiteType {

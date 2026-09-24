@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.util;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -257,6 +258,26 @@ public final class KeyUtils {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
                 new Object[]{"No such provider \"" + JCEMapper.getProviderId() + "\" for \"" + keyAlgorithm + "\""});
+        }
+    }
+
+    /**
+     * Returns the AES KeyWrap algorithm URI matching the given key length, used as the
+     * data-encapsulation algorithm for KEM-based (e.g. ML-KEM) key transport.
+     *
+     * @param keyBytes the key length in bytes (16, 24, or 32)
+     * @return the matching AES KeyWrap algorithm URI
+     */
+    public static String getAesKeyWrapAlgorithmForKeyLength(int keyBytes) {
+        switch (keyBytes) {
+            case 16:
+                return WSS4JConstants.KEYWRAP_AES128;
+            case 24:
+                return WSS4JConstants.KEYWRAP_AES192;
+            case 32:
+                return WSS4JConstants.KEYWRAP_AES256;
+            default:
+                throw new IllegalArgumentException("Unsupported key length for AES KeyWrap: " + keyBytes);
         }
     }
 

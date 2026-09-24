@@ -46,6 +46,7 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -278,6 +279,18 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 setSignatureAlgorithm(WSConstants.DSA);
             } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
                 setSignatureAlgorithm(WSConstants.RSA);
+            } else if (pubKeyAlgo.equalsIgnoreCase("EC")) {
+                setSignatureAlgorithm(WSConstants.ECDSA_SHA256);
+            } else if (pubKeyAlgo.equalsIgnoreCase("Ed25519")) {
+                setSignatureAlgorithm(WSConstants.ED25519);
+            } else if (pubKeyAlgo.equalsIgnoreCase("ED448")) {
+                setSignatureAlgorithm(WSConstants.ED448);
+            } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-44")) {
+                setSignatureAlgorithm(WSS4JConstants.ML_DSA_44);
+            } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-65")) {
+                setSignatureAlgorithm(WSS4JConstants.ML_DSA_65);
+            } else if (pubKeyAlgo.equalsIgnoreCase("ML-DSA-87")) {
+                setSignatureAlgorithm(WSS4JConstants.ML_DSA_87);
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,

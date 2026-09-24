@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -100,8 +101,11 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             || WSSConstants.NS_XMLDSIG_HMACSHA512.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA256.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA384.equals(algorithm)
-            || WSSConstants.NS_XMLDSIG_RSASHA512.equals(algorithm))) {
-            // Weakening this rule a bit to allow > SHA-1
+            || WSSConstants.NS_XMLDSIG_RSASHA512.equals(algorithm)
+            || WSS4JConstants.ML_DSA_44.equals(algorithm)
+            || WSS4JConstants.ML_DSA_65.equals(algorithm)
+            || WSS4JConstants.ML_DSA_87.equals(algorithm))) {
+            // Weakening this rule a bit to allow > SHA-1 and PQC algorithms (ML-DSA)
             securityContext.handleBSPRule(BSPRule.R5421);
         }
 

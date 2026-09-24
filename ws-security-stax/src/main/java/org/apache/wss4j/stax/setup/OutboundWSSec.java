@@ -401,6 +401,9 @@ public class OutboundWSSec {
         } else if (securityProperties.getEncryptionUseThisCertificate() != null) {
             x509Certificates = new X509Certificate[1];
             x509Certificates[0] = securityProperties.getEncryptionUseThisCertificate();
+        } else if (securityProperties.getEncryptionTransportKey() instanceof PublicKey) {
+            // Raw public key (e.g., ML-KEM): no certificate, key provided directly
+            publicKey = (PublicKey) securityProperties.getEncryptionTransportKey();
         } else {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(securityProperties.getEncryptionUser());

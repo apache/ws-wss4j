@@ -40,6 +40,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -223,121 +224,115 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 final String encryptionKeyTransportAlgorithm = getSecurityProperties().getEncryptionKeyTransportAlgorithm();
+                final boolean isMLKem = WSS4JConstants.KEYTRANSPORT_ML_KEM_512.equals(encryptionKeyTransportAlgorithm)
+                        || WSS4JConstants.KEYTRANSPORT_ML_KEM_768.equals(encryptionKeyTransportAlgorithm)
+                        || WSS4JConstants.KEYTRANSPORT_ML_KEM_1024.equals(encryptionKeyTransportAlgorithm);
+
+                // Fetched early (rather than just before wrapping, as for other algorithms) since
+                // the ML-KEM/Generic Hybrid Cipher structure needs the session key's length to pick
+                // a data-encapsulation (AES-KeyWrap) algorithm before writing the EncryptionMethod XML.
+                Key secretKey = securityToken.getSecretKey("");
+
+                String dataEncapsulationAlgorithm = null;
+                String hmacAlgorithm = null;
+                org.apache.xml.security.encryption.params.KeyDerivationParameters kdfParams = null;
+                int keyLenBytes = 0;
+                if (isMLKem) {
+                    dataEncapsulationAlgorithm =
+                            org.apache.wss4j.common.util.KeyUtils.getAesKeyWrapAlgorithmForKeyLength(secretKey.getEncoded().length);
+                    int keyBitLength = org.apache.xml.security.utils.KeyUtils.getAESKeyBitSizeForWrapAlgorithm(dataEncapsulationAlgorithm);
+                    keyLenBytes = keyBitLength / 8;
+                    hmacAlgorithm = XMLSecurityConstants.NS_XMLDSIG_HMACSHA256;
+                    kdfParams = org.apache.xml.security.encryption.params.HKDFParams.createBuilder(keyBitLength, hmacAlgorithm).build();
+                }
+
+                final String encryptionKeyTransportMGFAlgorithm = getSecurityProperties().getEncryptionKeyTransportMGFAlgorithm();
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Id, securityToken.getId()));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
 
-                attributes = new ArrayList<>(1);
-                attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, encryptionKeyTransportAlgorithm));
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
+                if (isMLKem) {
+                    writeGenericHybridEncryptionMethod(subOutputProcessorChain, encryptionKeyTransportAlgorithm,
+                            dataEncapsulationAlgorithm, hmacAlgorithm, keyLenBytes);
+                } else {
+                    attributes = new ArrayList<>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, encryptionKeyTransportAlgorithm));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
 
-                final String encryptionKeyTransportMGFAlgorithm = getSecurityProperties().getEncryptionKeyTransportMGFAlgorithm();
+                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
+                        || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
-                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
-                    || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
+                        byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
+                        if (oaepParams != null) {
+                            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams,
+                                                               false, null);
+                            createCharactersAndOutputAsEvent(subOutputProcessorChain, XMLUtils.encodeToString(oaepParams));
+                            createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
+                        }
 
-                    byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
-                    if (oaepParams != null) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams,
-                                                           false, null);
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, XMLUtils.encodeToString(oaepParams));
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
+                        String encryptionKeyTransportDigestAlgorithm = getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
+                        if (encryptionKeyTransportDigestAlgorithm != null) {
+                            attributes = new ArrayList<>(1);
+                            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportDigestAlgorithm));
+                            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod,
+                                                               true, attributes);
+                            createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
+                        }
+
+                        if (encryptionKeyTransportMGFAlgorithm != null) {
+                            attributes = new ArrayList<>(1);
+                            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportMGFAlgorithm));
+                            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF,
+                                                               true, attributes);
+                            createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF);
+                        }
                     }
 
-                    String encryptionKeyTransportDigestAlgorithm = getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
-                    if (encryptionKeyTransportDigestAlgorithm != null) {
-                        attributes = new ArrayList<>(1);
-                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportDigestAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod,
-                                                           true, attributes);
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
-                    }
-
-                    if (encryptionKeyTransportMGFAlgorithm != null) {
-                        attributes = new ArrayList<>(1);
-                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportMGFAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF,
-                                                           true, attributes);
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF);
-                    }
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
                 }
 
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
+                // For PQC keys (e.g., ML-KEM) without a certificate, omit ds:KeyInfo entirely.
+                // The receiver uses the directly configured decryption key (setDecryptionKey).
+                boolean hasCerts = securityToken.getKeyWrappingToken().getX509Certificates() != null
+                    && securityToken.getKeyWrappingToken().getX509Certificates().length > 0;
+                boolean hasCustomRef = securityToken.getCustomTokenReference() != null;
+                String wrappingKeyAlg = publicKey.getAlgorithm();
+                boolean isClassicalKey = "RSA".equals(wrappingKeyAlg)
+                    || "DSA".equals(wrappingKeyAlg) || "EC".equals(wrappingKeyAlg);
+                boolean emitKeyInfo = hasCerts || hasCustomRef || isClassicalKey;
+
+                if (emitKeyInfo) {
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
+                }
                 createSecurityTokenReferenceStructureForEncryptedKey(
                         subOutputProcessorChain, securityToken,
                         ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier(),
                         getSecurityProperties().isUseSingleCert()
                 );
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
+                if (emitKeyInfo) {
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
+                }
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData, false, null);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue, false, null);
 
-                try {
-                    //encrypt the symmetric session key with the public key from the receiver:
-                    String jceid = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportAlgorithm);
-                    Cipher cipher = Cipher.getInstance(jceid);
+                byte[] encryptedEphemeralKey = wrapSessionKey(secretKey, publicKey, encryptionKeyTransportAlgorithm,
+                        isMLKem, dataEncapsulationAlgorithm, kdfParams, encryptionKeyTransportMGFAlgorithm);
 
-                    AlgorithmParameterSpec algorithmParameterSpec = null;
-                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
-                        || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
-
-                        String jceDigestAlgorithm = "SHA-1";
-                        String encryptionKeyTransportDigestAlgorithm =
-                            getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
-                        if (encryptionKeyTransportDigestAlgorithm != null) {
-                            jceDigestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportDigestAlgorithm);
-                        }
-
-                        PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
-                        byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
-                        if (oaepParams != null) {
-                            pSource = new PSource.PSpecified(oaepParams);
-                        }
-
-                        MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
-                        if (encryptionKeyTransportMGFAlgorithm != null) {
-                            String jceMGFAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportMGFAlgorithm);
-                            mgfParameterSpec = new MGF1ParameterSpec(jceMGFAlgorithm);
-                        }
-                        algorithmParameterSpec = new OAEPParameterSpec(jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource);
+                if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
+                    // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
+                    WSPasswordCallback callback =
+                        new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.SECRET_KEY);
+                    callback.setKey(encryptedEphemeralKey);
+                    try {
+                        ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
+                    } catch (IOException | UnsupportedCallbackException e) { // NOPMD
+                        // Do nothing
                     }
-
-                    cipher.init(Cipher.WRAP_MODE, publicKey, algorithmParameterSpec);
-
-                    Key secretKey = securityToken.getSecretKey("");
-
-                    int blockSize = cipher.getBlockSize();
-                    if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {
-                        throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.FAILURE,
-                                "unsupportedKeyTransp",
-                                new Object[] {"public key algorithm too weak to encrypt symmetric key"}
-                        );
-                    }
-                    byte[] encryptedEphemeralKey = cipher.wrap(secretKey);
-
-                    if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
-                        // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
-                        WSPasswordCallback callback =
-                            new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.SECRET_KEY);
-                        callback.setKey(encryptedEphemeralKey);
-                        try {
-                            ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
-                        } catch (IOException | UnsupportedCallbackException e) { // NOPMD
-                            // Do nothing
-                        }
-                    }
-
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                                     XMLUtils.encodeToString(encryptedEphemeralKey));
-
-                } catch (NoSuchPaddingException | NoSuchAlgorithmException
-                    | InvalidKeyException | IllegalBlockSizeException
-                    | InvalidAlgorithmParameterException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
+
+                createCharactersAndOutputAsEvent(subOutputProcessorChain,
+                                                 XMLUtils.encodeToString(encryptedEphemeralKey));
 
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData);
@@ -348,6 +343,146 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
                 outputProcessorChain.removeProcessor(this);
             }
+        }
+
+        /**
+         * Wraps the session key for key transport: for ML-KEM, encapsulates a shared secret to
+         * the recipient's public key, derives an AES key-wrap key from it, and AES-KeyWraps the
+         * session key, returning the concatenation of the KEM encapsulation and the wrapped key
+         * (see SANTUARIO-633); for all other algorithms, wraps the session key directly with the
+         * recipient's public key via {@code Cipher.WRAP_MODE}, unchanged from before.
+         */
+        private byte[] wrapSessionKey(Key secretKey, PublicKey publicKey, String encryptionKeyTransportAlgorithm,
+                                      boolean isMLKem, String dataEncapsulationAlgorithm,
+                                      org.apache.xml.security.encryption.params.KeyDerivationParameters kdfParams,
+                                      String encryptionKeyTransportMGFAlgorithm)
+                throws WSSecurityException {
+            try {
+                if (isMLKem) {
+                    // Encapsulate a shared secret to the recipient's ML-KEM public key, derive
+                    // the AES key-wrap key from it, and wrap the session key with that key.
+                    // CipherValue holds the concatenation of the KEM encapsulation (C0) and the
+                    // wrapped session key (C1), per https://www.w3.org/TR/xmlsec-generic-hybrid/.
+                    org.apache.xml.security.utils.KeyUtils.KemEncapsulation kemResult =
+                            org.apache.xml.security.utils.KeyUtils.kemEncapsulate(
+                                    publicKey, encryptionKeyTransportAlgorithm, kdfParams);
+                    Cipher wrapCipher = org.apache.wss4j.common.util.KeyUtils.getCipherInstance(dataEncapsulationAlgorithm);
+                    wrapCipher.init(Cipher.WRAP_MODE, kemResult.getWrapKey());
+                    byte[] wrappedKey = wrapCipher.wrap(secretKey);
+
+                    byte[] encapsulation = kemResult.getEncapsulation();
+                    byte[] combined = new byte[encapsulation.length + wrappedKey.length];
+                    System.arraycopy(encapsulation, 0, combined, 0, encapsulation.length);
+                    System.arraycopy(wrappedKey, 0, combined, encapsulation.length, wrappedKey.length);
+                    return combined;
+                }
+
+                //encrypt the symmetric session key with the public key from the receiver:
+                String jceid = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportAlgorithm);
+                Cipher cipher = Cipher.getInstance(jceid);
+
+                AlgorithmParameterSpec algorithmParameterSpec = null;
+                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm)
+                    || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
+
+                    String jceDigestAlgorithm = "SHA-1";
+                    String encryptionKeyTransportDigestAlgorithm =
+                        getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
+                    if (encryptionKeyTransportDigestAlgorithm != null) {
+                        jceDigestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportDigestAlgorithm);
+                    }
+
+                    PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
+                    byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
+                    if (oaepParams != null) {
+                        pSource = new PSource.PSpecified(oaepParams);
+                    }
+
+                    MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
+                    if (encryptionKeyTransportMGFAlgorithm != null) {
+                        String jceMGFAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportMGFAlgorithm);
+                        mgfParameterSpec = new MGF1ParameterSpec(jceMGFAlgorithm);
+                    }
+                    algorithmParameterSpec = new OAEPParameterSpec(jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource);
+                }
+
+                cipher.init(Cipher.WRAP_MODE, publicKey, algorithmParameterSpec);
+
+                int blockSize = cipher.getBlockSize();
+                if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE,
+                            "unsupportedKeyTransp",
+                            new Object[] {"public key algorithm too weak to encrypt symmetric key"}
+                    );
+                }
+                return cipher.wrap(secretKey);
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException
+                | InvalidKeyException | IllegalBlockSizeException
+                | InvalidAlgorithmParameterException | org.apache.xml.security.encryption.XMLEncryptionException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+        }
+
+        /**
+         * Writes the {@code xenc:EncryptionMethod} for KEM-based (Generic Hybrid Cipher) key
+         * transport, per https://www.w3.org/TR/xmlsec-generic-hybrid/ section 6.1 "Key Transport
+         * Example" (see SANTUARIO-633): the top-level algorithm is {@code generic-hybrid}, with a
+         * nested {@code ghc:GenericHybridCipherMethod} identifying the KEM algorithm (with its
+         * HKDF key-derivation method) and the AES-KeyWrap data-encapsulation algorithm. Mirrors
+         * the structure Santuario's own {@code XMLEncryptOutputProcessor} now builds for the DOM
+         * and default STAX key-transport path.
+         */
+        private void writeGenericHybridEncryptionMethod(
+                OutputProcessorChain outputProcessorChain, String kemAlgorithm,
+                String dataEncapsulationAlgorithm, String hmacAlgorithm, int keyLenBytes)
+                throws XMLStreamException, XMLSecurityException {
+
+            List<XMLSecAttribute> attributes = new ArrayList<>(1);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm,
+                    org.apache.xml.security.utils.EncryptionConstants.ALGO_ID_KEYTRANSPORT_GENERIC_HYBRID));
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
+
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_GenericHybridCipherMethod, true, null);
+
+            attributes = new ArrayList<>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, kemAlgorithm));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_KeyEncapsulationMethod, true, attributes);
+
+            attributes = new ArrayList<>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, XMLSecurityConstants.NS_HKDF));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc11_KeyDerivationMethod, true, attributes);
+
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_HKDFParams, true, null);
+
+            attributes = new ArrayList<>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, hmacAlgorithm));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_PRF, true, attributes);
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_PRF);
+
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_KeyLength, false, null);
+            createCharactersAndOutputAsEvent(outputProcessorChain, String.valueOf(keyLenBytes));
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_KeyLength);
+
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_hkdf_HKDFParams);
+
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc11_KeyDerivationMethod);
+
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_KeyLen, false, null);
+            createCharactersAndOutputAsEvent(outputProcessorChain, String.valueOf(keyLenBytes));
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_KeyLen);
+
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_KeyEncapsulationMethod);
+
+            attributes = new ArrayList<>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, dataEncapsulationAlgorithm));
+            createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_ghc_DataEncapsulationMethod, true, attributes);
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_DataEncapsulationMethod);
+
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_ghc_GenericHybridCipherMethod);
+
+            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
         }
 
         protected void createSecurityTokenReferenceStructureForEncryptedKey(
@@ -365,8 +500,13 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             if ((x509Certificates == null || x509Certificates.length == 0)
                 && securityToken.getKeyWrappingToken().getPublicKey() != null) {
-                WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain,
-                                                      securityToken.getKeyWrappingToken().getPublicKey());
+                java.security.PublicKey wrappingPublicKey = securityToken.getKeyWrappingToken().getPublicKey();
+                String keyAlg = wrappingPublicKey.getAlgorithm();
+                // Only emit KeyValue for classical key types; PQC keys (e.g., ML-KEM) omit KeyInfo
+                // so that the receiver uses the directly configured decryption key
+                if ("RSA".equals(keyAlg) || "DSA".equals(keyAlg) || "EC".equals(keyAlg)) {
+                    WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, wrappingPublicKey);
+                }
                 return;
             }
 
