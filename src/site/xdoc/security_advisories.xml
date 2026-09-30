@@ -7,7 +7,7 @@
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,16 @@ For information on how to report a new security problem please see <a href="http
 <p>
 The following security advisories have been issued for Apache WSS4J&#8482;:
 <ul>
+<li><b>2026</b></li>
+<ul>
+<li><a href="advisories/CVE-2026-85532.txt">CVE-2026-85532</a> - Apache WSS4J: Insufficient Validation of Derived-Key Parameters.</li>
+<li><a href="advisories/CVE-2026-87830.txt">CVE-2026-87830</a> - Apache WSS4J: Streaming WS-SecurityPolicy validation may skip element-protection checks.</li>
+<li><a href="advisories/CVE-2026-88920.txt">CVE-2026-88920</a> - Apache WSS4J: SAML Sender-Vouches Authentication Bypass.</li>
+<li><a href="advisories/CVE-2026-89238.txt">CVE-2026-89238</a> - Apache WSS4J: WSS4J EncryptedHeader child confusion causing wrong protected-header selection.</li>
+<li><a href="advisories/CVE-2026-92121.txt">CVE-2026-92121</a> - Apache WSS4J: WS-SecurityPolicy signature checks skipped in the streaming code after an STR-Transform reference.</li>
+<li><a href="advisories/CVE-2026-92899.txt">CVE-2026-92899</a> - Apache WSS4J: UsernameToken replay protection bypassed by re-encoding the Nonce.</li>
+<li><a href="advisories/CVE-2026-95616.txt">CVE-2026-95616</a> - Apache WSS4J: Unauthenticated denial of service via integer overflow in DER parsing of X.509 certificate extensions.</li>
+</ul>
 <li><b>2015</b></li>
 <ul>
 <li><a href="advisories/CVE-2015-0226.txt.asc">CVE-2015-0226</a> - Apache
@@ -42,13 +52,13 @@ the best way to keep an eye on security issues involving WSS4J is to look at
 the security advisories pages of these projects.
 </p>
 <p>
-The security advisory page for Apache CXF is <a href="http://cxf.apache.org/security-advisories.html">here</a>. In particular, the following security 
+The security advisory page for Apache CXF is <a href="https://cxf.apache.org/security-advisories.html">here</a>. In particular, the following security 
 advisories are relevant to users of WSS4J:
 </p>
 <ul>
-<li><a href="http://cxf.apache.org/cve-2012-5575.html">Note on CVE-2012-5575</a> - XML Encryption backwards compatibility attack on Apache CXF.</li>
-<li><a href="http://cxf.apache.org/note-on-cve-2011-2487.html">Note on CVE-2011-2487</a> - Bleichenbacher attack against distributed symmetric key in WS-Security.</li>
-<li><a href="http://cxf.apache.org/note-on-cve-2011-1096.html">Note on CVE-2011-1096</a> - XML Encryption flaw / Character pattern encoding attack.</li>
+<li><a href="https://cxf.apache.org/cve-2012-5575.html">Note on CVE-2012-5575</a> - XML Encryption backwards compatibility attack on Apache CXF.</li>
+<li><a href="https://cxf.apache.org/note-on-cve-2011-2487.html">Note on CVE-2011-2487</a> - Bleichenbacher attack against distributed symmetric key in WS-Security.</li>
+<li><a href="https://cxf.apache.org/note-on-cve-2011-1096.html">Note on CVE-2011-1096</a> - XML Encryption flaw / Character pattern encoding attack.</li>
 </ul>
 
 </section>            

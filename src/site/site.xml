@@ -7,7 +7,7 @@
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,11 +23,11 @@
   </skin>
   <bannerLeft>
     <name>Apache WSS4J&#8482;</name>
-    <href>http://ws.apache.org/wss4j</href>
+    <href>https://ws.apache.org/wss4j</href>
   </bannerLeft>
   <bannerRight>
-    <src>http://activemq.apache.org/images/asf-logo.png</src>
-    <href>http://www.apache.org</href>
+    <src>https://activemq.apache.org/images/asf-logo.png</src>
+    <href>https://www.apache.org</href>
   </bannerRight>
   <body>
     <menu name="Apache WSS4J">
@@ -45,4 +45,3 @@
 
   </body>
 </project>
-

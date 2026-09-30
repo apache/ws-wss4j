@@ -7,7 +7,7 @@
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +27,8 @@ service deployment
 descriptor (wsdd file) to add a WS-Security layer to the web service.
 This is a step by step tutorial for deploying a simple service with
 Username Token.<br></br>
-<br></br></subsection><subsection name="Prerequisites"><a href="http://ws.apache.org/axis/">Axis
-1.2</a> installed and configured on a <a href="http://jakarta.apache.org/tomcat/">Tomcat Server</a>.  This
+<br></br></subsection><subsection name="Prerequisites"><a href="https://ws.apache.org/axis/">Axis
+1.2</a> installed and configured on a <a href="https://jakarta.apache.org/tomcat/">Tomcat Server</a>.ï¿½ This
 tutorial was performed on a Linux machine with Tomcat 5.5.4/Java 1.5.0,
 however, the setup should be similar on other application servers, or
 other operating systems (like Windows) unless we stated otherwise.<br></br>
@@ -43,7 +43,7 @@ WEB-INF/lib directory. Many jar files will already exist. Most of them
 will already exist there but you can just overwrite them all.</li>
   <li>You may need to restart Tomcat unless you have automatic
 deployment/class loading turned on. Check the Axis Happiness Page
-(typically at http://localhost:8080/axis), make sure that the XML
+(typically at https://localhost:8080/axis), make sure that the XML
 Security (xmlsec.jar) is listed under the "Optional Components" section.</li>
 </ol>
 <h4>Creating the Service</h4>
@@ -55,18 +55,18 @@ with Axis. Unless you have one already, create a deployment descriptor
 <ol start="2">
   <br></br>
   <span style="color: rgb(0, 0, 153);">&lt;deployment
-xmlns="http://xml.apache.org/axis/wsdd/"
-xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-  <span style="color: rgb(0, 0, 153);"> &lt;service
+xmlns="https://xml.apache.org/axis/wsdd/"
+xmlns:java="https://xml.apache.org/axis/wsdd/providers/java"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
+  <span style="color: rgb(0, 0, 153);">ï¿½&lt;service
 name="stock-wss-01" provider="java:RPC" style="document"
 use="literal"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-  <span style="color: rgb(0, 0, 153);">  &lt;parameter
+  <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="className" value="samples.stock.StockQuoteService"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-  <span style="color: rgb(0, 0, 153);">  &lt;parameter
+  <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="allowedMethods" value="getQuote"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-  <span style="color: rgb(0, 0, 153);">  &lt;parameter
+  <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="scope" value="application"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-  <span style="color: rgb(0, 0, 153);"> &lt;/service&gt;</span><br style="color: rgb(0, 0, 153);"></br>
+  <span style="color: rgb(0, 0, 153);">ï¿½&lt;/service&gt;</span><br style="color: rgb(0, 0, 153);"></br>
   <span style="color: rgb(0, 0, 153);">&lt;/deployment&gt;<br></br>
   <br></br>
   </span><li>deploy the service (using AxisAdmin):</li>
@@ -74,7 +74,7 @@ name="scope" value="application"/&gt;</span><br style="color: rgb(0, 0, 153);"><
 <ol>
   <span style="color: rgb(0, 0, 153);">java
 org.apache.axis.client.AdminClient
--lhttp://localhost:8080/axis/services/AdminService deploy.wsdd<br></br>
+-lhttps://localhost:8080/axis/services/AdminService deploy.wsdd<br></br>
   </span>
 </ol>
 <h4>Creating the Client</h4>
@@ -82,8 +82,8 @@ org.apache.axis.client.AdminClient
   <li>Use WSDL2Java to generate the client service bindings:<br></br>
     <span style="color: rgb(0, 0, 153);">java
 org.apache.axis.wsdl.WSDL2Java -o .
--Nhttp://fox:8080/axis/services/stock-wss-01 samples.stock.client
-http://fox:8080/axis/services/stock-wss-01?wsdl</span><br></br>
+-Nhttps://fox:8080/axis/services/stock-wss-01 samples.stock.client
+https://fox:8080/axis/services/stock-wss-01?wsdl</span><br></br>
     <br></br>
 A bunch of java classes will be created under samples/stock/client,
 including the StockQuoteServiceServiceLocator.<br></br>
@@ -101,31 +101,31 @@ javax.xml.rpc.ServiceException;</span><br style="color: rgb(0, 0, 153);"></br>
     <br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">public class
 StockServiceClient {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    public
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ public
 StockServiceClient() {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    public
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ }</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ public
 static void main(String[] args) throws ServiceException,
 RemoteException {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 if (args.length == 0) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 System.out.println("Usage:\njava StockServiceClient [symbol]");</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 return;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 StockQuoteServiceService locator = new
 StockQuoteServiceServiceLocator();</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 StockQuoteService service = locator.getStockWss01();</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 float quote = service.getQuote(args[0]);</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 System.out.println("stock quote service returned " + args[0] + ": " +
 quote);</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    }</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ }</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">}</span><br></br>
     <br></br>
   </li>
@@ -146,30 +146,30 @@ If all went well, you should get the result:<br></br>
   <li>Modify the deployment descriptor you created above to look like
 this:<br></br>
     <span style="color: rgb(0, 0, 153);">&lt;deployment
-xmlns="http://xml.apache.org/axis/wsdd/"
-xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> &lt;service
+xmlns="https://xml.apache.org/axis/wsdd/"
+xmlns:java="https://xml.apache.org/axis/wsdd/providers/java"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½&lt;service
 name="stock-wss-01" provider="java:RPC" style="document"
 use="literal"&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;"> 
+    <span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½
 &lt;requestFlow&gt;</span><br style="color: rgb(0, 0, 153); font-weight: bold;"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;">  
+    <span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½ï¿½
 &lt;handler type="java:org.apache.ws.axis.security.WSDoAllReceiver"&gt;</span><br style="color: rgb(0, 0, 153); font-weight: bold;"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;">   
+    <span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½ï¿½ï¿½
 &lt;parameter name="passwordCallbackClass" value="PWCallback"/&gt;</span><br style="color: rgb(0, 0, 153); font-weight: bold;"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;">   
+    <span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½ï¿½ï¿½
 &lt;parameter name="action" value="UsernameToken"/&gt;</span><br style="color: rgb(0, 0, 153); font-weight: bold;"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;"></span><span style="color: rgb(0, 0, 153); font-weight: bold;">  
+    <span style="color: rgb(0, 0, 153); font-weight: bold;"></span><span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½ï¿½
 &lt;/handler&gt;</span><br style="color: rgb(0, 0, 153); font-weight: bold;"></br>
-    <span style="color: rgb(0, 0, 153); font-weight: bold;"> 
+    <span style="color: rgb(0, 0, 153); font-weight: bold;">ï¿½
 &lt;/requestFlow&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">  &lt;parameter
+    <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="className" value="samples.stock.StockQuoteService"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">  &lt;parameter
+    <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="allowedMethods" value="getQuote"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">  &lt;parameter
+    <span style="color: rgb(0, 0, 153);">ï¿½ &lt;parameter
 name="scope" value="application"/&gt;</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> &lt;/service&gt;</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½&lt;/service&gt;</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">&lt;/deployment&gt;<br></br>
     <br></br>
     </span>WSDoAllReceiver is an Axis handler that can be located in
@@ -197,33 +197,33 @@ org.apache.ws.security.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153
     <br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">public class PWCallback
 implements CallbackHandler {</span><span style="color: rgb(0, 0, 153);"></span><span style="color: rgb(0, 0, 153);"></span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    public void
+    <span style="color: rgb(0, 0, 153);">ï¿½ ï¿½ public void
 handle(Callback[] callbacks)</span><span style="color: rgb(0, 0, 153);">
 throws IOException, UnsupportedCallbackException {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 for (int i = 0; i &lt; callbacks.length; i++) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 if (callbacks[i] instanceof WSPasswordCallback) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];<br></br>
-               
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 // set the password given a username<br></br>
-    </span>               
+    </span>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     <span style="color: rgb(0, 0, 153);">if
 ("wss4j".equals(pc.getIdentifier())) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">                   
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 pc.setPassword("security");</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"></span><span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);"></span><span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 } else {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 throw new UnsupportedCallbackException(</span><span style="color: rgb(0, 0, 153);">callbacks[i], "Unrecognized Callback");</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    }</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ }</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">}</span><br></br>
     <span style="font-weight: bold;"></span><br></br>
     <br></br>
@@ -244,10 +244,10 @@ You should now get an error:<br></br>
     <br></br>
     <span style="color: rgb(0, 0, 153);">Exception in thread "main"
 AxisFault</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> faultCode:
-{http://schemas.xmlsoap.org/soap/envelope/}Server.generalException</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> faultSubcode:</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> faultString:
+    <span style="color: rgb(0, 0, 153);">ï¿½faultCode:
+{https://schemas.xmlsoap.org/soap/envelope/}Server.generalException</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½faultSubcode:</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½faultString:
 WSDoAllReceiver: Request does not contain required Security header</span><br></br>
     <br></br>
 This is because your client is not configured to send a Username Token
@@ -258,24 +258,24 @@ yet, so the service is rejecting the request.<br></br>
 client:<br></br>
     <br></br>
     <span style="color: rgb(0, 0, 153);">&lt;deployment
-xmlns="http://xml.apache.org/axis/wsdd/"
-xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"&gt;<br></br>
- &lt;transport name="http"
+xmlns="https://xml.apache.org/axis/wsdd/"
+xmlns:java="https://xml.apache.org/axis/wsdd/providers/java"&gt;<br></br>
+ï¿½&lt;transport name="http"
 pivot="java:org.apache.axis.transport.http.HTTPSender"/&gt;<br></br>
-  &lt;globalConfiguration &gt;<br></br>
-   &lt;requestFlow &gt;<br></br>
-    &lt;handler
+ï¿½ &lt;globalConfiguration &gt;<br></br>
+ï¿½ï¿½ &lt;requestFlow &gt;<br></br>
+ï¿½ï¿½ï¿½ &lt;handler
 type="java:org.apache.ws.axis.security.WSDoAllSender" &gt;<br></br>
-     &lt;parameter name="action"
+ï¿½ï¿½ï¿½ï¿½ &lt;parameter name="action"
 value="UsernameToken"/&gt;<br></br>
-     &lt;parameter name="user" value="wss4j"/&gt;<br></br>
-     &lt;parameter name="passwordCallbackClass"
+ï¿½ï¿½ï¿½ï¿½ &lt;parameter name="user" value="wss4j"/&gt;<br></br>
+ï¿½ï¿½ï¿½ï¿½ &lt;parameter name="passwordCallbackClass"
 value="samples.stock.client.PWCallback"/&gt;<br></br>
-     &lt;parameter name="passwordType"
+ï¿½ï¿½ï¿½ï¿½ &lt;parameter name="passwordType"
 value="PasswordDigest"/&gt;<br></br>
-    &lt;/handler&gt;<br></br>
-   &lt;/requestFlow &gt;<br></br>
-  &lt;/globalConfiguration &gt;<br></br>
+ï¿½ï¿½ï¿½ &lt;/handler&gt;<br></br>
+ï¿½ï¿½ &lt;/requestFlow &gt;<br></br>
+ï¿½ &lt;/globalConfiguration &gt;<br></br>
 &lt;/deployment&gt;</span><span style="color: rgb(0, 0, 153);"></span><br></br>
     <br></br>
   </li>
@@ -295,45 +295,45 @@ javax.security.auth.callback.UnsupportedCallbackException;</span><br style="colo
 org.apache.ws.security.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153);"></br>
     <br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">/**</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> * PWCallback for the
+    <span style="color: rgb(0, 0, 153);">ï¿½* PWCallback for the
 Client</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);"> */</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½*/</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">public class PWCallback
 implements CallbackHandler {</span><br style="color: rgb(0, 0, 153);"></br>
     <br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    /**</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">     *
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ /**</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ *
 @see
 javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">     */</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    public void
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ */</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ public void
 handle(Callback[] callbacks) throws IOException,</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">                   
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 UnsupportedCallbackException {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 for (int i = 0; i &lt; callbacks.length; i++) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 if (callbacks[i] instanceof WSPasswordCallback) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 // set the password given a username</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 if ("wss4j".equals(pc.getIdentifier())) {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">                   
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 pc.setPassword("security");</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 } else {</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">               
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized
 Callback");</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">           
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">       
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }</span><br style="color: rgb(0, 0, 153);"></br>
-    <span style="color: rgb(0, 0, 153);">    }</span><br style="color: rgb(0, 0, 153);"></br>
+    <span style="color: rgb(0, 0, 153);">ï¿½ï¿½ï¿½ }</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">}</span><br></br>
     <br></br>
   </li>

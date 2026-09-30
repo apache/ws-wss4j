@@ -481,10 +481,6 @@
                 <artifactId>maven-jxr-plugin</artifactId>
                 <version>3.6.0</version>
             </plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-            </plugin>
         </plugins>
     </reporting>
 

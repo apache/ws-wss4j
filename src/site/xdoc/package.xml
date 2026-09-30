@@ -7,7 +7,7 @@
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,8 +41,8 @@ for Java) to process the SOAP messages. WSS4J in turn uses the Apache XML Securi
 project to handle XML Security according to XML Signature and XML Encryption. 
 
 <ul>
-  <li><a href="http://ws.apache.org/wss4j/index.html">WSS4J</a></li>
-  <li><a href="http://xml.apache.org/security/index.html">XML Security</a></li>
+  <li><a href="https://ws.apache.org/wss4j/index.html">WSS4J</a></li>
+  <li><a href="https://xml.apache.org/security/index.html">XML Security</a></li>
 </ul>
 
 The WSS4J Axis handlers require Axis V1.2 because of some problems in previous
@@ -52,7 +52,7 @@ Axis versions. WSS4J CVS contains the latest Axis libraries.
 The OASIS WSS specifications define a number of features and it is possible 
 to combine them in several ways. The WSS4J Axis handlers already support 
 a large number of WSS features and their combinations. 
-<a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">
+<a href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">
 Here</a> are the WSS specifications.
 
 </p></section><section name="The basics - a simple example that uses"><p>
@@ -119,11 +119,11 @@ The WSS4J Axis security handler interprets the parameter values and controls
 the WSS4J modules to generate the following SOAP request:
 <source>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+&lt;soapenv:Envelope xmlns:soapenv="https://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:xsd="https://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"&gt;
   &lt;soapenv:Header&gt;
-    &lt;wsse:Security xmlns:wsse="http://schemas.xmlsoap.org/ws/2002/07/secext" 
+    &lt;wsse:Security xmlns:wsse="https://schemas.xmlsoap.org/ws/2002/07/secext" 
       soapenv:mustUnderstand="true"&gt;
       &lt;wsse:UsernameToken&gt;
         &lt;wsse:Username&gt;werner&lt;/wsse:Username&gt;
@@ -132,9 +132,9 @@ the WSS4J modules to generate the following SOAP request:
     &lt;/wsse:Security&gt;
   &lt;/soapenv:Header&gt;
   &lt;soapenv:Body&gt;
-    &lt;Ping xmlns="http://xmlsoap.org/Ping"&gt;
+    &lt;Ping xmlns="https://xmlsoap.org/Ping"&gt;
       &lt;text&gt;Scenario 1 text&lt;/text&gt;
-      &lt;ticket xmlns:ns1="http://xmlsoap.org/Ping" 
+      &lt;ticket xmlns:ns1="https://xmlsoap.org/Ping" 
         xsi:type="ns1:ticketType"&gt;scenario1&lt;/ticket&gt;
     &lt;/Ping&gt;
   &lt;/soapenv:Body&gt;
@@ -333,7 +333,7 @@ The Axis deplyment descriptor for this use case:
     &lt;parameter name="encryptionUser" 
       value="16c73ab6-b892-458f-abf5-2f875f74882e" /&gt;
     &lt;parameter name="encryptionParts" 
-      value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" /&gt;  
+      value="{Element}{https://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken" /&gt;  
    &lt;/handler&gt;
   &lt;/requestFlow&gt;  
 </source>
@@ -363,7 +363,7 @@ This descriptor contains some new parameters to control the <code>UsernameToken
     the whole SOAP Body in <code>Content</code> mode. The value of the
     parameter in this example specifies to encrypt the element <code>
     UsernameToken</code>, contained in the namespace
-    <code>http://schemas.xmlsoap.org/ws/2002/07/secext</code>. The encryption
+    <code>https://schemas.xmlsoap.org/ws/2002/07/secext</code>. The encryption
     module uses the <code>Element</code> mode to encrypt the element data.
     Please refer to the
     {@link org.apache.ws.security.handler.WSHandlerConstants#ENCRYPTION_PARTS 
@@ -478,7 +478,7 @@ A deployment descriptor to chain handlers:
     &lt;parameter name="passwordCallbackClass" 
       value="org.apache.ws.axis.oasis.PWCallback"/&gt;
     &lt;parameter name="signaturePropFile" value="crypto.properties" /&gt;
-    &lt;parameter name="signatureParts" value="{}{http://xmlsoap.org/Ping}ticket" /&gt;    
+    &lt;parameter name="signatureParts" value="{}{https://xmlsoap.org/Ping}ticket" /&gt;    
    &lt;/handler&gt;
    &lt;handler type="java:org.apache.ws.axis.security.WSDoAllSender" &gt;
     &lt;parameter name="action" value="Signature"/&gt;

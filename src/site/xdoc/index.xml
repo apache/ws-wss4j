@@ -7,7 +7,7 @@
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,35 +24,35 @@
 The <b>Apache WSS4J&#8482;</b> project provides a Java implementation of the
 primary security standards for Web Services, namely the OASIS Web Services
 Security (WS-Security) specifications from the 
-<a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services Security TC</a>. WSS4J provides an implementation of the following
+<a href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services Security TC</a>. WSS4J provides an implementation of the following
 WS-Security standards:
 </p>
 <ul>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
 SOAP Message Security 1.1</a>
 </li>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf">Username
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-UsernameTokenProfile.pdf">Username
 Token Profile 1.1</a>
 </li>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf">X.509
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-x509TokenProfile.pdf">X.509
 Certificate Token Profile 1.1</a>
 </li>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SAMLTokenProfile.pdf">SAML Token
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SAMLTokenProfile.pdf">SAML Token
 Profile 1.1</a>
 </li>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-KerberosTokenProfile.pdf">Kerberos Token
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-KerberosTokenProfile.pdf">Kerberos Token
 Profile 1.1</a>
 </li>
 <li>
-<a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SwAProfile.pdf">SOAP Messages with Attachments Profile 1.1</a>
+<a href="https://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SwAProfile.pdf">SOAP Messages with Attachments Profile 1.1</a>
 </li>
 <li>
-<a href="http://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html">Basic Security Profile 1.1</a>
+<a href="https://www.ws-i.org/Profiles/BasicSecurityProfile-1.1.html">Basic Security Profile 1.1</a>
 </li>
 </ul>
 </subsection>
@@ -67,7 +67,7 @@ Profile 1.1</a>
 <th>Jakarta</th>
 </tr>
 <tr>
-<td>WSS4J 4.0.x*</td>
+<td>WSS4J 4.0.x</td>
 <td>17</td>
 <td>4.0.x</td>
 <td>5.x</td>
@@ -88,10 +88,14 @@ Profile 1.1</a>
 <td>No</td>
 </tr>
 </table>
-<p>* Not yet released</p>
 </subsection>
 <subsection name="News">
 <ul>
+<li>
+<p><b>September 2026</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 4.0.2 and 3.0.6 and 2.4.4. These releases contain a significant number of bug fixes and security updates. Several CVE issues have been addressed, see the <a href="security_advisories.html">security advisories page</a> for more information.
+</p>
+</li>
 <li>
 <p><b>November 2025</b> - 
 The Apache WSS4J team are pleased to announce the release of version 4.0.1 and 3.0.5. 
