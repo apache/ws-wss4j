@@ -97,8 +97,6 @@ public class KerberosTest {
     private static final TransformerFactory TRANSFORMER_FACTORY = SecureTransformerFactory.newInstance();
     private static DocumentBuilderFactory dbf;
 
-    private static boolean runTests = true;
-
     private static SimpleKdcServer kerbyServer;
 
     @BeforeAll
@@ -160,11 +158,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosCreationAndProcessing() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -218,11 +211,6 @@ public class KerberosTest {
      */
     @Test
     public void testSpnego() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -255,11 +243,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosClient() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -299,11 +282,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosSignature() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -373,11 +351,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosSignatureKI() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -450,11 +423,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosEncryption() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -521,11 +489,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosEncryptionBSTFirst() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -593,11 +556,6 @@ public class KerberosTest {
      */
     @Test
     public void testKerberosEncryptionKI() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -666,11 +624,6 @@ public class KerberosTest {
     //
     @Test
     public void testKerberosSignatureOutbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -746,11 +699,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosSignatureInbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -839,11 +787,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosSignatureKIInbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -932,11 +875,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosEncryptionOutbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1012,11 +950,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosEncryptionOutboundDeprecatedTag() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1092,11 +1025,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosEncryptionInbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1183,11 +1111,6 @@ public class KerberosTest {
 
     @Test
     public void testKerberosEncryptionKIInbound() throws Exception {
-        if (!runTests) {
-            System.out.println("Skipping test because kerberos server could not be started");
-            return;
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

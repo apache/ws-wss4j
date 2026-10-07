@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Tests the handling of {@code NameConstraint}s with {@code TrustAnchor}s in the
@@ -181,7 +180,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinAki() throws Exception {
-
         withTrustStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 new MerlinAKI());
@@ -195,7 +193,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinBc() throws Exception {
-
         withKeyStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 getMerlinBc());
@@ -209,7 +206,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinBc() throws Exception {
-
         withTrustStoreUsingMerlin(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 getMerlinBc());
@@ -223,7 +219,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAkiBc() throws Exception {
-
         withKeyStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 getMerlinAkiBc());
@@ -237,7 +232,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithTrustStoreUsingMerlinAkiBc() throws Exception {
-
         withTrustStoreUsingMerlinAKI(getSelfKeyStore(),
                 getTestCertificateChain(SELF_SIGNED),
                 getMerlinAkiBc());
@@ -291,7 +285,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinBreaking() throws Exception {
-
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
                 "true");
@@ -308,7 +301,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsWithKeyStoreUsingMerlinAkiBreaking() throws Exception {
-
         Properties properties = new Properties();
         properties.setProperty("org.apache.wss4j.crypto.merlin.cert.provider.nameconstraints",
                 "true");
@@ -325,7 +317,6 @@ public class NameConstraintsTest {
 
     @Test
     public void testNameConstraintsUsingCertificateStore() throws Exception {
-
         usingCertificateStore(getSelfKeyStore(), getTestCertificateChain(SELF_SIGNED));
         usingCertificateStore(getRootKeyStore(), getTestCertificateChain(ROOT_SIGNED));
         usingCertificateStore(getRootKeyStore(), getTestCertificateChain(INTERMEDIATE_SIGNED));
