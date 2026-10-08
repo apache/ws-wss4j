@@ -64,7 +64,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class AttachmentTest {
 
@@ -73,8 +72,6 @@ public class AttachmentTest {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto;
-
-    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     public AttachmentTest() throws Exception {
         WSSConfig.init();
@@ -429,8 +426,6 @@ public class AttachmentTest {
 
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
-        assumeFalse(isIBMJdK);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();

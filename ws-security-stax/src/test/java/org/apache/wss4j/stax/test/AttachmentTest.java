@@ -76,11 +76,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class AttachmentTest extends AbstractTestBase {
-
-    private boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     public AttachmentTest() throws Exception {
     }
@@ -493,8 +490,6 @@ public class AttachmentTest extends AbstractTestBase {
 
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
-        assumeFalse(isIBMJdK);
-
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
         attachment.setMimeType("text/xml");

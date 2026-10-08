@@ -49,7 +49,6 @@ import org.w3c.dom.Element;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * The receiver must not reveal whether the private key operation on an EncryptedKey produced a
@@ -76,7 +75,6 @@ public class EncryptedKeyLengthOracleTest {
 
     private final Crypto crypto;
     private final CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private final boolean isIBMJdK = System.getProperty("java.vendor").contains("IBM");
 
     public EncryptedKeyLengthOracleTest() throws Exception {
         WSSConfig.init();
@@ -85,8 +83,6 @@ public class EncryptedKeyLengthOracleTest {
 
     @Test
     public void testWrongLengthPlaintextIsIndistinguishableFromFailedDecryption() throws Exception {
-        assumeFalse(isIBMJdK);
-
         // A ciphertext that does not decrypt to a well formed plaintext at all: the block type
         // is 0x03 where PKCS#1 v1.5 encryption requires 0x02, so the unpadding rejects it.
         WSSecurityException failedDecryption =
@@ -111,8 +107,6 @@ public class EncryptedKeyLengthOracleTest {
      */
     @Test
     public void testOverlongPlaintextIsIndistinguishableFromFailedDecryption() throws Exception {
-        assumeFalse(isIBMJdK);
-
         WSSecurityException failedDecryption =
             decryptWithCipherValue(forgeCiphertext(NON_CONFORMING_BLOCK_TYPE, 16));
 
@@ -132,8 +126,6 @@ public class EncryptedKeyLengthOracleTest {
      */
     @Test
     public void testWrongLengthPlaintextIsIndistinguishableForAnEmbeddedEncryptedKey() throws Exception {
-        assumeFalse(isIBMJdK);
-
         WSSecurityException failedDecryption =
             decryptWithEmbeddedEncryptedKey(forgeCiphertext(NON_CONFORMING_BLOCK_TYPE, 16));
 
