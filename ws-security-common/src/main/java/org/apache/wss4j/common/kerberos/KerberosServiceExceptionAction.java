@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.common.kerberos;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.Key;
 import java.security.PrivilegedExceptionAction;
@@ -37,13 +36,8 @@ import org.ietf.jgss.Oid;
 
 public class KerberosServiceExceptionAction implements PrivilegedExceptionAction<KerberosServiceContext> {
 
-    private static final boolean IS_IBM_VENDOR = System.getProperty("java.vendor").startsWith("IBM");
-
     private static final String SUN_JGSS_INQUIRE_TYPE_CLASS = "com.sun.security.jgss.InquireType";
     private static final String SUN_JGSS_EXT_GSSCTX_CLASS = "com.sun.security.jgss.ExtendedGSSContext";
-
-    private static final String IBM_JGSS_INQUIRE_TYPE_CLASS = "com.ibm.security.jgss.InquireType";
-    private static final String IBM_JGSS_EXT_GSSCTX_CLASS = "com.ibm.security.jgss.ExtendedGSSContext";
 
     private static final String EXTENDED_JGSS_CONTEXT_INQUIRE_SEC_CONTEXT_METHOD_NAME = "inquireSecContext";
     private static final String EXTENDED_JGSS_CONTEXT_INQUIRE_TYPE_KRB5_GET_SESSION_KEY = "KRB5_GET_SESSION_KEY";
@@ -107,24 +101,21 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
 
             try {
                 @SuppressWarnings("rawtypes")
-                Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS
-                    : SUN_JGSS_INQUIRE_TYPE_CLASS);
+                Class inquireType = Class.forName(SUN_JGSS_INQUIRE_TYPE_CLASS);
 
                 @SuppressWarnings("rawtypes")
-                Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS
-                    : SUN_JGSS_EXT_GSSCTX_CLASS);
+                Class extendedGSSContext = Class.forName(SUN_JGSS_EXT_GSSCTX_CLASS);
 
                 @SuppressWarnings("unchecked")
                 Method inquireSecContext =
-                extendedGSSContext.getMethod(EXTENDED_JGSS_CONTEXT_INQUIRE_SEC_CONTEXT_METHOD_NAME, inquireType);
+                    extendedGSSContext.getMethod(EXTENDED_JGSS_CONTEXT_INQUIRE_SEC_CONTEXT_METHOD_NAME, inquireType);
 
                 @SuppressWarnings("unchecked")
                 Object obj = Enum.valueOf(inquireType, EXTENDED_JGSS_CONTEXT_INQUIRE_TYPE_KRB5_GET_SESSION_KEY);
                 Key key = (Key) inquireSecContext.invoke(secContext, obj);
 
                 krbServiceCtx.setSessionKey(key);
-            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
-                | InvocationTargetException e) {
+            } catch (ReflectiveOperationException e) {
                 throw new WSSecurityException(
                     ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                 );
