@@ -30,6 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Locale;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -88,14 +90,27 @@ public final class Loader {
             } catch (InvalidPathException ex) { //NOPMD
                 // skip - not a valid file system path
             }
-            if (path != null && Files.exists(path)) {
-                try {
-                    return Files.newInputStream(path);
-                } catch (Exception e) {
-                    LOG.debug(e.getMessage(), e);
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "resourceNotFound", new Object[] {resource}
-                    );
+            if (path != null) {
+                final Path filePath = path;
+                boolean fileExists = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        return Files.exists(filePath);
+                    }
+                });
+                if (fileExists) {
+                    try {
+                        return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+                            public InputStream run() throws IOException {
+                                return Files.newInputStream(filePath);
+                            }
+                        });
+                    } catch (PrivilegedActionException pae) {
+                        Exception e = pae.getException();
+                        LOG.debug(e.getMessage(), e);
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, e, "resourceNotFound", new Object[] {resource}
+                        );
+                    }
                 }
             }
 
