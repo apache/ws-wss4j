@@ -28,14 +28,18 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 
 import org.apache.wss4j.binding.wss10.TransformationParametersType;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -65,6 +69,7 @@ import org.apache.xml.security.stax.ext.Transformer;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
@@ -83,6 +88,10 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     private AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier completedReferenceVerifier;
     private boolean replayChecked = false;
     private ReplayCacheEntry pendingReplayCacheEntry;
+    private final Set<String> markedSTRTransformTargets = new HashSet<>();
+    private Object strTransformTargetMarker;
+    private QName strTransformTargetName;
+    private int strTransformTargetLevel;
 
     public WSSSignatureReferenceVerifyInputProcessor(InputProcessorChain inputProcessorChain,
             SignatureType signatureType, InboundSecurityToken inboundSecurityToken,
@@ -277,7 +286,74 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             replayChecked = true;
             pendingReplayCacheEntry = detectReplayAttack(inputProcessorChain);
         }
-        return super.processEvent(inputProcessorChain);
+        XMLSecEvent xmlSecEvent = super.processEvent(inputProcessorChain);
+        markSTRTransformTarget(xmlSecEvent, inputProcessorChain);
+        return xmlSecEvent;
+    }
+
+    /**
+     * An STR-Transform Reference points at a SecurityTokenReference, but what it signs is the
+     * element the STR dereferences to (e.g. a SAML Assertion). That element precedes the STR, so it
+     * is replayed before the Reference is resolved, and without a marker it would be reported as
+     * unsigned to the policy layer. Mark it as signed content while it streams, as is done for an
+     * element referenced directly by Id. As there, the digest is still verified: the STR is
+     * replayed later, and doFinal() rejects the message if the Reference was never processed.
+     */
+    private void markSTRTransformTarget(XMLSecEvent xmlSecEvent, InputProcessorChain inputProcessorChain) {
+        if (strTransformTargetMarker != null) {
+            if (XMLStreamConstants.END_ELEMENT == xmlSecEvent.getEventType()) {
+                XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                if (xmlSecEndElement.getDocumentLevel() == strTransformTargetLevel
+                        && xmlSecEndElement.getName().equals(strTransformTargetName)) {
+                    inputProcessorChain.getDocumentContext().unsetIsInSignedContent(strTransformTargetMarker);
+                    strTransformTargetMarker = null;
+                }
+            }
+            return;
+        }
+        if (XMLStreamConstants.START_ELEMENT != xmlSecEvent.getEventType()) {
+            return;
+        }
+        Map<String, Map.Entry<QName, String>> strDereferenceTargets =
+                inputProcessorChain.getSecurityContext().getAsMap(
+                        SecurityTokenReferenceInputHandler.STR_DEREFERENCE_TARGETS);
+        if (strDereferenceTargets == null || strDereferenceTargets.isEmpty()) {
+            return;
+        }
+        XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+        List<ReferenceType> referenceTypes = getSignatureType().getSignedInfo().getReference();
+        for (int i = 0; i < referenceTypes.size(); i++) {
+            ReferenceType referenceType = referenceTypes.get(i);
+            if (getProcessedReferences().contains(referenceType) || !isSTRTransformReference(referenceType)) {
+                continue;
+            }
+            String strId = XMLSecurityUtils.dropReferenceMarker(referenceType.getURI());
+            Map.Entry<QName, String> target = strDereferenceTargets.get(strId);
+            if (target == null || markedSTRTransformTargets.contains(strId)) {
+                continue;
+            }
+            Attribute attribute = xmlSecStartElement.getAttributeByName(target.getKey());
+            if (attribute != null && target.getValue().equals(attribute.getValue())) {
+                //Only the first match, as that is the element the STR is resolved to. A second one
+                //is rejected as a duplicate Id by SecurityTokenReferenceInputHandler.
+                markedSTRTransformTargets.add(strId);
+                strTransformTargetMarker = new Object();
+                strTransformTargetName = xmlSecStartElement.getName();
+                strTransformTargetLevel = xmlSecStartElement.getDocumentLevel();
+                inputProcessorChain.getDocumentContext().setIsInSignedContent(
+                        inputProcessorChain.getProcessors().indexOf(this), strTransformTargetMarker);
+                return;
+            }
+        }
+    }
+
+    private static boolean isSTRTransformReference(ReferenceType referenceType) {
+        //buildTransformerChain() treats a Reference as an STR-Transform one when its first
+        //Transform is the STR-Transform
+        return referenceType.getTransforms() != null
+                && !referenceType.getTransforms().getTransform().isEmpty()
+                && WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(
+                        referenceType.getTransforms().getTransform().get(0).getAlgorithm());
     }
 
     @Override

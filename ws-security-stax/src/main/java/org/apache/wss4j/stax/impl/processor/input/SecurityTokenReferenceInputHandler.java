@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -54,6 +55,12 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
  * Processor for the SecurityTokenReference XML Structure
  */
 public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHeaderHandler {
+
+    /**
+     * SecurityContext key of a map from the wsu:Id of a SecurityTokenReference to the attribute
+     * name and value that identify the element it dereferences to.
+     */
+    static final String STR_DEREFERENCE_TARGETS = "STRDereferenceTargets";
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
@@ -93,6 +100,13 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                     securityTokenReferenceType.getId(), attributeName,
                     attributeValue, (WSSSecurityProperties) securityProperties);
             inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
+            if (securityTokenReferenceType.getId() != null) {
+                //Lets a signature with an STR-Transform reference to this STR recognise the
+                //dereferenced element while it is replayed, see WSSSignatureReferenceVerifyInputProcessor
+                inputProcessorChain.getSecurityContext().putAsMap(STR_DEREFERENCE_TARGETS,
+                        securityTokenReferenceType.getId(),
+                        new AbstractMap.SimpleImmutableEntry<>(attributeName, attributeValue));
+            }
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }
