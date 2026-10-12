@@ -41,6 +41,7 @@ import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.Unmarshaller;
 import org.opensaml.core.xml.io.UnmarshallerFactory;
 import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.config.SAMLConfiguration;
 import org.opensaml.xmlsec.config.DecryptionParserPool;
@@ -159,6 +160,38 @@ public final class OpenSAMLUtil {
         } catch (UnmarshallingException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
                                           new Object[] {"Error unmarshalling a SAML assertion"});
+        }
+    }
+
+    /**
+     * An XMLObject can only have one parent. Return the given XMLObject if it has no parent,
+     * otherwise return a copy of it, for example if the same bean is used to create more than
+     * one SAML assertion. Elements without a registered unmarshaller are copied using the
+     * default provider (XSAny).
+     *
+     * @param xmlObject the XMLObject to add to a new parent
+     * @return the XMLObject, or a copy of it if it already has a parent
+     * @throws WSSecurityException if the XMLObject could not be copied
+     */
+    public static XMLObject cloneIfParented(XMLObject xmlObject) throws WSSecurityException {
+        if (xmlObject.getParent() == null) {
+            return xmlObject;
+        }
+        try {
+            Element element = XMLObjectSupport.marshall(xmlObject);
+            UnmarshallerFactory factory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = factory.getUnmarshaller(element);
+            if (unmarshaller == null) {
+                unmarshaller = factory.getUnmarshaller(XMLObjectProviderRegistrySupport.getDefaultProviderQName());
+            }
+            XMLObject clone = unmarshaller.unmarshall(element);
+            // Detach the copy from the DOM of the original object
+            clone.releaseDOM();
+            clone.releaseChildrenDOM(true);
+            return clone;
+        } catch (MarshallingException | UnmarshallingException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
+                                          new Object[] {"Error copying an XMLObject"});
         }
     }
 

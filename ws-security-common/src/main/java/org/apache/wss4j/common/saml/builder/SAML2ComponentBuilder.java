@@ -658,7 +658,7 @@ public final class SAML2ComponentBuilder {
                     if (obj == null) {
                         LOG.warn("Ignore <null> object in SubjectConfirmationData.any");
                     } else if (obj instanceof XMLObject) {
-                        unknownObjects.add((XMLObject) obj);
+                        unknownObjects.add(OpenSAMLUtil.cloneIfParented((XMLObject) obj));
                     } else if (obj instanceof AttributeStatementBean) {
                         unknownObjects.addAll(createAttributeStatement(Collections.singletonList((AttributeStatementBean) obj)));
                     } else {
