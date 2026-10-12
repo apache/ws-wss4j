@@ -36,15 +36,19 @@ import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSAnyBuilder;
 import org.opensaml.core.xml.schema.impl.XSStringBuilder;
 import org.opensaml.saml.common.SAMLObjectBuilder;
 import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml1.core.Action;
 import org.opensaml.saml.saml1.core.Advice;
 import org.opensaml.saml.saml1.core.Assertion;
@@ -71,11 +75,19 @@ import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
 
+import javax.xml.namespace.QName;
+
 /**
  * Class SAML1ComponentBuilder provides builder methods that can be used
  * to construct SAML v1.1 statements using the OpenSaml library.
  */
 public final class SAML1ComponentBuilder {
+
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(SAML1ComponentBuilder.class);
+
+    private static final QName SUBJECT_CONFIRMATION_DATA_ELEMENT_NAME =
+        new QName(SAMLConstants.SAML1_NS, "SubjectConfirmationData", SAMLConstants.SAML1_PREFIX);
 
     private static volatile SAMLObjectBuilder<Assertion> assertionV1Builder;
 
@@ -106,6 +118,8 @@ public final class SAML1ComponentBuilder {
     private static volatile SAMLObjectBuilder<Attribute> attributeV1Builder;
 
     private static volatile XSStringBuilder stringBuilder;
+
+    private static volatile XSAnyBuilder xsAnyBuilder;
 
     private static volatile SAMLObjectBuilder<AuthorizationDecisionStatement>
         authorizationDecisionStatementV1Builder;
@@ -199,10 +213,62 @@ public final class SAML1ComponentBuilder {
             KeyInfo keyInfo = createKeyInfo(subjectBean.getKeyInfo());
             subjectConfirmation.setKeyInfo(keyInfo);
         }
+        if (subjectBean.getSubjectConfirmationData() != null) {
+            subjectConfirmation.setSubjectConfirmationData(
+                createSubjectConfirmationData(subjectBean.getSubjectConfirmationData())
+            );
+        }
         subject.setNameIdentifier(nameIdentifier);
         subject.setSubjectConfirmation(subjectConfirmation);
 
         return subject;
+    }
+
+    /**
+     * Create a SAML 1.1 SubjectConfirmationData object. In SAML 1.1 the SubjectConfirmationData
+     * element is of type xs:anyType and has no defined attributes, so only the additional
+     * XMLObjects of the bean ("any") are added as child elements. The SAML 2.0 specific values
+     * (Recipient, Address, InResponseTo, NotBefore, NotOnOrAfter) are not supported and ignored.
+     *
+     * @param subjectConfirmationDataBean of type SubjectConfirmationDataBean
+     * @return a SubjectConfirmationData object, or null if there is no content to add
+     * @throws WSSecurityException if an XMLObject could not be cloned
+     */
+    public static XSAny createSubjectConfirmationData(
+        SubjectConfirmationDataBean subjectConfirmationDataBean
+    ) throws WSSecurityException {
+        if (subjectConfirmationDataBean.getInResponseTo() != null
+            || subjectConfirmationDataBean.getRecipient() != null
+            || subjectConfirmationDataBean.getAddress() != null
+            || subjectConfirmationDataBean.getNotBefore() != null
+            || subjectConfirmationDataBean.getNotAfter() != null) {
+            LOG.warn("Ignore the SAML 2.0 specific values of the SubjectConfirmationData for a SAML 1.1 token");
+        }
+
+        List<XMLObject> unknownObjects = new ArrayList<>();
+        if (subjectConfirmationDataBean.getAny() != null) {
+            for (Object obj : subjectConfirmationDataBean.getAny()) {
+                if (obj == null) {
+                    LOG.warn("Ignore <null> object in SubjectConfirmationData.any");
+                } else if (obj instanceof XMLObject) {
+                    unknownObjects.add(OpenSAMLUtil.cloneIfParented((XMLObject) obj));
+                } else {
+                    LOG.warn("Ignore object of the unsupported type {} in SubjectConfirmationData.any",
+                             obj.getClass());
+                }
+            }
+        }
+        if (unknownObjects.isEmpty()) {
+            return null;
+        }
+
+        if (xsAnyBuilder == null) {
+            xsAnyBuilder = new XSAnyBuilder();
+        }
+        XSAny subjectConfirmationData = xsAnyBuilder.buildObject(SUBJECT_CONFIRMATION_DATA_ELEMENT_NAME);
+        subjectConfirmationData.getUnknownXMLObjects().addAll(unknownObjects);
+
+        return subjectConfirmationData;
     }
 
     /**

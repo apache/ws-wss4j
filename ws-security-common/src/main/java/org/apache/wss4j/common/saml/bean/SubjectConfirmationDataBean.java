@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Class SubjectConfirmationDataBean represents a SAML (2) SubjectConfirmationData. Please note that
+ * Class SubjectConfirmationDataBean represents a SAML SubjectConfirmationData. Please note that
  * KeyInfo functionality is in SubjectBean for backwards compatibility reasons.
  */
 public class SubjectConfirmationDataBean {

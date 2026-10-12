@@ -33,6 +33,7 @@ import java.util.List;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
@@ -672,6 +673,61 @@ public class SamlTokenTest {
     }
 
     /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
+     * SubjectConfirmationData information.
+     */
+    @Test
+    public void testSAML1SubjectConfirmationData() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+        @SuppressWarnings("unchecked")
+        XMLObjectBuilder<XSAny> xsAnyBuilder =
+            (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+        XSAny customData = xsAnyBuilder.buildObject(new QName("urn:example:custom", "CustomData", "ex"));
+        customData.setTextContent("custom-confirmation-data");
+
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        // SAML 2.0 specific values must not be written to a SAML 1.1 token
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+        subjectConfirmationData.addAny(customData);
+        callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("SubjectConfirmationData"));
+        assertTrue(outputString.contains("custom-confirmation-data"));
+        assertFalse(outputString.contains("http://recipient.apache.org"));
+
+        WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+
+    /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * SubjectConfirmationData information.
      */
@@ -708,6 +764,60 @@ public class SamlTokenTest {
         }
         assertTrue(outputString.contains("http://recipient.apache.org"));
 
+        WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
+     * SubjectConfirmationData containing an additional element, where the same bean is used to
+     * create more than one assertion.
+     */
+    @Test
+    public void testSAML2SubjectConfirmationDataAny() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+        @SuppressWarnings("unchecked")
+        XMLObjectBuilder<XSAny> xsAnyBuilder =
+            (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+        XSAny customData = xsAnyBuilder.buildObject(new QName("urn:example:custom", "CustomData", "ex"));
+        customData.setTextContent("custom-confirmation-data");
+
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+        subjectConfirmationData.addAny(customData);
+        callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("custom-confirmation-data"));
+
+        // The same SubjectConfirmationDataBean is used again to create a second assertion
         WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
