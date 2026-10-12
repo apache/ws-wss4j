@@ -404,6 +404,8 @@ public class Merlin extends CryptoBase {
      */
     public void setKeyStore(KeyStore keyStore) {
         keystore = keyStore;
+        // Cached private keys are keyed by alias, so they are not valid for a different keystore
+        privateKeyCache.clear();
     }
 
     /**
