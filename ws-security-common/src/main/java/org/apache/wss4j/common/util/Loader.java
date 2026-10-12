@@ -88,7 +88,7 @@ public final class Loader {
             } catch (InvalidPathException ex) { //NOPMD
                 // skip - not a valid file system path
             }
-            if (path != null && Files.exists(path)) {
+            if (path != null && isExistingFile(path)) {
                 try {
                     return Files.newInputStream(path);
                 } catch (Exception e) {
@@ -128,6 +128,22 @@ public final class Loader {
             }
         }
         return is;
+    }
+
+    /**
+     * Return true if <code>path</code> names an existing file. A caller that is not
+     * permitted to read the path (e.g. under a SecurityManager without the relevant
+     * FilePermission) is treated as if the file does not exist, so that resolution falls
+     * through to the URL and classpath lookups rather than failing outright. No privilege
+     * is asserted on the caller's behalf.
+     */
+    private static boolean isExistingFile(Path path) {
+        try {
+            return Files.exists(path);
+        } catch (SecurityException ex) {
+            LOG.debug("Not permitted to check the file system for [{}]", path, ex);
+            return false;
+        }
     }
 
     /**
