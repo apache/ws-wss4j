@@ -21,12 +21,17 @@ package org.apache.wss4j.common.crypto;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 
 import org.apache.wss4j.common.util.Loader;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -75,6 +80,31 @@ public class MerlinTest {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
         assertNotNull(pkcs12Crypto.getX509Certificates(cryptoType));
+    }
+
+    /**
+     * Replacing the keystore must not return a cached private key from the previous keystore
+     * for the same alias (WSS-688).
+     */
+    @Test
+    public void testSetKeyStoreClearsPrivateKeyCache() throws Exception {
+        KeyStore firstKeyStore = loadKeyStore("keys/wss40.jks", "security");
+
+        // Put the wss40_server key under the "wss40" alias in a second keystore
+        KeyStore serverKeyStore = loadKeyStore("keys/wss40_server.jks", "security");
+        PrivateKey serverKey = (PrivateKey)serverKeyStore.getKey("wss40_server", "security".toCharArray());
+        Certificate[] serverChain = serverKeyStore.getCertificateChain("wss40_server");
+        KeyStore secondKeyStore = KeyStore.getInstance("JKS");
+        secondKeyStore.load(null, null);
+        secondKeyStore.setKeyEntry("wss40", serverKey, "security".toCharArray(), serverChain);
+
+        Merlin crypto = new Merlin();
+        crypto.setKeyStore(firstKeyStore);
+        PrivateKey firstKey = crypto.getPrivateKey("wss40", "security");
+        assertNotEquals(serverKey, firstKey);
+
+        crypto.setKeyStore(secondKeyStore);
+        assertEquals(serverKey, crypto.getPrivateKey("wss40", "security"));
     }
 
     private static KeyStore loadKeyStore(String path, String password) throws Exception {
