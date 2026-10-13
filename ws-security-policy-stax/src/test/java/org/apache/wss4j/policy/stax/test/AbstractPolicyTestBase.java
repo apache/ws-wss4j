@@ -153,7 +153,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         return x509SecurityToken;
     }
 
-    public KerberosServiceSecurityTokenImpl getKerberosServiceSecurityToken(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
+    public KerberosServiceSecurityTokenImpl getKerberosServiceSecurityToken() throws Exception {
         return new KerberosServiceSecurityTokenImpl(
                 null, null, null, null, IDGenerator.generateID(null),
                 WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);

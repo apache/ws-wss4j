@@ -364,7 +364,7 @@ public abstract class AbstractTestBase {
         return xPath.compile(expression);
     }
 
-    class CustomWSS4JHandler extends WSHandler {
+    static class CustomWSS4JHandler extends WSHandler {
 
         private final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(CustomWSS4JHandler.class.getName());
@@ -622,7 +622,7 @@ public abstract class AbstractTestBase {
         }
     }
 
-    protected class TestSecurityEventListener implements SecurityEventListener {
+    protected static class TestSecurityEventListener implements SecurityEventListener {
         private SecurityEventConstants.Event[] expectedEvents;
         private List<SecurityEvent> receivedSecurityEvents = new ArrayList<>();
 

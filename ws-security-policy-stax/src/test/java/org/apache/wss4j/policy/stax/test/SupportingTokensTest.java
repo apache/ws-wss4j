@@ -609,14 +609,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         KerberosTokenSecurityEvent tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
-        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
-        kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -644,14 +644,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         KerberosTokenSecurityEvent tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
-        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
-        kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -683,14 +683,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         KerberosTokenSecurityEvent tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
-        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
-        kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -718,14 +718,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         KerberosTokenSecurityEvent tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
-        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KerberosTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
-        kerberosServiceSecurityToken = getKerberosServiceSecurityToken(WSSecurityTokenConstants.KERBEROS_TOKEN);
+        kerberosServiceSecurityToken = getKerberosServiceSecurityToken();
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
