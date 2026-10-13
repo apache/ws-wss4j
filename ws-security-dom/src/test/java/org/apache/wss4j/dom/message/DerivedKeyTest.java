@@ -406,13 +406,6 @@ public class DerivedKeyTest {
     }
 
     /**
-     * Verifies the soap envelope
-     * <p/>
-     *
-     * @param envelope
-     * @throws Exception Thrown when there is a problem in verification
-     */
-    /**
      * A derived key signature verified against an AlgorithmSuite that states a signature key
      * derivation length. The requirement is denominated in bits and the wsc:Length of the
      * DerivedKeyToken in bytes, and the two must agree exactly: 24 bytes satisfies the 192 bit
@@ -528,6 +521,13 @@ public class DerivedKeyTest {
         return secEngine.processSecurityHeader(doc, data);
     }
 
+    /**
+     * Verifies the soap envelope
+     * <p/>
+     *
+     * @param doc the SOAP envelope to verify
+     * @throws Exception Thrown when there is a problem in verification
+     */
     private WSHandlerResult verify(Document doc) throws Exception {
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);

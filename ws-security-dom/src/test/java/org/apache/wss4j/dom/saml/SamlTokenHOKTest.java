@@ -251,7 +251,7 @@ public class SamlTokenHOKTest {
      * Verifies the soap envelope
      * <p/>
      *
-     * @param envelope
+     * @param doc the SOAP envelope to verify
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
