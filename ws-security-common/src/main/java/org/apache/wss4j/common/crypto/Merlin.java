@@ -760,33 +760,20 @@ public class Merlin extends CryptoBase {
         Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException {
         //
-        // FIRST step - Search the keystore for the transmitted certificate
+        // FIRST step - Search the truststore and keystore for the transmitted certificate
         //
-        if (certs.length == 1 && !enableRevocation) {
-            String issuerString = certs[0].getIssuerX500Principal().getName();
-            BigInteger issuerSerial = certs[0].getSerialNumber();
-
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
-            cryptoType.setIssuerSerial(issuerString, issuerSerial);
-            X509Certificate[] foundCerts = getX509Certificates(cryptoType);
-
-            //
-            // If a certificate has been found, the certificates must be compared
-            // to ensure against phony DNs (compare encoded form including signature)
-            //
-            if (foundCerts != null && foundCerts.length > 0 && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
-                try {
-                    certs[0].checkValidity();
-                } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
-                    );
-                }
-                LOG.debug(
-                    "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
+        if (certs.length == 1 && !enableRevocation && isDirectlyTrusted(certs[0])) {
+            try {
+                certs[0].checkValidity();
+            } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
                 );
-                return;
             }
+            LOG.debug(
+                "Direct trust for certificate with {}", certs[0].getSubjectX500Principal().getName()
+            );
+            return;
         }
 
         //
@@ -799,13 +786,13 @@ public class Merlin extends CryptoBase {
 
             Object subject = convertSubjectToPrincipal(issuerString);
 
-            if (keystore != null) {
-                foundIssuingCertChains = getCertificates(subject, keystore, false);
+            if (truststore != null) {
+                foundIssuingCertChains = getCertificates(subject, truststore, true);
             }
 
-            //If we can't find the issuer in the keystore then look at the truststore
-            if ((foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()) && truststore != null) {
-                foundIssuingCertChains = getCertificates(subject, truststore, true);
+            //If we can't find the issuer in the truststore then look at the keystore
+            if ((foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()) && keystore != null) {
+                foundIssuingCertChains = getCertificates(subject, keystore, false);
             }
 
             if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()
@@ -899,6 +886,41 @@ public class Merlin extends CryptoBase {
         if (!matchesSubjectDnPattern(certs[0], subjectCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
+    }
+
+    /**
+     * Check whether the given certificate is directly trusted, i.e. whether the exact same
+     * certificate is stored in the truststore or the keystore. The truststore is searched
+     * first, as that is where trusted certificates are normally stored, so that the keystore
+     * does not need to be searched in the common case (WSS-721).
+     *
+     * @param cert The certificate to check
+     * @return true if the certificate was found in the truststore or keystore
+     * @throws WSSecurityException
+     */
+    protected boolean isDirectlyTrusted(X509Certificate cert) throws WSSecurityException {
+        Object issuerName = convertSubjectToPrincipal(cert.getIssuerX500Principal().getName());
+        BigInteger serialNumber = cert.getSerialNumber();
+
+        //
+        // If a certificate has been found, the certificates must be compared
+        // to ensure against phony DNs (compare encoded form including signature)
+        //
+        if (truststore != null) {
+            Certificate[] foundCerts = getCertificates(issuerName, serialNumber, truststore, true);
+            if (foundCerts.length > 0 && cert.equals(foundCerts[0])) {
+                return true;
+            }
+        }
+
+        if (keystore != null) {
+            Certificate[] foundCerts = getCertificates(issuerName, serialNumber, keystore, false);
+            if (foundCerts.length > 0 && cert.equals(foundCerts[0])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
