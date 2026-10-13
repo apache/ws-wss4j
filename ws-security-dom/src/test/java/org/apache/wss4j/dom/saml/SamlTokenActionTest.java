@@ -27,9 +27,12 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.util.SOAPUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -284,6 +287,61 @@ public class SamlTokenActionTest {
             String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+
+        WSHandlerResult results = verify(doc, callbackHandler);
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertNotNull(receivedSamlAssertion);
+        assertTrue(receivedSamlAssertion.isSigned());
+    }
+
+    @Test
+    public void testSignedSAML2AssertionActionWithDigestAlgorithm() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+
+        CallbackHandler callbackHandler = new KeystoreCallbackHandler();
+
+        SAML2CallbackHandler samlCallbackHandler = new SAML2CallbackHandler();
+        samlCallbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        samlCallbackHandler.setIssuer("www.example.com");
+        samlCallbackHandler.setSignAssertion(true);
+        samlCallbackHandler.setIssuerCrypto(crypto);
+        samlCallbackHandler.setIssuerName("wss40");
+        samlCallbackHandler.setIssuerPassword("security");
+
+        final String digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha512";
+        CallbackHandler digestCallbackHandler = callbacks -> {
+            samlCallbackHandler.handle(callbacks);
+            ((SAMLCallback) callbacks[0]).setSignatureDigestAlgorithm(digestAlgorithm);
+        };
+
+        java.util.Map<String, Object> config = new java.util.TreeMap<>();
+        config.put(WSHandlerConstants.SAML_CALLBACK_REF, digestCallbackHandler);
+        reqData.setMsgContext(config);
+
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
+        handler.send(
+            doc,
+            reqData,
+            Collections.singletonList(action),
+            true
+        );
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.prettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        NodeList digestMethods = doc.getElementsByTagNameNS(WSConstants.SIG_NS, "DigestMethod");
+        assertEquals(1, digestMethods.getLength());
+        assertEquals(digestAlgorithm, ((Element) digestMethods.item(0)).getAttributeNS(null, "Algorithm"));
 
         WSHandlerResult results = verify(doc, callbackHandler);
         WSSecurityEngineResult actionResult =
