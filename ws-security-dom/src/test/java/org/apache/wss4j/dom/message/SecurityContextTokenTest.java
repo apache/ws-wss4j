@@ -380,7 +380,7 @@ public class SecurityContextTokenTest {
     /**
      * Verifies the soap envelope <p/>
      *
-     * @param envelope
+     * @param doc the SOAP envelope to verify
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
