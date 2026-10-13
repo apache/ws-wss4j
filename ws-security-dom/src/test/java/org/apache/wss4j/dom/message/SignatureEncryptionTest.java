@@ -500,7 +500,7 @@ public class SignatureEncryptionTest {
     /**
      * Verifies the soap envelope <p/>
      *
-     * @param envelope
+     * @param doc the SOAP envelope to verify
      *
      * @return the <code>WSSecurityEngineResult</code>s from processing
      *
