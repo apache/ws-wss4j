@@ -693,12 +693,4 @@ public abstract class AbstractTestBase {
             }
         }
     }
-
-    public static Double getJavaSpecificationVersion() {
-        String jsv = System.getProperty("java.specification.version");
-        if (jsv != null) {
-            return Double.parseDouble(jsv);
-        }
-        return 0.0d;
-    }
 }
