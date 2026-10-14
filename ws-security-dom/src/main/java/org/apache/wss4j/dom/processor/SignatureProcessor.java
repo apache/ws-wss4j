@@ -169,6 +169,11 @@ public class SignatureProcessor implements Processor {
             if (result != 1) {
                 data.getBSPEnforcer().handleBSPRule(BSPRule.R5402);
             }
+            if (child == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
+                );
+            }
 
             if (!(SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())
                 && WSConstants.WSSE_NS.equals(child.getNamespaceURI()))) {
