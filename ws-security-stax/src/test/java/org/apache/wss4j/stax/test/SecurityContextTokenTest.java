@@ -67,6 +67,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
@@ -82,9 +83,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         WSSConfig.init();
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
-    public void testSCTDKTEncryptOutbound(int version) throws Exception {
+    @Test
+    public void testSCTDKTEncryptOutbound() throws Exception {
         byte[] secret = WSSConstants.generateBytes(128 / 8);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -294,9 +294,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {ConversationConstants.VERSION_05_02, ConversationConstants.VERSION_05_12})
-    public void testSCTKDKTSignOutbound(int version) throws Exception {
+    @Test
+    public void testSCTKDKTSignOutbound() throws Exception {
         byte[] secret = WSSConstants.generateBytes(128 / 8);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

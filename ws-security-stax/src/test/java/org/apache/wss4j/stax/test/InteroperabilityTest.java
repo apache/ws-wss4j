@@ -1364,7 +1364,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         return null;
     }
 
-    class NodeIndex {
+    static class NodeIndex {
         Node node;
         int index;
     }
