@@ -527,10 +527,6 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
-        List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
-        sigPath.add(WSSConstants.TAG_dsig_Signature);
-
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509SecurityToken.setElementPath(bstPath);
@@ -593,10 +589,6 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         List<QName> ekPath = new ArrayList<>();
         ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
-
-        List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
-        sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
@@ -666,10 +658,6 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         List<QName> ekPath = new ArrayList<>();
         ekPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
-
-        List<QName> sigPath = new ArrayList<>();
-        sigPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
-        sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);

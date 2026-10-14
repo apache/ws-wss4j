@@ -120,10 +120,11 @@ class CommaDelimiterRfc2253NameTest {
 
 	private KeyStore loadDefaultKeyStore() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
 		String filename = System.getProperty("java.home") + "/lib/security/cacerts".replace('/', File.separatorChar);
-		FileInputStream is = new FileInputStream(filename);
 		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 		String password = "changeit";
-		keystore.load(is, password.toCharArray());
+		try (FileInputStream is = new FileInputStream(filename)) {
+			keystore.load(is, password.toCharArray());
+		}
 		return keystore;
 	}
 
