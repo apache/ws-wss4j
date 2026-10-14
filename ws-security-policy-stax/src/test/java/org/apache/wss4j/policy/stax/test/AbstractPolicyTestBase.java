@@ -178,14 +178,16 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     }
 
     protected String loadResourceAsString(String resource, Charset encoding) throws IOException {
-        InputStreamReader inputStreamReader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(resource), encoding);
-        StringBuilder stringBuilder = new StringBuilder();
-        int read = 0;
-        char[] buffer = new char[1024];
-        while ((read = inputStreamReader.read(buffer)) != -1) {
-            stringBuilder.append(buffer, 0, read);
+        try (InputStreamReader inputStreamReader =
+                 new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(resource), encoding)) {
+            StringBuilder stringBuilder = new StringBuilder();
+            int read = 0;
+            char[] buffer = new char[1024];
+            while ((read = inputStreamReader.read(buffer)) != -1) {
+                stringBuilder.append(buffer, 0, read);
+            }
+            return stringBuilder.toString();
         }
-        return stringBuilder.toString();
     }
 
     public static SamlAssertionWrapper createSamlAssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {

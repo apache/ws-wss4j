@@ -101,10 +101,10 @@ public class CRLFOutputStreamTest {
         for (int i = 0; i < res.length; i++) {
             byte re = res[i];
             if (re == '\r') {
-                if (res[i + 1] != '\n') {
+                if (i + 1 == res.length || res[i + 1] != '\n') {
                     throw new Exception("Missing \\n in\n" + createEscapedString(res) + "\n input string: " + createEscapedString(testString.toByteArray()));
                 }
-            } else if (re == '\n' && res[i - 1] != '\r') {
+            } else if (re == '\n' && (i == 0 || res[i - 1] != '\r')) {
                 throw new Exception("Missing \\r in\n" + createEscapedString(res) + "\n input string: " + createEscapedString(testString.toByteArray()));
             }
         }
