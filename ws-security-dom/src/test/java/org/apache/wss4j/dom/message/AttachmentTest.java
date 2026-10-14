@@ -823,7 +823,7 @@ public class AttachmentTest {
                 break;
             }
         }
-        assertFalse(attachmentEncData == null);
+        assertNotNull(attachmentEncData);
         attachmentEncData.setAttributeNS(null, "MimeType", "application/malicious");
         encryptedAttachments.get(0).getHeaders().put("X-Attacker-Controlled", "forged");
 

@@ -569,6 +569,9 @@ public class SecurityTokenReference {
         if (result != 1) {
             bspEnforcer.handleBSPRule(BSPRule.R3061);
         }
+        if (child == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
         if ("KeyIdentifier".equals(child.getLocalName())
             && WSS4JConstants.WSSE_NS.equals(child.getNamespaceURI())) {
 
