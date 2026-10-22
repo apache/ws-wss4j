@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class DerivedKeyTests extends AbstractPolicyTestBase {
+public class DerivedKeyTest extends AbstractPolicyTestBase {
 
     @Test
     public void testDerivedKeyInitiatorTokenPolicy() throws Exception {
