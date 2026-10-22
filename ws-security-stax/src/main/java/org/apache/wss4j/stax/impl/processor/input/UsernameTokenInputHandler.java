@@ -119,13 +119,11 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         // Only cache the Nonce once the token has actually been validated. Caching it beforehand
         // lets an attacker poison the cache with the Nonce of a token whose password does not
-        // verify, so that the genuine token is subsequently rejected as a replay.
-        if (nonceIdentifier != null) {
-            if (nonceExpiry != null) {
-                replayCache.add(nonceIdentifier, nonceExpiry);
-            } else {
-                replayCache.add(nonceIdentifier);
-            }
+        // verify, so that the genuine token is subsequently rejected as a replay. The Nonce must be
+        // added atomically, as a concurrent request carrying the same Nonce may also have passed the
+        // check above while this token was being validated.
+        if (nonceIdentifier != null && !replayCache.addIfAbsent(nonceIdentifier, nonceExpiry)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =

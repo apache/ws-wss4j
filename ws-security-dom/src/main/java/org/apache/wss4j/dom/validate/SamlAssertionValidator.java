@@ -253,18 +253,14 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             String identifier = samlAssertion.getId();
 
             ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();  //NOPMD
-            if (replayCache.contains(identifier)) {
+            // Check and cache the identifier atomically, so that concurrent requests carrying the
+            // same Assertion cannot all pass the check before any of them has cached it
+            Instant expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+            if (!replayCache.addIfAbsent(identifier, expires)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badSamlToken",
                     new Object[] {"A replay attack has been detected"});
-            }
-
-            Instant expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
-            if (expires != null) {
-                replayCache.add(identifier, expires);
-            } else {
-                replayCache.add(identifier);
             }
         }
     }
