@@ -350,6 +350,61 @@ public class ReplayTest extends AbstractTestBase {
     }
 
     /**
+     * An empty Nonce cannot be cached, so a UsernameToken carrying one must be rejected rather than
+     * escape replay detection. The check happens before the token is validated, so the error names
+     * the empty Nonce. An element with no text and one containing only whitespace must be treated
+     * alike.
+     */
+    @Test
+    public void testUsernameTokenWithEmptyNonce() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.USERNAME_TOKEN;
+            Properties properties = new Properties();
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        String genuineMessage = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+
+        Matcher matcher = Pattern.compile("(<[^>]*Nonce[^>]*>)([^<]*)(</)").matcher(genuineMessage);
+        assertTrue(matcher.find(), "No Nonce element was found");
+
+        for (String emptyNonce : new String[] {"", "   "}) {
+            String message = genuineMessage.substring(0, matcher.start(2))
+                + emptyNonce + genuineMessage.substring(matcher.end(2));
+
+            ReplayCache replayCache = createCache("wss4j.nonce.cache-");
+
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setNonceReplayCache(replayCache);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            // Return the underlying security error rather than the generic masked one, so that the
+            // reason for the rejection can be checked
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8))));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof WSSecurityException);
+                WSSecurityException ex = (WSSecurityException) e.getCause();
+                assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+                assertTrue(ex.getMessage().contains("The Nonce is empty"), ex.getMessage());
+            }
+
+            replayCache.close();
+        }
+    }
+
+    /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
      * is just a sanity test to make sure that it is possible to send the SAML token twice, as
      * no "OneTimeUse" Element is defined there is no problem with replaying it.

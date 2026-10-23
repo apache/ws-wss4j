@@ -32,7 +32,6 @@ import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
@@ -252,19 +251,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
             String identifier = samlAssertion.getId();
 
-            if (replayCache.contains(identifier)) {
+            // Check and cache the identifier atomically, so that concurrent requests carrying the
+            // same Assertion cannot all pass the check before any of them has cached it
+            Instant expires = samlAssertion.getNotOnOrAfter();
+            if (!replayCache.addIfAbsent(identifier, expires)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badSamlToken",
                     new Object[] {"A replay attack has been detected"});
-            }
-
-            DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
-            if (expires != null) {
-                Instant zonedExpires = Instant.ofEpochMilli(expires.getMillis());
-                replayCache.add(identifier, zonedExpires);
-            } else {
-                replayCache.add(identifier);
             }
         }
     }

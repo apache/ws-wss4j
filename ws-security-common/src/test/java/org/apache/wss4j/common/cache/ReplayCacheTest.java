@@ -23,7 +23,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -178,6 +185,144 @@ public class ReplayCacheTest {
     public void testTooSmallHeapEntries() throws Exception {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 new EHCacheReplayCache("abc", tempDir, 10, 10, false));
+    }
+
+    @Test
+    public void testMemoryReplayCacheAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new MemoryReplayCache()) {
+            testAddIfAbsent(replayCache);
+        }
+    }
+
+    @Test
+    public void testEhCacheReplayCacheAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new EHCacheReplayCache("xyz", tempDir)) {
+            testAddIfAbsent(replayCache);
+        }
+    }
+
+    @Test
+    public void testDefaultAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new DelegatingReplayCache(new MemoryReplayCache())) {
+            testAddIfAbsent(replayCache);
+        }
+    }
+
+    /**
+     * Concurrent requests carrying the same identifier must not all be accepted: exactly one
+     * addIfAbsent call per identifier may succeed.
+     */
+    @Test
+    public void testMemoryReplayCacheConcurrentAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new MemoryReplayCache()) {
+            testConcurrentAddIfAbsent(replayCache);
+        }
+    }
+
+    @Test
+    public void testEhCacheReplayCacheConcurrentAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new EHCacheReplayCache("xyz", tempDir)) {
+            testConcurrentAddIfAbsent(replayCache);
+        }
+    }
+
+    @Test
+    public void testDefaultConcurrentAddIfAbsent() throws Exception {
+        try (ReplayCache replayCache = new DelegatingReplayCache(new MemoryReplayCache())) {
+            testConcurrentAddIfAbsent(replayCache);
+        }
+    }
+
+    private void testAddIfAbsent(ReplayCache replayCache) throws InterruptedException {
+        String id = UUID.randomUUID().toString();
+        assertTrue(replayCache.addIfAbsent(id, null));
+        assertTrue(replayCache.contains(id));
+        assertFalse(replayCache.addIfAbsent(id, null));
+        assertFalse(replayCache.addIfAbsent(id, Instant.now().plusSeconds(100L)));
+
+        // An identifier added with add() is also seen
+        id = UUID.randomUUID().toString();
+        replayCache.add(id);
+        assertFalse(replayCache.addIfAbsent(id, null));
+
+        // An empty identifier cannot be cached, so is never reported as added
+        assertFalse(replayCache.addIfAbsent(null, null));
+        assertFalse(replayCache.addIfAbsent("", null));
+        assertFalse(replayCache.contains(""));
+
+        // Once an identifier has expired, it may be added again
+        id = UUID.randomUUID().toString();
+        assertTrue(replayCache.addIfAbsent(id, Instant.now().plusSeconds(1L)));
+        Thread.sleep(1250L);
+        assertTrue(replayCache.addIfAbsent(id, null));
+        assertFalse(replayCache.addIfAbsent(id, null));
+    }
+
+    private void testConcurrentAddIfAbsent(ReplayCache replayCache) throws Exception {
+        final int threads = 8;
+        final int identifiers = 500;
+        List<String> ids = new ArrayList<>(identifiers);
+        for (int i = 0; i < identifiers; i++) {
+            ids.add(UUID.randomUUID().toString());
+        }
+        AtomicIntegerArray accepted = new AtomicIntegerArray(identifiers);
+        CyclicBarrier barrier = new CyclicBarrier(threads);
+
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        try {
+            List<Future<?>> futures = new ArrayList<>(threads);
+            for (int t = 0; t < threads; t++) {
+                futures.add(executor.submit(() -> {
+                    barrier.await();
+                    for (int i = 0; i < identifiers; i++) {
+                        if (replayCache.addIfAbsent(ids.get(i), null)) {
+                            accepted.incrementAndGet(i);
+                        }
+                    }
+                    return null;
+                }));
+            }
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        } finally {
+            executor.shutdown();
+        }
+
+        for (int i = 0; i < identifiers; i++) {
+            assertEquals(1, accepted.get(i), "Identifier " + i + " was accepted more than once");
+        }
+    }
+
+    /**
+     * A ReplayCache that does not override addIfAbsent, to test the default implementation
+     */
+    private static final class DelegatingReplayCache implements ReplayCache {
+        private final ReplayCache delegate;
+
+        DelegatingReplayCache(ReplayCache delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void add(String identifier) {
+            delegate.add(identifier);
+        }
+
+        @Override
+        public void add(String identifier, Instant expiry) {
+            delegate.add(identifier, expiry);
+        }
+
+        @Override
+        public boolean contains(String identifier) {
+            return delegate.contains(identifier);
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+        }
     }
 
     private void testReplayCacheInstance(ReplayCache replayCache) throws InterruptedException, IOException {

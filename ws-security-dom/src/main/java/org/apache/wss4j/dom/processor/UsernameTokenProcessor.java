@@ -151,7 +151,7 @@ public class UsernameTokenProcessor implements Processor {
         ReplayCache replayCache = data.getNonceReplayCache();   //NOPMD
         String nonceIdentifier = null;
         Instant nonceExpiry = null;
-        if (replayCache != null && ut.getNonce() != null) {
+        if (replayCache != null && ut.containsNonceElement()) {
             nonceIdentifier = UsernameTokenUtil.getCanonicalNonce(ut.getNonce());
             if (replayCache.contains(nonceIdentifier)) {
                 throw new WSSecurityException(
@@ -178,13 +178,15 @@ public class UsernameTokenProcessor implements Processor {
 
         // Only cache the Nonce once the token has actually been validated. Caching it beforehand
         // lets an attacker poison the cache with the Nonce of a token whose password does not
-        // verify, so that the genuine token is subsequently rejected as a replay.
-        if (nonceIdentifier != null) {
-            if (nonceExpiry != null) {
-                replayCache.add(nonceIdentifier, nonceExpiry);
-            } else {
-                replayCache.add(nonceIdentifier);
-            }
+        // verify, so that the genuine token is subsequently rejected as a replay. The Nonce must be
+        // added atomically, as a concurrent request carrying the same Nonce may also have passed the
+        // check above while this token was being validated.
+        if (nonceIdentifier != null && !replayCache.addIfAbsent(nonceIdentifier, nonceExpiry)) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "badUsernameToken",
+                new Object[] {"A replay attack has been detected"}
+            );
         }
         return credential;
     }

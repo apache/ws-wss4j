@@ -222,19 +222,31 @@ public final class UsernameTokenUtil {
      * replay cache on the raw element text would let a replayed message escape detection simply by
      * rewriting its Nonce into an equivalent encoding.
      *
-     * @param nonce the Nonce exactly as it appeared in the message
+     * An empty Nonce - no text at all, or only characters the decoder ignores - is rejected: it
+     * cannot be cached, so would otherwise defeat replay detection.
+     *
+     * @param nonce the Nonce exactly as it appeared in the message, or null if the Nonce element
+     *              has no text
      * @return the same Nonce re-encoded in canonical base64
-     * @throws WSSecurityException if the Nonce is not valid base64
+     * @throws WSSecurityException if the Nonce is empty or not valid base64
      */
     public static String getCanonicalNonce(String nonce) throws WSSecurityException {
-        try {
-            return Base64.getEncoder().encodeToString(
-                org.apache.xml.security.utils.XMLUtils.decode(nonce));
-        } catch (IllegalArgumentException ex) {
-            LOG.debug(ex.getMessage(), ex);
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, ex, "badUsernameToken",
-                new Object[] {"The Nonce is not valid Base-64"});
+        byte[] decodedNonce = null;
+        if (nonce != null) {
+            try {
+                decodedNonce = org.apache.xml.security.utils.XMLUtils.decode(nonce);
+            } catch (IllegalArgumentException ex) {
+                LOG.debug(ex.getMessage(), ex);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, ex, "badUsernameToken",
+                    new Object[] {"The Nonce is not valid Base-64"});
+            }
         }
+        if (decodedNonce == null || decodedNonce.length == 0) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badUsernameToken",
+                new Object[] {"The Nonce is empty"});
+        }
+        return Base64.getEncoder().encodeToString(decodedNonce);
     }
 }

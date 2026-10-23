@@ -429,6 +429,13 @@ public class UsernameToken {
     }
 
     /**
+     * Return true if this UsernameToken contains a Nonce element, whether or not it has any text
+     */
+    public boolean containsNonceElement() {
+        return elementNonce != null;
+    }
+
+    /**
      * Get the Salt value of this UsernameToken.
      *
      * @return Returns the binary Salt value or <code>null</code> if no Salt
