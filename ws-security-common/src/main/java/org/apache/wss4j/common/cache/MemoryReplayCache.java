@@ -60,21 +60,48 @@ public class MemoryReplayCache implements ReplayCache {
             return;
         }
 
+        Instant cacheExpiry = getCacheExpiry(expiry);
+        synchronized (cache) {
+            cache.computeIfAbsent(cacheExpiry, k -> new ArrayList<>(1)).add(identifier);
+        }
+        ids.add(identifier);
+    }
+
+    /**
+     * Add the given identifier to the cache if, and only if, it is not already contained in it, as a
+     * single atomic operation.
+     * @param identifier The identifier to be added
+     * @param expiry A custom expiry time for the identifier
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty
+     */
+    @Override
+    public boolean addIfAbsent(String identifier, Instant expiry) {
+        if (identifier == null || identifier.length() == 0) {
+            return false;
+        }
+
+        processTokenExpiry();
+
+        Instant cacheExpiry = getCacheExpiry(expiry);
+        // processTokenExpiry removes identifiers from ids while holding the cache monitor, so the
+        // test-and-set on ids and the matching expiry entry are made under that monitor too
+        synchronized (cache) {
+            if (!ids.add(identifier)) {
+                return false;
+            }
+            cache.computeIfAbsent(cacheExpiry, k -> new ArrayList<>(1)).add(identifier);
+        }
+        return true;
+    }
+
+    private static Instant getCacheExpiry(Instant expiry) {
         Instant now = Instant.now();
         Instant maxTTL = now.plusSeconds(MAX_TTL);
         if (expiry == null || expiry.isBefore(now) || expiry.isAfter(maxTTL)) {
-            expiry = now.plusSeconds(DEFAULT_TTL);
+            return now.plusSeconds(DEFAULT_TTL);
         }
-
-        synchronized (cache) {
-            List<String> list = cache.get(expiry);
-            if (list == null) {
-                list = new ArrayList<>(1);
-                cache.put(expiry, list);
-            }
-            list.add(identifier);
-        }
-        ids.add(identifier);
+        return expiry;
     }
 
     /**

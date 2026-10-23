@@ -762,7 +762,8 @@ public class SignatureProcessor implements Processor {
     /**
      * A pending replay cache addition: the Timestamp/SignatureValue/Key identifier of the current
      * message, to be added to the ReplayCache only once the signature it was derived from has
-     * been successfully validated.
+     * been successfully validated. The addition is atomic, and fails if a concurrent request
+     * carrying the same identifier has been accepted in the meantime.
      */
     private static final class ReplayCacheEntry {
         private final ReplayCache replayCache;
@@ -775,11 +776,12 @@ public class SignatureProcessor implements Processor {
             this.expires = expires;
         }
 
-        void add() {
-            if (expires != null) {
-                replayCache.add(identifier, expires);
-            } else {
-                replayCache.add(identifier);
+        void add() throws WSSecurityException {
+            if (!replayCache.addIfAbsent(identifier, expires)) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "invalidTimestamp",
+                    new Object[] {"A replay attack has been detected"});
             }
         }
     }
