@@ -47,4 +47,37 @@ public interface ReplayCache extends Closeable {
      */
     boolean contains(String identifier);
 
+    /**
+     * Add the given identifier to the cache if, and only if, it is not already contained in it, as a
+     * single atomic operation. A replay check must use this method rather than contains() followed by
+     * add(): two concurrent requests carrying the same identifier could otherwise both pass contains()
+     * before either reaches add(), and both be accepted.
+     *
+     * The default implementation serializes calls on this cache instance, which is only atomic with
+     * respect to other calls to this method. Implementations should override it with an operation that
+     * is atomic in the underlying store.
+     *
+     * @param identifier The identifier to be added
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default
+     *               expiry is used.
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty, in which case the cache is left unchanged
+     */
+    default boolean addIfAbsent(String identifier, Instant expiry) {
+        if (identifier == null || identifier.length() == 0) {
+            return false;
+        }
+        synchronized (this) {
+            if (contains(identifier)) {
+                return false;
+            }
+            if (expiry != null) {
+                add(identifier, expiry);
+            } else {
+                add(identifier);
+            }
+            return true;
+        }
+    }
+
 }

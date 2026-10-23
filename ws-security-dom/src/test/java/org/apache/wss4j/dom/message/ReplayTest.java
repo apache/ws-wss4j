@@ -611,6 +611,46 @@ public class ReplayTest {
     }
 
     /**
+     * An empty Nonce cannot be cached, so a UsernameToken carrying one must be rejected rather than
+     * escape replay detection. The check happens before the token is validated, so the error names
+     * the empty Nonce rather than reporting a replay. An element with no text and one containing only
+     * whitespace must be treated alike.
+     */
+    @Test
+    public void testUsernameTokenWithEmptyNonce() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        String genuineMessage = XMLUtils.prettyDocumentToString(builder.build());
+
+        Matcher matcher = Pattern.compile("(<[^>]*Nonce[^>]*>)([^<]*)(</)").matcher(genuineMessage);
+        assertTrue(matcher.find(), "No Nonce element was found");
+
+        for (String emptyNonce : new String[] {"", "   "}) {
+            String message = genuineMessage.substring(0, matcher.start(2))
+                + emptyNonce + genuineMessage.substring(matcher.end(2));
+
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            RequestData data = new RequestData();
+            data.setCallbackHandler(new UsernamePasswordCallbackHandler());
+            data.setWssConfig(wssConfig);
+            data.setNonceReplayCache(new MemoryReplayCache());
+
+            try {
+                verify(SOAPUtil.toSOAPPart(message), wssConfig, data);
+                fail("Expected failure on an empty Nonce");
+            } catch (WSSecurityException ex) {
+                assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY, ex.getErrorCode());
+                assertTrue(ex.getMessage().contains("The Nonce is empty"), ex.getMessage());
+            }
+        }
+    }
+
+    /**
      * A UsernameToken whose password fails to verify must not leave its Nonce in the replay cache.
      * Otherwise an attacker can replay a genuine token with a corrupted Password and send that
      * first: it is rejected, but it has claimed the genuine token's Nonce, so the genuine token is

@@ -457,7 +457,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     /**
      * A pending replay cache addition: the Timestamp/SignatureValue identifier of the current
      * message, to be added to the ReplayCache only once the signature it was derived from has
-     * been successfully verified.
+     * been successfully verified. The addition is atomic, and fails if a concurrent request
+     * carrying the same identifier has been accepted in the meantime.
      */
     private static final class ReplayCacheEntry {
         private final ReplayCache replayCache;
@@ -470,11 +471,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             this.expires = expires;
         }
 
-        void add() {
-            if (expires != null) {
-                replayCache.add(identifier, expires);
-            } else {
-                replayCache.add(identifier);
+        void add() throws WSSecurityException {
+            if (!replayCache.addIfAbsent(identifier, expires)) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
         }
     }
