@@ -22,6 +22,7 @@ package org.apache.wss4j.common.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +31,7 @@ import java.util.jar.JarOutputStream;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -45,6 +47,12 @@ class LoaderTest {
 
     @TempDir
     Path tempDir;
+
+    @BeforeAll
+    static void disableJarCache() {
+        // see https://bugs.openjdk.org/browse/JDK-8239054 and https://github.com/junit-team/junit-framework/issues/2811
+        URLConnection.setDefaultUseCaches("jar", false);
+    }
 
     @AfterEach
     void clearAllowedSchemesProperty() {
