@@ -19,6 +19,11 @@
 
 package org.apache.wss4j.common.saml;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
+
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import net.shibboleth.shared.xml.impl.BasicParserPool;
@@ -26,7 +31,6 @@ import net.shibboleth.shared.xml.ParserPool;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.opensaml.core.config.Configuration;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.config.provider.MapBasedConfiguration;
 import org.opensaml.core.xml.XMLObject;
@@ -60,6 +64,9 @@ public final class OpenSAMLUtil {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(OpenSAMLUtil.class);
 
+    private static final String DEFER_NODE_EXPANSION_FEATURE =
+        "http://apache.org/xml/features/dom/defer-node-expansion";
+
     private static XMLObjectProviderRegistry providerRegistry;
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;
@@ -82,31 +89,42 @@ public final class OpenSAMLUtil {
             LOG.debug("Initializing the opensaml2 library...");
             WSProviderConfig.init();
 
-            Configuration configuration = new MapBasedConfiguration();
-            ConfigurationService.setConfiguration(configuration);
-
-            providerRegistry = new XMLObjectProviderRegistry();
-            configuration.register(XMLObjectProviderRegistry.class, providerRegistry,
-                                   ConfigurationService.DEFAULT_PARTITION_NAME);
-
             try {
+                XMLObjectProviderRegistry existingRegistry = getExistingProviderRegistry();
+                if (existingRegistry != null) {
+                    // OpenSAML has already been initialized (e.g. via InitializationService), so keep the
+                    // existing configuration, including the parser pools
+                    LOG.debug("Using the existing OpenSAML configuration");
+                    providerRegistry = existingRegistry;
+                } else {
+                    ConfigurationService.setConfiguration(new MapBasedConfiguration());
+
+                    providerRegistry = new XMLObjectProviderRegistry();
+                    ConfigurationService.register(XMLObjectProviderRegistry.class, providerRegistry);
+                }
+
+                // Always load the object providers, as an existing initialization may be partial (e.g. in OSGi,
+                // InitializationService only finds the initializers that are visible to the context classloader)
                 OpenSAMLBootstrap.bootstrap(includeXacml);
 
-                SAMLConfiguration samlConfiguration = new SAMLConfiguration();
-
-                configuration.register(SAMLConfiguration.class, samlConfiguration,
-                                       ConfigurationService.DEFAULT_PARTITION_NAME);
+                if (ConfigurationService.get(SAMLConfiguration.class) == null) {
+                    ConfigurationService.register(SAMLConfiguration.class, new SAMLConfiguration());
+                }
 
                 builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
                 marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
                 unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
 
                 try {
-                    configureParserPool();
+                    if (providerRegistry.getParserPool() == null) {
+                        configureParserPool();
+                    }
 
                     // used by org.opensaml.saml.saml2.encryption.Decrypter
-                    configuration.register(DecryptionParserPool.class, new DecryptionParserPool(getParserPool()),
-                        ConfigurationService.DEFAULT_PARTITION_NAME);
+                    if (ConfigurationService.get(DecryptionParserPool.class) == null) {
+                        ConfigurationService.register(DecryptionParserPool.class,
+                                                      new DecryptionParserPool(createDecryptionParserPool()));
+                    }
                 } catch (Throwable t) {
                     LOG.warn("Unable to bootstrap the parser pool part of the opensaml library "
                              + "- some SAML operations may fail", t);
@@ -120,11 +138,48 @@ public final class OpenSAMLUtil {
         }
     }
 
+    private static XMLObjectProviderRegistry getExistingProviderRegistry() {
+        try {
+            return ConfigurationService.get(XMLObjectProviderRegistry.class);
+        } catch (ServiceConfigurationError e) {
+            // The lookup of a Configuration implementation via the ServiceLoader failed (e.g. due to
+            // classloader visibility in OSGi), so treat OpenSAML as not initialized
+            LOG.debug("Unable to look up an existing OpenSAML configuration", e);
+            return null;
+        }
+    }
+
     private static void configureParserPool() throws Throwable {
         BasicParserPool pp = new BasicParserPool();
         pp.setMaxPoolSize(50);
         pp.initialize();
         providerRegistry.setParserPool(pp);
+    }
+
+    /**
+     * Create a ParserPool for decryption, configured in the same way as OpenSAML's
+     * DecryptionParserPoolInitializer.
+     */
+    private static ParserPool createDecryptionParserPool() {
+        try {
+            BasicParserPool pp = new BasicParserPool();
+            pp.setMaxPoolSize(50);
+
+            // Start with the default (hardened) features, and add the decryption-specific feature. The
+            // hardening features are set explicitly so that they cannot be lost when the features are replaced.
+            Map<String, Boolean> features = new HashMap<>(pp.getBuilderFeatures());
+            features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
+            features.put(DEFER_NODE_EXPANSION_FEATURE, Boolean.FALSE);
+            pp.setBuilderFeatures(features);
+
+            pp.initialize();
+            return pp;
+        } catch (Throwable t) {
+            // e.g. the XML parser does not support the feature - fall back to the default parser pool
+            LOG.warn("Unable to create a decryption-specific parser pool, using the default parser pool instead", t);
+            return getParserPool();
+        }
     }
 
     /**
