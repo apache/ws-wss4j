@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.crypto;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -102,12 +103,14 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
     }
 
     private void configureGenerators(String algorithm) {
-        if (FIPSUtils.isFIPSEnabled()) {
-            passwordEncryptor.setSaltGenerator(new RandomSaltGenerator("PKCS11"));
-            passwordEncryptor.setIvGenerator(new RandomIvGenerator("PKCS11"));
-        } else if (requiresIv(algorithm)) {
-            // AES-based PBE algorithms need an explicit IV generator with Jasypt
-            passwordEncryptor.setIvGenerator(new RandomIvGenerator());
+        boolean fipsEnabled = FIPSUtils.isFIPSEnabled();
+        // Always pass a SecureRandom algorithm explicitly, as Jasypt otherwise falls back to
+        // "SHA1PRNG", which is not offered by every JVM (e.g. one configured for FIPS)
+        String randomAlgorithm = fipsEnabled ? "PKCS11" : new SecureRandom().getAlgorithm();
+        passwordEncryptor.setSaltGenerator(new RandomSaltGenerator(randomAlgorithm));
+        // AES-based PBE algorithms need an explicit IV generator with Jasypt
+        if (fipsEnabled || requiresIv(algorithm)) {
+            passwordEncryptor.setIvGenerator(new RandomIvGenerator(randomAlgorithm));
         }
     }
 
