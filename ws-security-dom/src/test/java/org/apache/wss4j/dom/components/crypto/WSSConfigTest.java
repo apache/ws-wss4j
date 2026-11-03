@@ -19,14 +19,18 @@
 
 package org.apache.wss4j.dom.components.crypto;
 
+import java.security.Provider;
 import java.security.Security;
 
+import org.apache.wss4j.common.crypto.SantuarioUtil;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransformProvider;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Test loading and removing security providers via WSSConfig
@@ -76,6 +80,38 @@ public class WSSConfigTest {
         assertNull(Security.getProvider("BC"));
         assertNull(Security.getProvider("TLSP"));
 
+    }
+
+    /**
+     * WSS-660: cleanUp must not remove providers that were registered by someone else, e.g.
+     * by a copy of WSS4J deployed in another web application, after we registered ours.
+     */
+    @Test
+    public void testCleanUpLeavesForeignProviders() {
+        WSSConfig.cleanUp();
+        WSSConfig.init();
+
+        // Simulate another copy of WSS4J replacing the providers
+        Provider otherTransformProvider = new AttachmentContentSignatureTransformProvider();
+        Security.removeProvider("AttachmentContentSignatureTransform");
+        Security.addProvider(otherTransformProvider);
+
+        Provider otherSantuarioProvider = SantuarioUtil.getSantuarioProvider();
+        Security.removeProvider("ApacheXMLDSig");
+        Security.addProvider(otherSantuarioProvider);
+
+        try {
+            WSSConfig.cleanUp();
+
+            assertSame(otherTransformProvider, Security.getProvider("AttachmentContentSignatureTransform"));
+            assertSame(otherSantuarioProvider, Security.getProvider("ApacheXMLDSig"));
+            // The providers that were still ours are removed
+            assertNull(Security.getProvider("STRTransform"));
+            assertNull(Security.getProvider("AttachmentCompleteSignatureTransform"));
+        } finally {
+            Security.removeProvider("AttachmentContentSignatureTransform");
+            Security.removeProvider("ApacheXMLDSig");
+        }
     }
 
 }
