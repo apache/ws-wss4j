@@ -25,6 +25,8 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.Provider;
 import java.security.Security;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.wss4j.common.util.FIPSUtils;
 import org.apache.wss4j.common.util.Loader;
@@ -56,9 +58,12 @@ public final class WSProviderConfig {
      */
     private static boolean staticallyInitialized;
 
-    private static boolean santuarioProviderAdded;
-    private static boolean bcProviderAdded;
-    private static boolean tlProviderAdded;
+    /**
+     * The provider instances registered by this class, keyed by name. On cleanUp only these
+     * instances are removed, so that a provider of the same name registered by another copy
+     * of WSS4J (e.g. in another web application) is left alone.
+     */
+    private static final Map<String, Provider> ADDED_PROVIDERS = new HashMap<>();
 
     private WSProviderConfig() {
         // complete
@@ -75,10 +80,6 @@ public final class WSProviderConfig {
                         return true;
                     }
                 });
-
-                santuarioProviderAdded = true;
-                bcProviderAdded = false;
-                tlProviderAdded = false;
             }
             if (FIPSUtils.isFIPSEnabled()) {
                 //So far the in-JDK security provider in FIPS mode
@@ -99,7 +100,6 @@ public final class WSProviderConfig {
         if (!staticallyInitialized) {
             initializeResourceBundles();
             setXmlSecIgnoreLineBreak();
-            santuarioProviderAdded = addXMLDSigRIInternalProv;
             if (addXMLDSigRIInternalProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
@@ -109,11 +109,12 @@ public final class WSProviderConfig {
                 });
             }
 
-            bcProviderAdded = addBCProv;
             if (addBCProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
+                        Provider existing = Security.getProvider("BC");
                         addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                        recordAddedProvider("BC", existing);
                         return true;
                     }
                 });
@@ -133,11 +134,12 @@ public final class WSProviderConfig {
                 
             }
 
-            tlProviderAdded = addTLProv;
             if (addTLProv) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
+                        Provider existing = Security.getProvider("TLSP");
                         ThreadLocalSecurityProvider.install();
+                        recordAddedProvider("TLSP", existing);
                         return true;
                     }
                 });
@@ -148,18 +150,10 @@ public final class WSProviderConfig {
 
     public static synchronized void cleanUp() {
         if (staticallyInitialized) {
-            if (santuarioProviderAdded) {
-                Security.removeProvider("ApacheXMLDSig");
-                santuarioProviderAdded = false;
+            for (Map.Entry<String, Provider> entry : ADDED_PROVIDERS.entrySet()) {
+                removeJceProvider(entry.getKey(), entry.getValue());
             }
-            if (bcProviderAdded) {
-                Security.removeProvider("BC");
-                bcProviderAdded = false;
-            }
-            if (tlProviderAdded) {
-                Security.removeProvider("TLSP");
-                tlProviderAdded = false;
-            }
+            ADDED_PROVIDERS.clear();
 
             staticallyInitialized = false;
         }
@@ -212,8 +206,40 @@ public final class WSProviderConfig {
     }
 
     private static void addXMLDSigRIInternal() {
+        Provider existing = Security.getProvider("ApacheXMLDSig");
         Security.removeProvider("ApacheXMLDSig");
         addJceProvider("ApacheXMLDSig", SantuarioUtil.getSantuarioProvider());
+        recordAddedProvider("ApacheXMLDSig", existing);
+    }
+
+    private static void recordAddedProvider(String name, Provider previous) {
+        Provider current = Security.getProvider(name);
+        if (current != null && current != previous) {
+            ADDED_PROVIDERS.put(name, current);
+        }
+    }
+
+    /**
+     * Remove the JCE security provider registered under the given name, but only if it is the
+     * given provider instance. A provider of the same name registered by someone else, e.g. by
+     * a copy of WSS4J loaded by another web application's class loader, is left in place.
+     *
+     * @param name
+     *            The name of the provider
+     * @param provider
+     *            The provider instance that was registered by the caller
+     * @return true if the provider was removed
+     */
+    public static boolean removeJceProvider(String name, Provider provider) {
+        Provider current = Security.getProvider(name);
+        if (current != null && current == provider) {
+            Security.removeProvider(name);
+            return true;
+        }
+        if (current != null) {
+            LOG.debug("Not removing provider {} as it was not registered by this instance of WSS4J", name);
+        }
+        return false;
     }
 
     private static void initializeResourceBundles() {

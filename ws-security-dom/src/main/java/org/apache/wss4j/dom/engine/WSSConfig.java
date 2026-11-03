@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.engine;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.Provider;
 import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
@@ -254,6 +255,13 @@ public final class WSSConfig {
     private static boolean staticallyInitialized = false;
 
     /**
+     * The provider instances registered by this class, keyed by name. On cleanUp only these
+     * instances are removed, so that a provider of the same name registered by another copy
+     * of WSS4J (e.g. in another web application) is left alone.
+     */
+    private static final Map<String, Provider> ADDED_PROVIDERS = new HashMap<>();
+
+    /**
      * This allows the user to specify a different time than that of the current System time.
      */
     private WSTimeSource currentTime;
@@ -318,24 +326,18 @@ public final class WSSConfig {
             if (addJceProviders) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
-                        Security.removeProvider("STRTransform");
-                        WSProviderConfig.appendJceProvider(
+                        replaceJceProvider(
                             "STRTransform",
                             new org.apache.wss4j.dom.transform.STRTransformProvider()
                         );
-
-                        Security.removeProvider("AttachmentContentSignatureTransform");
-                        WSProviderConfig.appendJceProvider(
-                                "AttachmentContentSignatureTransform",
-                                new AttachmentContentSignatureTransformProvider()
+                        replaceJceProvider(
+                            "AttachmentContentSignatureTransform",
+                            new AttachmentContentSignatureTransformProvider()
                         );
-
-                        Security.removeProvider("AttachmentCompleteSignatureTransform");
-                        WSProviderConfig.appendJceProvider(
-                                "AttachmentCompleteSignatureTransform",
-                                new AttachmentCompleteSignatureTransformProvider()
+                        replaceJceProvider(
+                            "AttachmentCompleteSignatureTransform",
+                            new AttachmentCompleteSignatureTransformProvider()
                         );
-
                         return true;
                     }
                 });
@@ -347,14 +349,30 @@ public final class WSSConfig {
 
     public static synchronized void cleanUp() {
         if (staticallyInitialized) {
-            if (addJceProviders) {
-                Security.removeProvider("STRTransform");
-                Security.removeProvider("AttachmentContentSignatureTransform");
-                Security.removeProvider("AttachmentCompleteSignatureTransform");
+            for (Map.Entry<String, Provider> entry : ADDED_PROVIDERS.entrySet()) {
+                WSProviderConfig.removeJceProvider(entry.getKey(), entry.getValue());
             }
+            ADDED_PROVIDERS.clear();
             WSProviderConfig.cleanUp();
 
             staticallyInitialized = false;
+        }
+    }
+
+    private static void replaceJceProvider(String name, Provider provider) {
+        Provider existing = Security.getProvider(name);
+        if (existing != null
+            && existing.getClass().getClassLoader() != provider.getClass().getClassLoader()) {
+            LOG.warn("The security provider {} has already been registered by a different class loader "
+                + "and will be replaced. If WSS4J is deployed in more than one web application in the same "
+                + "JVM, the other application may fail to use it. Consider deploying WSS4J in a class loader "
+                + "shared by all applications, e.g. the container's lib directory.", name);
+        }
+        Security.removeProvider(name);
+        WSProviderConfig.appendJceProvider(name, provider);
+        Provider current = Security.getProvider(name);
+        if (current != null && current != existing) {
+            ADDED_PROVIDERS.put(name, current);
         }
     }
 
