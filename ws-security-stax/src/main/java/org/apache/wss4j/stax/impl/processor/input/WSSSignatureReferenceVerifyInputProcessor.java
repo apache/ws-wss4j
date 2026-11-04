@@ -49,6 +49,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -435,8 +436,11 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         }
 
         // Return the Timestamp/SignatureValue combination so that it can be stored in the cache
-        // once the signature has been verified
-        return new ReplayCacheEntry(replayCache, cacheKey, timestampSecurityEvent.getExpires());
+        // once the signature has been verified, for as long as the Timestamp is accepted
+        Instant expires = DateUtil.getTimestampReplayExpiry(timestampSecurityEvent.getCreated(),
+            timestampSecurityEvent.getExpires(),
+            ((WSSSecurityProperties)getSecurityProperties()).getTimestampTTL());
+        return new ReplayCacheEntry(replayCache, cacheKey, expires);
     }
 
     /**
