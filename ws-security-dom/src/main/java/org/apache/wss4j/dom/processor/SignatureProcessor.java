@@ -63,6 +63,7 @@ import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -728,8 +729,10 @@ public class SignatureProcessor implements Processor {
         }
 
         // Return the Timestamp/SignatureValue/Key combination so that it can be stored in the
-        // cache once the signature has been validated
-        return new ReplayCacheEntry(replayCache, identifier, timeStamp.getExpires());
+        // cache once the signature has been validated, for as long as the Timestamp is accepted
+        Instant expires =
+            DateUtil.getTimestampReplayExpiry(created, timeStamp.getExpires(), requestData.getTimeStampTTL());
+        return new ReplayCacheEntry(replayCache, identifier, expires);
     }
 
     /**

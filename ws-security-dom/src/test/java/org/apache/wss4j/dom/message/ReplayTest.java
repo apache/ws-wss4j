@@ -19,7 +19,10 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -749,6 +752,102 @@ public class ReplayTest {
     }
 
     /**
+     * A UsernameToken is accepted until its Created time plus the TTL, and the Created time may be
+     * in the future (within the future TTL). The Nonce must be cached until then, not just until
+     * the current time plus the TTL.
+     */
+    @Test
+    public void testUsernameTokenFutureCreatedNonceExpiry() throws Exception {
+        Instant created = Instant.now().plusSeconds(30L).truncatedTo(ChronoUnit.MILLIS);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+        builder.setWsTimeSource(() -> created);
+
+        Document signedDoc = builder.build();
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setCallbackHandler(new UsernamePasswordCallbackHandler());
+        data.setWssConfig(wssConfig);
+        RecordingReplayCache replayCache = new RecordingReplayCache();
+        data.setNonceReplayCache(replayCache);
+
+        verify(signedDoc, wssConfig, data);
+
+        assertEquals(created.plusSeconds(data.getUtTTL()), replayCache.lastExpiry);
+    }
+
+    /**
+     * A Timestamp with no Expires is accepted until its Created time plus the TTL, and the Created
+     * time may be in the future (within the future TTL). The signature must be cached until then.
+     */
+    @Test
+    public void testTimestampNoExpiresFutureCreatedReplayExpiry() throws Exception {
+        Instant created = Instant.now().plusSeconds(30L).truncatedTo(ChronoUnit.MILLIS);
+
+        RequestData data = new RequestData();
+        RecordingReplayCache replayCache = verifySignedTimestamp(created, 0, data);
+
+        assertEquals(created.plusSeconds(data.getTimeStampTTL()), replayCache.lastExpiry);
+    }
+
+    /**
+     * If the Timestamp check is not strict, then Expires is not enforced, and a Timestamp is
+     * accepted until its Created time plus the TTL, even if that is after its Expires time. The
+     * signature must be cached until then.
+     */
+    @Test
+    public void testNonStrictTimestampReplayExpiry() throws Exception {
+        Instant created = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+        RequestData data = new RequestData();
+        data.setTimeStampStrict(false);
+        RecordingReplayCache replayCache = verifySignedTimestamp(created, 1, data);
+
+        assertEquals(created.plusSeconds(data.getTimeStampTTL()), replayCache.lastExpiry);
+    }
+
+    /**
+     * Sign a Timestamp with the given Created time and time to live, and verify it with the given
+     * RequestData, returning the replay cache that the signature was cached in
+     */
+    private RecordingReplayCache verifySignedTimestamp(
+        Instant created, int timeToLive, RequestData data
+    ) throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        timestamp.setTimeToLive(timeToLive);
+        timestamp.setWsTimeSource(() -> created);
+        Document createdDoc = timestamp.build();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.getParts().add(new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, ""));
+        builder.prepare(crypto);
+        List<javax.xml.crypto.dsig.Reference> referenceList =
+            builder.addReferencesToSign(builder.getParts());
+        builder.computeSignature(referenceList, false, null);
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        RecordingReplayCache replayCache = new RecordingReplayCache();
+        data.setTimestampReplayCache(replayCache);
+
+        verify(createdDoc, wssConfig, data);
+        return replayCache;
+    }
+
+    /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
      * is just a sanity test to make sure that it is possible to send the SAML token twice, as
      * no "OneTimeUse" Element is defined there is no problem with replaying it.
@@ -883,5 +982,33 @@ public class ReplayTest {
         return secEngine.processSecurityHeader(elem, data);
     }
 
+    /**
+     * A ReplayCache that records the expiry it was last asked to cache an identifier for
+     */
+    private static final class RecordingReplayCache implements ReplayCache {
+        private final MemoryReplayCache delegate = new MemoryReplayCache();
+        private Instant lastExpiry;
 
+        @Override
+        public void add(String identifier) {
+            lastExpiry = null;
+            delegate.add(identifier);
+        }
+
+        @Override
+        public void add(String identifier, Instant expiry) {
+            lastExpiry = expiry;
+            delegate.add(identifier, expiry);
+        }
+
+        @Override
+        public boolean contains(String identifier) {
+            return delegate.contains(identifier);
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+        }
+    }
 }

@@ -162,11 +162,12 @@ public class UsernameTokenProcessor implements Processor {
             }
 
             // If no Created, then just cache for the default time
-            // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
-            // older token will just get rejected anyway
+            // Otherwise, cache until the Created time plus the configured TTL, as the token is
+            // rejected after that anyway. This is not the same as the current time plus the TTL,
+            // as the Created time may be in the future, within the future TTL.
             Instant created = ut.getCreatedDate();
             if (created != null && utTTL > 0) {
-                nonceExpiry = Instant.now().plusSeconds(utTTL);
+                nonceExpiry = created.plusSeconds(utTTL);
             }
         }
 
