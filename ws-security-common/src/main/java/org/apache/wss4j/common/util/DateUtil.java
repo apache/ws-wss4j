@@ -75,6 +75,30 @@ public final class DateUtil {
         return true;
     }
 
+    /**
+     * Return how long the replay cache entry for a message with the given Timestamp must be kept,
+     * which is for as long as the Timestamp may still be accepted: the later of the Expires value
+     * and Created + timeToLive. verifyCreated accepts the message until Created + timeToLive,
+     * which can be after the Expires value if the Expires value is not enforced (a non-strict
+     * Timestamp check), and after the current time + timeToLive, as the Created value may be in
+     * the future, within the future time to live.
+     *
+     * @param created the Created value of the Timestamp, can be null
+     * @param expires the Expires value of the Timestamp, can be null
+     * @param timeToLive the value in seconds for the validity of the Created time
+     * @return the expiry of the replay cache entry, or null if the Timestamp does not bound it
+     */
+    public static Instant getTimestampReplayExpiry(Instant created, Instant expires, int timeToLive) {
+        if (created == null) {
+            return expires;
+        }
+        Instant createdExpiry = created.plusSeconds(timeToLive);
+        if (expires != null && expires.isAfter(createdExpiry)) {
+            return expires;
+        }
+        return createdExpiry;
+    }
+
     public static DateTimeFormatter getDateTimeFormatter(boolean milliseconds) {
         if (milliseconds) {
             return MILLISECOND_FORMATTER;
