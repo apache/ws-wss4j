@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.cache;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,8 +99,12 @@ public class MemoryReplayCache implements ReplayCache {
     private static Instant getCacheExpiry(Instant expiry) {
         Instant now = Instant.now();
         Instant maxTTL = now.plusSeconds(MAX_TTL);
-        if (expiry == null || expiry.isBefore(now) || expiry.isAfter(maxTTL)) {
+        if (expiry == null || expiry.isBefore(now)) {
             return now.plusSeconds(DEFAULT_TTL);
+        } else if (expiry.isAfter(maxTTL)) {
+            // Clamp to the max TTL rather than falling back to the (shorter) default TTL, so that
+            // an identifier is not dropped from the cache while the token it belongs to is still valid
+            return maxTTL;
         }
         return expiry;
     }
@@ -133,6 +138,11 @@ public class MemoryReplayCache implements ReplayCache {
                 }
             }
         }
+    }
+
+    @Override
+    public Duration getMaxTTL() {
+        return Duration.ofSeconds(MAX_TTL);
     }
 
     @Override

@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.cache;
 
 import java.io.Closeable;
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -78,6 +79,17 @@ public interface ReplayCache extends Closeable {
             }
             return true;
         }
+    }
+
+    /**
+     * Return the maximum time for which this cache holds an identifier. A custom expiry passed to
+     * add(String, Instant) or addIfAbsent(String, Instant) that is further in the future than this is
+     * reduced to it, so an identifier whose token is valid for longer can be replayed once it has
+     * expired from the cache.
+     * @return the maximum time for which this cache holds an identifier, or null if this is not known
+     */
+    default Duration getMaxTTL() {
+        return null;
     }
 
 }

@@ -21,6 +21,7 @@ package org.apache.wss4j.common.cache;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -140,7 +141,7 @@ public class ReplayCacheTest {
         replayCache.close();
     }
 
-    // The huge expiry is rejected and it falls back to the default
+    // The huge expiry is clamped to the max TTL
     @Test
     public void testEhCacheReplayCacheHugeExpiry() throws Exception {
         ReplayCache replayCache = new EHCacheReplayCache("xyz", tempDir);
@@ -155,6 +156,16 @@ public class ReplayCacheTest {
         assertEquals(id, ehCacheValue.getIdentifier());
 
         replayCache.close();
+    }
+
+    @Test
+    public void testMaxTTL() throws Exception {
+        try (ReplayCache replayCache = new MemoryReplayCache()) {
+            assertEquals(Duration.ofSeconds(MemoryReplayCache.MAX_TTL), replayCache.getMaxTTL());
+        }
+        try (ReplayCache replayCache = new EHCacheReplayCache("xyz", tempDir)) {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+        }
     }
 
     @Test
