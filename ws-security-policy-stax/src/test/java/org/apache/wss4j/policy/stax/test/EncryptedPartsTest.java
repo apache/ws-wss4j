@@ -154,6 +154,7 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
         encryptedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         try {
             policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),

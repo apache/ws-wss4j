@@ -160,6 +160,7 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),
