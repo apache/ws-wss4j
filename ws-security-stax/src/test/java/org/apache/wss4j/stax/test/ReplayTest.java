@@ -33,6 +33,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
+import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
@@ -520,6 +521,60 @@ public class ReplayTest extends AbstractTestBase {
         }
 
         // now process SAML Token again
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
+
+            securityProperties.setSamlOneTimeUseReplayCache(replayCache);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof XMLSecurityException);
+            }
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * A OneTimeUse assertion that is valid for longer than the replay cache can hold its identifier
+     * could be replayed once the identifier has expired from the cache, so it must be rejected
+     */
+    @Test
+    public void testSAML2OneTimeUseBeyondCacheTTL() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+
+            // Valid for 2 hours, but a MemoryReplayCache only holds an identifier for 1 hour
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(2 * 60);
+            conditions.setOneTimeUse(true);
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        ReplayCache replayCache = new MemoryReplayCache();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
 

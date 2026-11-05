@@ -95,6 +95,7 @@ public class EHCacheExpiryTest {
                         new EHCacheValue("xyz", Instant.now().plus(14, ChronoUnit.HOURS)));
         assertNotNull(expiryForCreation);
 
-        assertEquals(EHCacheExpiry.DEFAULT_TTL, expiryForCreation.getSeconds());
+        // A huge expiry is clamped to the max TTL, not reduced to the default TTL
+        assertEquals(EHCacheExpiry.MAX_TTL, expiryForCreation.getSeconds());
     }
 }

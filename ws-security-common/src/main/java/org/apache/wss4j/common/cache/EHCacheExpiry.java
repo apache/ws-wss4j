@@ -28,7 +28,8 @@ import org.ehcache.expiry.ExpiryPolicy;
 
 /**
  * A custom Expiry implementation for EhCache. It uses the supplied expiry which is part of the cache value.
- * If it doesn't exist, it falls back to the default value (3600 seconds).
+ * If it doesn't exist (or is in the past), it falls back to the default value (3600 seconds). If it exceeds
+ * the max value (12 hours), it is clamped to the max value.
  */
 public class EHCacheExpiry implements ExpiryPolicy<String, EHCacheValue> {
 
@@ -48,8 +49,12 @@ public class EHCacheExpiry implements ExpiryPolicy<String, EHCacheValue> {
         Instant expiry = ehCacheValue.getExpiry();
         Instant now = Instant.now();
 
-        if (expiry == null || expiry.isBefore(now) || expiry.isAfter(now.plusSeconds(MAX_TTL))) {
+        if (expiry == null || expiry.isBefore(now)) {
             return Duration.of(DEFAULT_TTL, ChronoUnit.SECONDS);
+        } else if (expiry.isAfter(now.plusSeconds(MAX_TTL))) {
+            // Clamp to the max TTL rather than falling back to the (shorter) default TTL, so that
+            // an identifier is not dropped from the cache while the token it belongs to is still valid
+            return Duration.of(MAX_TTL, ChronoUnit.SECONDS);
         }
 
         return Duration.of(expiry.toEpochMilli() - now.toEpochMilli(), ChronoUnit.MILLIS);
