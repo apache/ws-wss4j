@@ -216,6 +216,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),
@@ -431,6 +432,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(WSDL_DEFINITIONS);
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),
@@ -493,6 +495,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),
@@ -625,6 +628,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         try {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            fail("Exception expected");
         } catch (WSSecurityException e) {
             assertTrue(e.getCause() instanceof PolicyViolationException);
             assertEquals(e.getCause().getMessage(),
