@@ -21,6 +21,7 @@ package org.apache.wss4j.common.cache;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -159,6 +160,11 @@ public class EHCacheReplayCache implements ReplayCache {
     // Only exposed for testing
     EHCacheValue get(String identifier) {
         return cache.get(identifier);
+    }
+
+    @Override
+    public Duration getMaxTTL() {
+        return Duration.ofSeconds(EHCacheExpiry.MAX_TTL);
     }
 
     @Override

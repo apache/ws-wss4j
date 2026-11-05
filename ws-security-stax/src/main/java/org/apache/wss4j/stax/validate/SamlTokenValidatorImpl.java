@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -73,6 +74,13 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      * signed
      */
     private boolean requireBearerSignature = true;
+
+    /**
+     * Whether to accept an Assertion with a OneTimeUse Condition that is valid for longer than the
+     * replay cache can hold its identifier. Such an Assertion can be replayed once its identifier has
+     * expired from the cache, so it is rejected by default.
+     */
+    private boolean allowOneTimeUseBeyondCacheTTL;
 
     /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming
@@ -251,9 +259,27 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
             String identifier = samlAssertion.getId();
 
+            Instant expires = samlAssertion.getNotOnOrAfter();
+            if (expires == null && samlAssertion.getSaml2().getIssueInstant() != null) {
+                // With no NotOnOrAfter, checkIssueInstant accepts the assertion until IssueInstant + ttl,
+                // so it must stay in the cache until then
+                expires = samlAssertion.getSaml2().getIssueInstant().toDate().toInstant().plusSeconds(ttl);
+            }
+
+            // The cache only holds the identifier for so long. An Assertion that is valid for longer
+            // could be replayed once its identifier has expired from the cache, so reject it
+            Duration maxTTL = replayCache.getMaxTTL();
+            if (!allowOneTimeUseBeyondCacheTTL && maxTTL != null && expires != null
+                && expires.isAfter(Instant.now().plus(maxTTL))) {
+                LOG.warn("A OneTimeUse Assertion is valid for longer than the replay cache can hold it");
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "badSamlToken",
+                    new Object[] {"A OneTimeUse Assertion is valid for longer than the replay cache can hold it"});
+            }
+
             // Check and cache the identifier atomically, so that concurrent requests carrying the
             // same Assertion cannot all pass the check before any of them has cached it
-            Instant expires = samlAssertion.getNotOnOrAfter();
             if (!replayCache.addIfAbsent(identifier, expires)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
@@ -286,6 +312,19 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
 
     public void setRequireBearerSignature(boolean requireBearerSignature) {
         this.requireBearerSignature = requireBearerSignature;
+    }
+
+    /**
+     * Whether to accept an Assertion with a OneTimeUse Condition that is valid for longer than the
+     * replay cache can hold its identifier (see ReplayCache#getMaxTTL()). The default is false.
+     * Such an Assertion can be replayed once its identifier has expired from the cache.
+     */
+    public boolean isAllowOneTimeUseBeyondCacheTTL() {
+        return allowOneTimeUseBeyondCacheTTL;
+    }
+
+    public void setAllowOneTimeUseBeyondCacheTTL(boolean allowOneTimeUseBeyondCacheTTL) {
+        this.allowOneTimeUseBeyondCacheTTL = allowOneTimeUseBeyondCacheTTL;
     }
 
     public int getTtl() {

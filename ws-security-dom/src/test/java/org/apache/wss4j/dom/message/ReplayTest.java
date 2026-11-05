@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -963,6 +964,175 @@ public class ReplayTest {
         }
 
         replayCache.close();
+    }
+
+    /**
+     * Test that a OneTimeUse assertion with no NotOnOrAfter is cached until IssueInstant + ttl,
+     * which is how long checkIssueInstant accepts it for, rather than for the cache's default TTL.
+     */
+    @Test
+    public void testSAML2OneTimeUseNoNotOnOrAfterCacheExpiry() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setOneTimeUse(true);
+
+        callbackHandler.setConditions(conditions);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
+        Instant issueInstant = samlAssertion.getSaml2().getIssueInstant().toDate().toInstant();
+        assertNotNull(issueInstant);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(samlAssertion);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("OneTimeUse"));
+        assertTrue(!outputString.contains("NotOnOrAfter"));
+
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequireBearerSignature(false);
+        wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
+
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        RecordingReplayCache replayCache = new RecordingReplayCache();
+        data.setSamlOneTimeUseReplayCache(replayCache);
+
+        // Successfully verify SAML Token
+        verify(unsignedDoc, wssConfig, data);
+
+        // The IssueInstant is serialized with millisecond precision, so the validator sees it truncated
+        assertEquals(issueInstant.truncatedTo(ChronoUnit.MILLIS).plusSeconds(assertionValidator.getTtl()),
+                     replayCache.lastExpiry);
+
+        // Now try again - a replay attack should be detected
+        try {
+            verify(unsignedDoc, wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * A OneTimeUse assertion that is valid for longer than the replay cache can hold its identifier
+     * could be replayed once the identifier has expired from the cache, so it must be rejected
+     */
+    @Test
+    public void testSAML2OneTimeUseBeyondCacheTTL() throws Exception {
+        // Valid for 2 hours, but a MemoryReplayCache only holds an identifier for 1 hour
+        Document doc = createOneTimeUseAssertionDoc(2 * 60);
+
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        ReplayCache replayCache = new MemoryReplayCache();
+        RequestData data = createOneTimeUseRequestData(assertionValidator, replayCache);
+
+        try {
+            verify(doc, data.getWssConfig(), data);
+            fail("Expected failure as the assertion is valid for longer than the cache can hold it");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * The check can be disabled, in which case the identifier is held for as long as the cache can
+     */
+    @Test
+    public void testSAML2OneTimeUseBeyondCacheTTLAllowed() throws Exception {
+        Document doc = createOneTimeUseAssertionDoc(2 * 60);
+
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setAllowOneTimeUseBeyondCacheTTL(true);
+        ReplayCache replayCache = new MemoryReplayCache();
+        RequestData data = createOneTimeUseRequestData(assertionValidator, replayCache);
+
+        verify(doc, data.getWssConfig(), data);
+
+        // Now try again - a replay attack should be detected
+        try {
+            verify(doc, data.getWssConfig(), data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        replayCache.close();
+    }
+
+    /**
+     * A custom replay cache that does not say how long it holds an identifier for is not checked
+     */
+    @Test
+    public void testSAML2OneTimeUseUnknownCacheTTL() throws Exception {
+        Document doc = createOneTimeUseAssertionDoc(2 * 60);
+
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        RecordingReplayCache replayCache = new RecordingReplayCache();
+        RequestData data = createOneTimeUseRequestData(assertionValidator, replayCache);
+
+        verify(doc, data.getWssConfig(), data);
+        assertNotNull(replayCache.lastExpiry);
+
+        replayCache.close();
+    }
+
+    private Document createOneTimeUseAssertionDoc(int tokenPeriodMinutes) throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(tokenPeriodMinutes);
+        conditions.setOneTimeUse(true);
+        callbackHandler.setConditions(conditions);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        return wsSign.build(samlAssertion);
+    }
+
+    private RequestData createOneTimeUseRequestData(
+        SamlAssertionValidator assertionValidator, ReplayCache replayCache
+    ) {
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        assertionValidator.setRequireBearerSignature(false);
+        wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
+
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        data.setSamlOneTimeUseReplayCache(replayCache);
+        return data;
     }
 
     /**
