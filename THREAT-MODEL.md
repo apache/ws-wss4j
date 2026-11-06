@@ -508,6 +508,17 @@ on each is captured in §14 Q10–Q11.
   SAML2 `OneTimeUse` condition.
 - **Violation symptom**: an inbound envelope identical to one already
   accepted within the TTL window is accepted again.
+- **Ordering**: an identifier is cached only once the token it belongs to
+  has been validated — a UsernameToken once its password verifies, a
+  Timestamp/Signature pair once the signature verifies, and a OneTimeUse
+  assertion once its signature verifies and its signing key is trusted.
+  Caching earlier would let anyone who knows a genuine token's identifier
+  get it rejected as a replay by sending a forged token with the same one.
+- **Residual**: an *unsigned* OneTimeUse assertion (e.g. sender-vouches) has
+  no signature of its own to check, so its ID is cached before the message
+  signature that is meant to cover it has been checked. An attacker who knows
+  the ID of a genuine unsigned assertion can therefore get it rejected. That
+  is denial of service against a single assertion, not an accepted replay.
 - **Severity**: **security-critical**, `VALID` per §13.
 - *(documented: `src/site/asciidoc/config.adoc` §"Non-boolean configuration
   tags" — `NONCE_CACHE_INSTANCE`, `TIMESTAMP_CACHE_INSTANCE`,
