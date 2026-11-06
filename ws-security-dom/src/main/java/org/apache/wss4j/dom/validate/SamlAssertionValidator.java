@@ -118,9 +118,6 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(samlAssertion);
 
-        // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertion, data);
-
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertion);
 
@@ -128,6 +125,13 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         if (samlAssertion.isSigned()) {
             verifySignedAssertion(samlAssertion, data);
         }
+
+        // Check OneTimeUse Condition. This must come last, as it caches the Assertion ID: caching it
+        // before the Assertion has been validated would let an attacker poison the cache with an
+        // Assertion (e.g. one signed by an untrusted key) that carries the ID of a genuine one, so
+        // that the genuine Assertion is subsequently rejected as a replay.
+        checkOneTimeUse(samlAssertion, data);
+
         return credential;
     }
 

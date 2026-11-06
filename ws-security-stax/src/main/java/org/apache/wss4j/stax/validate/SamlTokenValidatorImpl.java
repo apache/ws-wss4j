@@ -128,12 +128,16 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         // Check the Subject Confirmation requirements
         verifySubjectConfirmationMethod(samlAssertionWrapper);
 
-        // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertionWrapper,
-                        tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
-
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
+
+        // Check OneTimeUse Condition. This must come after every other check, as it caches the
+        // Assertion ID, and caching the ID of an Assertion that is then rejected would let an
+        // attacker poison the cache against a genuine Assertion with the same ID. The signature of
+        // a signed Assertion has already been verified, and its signing key trusted, by
+        // SAMLTokenInputHandler before this method is called.
+        checkOneTimeUse(samlAssertionWrapper,
+                        tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
 
         Crypto sigVerCrypto = null;
         if (samlAssertionWrapper.isSigned()) {

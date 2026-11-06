@@ -31,6 +31,8 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.cache.MemoryReplayCache;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -38,6 +40,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -381,6 +384,79 @@ public class SamlNegativeTest {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
+    }
+
+    /**
+     * An Assertion with a OneTimeUse Condition that is rejected because its signature is not trusted
+     * must not have its ID cached. Otherwise an attacker could pre-empt a genuine Assertion by sending
+     * one with the same ID, signed by any key, so that the genuine one is rejected as a replay.
+     */
+    @Test
+    public void testSAML2OneTimeUseUntrustedDoesNotPoisonCache() throws Exception {
+        ReplayCache replayCache = new MemoryReplayCache();
+        String assertionId = "_" + java.util.UUID.randomUUID().toString();
+
+        // An attacker's Assertion with the ID of the genuine one, signed by an untrusted key
+        Document forgedDoc = createOneTimeUseSignedAssertionDoc(
+            assertionId, "16c73ab6-b892-458f-abf5-2f875f74882e", "security",
+            CryptoFactory.getInstance("crypto.properties")
+        );
+        try {
+            verifyOneTimeUse(forgedDoc, replayCache);
+            fail("Failure expected on an untrusted signed assertion");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
+        }
+
+        // The genuine Assertion, signed by the trusted issuer, must still be accepted
+        Document genuineDoc =
+            createOneTimeUseSignedAssertionDoc(assertionId, "wss40_server", "security", issuerCrypto);
+        verifyOneTimeUse(genuineDoc, replayCache);
+
+        // ...but only once
+        try {
+            verifyOneTimeUse(genuineDoc, replayCache);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+
+        replayCache.close();
+    }
+
+    private Document createOneTimeUseSignedAssertionDoc(
+        String assertionId, String alias, String password, Crypto signingCrypto
+    ) throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        conditions.setOneTimeUse(true);
+        callbackHandler.setConditions(conditions);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        samlAssertion.getSaml2().setID(assertionId);
+        samlAssertion.signAssertion(alias, password, signingCrypto, false);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        return wsSign.build(samlAssertion);
+    }
+
+    private WSHandlerResult verifyOneTimeUse(Document doc, ReplayCache replayCache) throws Exception {
+        RequestData requestData = new RequestData();
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setSigVerCrypto(trustCrypto);
+        requestData.setSamlOneTimeUseReplayCache(replayCache);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
 
     /**
