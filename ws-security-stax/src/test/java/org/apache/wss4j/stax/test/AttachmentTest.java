@@ -215,7 +215,7 @@ public class AttachmentTest extends AbstractTestBase {
                 }
             });
 
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -340,7 +340,7 @@ public class AttachmentTest extends AbstractTestBase {
                 }
             });
 
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -1071,7 +1071,7 @@ public class AttachmentTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
-        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
         XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
         try {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -1335,7 +1335,7 @@ public class AttachmentTest extends AbstractTestBase {
                     }
                 }
             });
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
