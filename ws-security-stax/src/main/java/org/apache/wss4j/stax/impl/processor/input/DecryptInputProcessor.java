@@ -179,6 +179,10 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     protected void handleCipherReference(InputProcessorChain inputProcessorChain, EncryptedDataType encryptedDataType,
                                          Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
 
+        // An attachment is decrypted from here rather than through newDecryptedEventReaderInputProcessor,
+        // so the required algorithm must be checked here too
+        checkEncryptionAlgorithm(encryptedDataType);
+
         String typeStr = encryptedDataType.getType();
         if (typeStr != null
             && (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr)
@@ -209,6 +213,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     protected InputStream handleXOPInclude(InputProcessorChain inputProcessorChain, EncryptedDataType encryptedDataType, String href,
                                            Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
+        checkEncryptionAlgorithm(encryptedDataType);
+
         if (href == null || href.length() < 5) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
@@ -257,15 +263,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType encryptedDataType,
             InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext) throws XMLSecurityException {
 
-        // Check encryption algorithm against the required algorithm, if defined
+        checkEncryptionAlgorithm(encryptedDataType);
         String encryptionAlgorithm = encryptedDataType.getEncryptionMethod().getAlgorithm();
-        if (this.getSecurityProperties().getEncryptionSymAlgorithm() != null
-            && !this.getSecurityProperties().getEncryptionSymAlgorithm().equals(encryptionAlgorithm)) {
-            LOG.warn(
-                "The Key encryption method does not match the requirement"
-            );
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-        }
 
         if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
@@ -278,6 +277,27 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                 SecurePart.Modifier.getModifier(encryptedDataType.getType()),
                 encryptedHeader, xmlSecStartElement, encryptedDataType, this, inboundSecurityToken);
+    }
+
+    /**
+     * Check the encryption algorithm of the EncryptedData against the required algorithm, if one is
+     * defined. This must be done on every path that decrypts: the algorithm is stated by the message
+     * itself, so where it is not checked the sender chooses it, e.g. relabelling an aes128-gcm
+     * EncryptedData as aes128-cbc, which takes the same key.
+     */
+    private void checkEncryptionAlgorithm(EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        String requiredAlgorithm = this.getSecurityProperties().getEncryptionSymAlgorithm();
+        if (requiredAlgorithm == null) {
+            return;
+        }
+        String encryptionAlgorithm = encryptedDataType.getEncryptionMethod() != null
+            ? encryptedDataType.getEncryptionMethod().getAlgorithm() : null;
+        if (!requiredAlgorithm.equals(encryptionAlgorithm)) {
+            LOG.warn(
+                "The Key encryption method does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
 
     @Override
