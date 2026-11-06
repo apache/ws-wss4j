@@ -559,6 +559,91 @@ public class AttachmentTest extends AbstractTestBase {
         assertEquals(6, attHeaders.size());
     }
 
+    /**
+     * The required symmetric algorithm must be enforced for an encrypted attachment as well as for the
+     * SOAP Body. Here the attachment's EncryptedData is relabelled from aes128-gcm to aes128-cbc, which
+     * takes the same 16-byte key: decrypting it would expose the attachment to a CBC padding oracle.
+     */
+    @Test
+    public void testXMLAttachmentContentEncryptionAlgorithmRelabelled() throws Exception {
+        final String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<>();
+            actions.add(WSSConstants.ENCRYPTION);
+            securityProperties.setActions(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
+            securityProperties.addEncryptionPart(new SecurePart("cid:Attachments", SecurePart.Modifier.Content));
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC11_AES128_GCM);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+        }
+
+        // Relabel only the attachment's EncryptedData, so that the Body still meets the requirement
+        Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+        NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
+        Element attachmentEncData = null;
+        for (int i = 0; i < encDatas.getLength(); i++) {
+            Element encData = (Element) encDatas.item(i);
+            if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(encData.getAttributeNS(null, "Type"))) {
+                attachmentEncData = encData;
+                break;
+            }
+        }
+        assertNotNull(attachmentEncData);
+        Element encryptionMethod =
+            (Element) attachmentEncData.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptionMethod").item(0);
+        assertNotNull(encryptionMethod);
+        assertEquals(WSSConstants.NS_XENC11_AES128_GCM, encryptionMethod.getAttributeNS(null, "Algorithm"));
+        encryptionMethod.setAttributeNS(null, "Algorithm", WSSConstants.NS_XENC_AES128);
+
+        ByteArrayOutputStream tamperedBaos = new ByteArrayOutputStream();
+        TRANSFORMER_FACTORY.newTransformer().transform(new DOMSource(securedDoc), new StreamResult(tamperedBaos));
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC11_AES128_GCM);
+
+            // Return the underlying error rather than the masked SECURITY_ERROR, so that the test
+            // shows the message was rejected by the algorithm check, and not by some later failure
+            // (e.g. CBC padding) when decrypting the relabelled attachment
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(tamperedBaos.toByteArray())));
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Exception expected on an attachment encrypted with an algorithm other than the required one");
+            } catch (XMLStreamException e) {
+                assertTrue(e.getCause() instanceof WSSecurityException);
+                assertEquals(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                             ((WSSecurityException) e.getCause()).getErrorCode());
+            }
+        }
+
+        // The attachment must not have been decrypted under the relabelled algorithm
+        assertTrue(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+    }
+
     @Test
     public void testInvalidXMLAttachmentContentEncryption() throws Exception {
         final String attachmentId = UUID.randomUUID().toString();
