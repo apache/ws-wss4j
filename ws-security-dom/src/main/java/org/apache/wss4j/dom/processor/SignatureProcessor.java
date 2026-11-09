@@ -407,7 +407,7 @@ public class SignatureProcessor implements Processor {
 
             // Test for replay attacks
             ReplayCacheEntry replayCacheEntry =
-                testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
+                testMessageReplay(elem, xmlSignature.getSignedInfo(), key, data, wsDocInfo);
 
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo);
 
@@ -727,10 +727,10 @@ public class SignatureProcessor implements Processor {
     }
 
     /**
-     * Test for a replayed message. The cache key is the Timestamp Created value, the signature
-     * value, and the encoded value of the signing key.
+     * Test for a replayed message. The cache key is the Timestamp Created value, the References
+     * of the SignedInfo, and the encoded value of the signing key.
      * @param signatureElement
-     * @param signatureValue
+     * @param signedInfo
      * @param key
      * @param requestData
      * @param wsDocInfo
@@ -740,7 +740,7 @@ public class SignatureProcessor implements Processor {
      */
     private ReplayCacheEntry testMessageReplay(
         Element signatureElement,
-        byte[] signatureValue,
+        SignedInfo signedInfo,
         Key key,
         RequestData requestData,
         WSDocInfo wsDocInfo
@@ -773,8 +773,10 @@ public class SignatureProcessor implements Processor {
         }
 
         // Test for replay attacks. The identifier is a digest over the full Timestamp Created
-        // value, signature value and encoded signing key, rather than over the 32-bit hashCodes
-        // of the latter two, which are trivially collidable.
+        // value, the References of the SignedInfo and the encoded signing key. The SignatureValue
+        // is not used: it is not covered by the signature, and for ECDSA and DSA a second valid
+        // value can be computed from the first without the key, which would give a replayed
+        // message a new identifier.
         //
         // The parsed Created value is used rather than the raw element text, so that two Created
         // Strings denoting the same instant - a trailing ".000", or a "+00:00" offset written in
@@ -783,7 +785,7 @@ public class SignatureProcessor implements Processor {
         // otherwise be enough to slip a replayed message past the cache.
         Instant created = timeStamp.getCreated();
         String identifier =
-            createIdentifier(created != null ? created.toString() : "", signatureValue, key);
+            createIdentifier(created != null ? created.toString() : "", signedInfo, key);
 
         if (replayCache.contains(identifier)) {
             throw new WSSecurityException(
@@ -800,19 +802,26 @@ public class SignatureProcessor implements Processor {
     }
 
     /**
-     * Create the replay cache identifier for the given Timestamp Created value, signature value
-     * and signing key. The values are separated by a '|', which can appear in neither a Created
-     * value nor Base64, so that they cannot run together into an ambiguous identifier.
+     * Create the replay cache identifier for the given Timestamp Created value, the URI and
+     * DigestValue of each Reference of the SignedInfo, and the signing key. The values are
+     * separated by a '|', which can appear in neither a Created value nor Base64, so that they
+     * cannot run together into an ambiguous identifier.
      */
     private static String createIdentifier(
-        String createdString, byte[] signatureValue, Key key
+        String createdString, SignedInfo signedInfo, Key key
     ) throws WSSecurityException {
+        StringBuilder identifierBuilder = new StringBuilder(createdString);
+        for (Object referenceObject : signedInfo.getReferences()) {
+            Reference reference = (Reference)referenceObject;
+            String uri = reference.getURI();
+            identifierBuilder.append('|')
+                .append(encode(uri != null ? uri.getBytes(StandardCharsets.UTF_8) : null))
+                .append('|')
+                .append(encode(reference.getDigestValue()));
+        }
         // getEncoded() returns null for a key whose material cannot be extracted, for example one
-        // held in a hardware token. The signature value alone still identifies the message then.
-        byte[] keyBytes = key.getEncoded();
-        String identifier = createdString
-            + "|" + encode(signatureValue)
-            + "|" + encode(keyBytes);
+        // held in a hardware token. The References alone still identify the message then.
+        String identifier = identifierBuilder.append('|').append(encode(key.getEncoded())).toString();
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
