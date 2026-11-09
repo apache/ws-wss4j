@@ -426,7 +426,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         }
 
         final String cacheKey = createIdentifier(timestampSecurityEvent.getCreated(),
-                                                 getSignatureType().getSignatureValue().getValue());
+                                                 getSignatureType().getSignedInfo().getReference());
         if (replayCache.contains(cacheKey)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
@@ -440,12 +440,24 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     }
 
     /**
-     * Create the replay cache identifier for the given Timestamp Created value and signature
-     * value. The two are separated by a '|', which can appear in neither a Created value nor
-     * Base64, so that they cannot run together into an ambiguous identifier.
+     * Create the replay cache identifier for the given Timestamp Created value and the URI and
+     * DigestValue of each Reference of the SignedInfo. The SignatureValue is not used: it is not
+     * covered by the signature, and for ECDSA and DSA a second valid value can be computed from
+     * the first without the key, which would give a replayed message a new identifier. The values
+     * are separated by a '|', which can appear in neither a Created value nor Base64, so that they
+     * cannot run together into an ambiguous identifier.
      */
-    private static String createIdentifier(Instant created, byte[] signatureValue) throws WSSecurityException {
-        String identifier = (created != null ? created.toString() : "") + "|" + encode(signatureValue);
+    private static String createIdentifier(Instant created, List<ReferenceType> references)
+        throws WSSecurityException {
+        StringBuilder identifierBuilder = new StringBuilder(created != null ? created.toString() : "");
+        for (ReferenceType reference : references) {
+            String uri = reference.getURI();
+            identifierBuilder.append('|')
+                .append(encode(uri != null ? uri.getBytes(StandardCharsets.UTF_8) : null))
+                .append('|')
+                .append(encode(reference.getDigestValue()));
+        }
+        String identifier = identifierBuilder.toString();
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return encode(digest.digest(identifier.getBytes(StandardCharsets.UTF_8)));

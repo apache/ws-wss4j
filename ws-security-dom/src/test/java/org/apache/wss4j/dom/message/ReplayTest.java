@@ -20,9 +20,13 @@
 package org.apache.wss4j.dom.message;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +47,7 @@ import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -62,6 +67,7 @@ import org.w3c.dom.Element;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -216,6 +222,83 @@ public class ReplayTest {
      * rejected as one. Where the Signature does not cover the Timestamp - as here, only the SOAP
      * Body is signed - that rewriting costs an attacker nothing.
      */
+    /**
+     * An ECDSA SignatureValue (r, s) can be rewritten as (r, n - s), where n is the order of the
+     * curve, without the private key, and still verifies. A replayed message rewritten that way
+     * must still be detected, so the replay cache must not be keyed on the SignatureValue.
+     */
+    @Test
+    public void testReplayedTimestampRewrittenECDSASignatureValue() throws Exception {
+        Crypto ecCrypto = CryptoFactory.getInstance("wss40.properties");
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build();
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40ec", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSignatureAlgorithm(WSConstants.ECDSA_SHA256);
+        builder.getParts().add(new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, ""));
+        builder.prepare(ecCrypto);
+        List<javax.xml.crypto.dsig.Reference> referenceList =
+            builder.addReferencesToSign(builder.getParts());
+        builder.computeSignature(referenceList, false, null);
+        // The BinarySecurityToken the Signature refers to is only added to the header by build(),
+        // so it must be added here too
+        builder.prependBSTElementToHeader();
+
+        ReplayCache replayCache = new MemoryReplayCache();
+        verify(createdDoc, ecCrypto, replayCache);
+
+        // Rewrite the SignatureValue (r, s) as (r, n - s)
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40ec");
+        X509Certificate[] certs = ecCrypto.getX509Certificates(cryptoType);
+        BigInteger order = ((ECPublicKey)certs[0].getPublicKey()).getParams().getOrder();
+
+        Element signatureValueElement =
+            (Element)createdDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "SignatureValue").item(0);
+        byte[] signatureValue = Base64.getMimeDecoder().decode(signatureValueElement.getTextContent());
+        int half = signatureValue.length / 2;
+        byte[] s = new byte[half];
+        System.arraycopy(signatureValue, half, s, 0, half);
+        byte[] rewrittenS = order.subtract(new BigInteger(1, s)).toByteArray();
+        byte[] rewritten = signatureValue.clone();
+        java.util.Arrays.fill(rewritten, half, rewritten.length, (byte)0);
+        int length = Math.min(rewrittenS.length, half);
+        System.arraycopy(rewrittenS, rewrittenS.length - length, rewritten, rewritten.length - length, length);
+        assertFalse(java.util.Arrays.equals(signatureValue, rewritten));
+        signatureValueElement.setTextContent(Base64.getEncoder().encodeToString(rewritten));
+
+        // The rewritten SignatureValue is a valid signature in its own right...
+        verify(createdDoc, ecCrypto, new MemoryReplayCache());
+
+        // ...but it is the same message, so it must be detected as a replay
+        try {
+            verify(createdDoc, ecCrypto, replayCache);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+    }
+
+    private WSHandlerResult verify(Document doc, Crypto sigVerCrypto, ReplayCache replayCache) throws Exception {
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        data.setSigVerCrypto(sigVerCrypto);
+        data.setTimestampReplayCache(replayCache);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.setWssConfig(wssConfig);
+        return secEngine.processSecurityHeader(WSSecurityUtil.getSecurityHeader(doc, null), data);
+    }
+
     @Test
     public void testReplayedTimestampWithEquivalentCreatedValue() throws Exception {
 
