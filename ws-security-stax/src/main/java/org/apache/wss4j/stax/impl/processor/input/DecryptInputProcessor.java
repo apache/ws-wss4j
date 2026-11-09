@@ -55,6 +55,7 @@ import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.apache.xml.security.binding.xmldsig.TransformsType;
 import org.apache.xml.security.binding.xmlenc.CipherReferenceType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
+import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -88,11 +89,19 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
     private List<DeferredAttachment> attachmentReferences = new ArrayList<>();
 
+    /**
+     * Whether the key is taken from the KeyInfo of each EncryptedData, rather than from a KeyInfo
+     * given to this processor. Santuario then processes an EncryptedKey in that KeyInfo itself,
+     * without WSSEncryptedKeyInputHandler, so its checks are applied in handleSecurityToken.
+     */
+    private final boolean keyInfoFromEncryptedData;
+
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSInboundSecurityContext securityContext)
             throws XMLSecurityException {
 
         super(keyInfoType, referenceList, securityProperties);
+        keyInfoFromEncryptedData = keyInfoType == null;
         checkBSPCompliance(keyInfoType, referenceList, securityContext, BSPRule.R3006);
     }
 
@@ -303,6 +312,20 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     protected void handleSecurityToken(InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext,
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        // An EncryptedKey embedded in the KeyInfo of the EncryptedData has been resolved by Santuario
+        // without WSSEncryptedKeyInputHandler, so it has not been checked yet. The key is only
+        // unwrapped once it is used, which is after this method, so check it here.
+        if (keyInfoFromEncryptedData && encryptedDataType.getKeyInfo() != null) {
+            EncryptedKeyType encryptedKeyType = XMLSecurityUtils.getQNameType(
+                encryptedDataType.getKeyInfo().getContent(), XMLSecurityConstants.TAG_xenc_EncryptedKey);
+            if (encryptedKeyType != null) {
+                WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inboundSecurityContext;
+                WSSEncryptedKeyInputHandler.checkBSPCompliance(wsInboundSecurityContext, encryptedKeyType);
+                WSSEncryptedKeyInputHandler.checkKeyTransportAlgorithm(
+                    encryptedKeyType, getSecurityProperties(), wsInboundSecurityContext);
+            }
+        }
+
         inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
         TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent =
             WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());

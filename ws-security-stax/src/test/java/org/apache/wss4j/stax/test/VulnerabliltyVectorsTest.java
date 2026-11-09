@@ -24,15 +24,25 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.SOAPUtil;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.junit.jupiter.api.Test;
@@ -410,5 +420,60 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             assertTrue(e.getCause() instanceof WSSecurityException);
             assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
+    }
+
+    /**
+     * RSA v1.5 key transport must also be rejected by default for an EncryptedKey embedded in the
+     * KeyInfo of an EncryptedData, rather than placed in the security header. Santuario processes
+     * such an EncryptedKey itself, so the check used to be skipped.
+     */
+    @Test
+    public void testDisallowRSA15AlgorithmEmbeddedEncryptedKey() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("receiver", "default");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrypt.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
+        encrypt.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrypt.setEmbedEncryptedKey(true);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        SecretKey symmetricKey = keyGen.generateKey();
+        encrypt.prepare(CryptoFactory.getInstance("transmitter-crypto.properties"), symmetricKey);
+        // Only the ReferenceList goes in the security header: the EncryptedKey is in the KeyInfo of
+        // the EncryptedData
+        encrypt.addExternalRefElement(encrypt.encrypt(symmetricKey));
+
+        NodeList encryptedKeys = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedKey");
+        assertEquals(1, encryptedKeys.getLength());
+        assertEquals("KeyInfo", encryptedKeys.item(0).getParentNode().getLocalName());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        TRANSFORMER_FACTORY.newTransformer().transform(new DOMSource(doc), new StreamResult(baos));
+
+        // Rejected by default...
+        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
+        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        try {
+            doInboundSecurity(inboundsecurityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            assertTrue(e.getCause() instanceof WSSecurityException);
+            assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+        }
+
+        // ...but the message decrypts once RSA v1.5 is allowed, so the rejection is the RSA v1.5 check
+        inboundsecurityProperties.setAllowRSA15KeyTransportAlgorithm(true);
+        Document document = doInboundSecurity(inboundsecurityProperties,
+                xmlInputFactory.createXMLStreamReader(
+                        new ByteArrayInputStream(baos.toByteArray())));
+        assertEquals(0, document.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData").getLength());
     }
 }

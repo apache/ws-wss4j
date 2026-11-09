@@ -49,7 +49,22 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
                        XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties)
         throws XMLSecurityException {
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
+        checkKeyTransportAlgorithm(encryptedKeyType, securityProperties,
+                                   (WSInboundSecurityContext) inputProcessorChain.getSecurityContext());
 
+        super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
+    }
+
+    /**
+     * Check the key transport algorithm of the EncryptedKey: it must match the required algorithm,
+     * if one is defined, and RSA v1.5 is rejected unless it has been allowed. This must be done
+     * before the key is unwrapped. It is also called by DecryptInputProcessor for an EncryptedKey
+     * embedded in the KeyInfo of an EncryptedData, which Santuario processes without this handler.
+     */
+    static void checkKeyTransportAlgorithm(EncryptedKeyType encryptedKeyType,
+                                           XMLSecurityProperties securityProperties,
+                                           WSInboundSecurityContext wsInboundSecurityContext)
+        throws WSSecurityException {
         // Check encryption algorithm against the required algorithm, if defined
         EncryptionMethodType encryptionMethodType = encryptedKeyType.getEncryptionMethod();
         if (securityProperties.getEncryptionKeyTransportAlgorithm() != null
@@ -67,8 +82,6 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         if (encryptionMethodType != null
             && WSSConstants.NS_XENC_RSA15.equals(encryptionMethodType.getAlgorithm())
             && !((WSSSecurityProperties) securityProperties).isAllowRSA15KeyTransportAlgorithm()) {
-            final WSInboundSecurityContext wsInboundSecurityContext =
-                (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
             Boolean allowRSA15 =
                 wsInboundSecurityContext.get(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
             if (allowRSA15 == null || !allowRSA15) {
@@ -76,8 +89,6 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
                                               WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
             }
         }
-
-        super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
     }
 
     //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
@@ -102,7 +113,11 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
 
     protected void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType)
             throws XMLSecurityException {
-        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
+        checkBSPCompliance((WSInboundSecurityContext) inputProcessorChain.getSecurityContext(), encryptedKeyType);
+    }
+
+    static void checkBSPCompliance(WSInboundSecurityContext securityContext, EncryptedKeyType encryptedKeyType)
+            throws WSSecurityException {
         if (encryptedKeyType.getType() != null) {
             securityContext.handleBSPRule(BSPRule.R3209);
         }
