@@ -304,4 +304,67 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
+
+    /**
+     * IncludeTimestamp must be satisfied by a Timestamp that has actually been processed, i.e. one
+     * in the Security header for this actor/role. Here the signed Timestamp is moved, unchanged,
+     * into a Security header for another actor: it is never validated, so its expiry and the replay
+     * cache are not checked, but its element path still matches the RequiredElements and
+     * SignedElements assertions, and its signature still verifies.
+     */
+    @Test
+    public void testSignedTimestampMovedToSecurityHeaderOfAnotherActor() throws Exception {
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPTION;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        properties.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+        // The genuine message meets the policy
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        TRANSFORMER_FACTORY.newTransformer().transform(new DOMSource(securedDocument), new StreamResult(baos));
+        verifyWithGoodPolicy(baos.toByteArray());
+
+        // Move the signed Timestamp into a Security header for another actor
+        Element timestamp = (Element) securedDocument.getElementsByTagNameNS(
+            WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()).item(0);
+        assertNotNull(timestamp);
+        Element headerElement = (Element) timestamp.getParentNode().getParentNode();
+        timestamp.getParentNode().removeChild(timestamp);
+        Element otherSecurityHeader = securedDocument.createElementNS(
+            WSSConstants.TAG_WSSE_SECURITY.getNamespaceURI(), "wsse:" + WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
+        otherSecurityHeader.setAttributeNS(WSSConstants.NS_SOAP11, "soap:actor", "urn:another-actor");
+        otherSecurityHeader.appendChild(timestamp);
+        headerElement.appendChild(otherSecurityHeader);
+
+        baos = new ByteArrayOutputStream();
+        TRANSFORMER_FACTORY.newTransformer().transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        try {
+            verifyWithGoodPolicy(baos.toByteArray());
+            fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Throwable throwable = e.getCause();
+            assertNotNull(throwable);
+            assertTrue(throwable instanceof WSSecurityException);
+            assertEquals("Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present",
+                         throwable.getMessage());
+            assertEquals(WSSecurityException.INVALID_SECURITY, ((WSSecurityException) throwable).getFaultCode());
+        }
+    }
+
+    private void verifyWithGoodPolicy(byte[] message) throws Exception {
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
+        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("goodPolicy", false, null, 0, false);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
+
+        doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(message)), policyEnforcer);
+    }
 }
