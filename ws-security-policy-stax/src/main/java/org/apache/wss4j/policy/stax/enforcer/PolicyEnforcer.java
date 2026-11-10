@@ -102,6 +102,7 @@ import org.apache.wss4j.policy.stax.assertionStates.TokenProtectionAssertionStat
 import org.apache.wss4j.policy.stax.assertionStates.UsernameTokenAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.X509TokenAssertionState;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.NoSecuritySecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
@@ -400,6 +401,42 @@ public class PolicyEnforcer implements SecurityEventListener {
         return true;
     }
 
+    /**
+     * Add the assertion states for the Timestamp property of a binding (WSP1.3, 6.2).
+     */
+    private void addTimestampAssertionStates(List<Assertable> assertableList, AbstractBinding abstractBinding,
+                                             AbstractSecurityAssertion abstractSecurityAssertion)
+        throws WSSPolicyException {
+        //Where a Timestamp is required, the assertion only holds once a TIMESTAMP event has been
+        //received, i.e. once a Timestamp in the Security header for this actor/role has been
+        //validated. The RequiredElements and SignedElements assertions below only compare the
+        //element path, which a Timestamp moved into the Security header of another actor/role
+        //also matches, although it is never validated.
+        IncludeTimeStampAssertionState includeTimeStampAssertionState =
+            new IncludeTimeStampAssertionState(abstractBinding, policyAsserter, !abstractBinding.isIncludeTimestamp());
+        assertableList.add(includeTimeStampAssertionState);
+        if (abstractBinding.isIncludeTimestamp()) {
+            List<QName> timestampElementPath = new LinkedList<>();
+            if (soap12) {
+                timestampElementPath.addAll(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
+            } else {
+                timestampElementPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
+            }
+            timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
+            includeTimeStampAssertionState.setErrorMessage(
+                "Element " + WSSUtils.pathAsString(timestampElementPath) + " must be present");
+            RequiredElementsAssertionState requiredElementsAssertionState =
+                new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
+            requiredElementsAssertionState.addElement(timestampElementPath);
+            assertableList.add(requiredElementsAssertionState);
+
+            SignedElementsAssertionState signedElementsAssertionState =
+                new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true);
+            signedElementsAssertionState.addElement(timestampElementPath);
+            assertableList.add(signedElementsAssertionState);
+        }
+    }
+
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion)
         throws WSSPolicyException {
         List<Assertable> assertableList = new LinkedList<>();
@@ -486,25 +523,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
 
             //WSP1.3, 6.2 Timestamp Property
-            assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, policyAsserter, true));
-            if (abstractBinding.isIncludeTimestamp()) {
-                List<QName> timestampElementPath = new LinkedList<>();
-                if (soap12) {
-                    timestampElementPath.addAll(WSSConstants.SOAP_12_WSSE_SECURITY_HEADER_PATH);
-                } else {
-                    timestampElementPath.addAll(WSSConstants.SOAP_11_WSSE_SECURITY_HEADER_PATH);
-                }
-                timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
-                RequiredElementsAssertionState requiredElementsAssertionState =
-                    new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
-                requiredElementsAssertionState.addElement(timestampElementPath);
-                assertableList.add(requiredElementsAssertionState);
-
-                SignedElementsAssertionState signedElementsAssertionState =
-                    new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true);
-                signedElementsAssertionState.addElement(timestampElementPath);
-                assertableList.add(signedElementsAssertionState);
-            }
+            addTimestampAssertionStates(assertableList, abstractBinding, abstractSecurityAssertion);
         } else if (abstractSecurityAssertion instanceof Wss10) {
             Wss10 wss10 = (Wss10)abstractSecurityAssertion;
             String namespace = wss10.getName().getNamespaceURI();
