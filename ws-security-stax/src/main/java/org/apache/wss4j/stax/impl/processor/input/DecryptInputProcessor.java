@@ -43,6 +43,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -50,6 +51,7 @@ import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.utils.LimitingInputStream;
 import org.apache.wss4j.stax.utils.WSSUtils;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.apache.xml.security.binding.xmldsig.TransformsType;
@@ -261,7 +263,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
         final String encAlgo = encryptedDataType.getEncryptionMethod().getAlgorithm();
         final Key symmetricKey =
-            inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, encryptedDataType.getId());
+            getAttachmentDecryptionKey(inboundSecurityToken, encAlgo, encryptedDataType.getId());
 
         return
             AttachmentUtils.setupAttachmentDecryptionStream(encAlgo, cipher, symmetricKey, attachment.getSourceStream());
@@ -286,6 +288,56 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                 SecurePart.Modifier.getModifier(encryptedDataType.getType()),
                 encryptedHeader, xmlSecStartElement, encryptedDataType, this, inboundSecurityToken);
+    }
+
+    /**
+     * Get the key to decrypt an attachment (SwA, or an MTOM/XOP-referenced CipherValue) with. Santuario
+     * prepares the key for XML content itself, but these are decrypted here, so do the same here.
+     *
+     * A key recovered from an EncryptedKey must have the length the content encryption algorithm
+     * requires. A key decryption that fails yields a random key of that length, so a key decryption
+     * that succeeds but yields a key of some other length must be answered the same way: otherwise
+     * the two fail differently, which tells the sender whether the RSA key transport decryption
+     * produced a well-formed plaintext. This is the streaming counterpart of
+     * EncryptedKeyProcessor.prepareSecretKeyFromEncryptedKey in the DOM engine.
+     *
+     * Only a key recovered from an EncryptedKey is treated this way. A derived key, or a key supplied
+     * by a CallbackHandler (EncryptedKeySHA1) or carried by another token, is returned as it is: a
+     * length mismatch there carries no signal about a key decryption.
+     */
+    static Key getAttachmentDecryptionKey(InboundSecurityToken inboundSecurityToken, String encAlgo,
+                                          String correlationId) throws XMLSecurityException {
+        Key key = inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, correlationId);
+        if (key == null || !isEncryptedKeyToken(inboundSecurityToken)) {
+            return key;
+        }
+        try {
+            return KeyUtils.prepareSecretKey(encAlgo, key.getEncoded(), true);
+        } catch (WSSecurityException ex) {
+            // Answer it the way Santuario answers a key decryption that fails: with random bytes of
+            // the length the algorithm requires (XMLEncryptedKeyInputHandler)
+            int keyLength = JCEMapper.getKeyLengthFromURI(encAlgo) / 8;
+            if (keyLength <= 0) {
+                // prepareSecretKey has no length to check against, so did not reject it for its length
+                throw ex;
+            }
+            LOG.debug("The key recovered from the EncryptedKey does not match {}", encAlgo);
+            return KeyUtils.prepareSecretKey(encAlgo, XMLSecurityConstants.generateBytes(keyLength), true);
+        }
+    }
+
+    /**
+     * Whether the key of the token is the one recovered from an EncryptedKey. The token may be reached
+     * through a SecurityTokenReference, or through the proxy SecurityTokenFactoryImpl returns for a
+     * direct reference (which is how the ReferenceList of an EncryptedKey is resolved). Both report
+     * the key identifier of the reference rather than of the token, but pass the token type and key
+     * wrapping token through, so go by those. An EncryptedKeySHA1 token has the same type, but its key
+     * comes from a CallbackHandler, and it has no key wrapping token.
+     */
+    private static boolean isEncryptedKeyToken(InboundSecurityToken inboundSecurityToken)
+        throws XMLSecurityException {
+        return WSSecurityTokenConstants.EncryptedKeyToken.equals(inboundSecurityToken.getTokenType())
+            && inboundSecurityToken.getKeyWrappingToken() != null;
     }
 
     /**
@@ -396,7 +448,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
             final String encAlgo = encryptedDataType.getEncryptionMethod().getAlgorithm();
             final Key symmetricKey =
-                inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, encryptedDataType.getId());
+                getAttachmentDecryptionKey(inboundSecurityToken, encAlgo, encryptedDataType.getId());
 
             InputStream attachmentInputStream =
                 AttachmentUtils.setupAttachmentDecryptionStream(encAlgo, cipher, symmetricKey, attachment.getSourceStream());
