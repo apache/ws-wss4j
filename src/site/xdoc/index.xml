@@ -92,6 +92,11 @@ Profile 1.1</a>
 <subsection name="News">
 <ul>
 <li>
+<p><b>November 2026</b> - 
+The Apache WSS4J team are pleased to announce the release of versions 4.0.3 and 3.0.7 and 2.4.5. A CVE issue has been addressed in these releases, see the <a href="security_advisories.html">security advisories page</a> for more information.
+</p>
+</li>
+<li>
 <p><b>September 2026</b> - 
 The Apache WSS4J team are pleased to announce the release of versions 4.0.2 and 3.0.6 and 2.4.4. These releases contain a significant number of bug fixes and security updates. Several CVE issues have been addressed, see the <a href="security_advisories.html">security advisories page</a> for more information.
 </p>

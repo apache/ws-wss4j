@@ -33,6 +33,7 @@ The following security advisories have been issued for Apache WSS4J&#8482;:
 <li><a href="advisories/CVE-2026-92121.txt">CVE-2026-92121</a> - Apache WSS4J: WS-SecurityPolicy signature checks skipped in the streaming code after an STR-Transform reference.</li>
 <li><a href="advisories/CVE-2026-92899.txt">CVE-2026-92899</a> - Apache WSS4J: UsernameToken replay protection bypassed by re-encoding the Nonce.</li>
 <li><a href="advisories/CVE-2026-95616.txt">CVE-2026-95616</a> - Apache WSS4J: Unauthenticated denial of service via integer overflow in DER parsing of X.509 certificate extensions.</li>
+<li><a href="advisories/CVE-2026-115690.txt">CVE-2026-115690</a> - Apache WSS4J: Replay protection bypassed by concurrent copies of a message.</li>
 </ul>
 <li><b>2015</b></li>
 <ul>
